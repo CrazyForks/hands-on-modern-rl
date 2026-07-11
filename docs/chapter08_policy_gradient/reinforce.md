@@ -13,7 +13,7 @@ $$J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \sum_{t=0}^{\infty} \gamma^t r_t \r
 | $\theta$                  | 策略参数 | 神经网络的权重——调它们就改变策略的行为               |
 | $\pi_\theta$              | 策略函数 | 给定状态，输出每个动作的概率分布                     |
 | $J(\theta)$               | 目标函数 | 策略的"成绩单"——参数为 $\theta$ 的策略平均能拿多少分 |
-| $\mathbb{E}_{\pi\theta}$  | 期望     | 按策略 $\pi_\theta$ 行动很多很多次，取平均           |
+| $\mathbb{E}_{\pi_\theta}$ | 期望     | 按策略 $\pi_\theta$ 行动很多很多次，取平均           |
 | $\gamma^t r_t$            | 折扣奖励 | 第 $t$ 步的奖励，越远未来的奖励越"不值钱"            |
 
 $J(\theta)$ 就是北极星——目标很简单：找到让 $J(\theta)$ 最大的参数 $\theta$。
@@ -428,7 +428,7 @@ $$
 
 Q-Learning 更新的是价值函数 $Q(s,a)$（"这个动作值多少分"），策略是通过 $\arg\max Q$ 隐式得到的。REINFORCE 直接更新策略参数 $\theta$，跳过了 Q 值这一步。
 
-这个区别带来两个关键后果：Q-Learning 是 off-policy 的（可以用旧数据反复训练），REINFORCE 是 on-policy 的（必须用当前策略的新数据）；Q-Learning 只能处理离散动作（需要遍历所有动作取 max），REINFORCE 可以处理连续动作（直接对概率密度求梯度）。
+这个区别带来两个关键后果：Q-Learning 是 off-policy 的（可以用旧数据反复训练），REINFORCE 是 on-policy 的（必须用当前策略的新数据）；经典表格 Q-Learning 和 DQN 通过枚举动作取最大值，而 REINFORCE 可以用连续概率分布直接参数化连续动作。
 
 </details>
 

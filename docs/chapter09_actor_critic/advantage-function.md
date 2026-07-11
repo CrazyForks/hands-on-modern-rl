@@ -5,7 +5,7 @@
 ::: tip 本节会用到的前置知识
 
 - [REINFORCE 策略梯度](../chapter08_policy_gradient/reinforce) $\nabla_\theta J \approx \nabla_\theta \log \pi(a|s) \cdot G_t$——基线要加在哪里
-- [状态价值 $V(s)$](../chapter03_mdp/value-bellman)——最好的基线是什么
+- [状态价值 $V(s)$](../chapter03_mdp/value-bellman)——如何构造常用的状态基线
 - [动作价值 $Q(s,a)$](../chapter03_mdp/value-q)——优势函数的定义依赖 $Q$ 和 $V$ 的差
 - [TD Error](../chapter03_mdp/dp-mc-td) $\delta = r + \gamma V(s') - V(s)$——优势函数的实用估计方法
   :::
