@@ -137,13 +137,13 @@ RLHF 用连续奖励（RM 输出标量），但 RLVR 几乎都用二值奖励。
 
 策略优化是"对抗 verifier"的过程——只要 verifier 有可乘之机，策略就会找到。经典的 reward hacking 模式：
 
-| 任务 | Hacking 模式 | 缓解 |
-|------|-------------|------|
-| 单元测试 | 写空函数让所有 `assert False` 不执行 | 强制覆盖率 ≥ 90% |
-| 数学证明 | 用未证明引理 | Lean/Coq 形式化验证 |
-| Web 浏览 | 修改 DOM 模拟"成功" | 在真实浏览器执行 |
-| 数据分析 | 直接 hardcode 答案 | Hold-out 测试集 |
-| 邮件回复 | 用"Yes"回复一切 | 人工/LLM-judge 二次验证 |
+| 任务     | Hacking 模式                         | 缓解                    |
+| -------- | ------------------------------------ | ----------------------- |
+| 单元测试 | 写空函数让所有 `assert False` 不执行 | 强制覆盖率 ≥ 90%        |
+| 数学证明 | 用未证明引理                         | Lean/Coq 形式化验证     |
+| Web 浏览 | 修改 DOM 模拟"成功"                  | 在真实浏览器执行        |
+| 数据分析 | 直接 hardcode 答案                   | Hold-out 测试集         |
+| 邮件回复 | 用"Yes"回复一切                      | 人工/LLM-judge 二次验证 |
 
 形式化地，抗作弊要求 verifier 满足：
 
@@ -339,9 +339,13 @@ Fix the memory leak in worker.py reported in issue #1234
 ```json
 {
   "features": [
-    {"name": "auth.login", "status": "done", "tests": ["test_login.py"]},
-    {"name": "auth.logout", "status": "in_progress", "tests": ["test_logout.py"]},
-    {"name": "api.users", "status": "todo", "tests": []}
+    { "name": "auth.login", "status": "done", "tests": ["test_login.py"] },
+    {
+      "name": "auth.logout",
+      "status": "in_progress",
+      "tests": ["test_logout.py"]
+    },
+    { "name": "api.users", "status": "todo", "tests": [] }
   ]
 }
 ```
@@ -469,10 +473,10 @@ def trainer(policy):
 
 AReaL 论文报告，在 agentic 任务上对 Llama-3-8B 训练：
 
-| 模式 | GPU 利用率 | Wall-clock / step | 加速比 |
-|------|----------|-------------------|--------|
-| 同步（veRL） | 45% | 320s | 1.0× |
-| 异步（AReaL） | 92% | 115s | **2.77×** |
+| 模式          | GPU 利用率 | Wall-clock / step | 加速比    |
+| ------------- | ---------- | ----------------- | --------- |
+| 同步（veRL）  | 45%        | 320s              | 1.0×      |
+| 异步（AReaL） | 92%        | 115s              | **2.77×** |
 
 加速主要来自：
 
@@ -486,9 +490,9 @@ AReaL 论文报告，在 agentic 任务上对 Llama-3-8B 训练：
 - 短 rollout（< 30 秒）任务：同步更稳定
 - 长 rollout（> 5 分钟）agentic 任务：异步收益显著
 - 极长任务（> 1 小时）：异步是唯一可行方案
-:::
+  :::
 
-更深入的工程细节见 [第 36 章 分布式 RL 训练](../construction)。
+更深入的工程细节见[附录 B.1：RL 训练系统](../appendix_industrial_training/rl-infrastructure)。
 
 ## 23.7 评测基准
 
@@ -496,37 +500,37 @@ RL 环境质量最终要在公认基准上验证。2025 年主流的 agent RL �
 
 ### 代码与软件工程
 
-| 基准 | 任务 | Verifier | 特点 |
-|------|------|----------|------|
-| **[SWE-bench](https://arxiv.org/abs/2310.06770)** | 修真实 GitHub issue | 单元测试（已通过的 + 修复后的） | 业界 SWE agent 标杆 |
-| **[SWE-Gym](https://arxiv.org/abs/2412.21139)** | SWE-bench 的训练集版本 | 同上 | 专为 RL 训练设计 |
-| **[Terminal-Bench](https://arxiv.org/abs/2503.19805)** | 终端任务（git、ssh、文件操作） | 状态检查 | 真实 shell 环境 |
-| **[LiveCodeBench](https://arxiv.org/abs/2403.07974)** | 算法题（每月更新） | 单元测试 | 抗污染设计 |
-| **[CyberGym](https://arxiv.org/abs/2506.02548)** | CTF 安全任务 | flag 匹配 | 形式化 |
+| 基准                                                   | 任务                           | Verifier                        | 特点                |
+| ------------------------------------------------------ | ------------------------------ | ------------------------------- | ------------------- |
+| **[SWE-bench](https://arxiv.org/abs/2310.06770)**      | 修真实 GitHub issue            | 单元测试（已通过的 + 修复后的） | 业界 SWE agent 标杆 |
+| **[SWE-Gym](https://arxiv.org/abs/2412.21139)**        | SWE-bench 的训练集版本         | 同上                            | 专为 RL 训练设计    |
+| **[Terminal-Bench](https://arxiv.org/abs/2503.19805)** | 终端任务（git、ssh、文件操作） | 状态检查                        | 真实 shell 环境     |
+| **[LiveCodeBench](https://arxiv.org/abs/2403.07974)**  | 算法题（每月更新）             | 单元测试                        | 抗污染设计          |
+| **[CyberGym](https://arxiv.org/abs/2506.02548)**       | CTF 安全任务                   | flag 匹配                       | 形式化              |
 
 ### 工具调用与 Function Calling
 
-| 基准 | 任务 | Verifier |
-|------|------|----------|
-| **[BFCL](https://arxiv.org/abs/2407.13636)** (Berkeley Function Calling Leaderboard) | 调用正确函数 + 参数 | 精确匹配 + 类型检查 |
-| **[τ-bench](https://arxiv.org/abs/2404.44581)** (Salesforce) | 模拟客服 agent（航空、零售） | 任务完成 + 规则遵守 |
-| **[ToolBench](https://arxiv.org/abs/2307.16789)** | 调用 16000+ 真实 API | 端到端任务完成 |
+| 基准                                                                                 | 任务                         | Verifier            |
+| ------------------------------------------------------------------------------------ | ---------------------------- | ------------------- |
+| **[BFCL](https://arxiv.org/abs/2407.13636)** (Berkeley Function Calling Leaderboard) | 调用正确函数 + 参数          | 精确匹配 + 类型检查 |
+| **[τ-bench](https://arxiv.org/abs/2404.44581)** (Salesforce)                         | 模拟客服 agent（航空、零售） | 任务完成 + 规则遵守 |
+| **[ToolBench](https://arxiv.org/abs/2307.16789)**                                    | 调用 16000+ 真实 API         | 端到端任务完成      |
 
 ### Web 与 Browser
 
-| 基准 | 任务 | Verifier |
-|------|------|----------|
-| **[WebArena](https://arxiv.org/abs/2307.13854)** | 网页操作（购物、论坛、CMS） | 端到端状态 |
-| **[VisualWebArena](https://arxiv.org/abs/2401.13649)** | WebArena 多模态版 | 同上 |
-| **[BrowseComp](https://openai.com/index/browsecomp/)** | 困难 web 检索 | 答案精确匹配 |
+| 基准                                                   | 任务                        | Verifier     |
+| ------------------------------------------------------ | --------------------------- | ------------ |
+| **[WebArena](https://arxiv.org/abs/2307.13854)**       | 网页操作（购物、论坛、CMS） | 端到端状态   |
+| **[VisualWebArena](https://arxiv.org/abs/2401.13649)** | WebArena 多模态版           | 同上         |
+| **[BrowseComp](https://openai.com/index/browsecomp/)** | 困难 web 检索               | 答案精确匹配 |
 
 ### 长程与多轮
 
-| 基准 | 任务 | Verifier |
-|------|------|----------|
-| **[Vending-Bench](https://arxiv.org/abs/2502.15840)** (V-BENCH) | 长期经营自动售货机 | 累计利润 |
-| **[GAIA](https://arxiv.org/abs/2311.12983)** | 通用 assistant 多步任务 | 答案匹配 |
-| **[Mind2Web](https://arxiv.org/abs/2305.04203)** | 真实网页任务 | DOM 状态 |
+| 基准                                                            | 任务                    | Verifier |
+| --------------------------------------------------------------- | ----------------------- | -------- |
+| **[Vending-Bench](https://arxiv.org/abs/2502.15840)** (V-BENCH) | 长期经营自动售货机      | 累计利润 |
+| **[GAIA](https://arxiv.org/abs/2311.12983)**                    | 通用 assistant 多步任务 | 答案匹配 |
+| **[Mind2Web](https://arxiv.org/abs/2305.04203)**                | 真实网页任务            | DOM 状态 |
 
 ### 选择基准的原则
 
@@ -653,7 +657,7 @@ RL 环境质量差会导致一系列 alignment failures——策略学到 verifi
 7. **基准生态**——SWE-bench、τ-bench、WebArena、Vending-Bench、CyberGym 等覆盖不同能力维度，组合使用避免过拟合
 8. **训练-评估循环**——Eval-driven training、增量评测、污染检测、Pareto checkpoint 选择，是工业级 RL 工程的标配
 
-下一章 [第 22 章](../construction) 我们转向 VLM-RL——当观察从文本变成图像/视频，奖励信号如何设计、训练如何扩展。
+接下来可以阅读[第 24 章 VLM RL](../chapter26_vlm/intro)，了解当观察从文本变成图像或视频后，奖励信号如何设计、训练如何扩展。
 
 ## 延伸阅读
 

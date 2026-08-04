@@ -2,7 +2,8 @@
 
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
+import matter from 'gray-matter'
+import { fileURLToPath, pathToFileURL } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -11,21 +12,7 @@ const docsDir = path.join(rootDir, 'docs')
 const publicDir = path.join(docsDir, 'public')
 const packageJsonPath = path.join(rootDir, 'package.json')
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
-const excludedDirectories = new Set([
-  '.vitepress',
-  'public',
-  'node_modules',
-  '_archive_v5.1',
-  '_archive'
-])
-const excludedPages = new Set([
-  'construction.md',
-  'en/chapter17_dpo/_archive_post_training_alignment_overview.md',
-  'en/summaries/part1-summary.md',
-  'en/summaries/part2-summary.md',
-  'en/summaries/part3-summary.md',
-  'en/summaries/part4-summary.md'
-])
+const ignoredDirectoryNames = new Set(['.vitepress', 'public', 'node_modules'])
 
 function parseRepository() {
   const repositoryUrl =
@@ -69,7 +56,20 @@ function getSiteUrl() {
   return `https://${owner}.github.io/${repo}`
 }
 
-function scanMarkdownFiles(dir, basePath = '') {
+function shouldIgnoreDirectory(name) {
+  return ignoredDirectoryNames.has(name) || name.startsWith('_archive')
+}
+
+function shouldIncludeMarkdownFile(fullPath, relativePath) {
+  const basename = path.basename(relativePath)
+  if (!basename.endsWith('.md') || basename.startsWith('_archive')) {
+    return false
+  }
+
+  return matter(fs.readFileSync(fullPath, 'utf8')).data.sitemap !== false
+}
+
+export function scanMarkdownFiles(dir, basePath = '') {
   const files = []
   const entries = fs.readdirSync(dir, { withFileTypes: true })
 
@@ -78,20 +78,14 @@ function scanMarkdownFiles(dir, basePath = '') {
     const relativePath = path.join(basePath, entry.name)
 
     if (entry.isDirectory()) {
-      if (excludedDirectories.has(entry.name)) {
+      if (shouldIgnoreDirectory(entry.name)) {
         continue
       }
       files.push(...scanMarkdownFiles(fullPath, relativePath))
       continue
     }
 
-    const normalizedPath = relativePath.replace(/\\/g, '/')
-    if (
-      entry.isFile() &&
-      entry.name.endsWith('.md') &&
-      !entry.name.startsWith('_archive') &&
-      !excludedPages.has(normalizedPath)
-    ) {
+    if (entry.isFile() && shouldIncludeMarkdownFile(fullPath, relativePath)) {
       files.push(relativePath)
     }
   }
@@ -170,4 +164,9 @@ function main() {
   console.log(`Generated sitemap for ${urls.length} pages`)
 }
 
-main()
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  main()
+}

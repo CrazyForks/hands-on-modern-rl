@@ -1,5 +1,6 @@
 ---
 title: Part III Summary
+sitemap: false
 ---
 
 ::: warning TODO: Summaries removed from Chinese side (2026-06-25)
