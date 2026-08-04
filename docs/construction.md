@@ -1,23 +1,19 @@
 # 🚧 本节建设中
 
-> 根据 [v5.1 完整大纲](https://github.com/sanbu/Code/2026重要开源项目/hands-on-modern-rl/blob/main/planning/outline-final.md)，本章节正在按规划逐步补全。
+> 根据仓库中的 [课程完整大纲](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/planning/outline-final.md)，本章节正在逐步补全。
 
 ---
 
 ## 当前进展
 
-本书正在按 **v5.1 大纲**从 16 章扩展到 38 章。新章节按以下优先级推进：
-
-- **P0**（已发布）：第 19/20/21/26/32/33/37 章等核心前沿内容
-- **P0**（建设中）：Part I 经典 RL 基础（第 3/5/6/7 章）、Part II 第 10 章、Part IV 第 22/23 章
-- **P1**（规划中）：Part III 高级 RL、Part V 第 26 章、Part VI 第 28 章、Part VII 第 34/35/36 章
+课程内容仍在持续审校和扩展。各章节的实际发布状态以网站侧边栏和仓库中的 Markdown 文件为准；规划中的内容以课程完整大纲为参考。
 
 ## 如何贡献
 
 如果你想加速本章节的写作：
 
-1. 在 GitHub 上 [open 一个 issue](https://github.com/sanbu/Code/2026重要开源项目/hands-on-modern-rl/issues)，标注你最关心的章节
-2. 或直接提交 PR，参考 `CLAUDE.md` 的写作风格指南
+1. 在 GitHub 上 [提交 Issue](https://github.com/walkinglabs/hands-on-modern-rl/issues)，说明你关注的章节或发现的问题。
+2. 直接提交 PR，并遵循仓库中的 [`AGENTS.md`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/AGENTS.md) 写作与维护约定。
 
 ## 推荐阅读路径
 
@@ -29,4 +25,4 @@
 
 ---
 
-*最后更新：2026-06-19*
+_最后更新：2026-07-12_

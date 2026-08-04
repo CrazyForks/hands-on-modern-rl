@@ -52,7 +52,7 @@ $$\sum_a \pi_\theta(a|s) \cdot \nabla_\theta \log \pi_\theta(a|s) = 0$$
 
 基线做的事情是给每个状态建立一个"及格线"：超过及格线的强化，低于及格线的抑制。这个及格线不是固定的——不同的状态有不同的 $V(s)$，因为不同状态的"正常表现"本来就不一样。
 
-## 最好的基线是 $V(s)$
+## 用 $V(s)$ 构造状态基线
 
 基线可以是任何不依赖动作的函数。最简单的选择是常数（比如所有 episode 的平均回报）。常数基线在无状态赌博机中就有用，但它无法区分不同状态。
 
@@ -76,9 +76,9 @@ $$\hat{A}_t = G_t - V(s_t)$$
 
 后续章节会反复用到优势函数：
 
-- **第 6 章 Actor-Critic**：用 Critic 网络直接估计 $V(s)$，实现每步更新（不必等 episode 结束）
-- **第 5 章 PPO**：用 GAE（Generalized Advantage Estimation）在偏差和方差之间取折中
-- **第 7 章 RLHF**：奖励模型给出的信号本质上也是一种优势估计
+- **第 7 章 Actor-Critic**：用 Critic 网络直接估计 $V(s)$，实现每步更新（不必等 episode 结束）
+- **第 8 章 PPO**：用 GAE（Generalized Advantage Estimation）在偏差和方差之间取折中
+- **第 13 章 RLHF**：奖励模型提供标量奖励，PPO-RLHF 再结合 Critic 将奖励转化为优势估计
 
 ## 加入价值网络
 

@@ -11,6 +11,21 @@ const docsDir = path.join(rootDir, 'docs')
 const publicDir = path.join(docsDir, 'public')
 const packageJsonPath = path.join(rootDir, 'package.json')
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+const excludedDirectories = new Set([
+  '.vitepress',
+  'public',
+  'node_modules',
+  '_archive_v5.1',
+  '_archive'
+])
+const excludedPages = new Set([
+  'construction.md',
+  'en/chapter17_dpo/_archive_post_training_alignment_overview.md',
+  'en/summaries/part1-summary.md',
+  'en/summaries/part2-summary.md',
+  'en/summaries/part3-summary.md',
+  'en/summaries/part4-summary.md'
+])
 
 function parseRepository() {
   const repositoryUrl =
@@ -63,14 +78,20 @@ function scanMarkdownFiles(dir, basePath = '') {
     const relativePath = path.join(basePath, entry.name)
 
     if (entry.isDirectory()) {
-      if (['.vitepress', 'public', 'node_modules'].includes(entry.name)) {
+      if (excludedDirectories.has(entry.name)) {
         continue
       }
       files.push(...scanMarkdownFiles(fullPath, relativePath))
       continue
     }
 
-    if (entry.isFile() && entry.name.endsWith('.md')) {
+    const normalizedPath = relativePath.replace(/\\/g, '/')
+    if (
+      entry.isFile() &&
+      entry.name.endsWith('.md') &&
+      !entry.name.startsWith('_archive') &&
+      !excludedPages.has(normalizedPath)
+    ) {
       files.push(relativePath)
     }
   }
