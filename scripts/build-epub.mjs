@@ -5,6 +5,7 @@ import os from 'node:os'
 import { execFileSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import archiver from 'archiver'
+import { convertImageToPngFile } from './epub-image-conversion.mjs'
 import {
   docsDir,
   distDir,
@@ -51,7 +52,7 @@ const epubBookId = 'hands-on-modern-rl-epub'
 function isValidMathDelimiter(state, pos) {
   const max = state.posMax
   const prevChar = pos > 0 ? state.src.charCodeAt(pos - 1) : -1
-  const nextChar = pos + 1 <= max ? state.src.charCodeAt(pos + 1) : -1
+  const nextChar = pos + 1 < max ? state.src.charCodeAt(pos + 1) : -1
 
   return {
     canOpen: nextChar !== 0x20 && nextChar !== 0x09,
@@ -239,17 +240,9 @@ function convertImageToPng(imagePath) {
   const basename = path.basename(imagePath, path.extname(imagePath))
   const pngPath = path.join(dir, `${basename}-${Date.now()}.png`)
 
-  try {
-    execFileSync('sips', ['-s', 'format', 'png', imagePath, '--out', pngPath], {
-      stdio: ['ignore', 'pipe', 'pipe'],
-      timeout: 15_000
-    })
-    if (fs.existsSync(pngPath) && fs.statSync(pngPath).size > 0) {
-      convertCache.set(imagePath, pngPath)
-      return pngPath
-    }
-  } catch {
-    // sips not available or conversion failed
+  if (convertImageToPngFile(imagePath, pngPath)) {
+    convertCache.set(imagePath, pngPath)
+    return pngPath
   }
   return null
 }
@@ -634,12 +627,11 @@ function collectAndRewriteImages(html, sourcePagePath, imageMap) {
 
     if (needsConversion(absolutePath, ext)) {
       const converted = convertImageToPng(absolutePath)
-      if (converted) {
-        absolutePath = converted
-        ext = '.png'
-      } else if (ext === '.webp') {
-        return match
+      if (!converted) {
+        throw new Error(`Unable to convert image to PNG: ${absolutePath}`)
       }
+      absolutePath = converted
+      ext = '.png'
     }
 
     const imageId =
@@ -677,12 +669,11 @@ function collectMarkdownImages(markdown, sourcePagePath, imageMap) {
 
     if (needsConversion(absolutePath, ext)) {
       const converted = convertImageToPng(absolutePath)
-      if (converted) {
-        absolutePath = converted
-        ext = '.png'
-      } else if (ext === '.webp') {
-        continue
+      if (!converted) {
+        throw new Error(`Unable to convert image to PNG: ${absolutePath}`)
       }
+      absolutePath = converted
+      ext = '.png'
     }
 
     if (!imageMap.has(absolutePath)) {

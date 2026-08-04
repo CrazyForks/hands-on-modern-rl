@@ -38,6 +38,7 @@ debug/
 # Temporary scripts and files
 temp/
 docs/__pdf__/
+.worktrees/
 
 # Generated sitemap
 docs/public/sitemap.xml
