@@ -1240,4 +1240,4 @@ Task travel_012: reward=0.52
 
 [^deepswe]: Agentica Project. "DeepSWE: Training a Fully Open-sourced, State-of-the-Art Coding Agent by Scaling RL." [Blog](https://pretty-radio-b75.notion.site/DeepSWE-Training-a-Fully-Open-sourced-State-of-the-Art-by-Scaling-RL-22281902c1468193aabbe9a8c59bbe33), 2025. 32B 模型，SWEBench-Verified 59%，开源 SOTA。
 
-[^finqa]: rLLM Team. "rLLM-FinQA: How a 4B Model Outperforms 235B and Rivals Gemini 2.5 Pro on Financial Analysis." [Blog](https://rllm-project.com/blog/post.html?post=finqa.md), 2026. 多轮 ReAct Agent，4B 模型在金融分析上超越 Qwen3-235B。
+[^finqa]: rLLM Team. "rLLM-FinQA: How a 4B Model Outperforms 235B and Rivals Gemini 2.5 Pro on Financial Analysis." [Blog](https://rllm-project.com/post.html?post=finqa.md), 2026. 多轮 ReAct Agent，4B 模型在金融分析上超越 Qwen3-235B。

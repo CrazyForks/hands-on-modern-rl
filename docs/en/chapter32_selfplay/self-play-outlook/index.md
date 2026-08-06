@@ -234,7 +234,7 @@ Next we discuss [12.4 LLM Multi-Agent RL](../llm-multi-agent-rl) — from multi-
 
 - Chen Z, Deng Y, et al. "[SPIN: Self-Play Fine-Tuning Converts Weak Language Models to Strong Language Models](https://arxiv.org/abs/2401.01335)." ICML 2024. — Models RLHF as self-play, continuously improving by playing against "past self."
 
-- Metak Q, Yu D, et al. "[Self-Rewarding Language Models](https://arxiv.org/abs/2401.10020)." 2024. — Meta and NYU jointly propose self-rewarding language models, where the same model plays both Generator and Judge.
+- Yuan W, Pang R Y, Cho K, et al. "[Self-Rewarding Language Models](https://arxiv.org/abs/2401.10020)." ICML 2024. — Meta and NYU jointly propose self-rewarding language models, where the same model plays both Generator and Judge.
 
 - Zelikman E, et al. "[STaR: Self-Taught Reasoner](https://arxiv.org/abs/2203.14465)." NeurIPS 2022. — Self-trained reasoner, iteratively improving with self-generated reasoning data.
 

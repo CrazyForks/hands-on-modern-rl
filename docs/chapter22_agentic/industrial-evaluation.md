@@ -754,7 +754,7 @@ class FrontendEvalPipeline:
 
 层 3 直接让 LLM 看截图然后打分，有明显的局限。LLM 对视觉细节的判断不稳定——同一个页面，跑两次可能得到不同的分数。更严重的是，LLM 可能被表面特征误导：一个功能完全错误的页面，只要配色好看、对齐整齐，也可能拿到高分。
 
-这不是空想的担忧。Omni-I2C 基准的测试表明 [^omni-i2c]，纯像素指标（SSIM、LPIPS）与人类判断的相关性只有 0.11-0.44（Kendall's Tau），而 LMM Judge 可以达到 0.83。但即便如此，0.83 意味着每 10 个判断里还有近 2 个与人类不一致。FullFront 基准用 CLIP + DINOv2 + Gemini 三层视觉评估 [^fullfront]，与人类相关性达到 0.94，是目前最好的结果——但仍有 6% 的偏差。
+这不是空想的担忧。Omni-I2C 基准的测试表明 [^omni-i2c]，纯像素指标（SSIM、LPIPS）与人类判断的相关性只有 0.11-0.44（Kendall's Tau），而 LMM Judge 可以达到 0.83。但即便如此，0.83 意味着每 10 个判断里还有近 2 个与人类不一致。FullFront 基准的网页感知问答也印证了这一点 [^fullfront]：最强模型 Claude 3.7 Sonnet 的平均准确率仍低于 55%，而人类超过 95%——模型对页面细节的视觉判断远未达到人类水平。
 
 问题确实存在，但可以用组合策略缓解。
 
@@ -1197,21 +1197,21 @@ $$
 
 [^tau-bench]: Yao S, Shinn N, Razavi P, Narasimhan K. "[τ-bench: A Benchmark for Tool-Agent-User Interaction](https://arxiv.org/abs/2406.12045)." 2024. —— 三阶段构建方法：手动 schema → LLM 数据生成 → 人工场景编写。
 
-[^taskcraft]: TaskCraft Team. "[TaskCraft: Automated Generation of Agentic Tasks](https://arxiv.org/abs/2506.10055)." ICLR 2026. —— 原子任务 + 深度/宽度扩展，自动生成 41K 多工具任务。
+[^taskcraft]: Shi D, Cao J, Chen Q, et al. "[TaskCraft: Automated Generation of Agentic Tasks](https://arxiv.org/abs/2506.10055)." ICLR 2026. —— 原子任务 + 深度/宽度扩展，自动生成 41K 多工具任务。
 
 [^hardgen]: Hao B, et al. "[From Failure to Mastery: Generating Hard Samples for Tool-use Agents](https://arxiv.org/abs/2601.01498)." 2026. —— 从失败 case 构建 API Graph，反向采样合成困难样本，4B 模型超越 GPT-5.2 和 Claude Opus 4.5。
 
 [^evol-instruct]: Xu C, et al. "[WizardLM: Empowering Large Language Models to Follow Complex Instructions](https://arxiv.org/abs/2304.12244)." ICLR 2024. —— Evol-Instruct 通过深化、拓宽、加约束等进化操作提升指令复杂度。
 
-[^tag-evol]: Tag-Evol Team. "[Tag-Evol: Achieving Efficient Instruction Evolving via Tag Injection](https://arxiv.org/abs/2505.24165)." 2025. —— 在进化时注入结构化标签（领域、难度、技能）来控制进化方向。
+[^tag-evol]: Wang Y, Zhou S, Guo C, Zhu Q. "[Tag-Evol: Achieving Efficient Instruction Evolving via Tag Injection](https://arxiv.org/abs/2505.24165)." 2025. —— 在进化时注入结构化标签（领域、难度、技能）来控制进化方向。
 
-[^agenttrek]: AgentTrek Team. "[AgentTrek: Agent Trajectory Synthesis via Guiding Replay with Web Tutorials](https://arxiv.org/abs/2412.09605)." ICLR 2025 Spotlight. —— 从 Web 教程提取操作流，回放合成 Agent 交互轨迹。
+[^agenttrek]: Xu Y, Lu D, Shen Z, et al. "[AgentTrek: Agent Trajectory Synthesis via Guiding Replay with Web Tutorials](https://arxiv.org/abs/2412.09605)." ICLR 2025 Spotlight. —— 从 Web 教程提取操作流，回放合成 Agent 交互轨迹。
 
 [^firefly]: Lu Y, et al. "[Firefly: Illuminating Large-Scale Verified Tool-Call Data Generation from Real APIs](https://arxiv.org/abs/2605.17558)." 2026. —— 从真实 API 大规模生成可验证的工具调用数据。
 
 [^webshaper]: Tao Z, et al. "[WebShaper: Agentically Data Synthesizing via Information-Seeking Formalization](https://arxiv.org/abs/2507.15061)." 2025. —— 信息寻求形式化指导数据合成，构建离线搜索环境。
 
-[^apigen]: APIGen-MT Team. "[Agentic Pipeline for Multi-Turn Data Generation](https://openreview.net/forum?id=qk6ORqQ4Cu)." NeurIPS 2025. —— 模拟 Agent-人类交互生成多轮对话任务。
+[^apigen]: Prabhakar A, Liu Z, Zhu M, et al. "[Agentic Pipeline for Multi-Turn Data Generation](https://openreview.net/forum?id=qk6ORqQ4Cu)." NeurIPS 2025. —— 模拟 Agent-人类交互生成多轮对话任务。
 
 [^jade]: Lin L, Liu J, Yang T, Cai L, Xu Y, Wei L, Xie S, Zhang G. "[JADE: Expert-Grounded Dynamic Evaluation](https://arxiv.org/html/2602.06486v1)." 2026. —— 两层框架评估开放式任务：技能激活 + 声明验证。
 
@@ -1223,9 +1223,9 @@ $$
 
 [^omni-i2c]: Zhou J, Zhang C, Feng X, et al. "[Omni-I2C: A Holistic Benchmark for Image-to-Code](https://arxiv.org/abs/2603.17508)." 2026. —— 发现 LMM Judge 与人类判断相关性达 Tau=0.83，远高于 SSIM（0.12）和 CLIP Score（0.44）。
 
-[^fullfront]: FullFront Team. "[FullFront: A Benchmark for Full-Stack Front-End Development](https://openreview.net/pdf/636edc8feafa72561dc2cff193472b1f68327a52.pdf)." 2025. —— CLIP + DINOv2 + Gemini 三层视觉评估，与人类相关性达 Spearman rho=0.94。
+[^fullfront]: Sun H, Wang H W, Gu J, Li L, Cheng Y. "[FullFront: Benchmarking MLLMs Across the Full Front-End Engineering Workflow](https://arxiv.org/abs/2505.17399)." 2025. —— 覆盖前端工程全流程的三项任务：网页设计、网页感知问答、网页代码生成。感知问答任务上最强模型（Claude 3.7 Sonnet）平均准确率仍低于 55%，而人类超过 95%。
 
-[^visrefiner]: VisRefiner Authors. "[VisRefiner: Learning from Visual Differences](https://arxiv.org/abs/2602.05998)." 2026. —— 用渲染截图与参考图的视觉差异作为 RL 训练奖励信号。
+[^visrefiner]: Deng J, Yao K, Zhang L. "[VisRefiner: Learning from Visual Differences for Screenshot-to-Code Generation](https://arxiv.org/abs/2602.05998)." 2026. —— 用渲染截图与参考图的视觉差异作为 RL 训练奖励信号。
 
 [^agent-prm]: Chen et al. "[AgentPRM: Process Reward Models for LLM Agents via Step-Wise Promise and Progress](https://arxiv.org/abs/2511.08325)." 2025. —— 用 Promise（Q-value）和 Progress（Advantage）双信号评估 Agent 每步质量。
 

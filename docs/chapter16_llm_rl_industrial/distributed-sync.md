@@ -883,5 +883,5 @@ def monitor_expert_balance(model):
 - [DeepSeek-AI 2024 "DeepSeek-V3 Technical Report"](https://arxiv.org/abs/2412.19437)
 - [DeepSeek-AI 2025 "DeepSeek-R1: Incentivizing Reasoning Capability via RL"](https://arxiv.org/abs/2501.12948)
 - [Qwen Team 2025 "Qwen3 Technical Report"](https://arxiv.org/abs/2505.09388)
-- [Zhao et al. 2024 "GSPO: Group Sequence Policy Optimization"](https://arxiv.org/abs/2507.18071)
-- [Seer Team 2025 "Seer: Eliminating Rollout Tail Latency"](https://arxiv.org/abs/2511.14617)
+- [Zheng et al. 2025 "GSPO: Group Sequence Policy Optimization"](https://arxiv.org/abs/2507.18071)
+- [Qin et al. 2025 "Seer: Online Context Learning for Fast Synchronous LLM Reinforcement Learning"](https://arxiv.org/abs/2511.14617)

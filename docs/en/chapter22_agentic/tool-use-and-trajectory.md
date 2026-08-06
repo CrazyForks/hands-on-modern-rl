@@ -345,7 +345,7 @@ Next, we focus on another key dimension of Agentic RL: tool-use RL, and how a mo
 
 [^magnet]: Yin F, Wang Z, Hsu I-H, et al. "[Magnet: Multi-turn Tool-use Data Synthesis and Distillation via Graph Translation](https://arxiv.org/abs/2503.07826)." ACL 2025. Graph-based trajectory synthesis using function signature graphs and MAGNIFY/CONNECT operations to generate legal call paths.
 
-[^looptool]: LoopTool Team. "[LoopTool: Closing the Data-Training Loop for Robust LLM Tool Calls](https://arxiv.org/abs/2511.09148)." arXiv:2511.09148, 2025. A closed-loop iteration framework that uses GCP, JGLV, and EDDE to make data evolve with the model. [GitHub](https://github.com/Rednote-DeepExperience/LoopTool)
+[^looptool]: Zhang K, Jiao W, Du K, et al. "[LoopTool: Closing the Data-Training Loop for Robust LLM Tool Calls](https://arxiv.org/abs/2511.09148)." arXiv:2511.09148, 2025. A closed-loop iteration framework that uses GCP, JGLV, and EDDE to make data evolve with the model. [GitHub](https://github.com/Rednote-DeepExperience/LoopTool)
 
 [^hardgen]: Hao B, et al. "[From Failure to Mastery: Generating Hard Samples for Tool-use Agents](https://arxiv.org/abs/2601.01498)." arXiv:2601.01498, 2026. Targeted generation of difficult training data from model failure cases. [Dataset](https://huggingface.co/datasets/Bingguang/HardGen)
 
@@ -743,7 +743,7 @@ In the next part, we will look at industry practice and evaluation systems for A
 
 [^toolrl]: Qian C, Acikgoz EC, et al. "[ToolRL: Reward is All Tool Learning Needs](https://arxiv.org/abs/2504.13958)." NeurIPS 2025. Treats tool calls as special actions in RL and expands the policy action space.
 
-[^verltool]: verl-tool Team. "[verl-tool](https://github.com/volcengine/verl-tool)." GitHub, 2025. Tool-call-enhanced version of VeRL and a cross-domain RL framework for tool use.
+[^verltool]: Jiang D, Lu Y, Li Z, et al. "[VERLTOOL: Towards Holistic Agentic Reinforcement Learning with Tool Use](https://arxiv.org/abs/2509.01055)." 2025. A unified multi-tool Agentic RL framework built on VeRL for cross-domain tool-use RL training (code, search, SQL, vision, and software engineering).
 
 [^mcp_intro]: Model Context Protocol. "[What is the Model Context Protocol (MCP)?](https://modelcontextprotocol.io/docs/getting-started/intro)." Official MCP documentation, defining MCP as an open standard for connecting AI applications with external systems.
 
@@ -1137,7 +1137,7 @@ At this point, we have covered the core theory and engineering practice of Agent
 ### References
 
 - Cheng M, Ouyang J, Yu S, et al. "[Agent-R1: Training Powerful LLM Agents with End-to-End Reinforcement Learning](https://arxiv.org/abs/2511.14460)." arXiv:2511.14460, 2025. Benchmark Agentic RL framework that extends MDP modeling and distinguishes process reward from outcome reward. [GitHub](https://github.com/AgentR1/Agent-R1)
-- AReaL Team. "[AReaL: A Large-Scale Asynchronous Reinforcement Learning System for Language Reasoning](https://arxiv.org/abs/2505.24298)." arXiv:2505.24298, 2025. Asynchronous RL framework from Ant Group and Tsinghua; fully asynchronous training improves speed by 2.77x. [GitHub](https://github.com/inclusionAI/AReaL)
+- Fu W, Gao J, Shen X, et al. "[AReaL: A Large-Scale Asynchronous Reinforcement Learning System for Language Reasoning](https://arxiv.org/abs/2505.24298)." arXiv:2505.24298, 2025. Asynchronous RL framework from Ant Group and Tsinghua; fully asynchronous training improves speed by 2.77x. [GitHub](https://github.com/inclusionAI/AReaL)
 - NVIDIA. "[NeMo Gym](https://github.com/NVIDIA-NeMo/Gym)." NVIDIA's training platform for scientific agents.
 - Patil S, et al. "[The Berkeley Function Calling Leaderboard](https://gorilla.cs.berkeley.edu/leaderboard.html)." ICML 2025. BFCL leaderboard for evaluating LLM function-calling ability.
 - Jimenez C E, et al. "[SWE-bench: Can Language Models Resolve Real-World GitHub Issues?](https://arxiv.org/abs/2310.06770)." ICLR 2024. Benchmark for code agents.

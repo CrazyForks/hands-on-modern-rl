@@ -358,7 +358,7 @@ In the next section, we will look at practical agentic RL experience from indust
 
 [^toolrl]: Qian C, Acikgoz EC, et al. "[ToolRL: Reward is All Tool Learning Needs](https://arxiv.org/abs/2504.13958)." NeurIPS 2025. Treats tool calls as special actions in RL and expands the policy action space.
 
-[^verltool]: verl-tool Team. "[verl-tool](https://github.com/volcengine/verl-tool)." GitHub, 2025. A tool-use enhanced version of VeRL and a cross-domain RL training framework for tool use.
+[^verltool]: Jiang D, Lu Y, Li Z, et al. "[VERLTOOL: Towards Holistic Agentic Reinforcement Learning with Tool Use](https://arxiv.org/abs/2509.01055)." 2025. A unified multi-tool Agentic RL framework built on VeRL for cross-domain tool-use RL training (code, search, SQL, vision, and software engineering).
 
 [^rstar2]: Shang N, Liu Y, Zhu Y, et al. "[rStar2-Agent: Agentic Reasoning Technical Report](https://arxiv.org/abs/2508.20722)." arXiv:2508.20722, 2025. A 14B model using GRPO-RoC reaches 80.6% on AIME24, surpassing the 671B DeepSeek-R1.
 
@@ -746,7 +746,7 @@ At this point, we have covered the core theory and engineering practice of agent
 ## References
 
 - Cheng M, Ouyang J, Yu S, et al. "[Agent-R1: Training Powerful LLM Agents with End-to-End Reinforcement Learning](https://arxiv.org/abs/2511.14460)." arXiv:2511.14460, 2025. A benchmark agentic RL framework that extends MDP modeling and distinguishes process rewards from outcome rewards. [GitHub](https://github.com/AgentR1/Agent-R1)
-- AReaL Team. "[AReaL: A Large-Scale Asynchronous Reinforcement Learning System for Language Reasoning](https://arxiv.org/abs/2505.24298)." arXiv:2505.24298, 2025. An asynchronous RL framework from Ant Group and Tsinghua University; fully asynchronous training improves speed by 2.77x. [GitHub](https://github.com/inclusionAI/AReaL)
+- Fu W, Gao J, Shen X, et al. "[AReaL: A Large-Scale Asynchronous Reinforcement Learning System for Language Reasoning](https://arxiv.org/abs/2505.24298)." arXiv:2505.24298, 2025. An asynchronous RL framework from Ant Group and Tsinghua University; fully asynchronous training improves speed by 2.77x. [GitHub](https://github.com/inclusionAI/AReaL)
 - NVIDIA. "[NeMo Gym](https://github.com/NVIDIA-NeMo/Gym)." NVIDIA's scientific agent training platform.
 - Patil S, et al. "[The Berkeley Function Calling Leaderboard](https://gorilla.cs.berkeley.edu/leaderboard.html)." ICML 2025. BFCL leaderboard for evaluating LLM function-calling ability.
 - Jimenez C E, et al. "[SWE-bench: Can Language Models Resolve Real-World GitHub Issues?](https://arxiv.org/abs/2310.06770)." ICLR 2024. Evaluation benchmark for code agents.

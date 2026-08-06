@@ -230,7 +230,7 @@ $$\mathcal{P}^*(d) \propto \mathcal{P}_0(d) \cdot (1 - p(d))$$
 
 - Chen Z, Deng Y, et al. "[SPIN: Self-Play Fine-Tuning Converts Weak Language Models to Strong Language Models](https://arxiv.org/abs/2401.01335)." ICML 2024. —— 将 RLHF 建模为自博弈，模型通过与"过去的自己"博弈来持续提升。
 
-- Metak Q, Yu D, et al. "[Self-Rewarding Language Models](https://arxiv.org/abs/2401.10020)." 2024. —— Meta 与 NYU 联合提出自我奖励语言模型，让同一模型同时扮演 Generator 和 Judge。
+- Yuan W, Pang R Y, Cho K, et al. "[Self-Rewarding Language Models](https://arxiv.org/abs/2401.10020)." ICML 2024. —— Meta 与 NYU 联合提出自我奖励语言模型，让同一模型同时扮演 Generator 和 Judge。
 
 - Zelikman E, et al. "[STaR: Self-Taught Reasoner](https://arxiv.org/abs/2203.14465)." NeurIPS 2022. —— 自我训练推理器，用自我生成的推理数据迭代提升。
 
