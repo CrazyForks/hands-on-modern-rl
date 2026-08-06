@@ -164,7 +164,7 @@ LLM-as-Judge 是 GenRM 的一种工业实践——用一个强 LLM（GPT-4、Cla
 
 ### Self-Rewarding Language Models
 
-[Self-Rewarding LM](https://arxiv.org/abs/2312.10017)（Meta 2024）把 LLM-as-Judge 推到极致——**让模型评价自己的输出**：
+[Self-Rewarding LM](https://arxiv.org/abs/2401.10020)（Meta 2024）把 LLM-as-Judge 推到极致——**让模型评价自己的输出**：
 
 ```python
 def self_reward_training(prompt, model):

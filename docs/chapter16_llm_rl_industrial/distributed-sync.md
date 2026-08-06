@@ -421,7 +421,7 @@ LoRA（[第 6 章](../chapter08_rlhf/industrial-post-training)）只训少量参
 
 ### LlamaRL
 
-[LlamaRL, Meta arXiv:2506.10910](https://arxiv.org/abs/2506.10910) Meta 2025 年 6 月发布的分布式 RL 框架：
+[LlamaRL, Meta arXiv:2505.24034](https://arxiv.org/abs/2505.24034) Meta 2025 年 5 月发布的分布式 RL 框架：
 
 **核心创新**：**完全去中心化**——没有 master node，每个 worker 自治。
 
@@ -877,7 +877,7 @@ def monitor_expert_balance(model):
 - [Kwon et al. 2023 "Efficient Memory Management for Large Language Model Serving with PagedAttention" (vLLM)](https://arxiv.org/abs/2309.06180)
 - [Rajaseharan et al. 2024 "SGLang"](https://arxiv.org/abs/2312.07104)
 - [Rajbhandari et al. 2020 "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models"](https://arxiv.org/abs/1910.02054)
-- [Zhao et al. 2025 "LlamaRL: A Distributed Asynchronous Reinforcement Learning Framework"](https://arxiv.org/abs/2506.10910)
+- [LlamaRL (Meta GenAI) 2025 "LlamaRL: A Distributed Asynchronous Reinforcement Learning Framework"](https://arxiv.org/abs/2505.24034)
 - [Fu et al. 2025 "AReaL: A Large-Scale Asynchronous Reinforcement Learning System for Language Reasoning"](https://arxiv.org/abs/2505.24298)
 - [Zhang et al. 2025 "AgentRL: Scaling Agentic Reinforcement Learning with a Multi-Turn, Multi-Task Framework"](https://arxiv.org/abs/2510.04206)
 - [DeepSeek-AI 2024 "DeepSeek-V3 Technical Report"](https://arxiv.org/abs/2412.19437)

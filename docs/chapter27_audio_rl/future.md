@@ -220,7 +220,7 @@ DPO 的精准对齐把错误率压到接近零。这一步看似琐碎，但部�
 
 - [Step-Audio-R1 Technical Report (StepFun, 2025.11, arXiv:2511.15848)](https://arxiv.org/abs/2511.15848) — MGRD 框架原文，音频推理的奠基工作
 - [Step-Audio-R1.5 Technical Report (StepFun, 2026.04, arXiv:2604.25719)](https://arxiv.org/abs/2604.25719) — RLHF 范式迁移，破解 verifiable reward trap
-- [Step-Audio 2 Technical Report](https://arxiv.org/abs/2506.08946) — Step-Audio 系列基础模型
+- [Step-Audio 2 Technical Report](https://arxiv.org/abs/2507.16632) — Step-Audio 系列基础模型
 - [EnCodec: High Fidelity Neural Audio Compression (Meta, 2022)](https://arxiv.org/abs/2210.13438) — RVQ 编解码器经典工作
 - [SoundStream: An End-to-End Neural Audio Codec (Google, 2021)](https://arxiv.org/abs/2107.03312) — SoundStream 原始论文
 - [SpeechTokenizer: Unified Speech Tokenizer for Speech LLMs (2023)](https://arxiv.org/abs/2308.16692) — 语义/声学分层 token 化

@@ -236,7 +236,7 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 
 ## 11.5.5 AlphaCodium 与 代码生成搜索
 
-[AlphaCodium](https://arxiv.org/abs/2404.18496)（2024.04）是专门为代码生成设计的搜索方法。它的核心思想：
+[AlphaCodium](https://arxiv.org/abs/2401.08500)（2024.01）是专门为代码生成设计的搜索方法。它的核心思想：
 
 - 代码任务的"正确性"可以用**单元测试**自动验证（类似 Lean4）
 - 用迭代式搜索：生成 → 测试 → 修复 → 再测试

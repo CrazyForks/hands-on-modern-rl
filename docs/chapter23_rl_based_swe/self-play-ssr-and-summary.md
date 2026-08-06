@@ -58,7 +58,7 @@ SSR 的核心价值是**数据 flywheel**——模型越强，生成数据越好
 
 ## 12.4.2 SSR 的算法细节
 
-清华 [SSR](https://arxiv.org/abs/2507.17492)（Self-play SWE-RL）的具体设计：
+清华 [SSR](https://arxiv.org/abs/2512.18552)（Self-play SWE-RL）的具体设计：
 
 ### Bug Generator（Player A）
 

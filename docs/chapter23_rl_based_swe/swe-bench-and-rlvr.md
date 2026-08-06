@@ -214,7 +214,7 @@ reward += 0.05 * context_efficiency
 
 鼓励模型只读相关文件，避免"读所有文件"的浪费。
 
-但 [Meta SWE-RL](https://arxiv.org/abs/2502.18452) 报告了一个重要发现：**最简单的 reward（测试通过 binary）效果最好**。复杂的 shaping 容易引入 reward hacking——模型学会"优化 shaping term"而不是真正修 bug。
+但 [Meta SWE-RL](https://arxiv.org/abs/2502.18449) 报告了一个重要发现：**最简单的 reward（测试通过 binary）效果最好**。复杂的 shaping 容易引入 reward hacking——模型学会"优化 shaping term"而不是真正修 bug。
 
 这与 [R1-Zero 的发现](../chapter18_grpo/deepseek-dapo) 一致：**简单 reward + 大规模 RL > 复杂 reward + 小规模 RL**。
 

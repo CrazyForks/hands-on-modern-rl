@@ -111,7 +111,7 @@ UNIFIED_ACTIONS = {
 Open-AutoGLM 把**模型权重、训练数据、环境模拟器、训练脚本**全部开源，是目前最完整的开源 GUI Agent 训练框架：
 
 ```bash
-git clone https://github.com/THUDM/Open-AutoGLM
+git clone https://github.com/zai-org/Open-AutoGLM
 cd Open-AutoGLM
 
 # 1. 下载预训练权重

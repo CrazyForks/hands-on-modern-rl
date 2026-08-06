@@ -13,7 +13,7 @@
 - **AlphaEvolve**（DeepMind, 2024.05）：LLM + 进化算法发现新数学
 - **Genie 3**（DeepMind, 2025.08）：生成式 world model
 - **Titans**（Google, 2024.12）：长期记忆架构
-- **MIRAS**（2025.07）：多智能体推理与搜索
+- **Multi-Agent Deep Research**（字节 Seed, 2025.11）：用 M-GRPO 训练多智能体搜索系统
 
 这些工作代表了 RL 与 LLM 结合的"下一代范式"——从"训练一个 policy"到"训练一个研究系统"。
 
@@ -215,51 +215,47 @@ Titans 用**惊喜度（surprise）**作为内部 reward——当输入"令人�
 
 Titans 证明了**长期记忆是 scaling 的下一个方向**——不只是"更宽、更深"，还要"更记得"。
 
-## 29.4.4 MIRAS 与 多智能体推理与搜索
+## 29.4.4 M-GRPO 与多智能体搜索训练
 
-[MIRAS](https://arxiv.org/abs/2507.11459)（2025.07）是 multi-agent reasoning + search 的框架。
+[Multi-Agent Deep Research: Training Multi-Agent Systems with M-GRPO](https://arxiv.org/abs/2511.13288)（字节 Seed, 2025.11）用 M-GRPO——Group Relative Policy Optimization 的多智能体扩展——训练多智能体搜索系统。
 
-### MIRAS 的设计
+### M-GRPO 的系统设计
 
-把复杂推理任务**分解给多个 agent**：
+多智能体系统由主 agent 和多个子 agent 组成：
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
-│ Coordinator Agent: 总指挥                              │
+│ 主 Agent（planner）：总规划                              │
 │   - 接收任务                                            │
-│   - 分解为子任务                                       │
-│   - 协调子 agents                                      │
+│   - 拆解为子任务                                        │
+│   - 调度子 agents                                       │
 ├─────────────────────────────────────────────────────────┤
-│ Worker Agents: 子任务执行                              │
-│   - 每个 worker 处理一个子任务                         │
-│   - 可以是不同类型（LLM、tool-using agent）            │
+│ 子 Agents（tool executors）：工具执行                    │
+│   - 多轮调用搜索、代码等工具                            │
+│   - 各自频率不同、调用次数可变                          │
 ├─────────────────────────────────────────────────────────┤
-│ Critic Agent: 评估                                     │
-│   - 检查 worker 的输出                                 │
-│   - 反馈给 coordinator                                 │
-├─────────────────────────────────────────────────────────┤
-│ Memory Agent: 记忆管理                                 │
-│   - 维护任务历史                                       │
-│   - 提供上下文                                         │
+│ 层级 Credit Assignment                                  │
+│   - 主 agent 和子 agent 各自计算 group-relative         │
+│   - 通过共享 store 交换最小统计量                       │
 └─────────────────────────────────────────────────────────┘
 ```
 
-### MIRAS 的搜索算法
+### M-GRPO 的训练方法
 
-MIRAS 集成了多种搜索方法：
+M-GRPO 解决多智能体 RL 训练的三个难点：
 
-- **Beam Search**：探索多个候选解
-- **MCTS**：用 value function 引导搜索
-- **A\* Search**：启发式搜索
+- **层级 credit assignment**：主 agent 和子 agent 分别计算 group-relative advantage，避免"贡献混淆"
+- **轨迹对齐**：子 agent 调用次数可变，用轨迹对齐方案生成固定 size 的 batch
+- **解耦训练**：agent 分布在独立服务器上，通过共享 store 交换统计量，不需要跨服务器反向传播
 
-这让 MIRAS 能处理**NP-hard** 问题——比如复杂的规划、调度、组合优化。
+在 GAIA、XBench-DeepSearch、WebWalkerQA 等基准上，M-GRPO 一致优于单 agent GRPO 和"冻结子 agent"的多智能体 GRPO。
 
-### MIRAS 与 AlphaEvolve 的关系
+### M-GRPO 与 AlphaEvolve 的关系
 
-两者都用 LLM + 搜索，但角度不同：
+两者都用 LLM + RL/搜索，但角度不同：
 
-- **AlphaEvolve**：进化搜索（无梯度，population-based）
-- **MIRAS**：树搜索（gradient-free，single-agent + multi-agent）
+- **AlphaEvolve**：进化搜索（无梯度，population-based），面向算法发现
+- **M-GRPO**：多智能体 RL（基于 GRPO），面向工具增强的深度研究
 
 它们是 LLM-driven discovery 的两个互补范式。
 
@@ -311,7 +307,7 @@ MIRAS 集成了多种搜索方法：
 虽然没有完整 RSI，但有几个**部分实现**：
 
 - **AutoGPT**（2023）：早期尝试，效果有限
-- **Meta's Self-Improving LLMs**（[arXiv:2404.08898](https://arxiv.org/abs/2404.08898)）：用 LLM 生成自己的训练数据
+- **SRPO**（[arXiv:2406.01660](https://arxiv.org/abs/2406.01660)）：用自改进过程训练偏好模型（Cohere, 2024）
 - **Voyager**（[arXiv:2305.16291](https://arxiv.org/abs/2305.16291)）：Minecraft agent 自主学习新技能
 - **DeepMind 的自我博弈系统**：模型与自己对弈提升
 
@@ -334,7 +330,7 @@ AlphaEvolve 之所以能发现新算法，是因为**算法的效果可以自动
 - AlphaEvolve = LLM + 进化
 - Genie 3 = LLM + world model
 - Titans = LLM + 长期记忆
-- MIRAS = LLM + multi-agent + search
+- Multi-Agent Deep Research = LLM + multi-agent + RL
 
 **组合多种方法**比单一方法更强——这是 RL 在 LLM 时代的新形态。
 
@@ -369,7 +365,7 @@ LLM-driven discovery 是 RL 在 2025-2026 年的新前沿：
 - **AlphaEvolve**：LLM + 进化，发现新数学
 - **Genie 3**：生成式 world model，用于 embodied agent
 - **Titans**：长期记忆架构，扩展 context
-- **MIRAS**：multi-agent + search 框架
+- **M-GRPO**：多智能体 RL 训练
 - **RSI**：递归自我改进（部分实现）
 
 这些工作共同指向一个新范式——**从训练 policy 到训练研究系统**。这是 RL 与 LLM 深度结合的下一代方向，也是 AGI 研究的最前沿。

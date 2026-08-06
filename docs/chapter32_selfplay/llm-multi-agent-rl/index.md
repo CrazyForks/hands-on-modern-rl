@@ -91,7 +91,7 @@ $$R_i = \alpha \cdot R^{\text{outcome}} + (1-\alpha) \cdot R_i^{\text{process}}$
 ![MetaGPT Pipeline](./images/metagpt.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>图 2：MetaGPT 架构。不仅将不同角色的 Agent 封装，更引入了 Standardized Operating Procedures (SOPs) 约束 Agent 的工作流和通信协议，从而极大地缓解了多智能体交流时的"信息幻觉"问题。来源：<a href="https://arxiv.org/abs/2308.01432" target="_blank" rel="noopener noreferrer">MetaGPT Paper</a></em>
+  <em>图 2：MetaGPT 架构。不仅将不同角色的 Agent 封装，更引入了 Standardized Operating Procedures (SOPs) 约束 Agent 的工作流和通信协议，从而极大地缓解了多智能体交流时的"信息幻觉"问题。来源：<a href="https://arxiv.org/abs/2308.00352" target="_blank" rel="noopener noreferrer">MetaGPT Paper</a></em>
 </div>
 
 ### 辩论对抗 (Debate and Competition)

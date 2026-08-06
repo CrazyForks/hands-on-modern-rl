@@ -195,7 +195,7 @@ runner.run("History of reinforcement learning")
 **适合场景**：从零训一个 Deep Research Agent。**优势**：完整的 vLLM + veRL pipeline，可扩展。
 
 ```bash
-git clone https://github.com/tjuloonk/open-researcher
+git clone https://github.com/OPPO-PersonalAI/O-Researcher
 cd open-researcher
 bash train.sh --model qwen2.5-7b --algo grpo
 ```

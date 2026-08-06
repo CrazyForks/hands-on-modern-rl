@@ -4,7 +4,7 @@
 
 这个问题的工业意义巨大。如果对齐难度随模型规模**指数级增长**，那 scaling 受限；如果对齐难度**线性增长**或**对数增长**，那 scaling 可以持续。
 
-[Seed RLHF Scaling Law](https://arxiv.org/abs/2410.18057)（字节 Seed, 2024.10）是这个方向最重要的研究之一。
+[Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)（OpenAI, 2022.10）是这个方向最重要的研究之一。
 
 ## 13.4.1 经典 Scaling Law 回顾
 
@@ -34,13 +34,13 @@ $$L(N, D) = E + \frac{A}{N^\alpha} + \frac{B}{D^\beta}$$
 
 经典 scaling law 都是关于**预训练 loss** 的。但对齐（RLHF）有自己的 scaling law——它和预训练 scaling law 不一定一致。
 
-## 13.4.2 Seed RLHF Scaling Law
+## 13.4.2 Reward Model Overoptimization 的 Scaling Law
 
-[Seed RLHF Scaling](https://arxiv.org/abs/2410.18057)（字节 Seed, 2024.10）专门研究 RLHF 的 scaling。
+[Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)（OpenAI, 2022.10）专门研究 RLHF 中 RM 的 scaling。
 
 ### 研究问题
 
-Seed 团队问：
+OpenAI 团队问：
 
 1. **Reward model 怎么 scale？** RM 的准确性如何随 RM 参数量、训练数据量变化？
 2. **Policy 怎么 scale？** Policy 的 RLHF 效果如何随 policy 参数量、RM 质量变化？
@@ -48,7 +48,7 @@ Seed 团队问：
 
 ### 实验设计
 
-团队训练了多个规模的 RM（1.5B, 7B, 30B, 70B）和 policy（1.5B, 7B, 30B, 70B），测量：
+团队训练了多个规模的 RM 和 policy（3B 到 52B），测量：
 
 - RM accuracy vs RM size
 - Policy RLHF improvement vs Policy size + RM size
@@ -230,7 +230,7 @@ RLHF 让大模型变得更 sycophantic——这与 [GPT-4o rollback](./modern-in
 
 ### Scalable Oversight
 
-[Scalable Oversight](https://arxiv.org/abs/2211.03592)——**用 AI 监督 AI**。
+[Scalable Oversight](https://arxiv.org/abs/2211.03540)——**用 AI 监督 AI**。
 
 当模型能力超过人类评估能力时（如代码生成、数学证明），人类无法直接评估模型回答。解决方法：
 
@@ -238,15 +238,15 @@ RLHF 让大模型变得更 sycophantic——这与 [GPT-4o rollback](./modern-in
 - **Debate**：让两个 AI 辩论，人类评判胜负
 - **IRIS（Iterated amplification）**：让弱模型监督强模型，迭代放大
 
-### Constitutional AI 2.0
+### Constitutional AI
 
-[Anthropic Constitutional AI](https://www.anthropic.com/research/constitutional-ai-2) 2.0（2026.02）——用 80 页 Constitution 训练 Claude。
+[Constitutional AI: Harmlessness from AI Feedback](https://arxiv.org/abs/2212.08073)（Anthropic, 2022）——用显式的"宪法"做 AI 反馈训练。
 
 核心思想：
 
 - 把对齐规则写成显式的"宪法"
-- 让模型在训练时内化宪法
-- 推理时自然遵守，不需要 prompt
+- 用 AI feedback 依据宪法修订模型回答，减少人类标注
+- 模型在训练时内化宪法
 
 这是把 [Sleeper Agents 启示](./sleeper-and-faking)——"需要显式规则"——具体化。
 
@@ -260,17 +260,17 @@ RLHF 让大模型变得更 sycophantic——这与 [GPT-4o rollback](./modern-in
 - **Circuit analysis**：分析模型的推理路径
 - **Activation patching**：定位关键神经元
 
-### Provable Alignment
+### Formal Reasoning via RL（形式化推理）
 
-[Provable Alignment](https://arxiv.org/abs/2309.02533)——**用形式化方法证明对齐**。
+[DeepSeek-Prover-V2](https://arxiv.org/abs/2504.21801)（DeepSeek, 2025.04）——**用 RL 推进形式化证明**。
 
 理论上：
 
-- 用 Lean4 / Coq 形式化"对齐"的定义
-- 证明模型的某些性质满足这个定义
-- 提供数学保证
+- 用 Lean4 形式化数学命题
+- 用 RL 训练模型做 subgoal decomposition，把定理逐步拆成可验证的子目标
+- 生成机器可验证的证明链
 
-目前还是理论阶段，但形式化 PRM（[第 9 章](../chapter20_prm_search/formal-prm)）的进展让这个方向看到了曙光。
+目前还聚焦在数学定理证明，但形式化 PRM（[第 9 章](../chapter20_prm_search/formal-prm)）的进展让这个方向看到了曙光。
 
 ## 本章总结
 

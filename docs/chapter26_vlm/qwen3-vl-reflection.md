@@ -9,7 +9,7 @@
 
 ## 11.7.1 Qwen3-VL 的反思机制
 
-[Qwen3-VL](https://arxiv.org/abs/2505.09388)（阿里, 2025.05，与 Qwen3 同期发布）是 Qwen3 系列的视觉语言版本。
+[Qwen3-VL](https://arxiv.org/abs/2511.21631)（阿里, 2025.05，与 Qwen3 同期发布）是 Qwen3 系列的视觉语言版本。
 
 ### 视觉理解的反思
 
@@ -96,7 +96,7 @@ Qwen3-VL 在多项视觉推理 benchmark 上显著超越 Qwen2.5-VL——反思�
 
 ## 11.7.2 音频 RL 与 Step-Audio-R1 的 MGRD
 
-[Step-Audio-R1](https://arxiv.org/abs/2506.08946)（StepFun, 2025.06）是音频领域的 RL 突破——**Multimodal Generative Reasoning with Direct Preference Optimization (MGRD)**。
+[Step-Audio-R1](https://arxiv.org/abs/2511.15848)（StepFun, 2025.11）是音频领域的 RL 突破——**Multimodal Generative Reasoning with Direct Preference Optimization (MGRD)**。
 
 ### 音频 RL 的挑战
 

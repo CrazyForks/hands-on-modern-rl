@@ -122,7 +122,7 @@ $$\mathcal{L}_{\text{GRPO}}(\theta) = \mathbb{E}_q \left[ \frac{1}{G} \sum_{i=1}
 R1 论文发布后，开源社区和工业实验室在不到一年内提出了至少五个有影响力的 GRPO 变体，每一条都对应一类具体的训练痛点：
 
 - **DAPO**（字节跳动与清华，2025.03，[arXiv:2503.14476](https://arxiv.org/abs/2503.14476)）针对 R1-Zero 训练中的"思考过程越来越长""采样效率低"问题，引入四项工程改造——非对称裁剪（Clip-Higher，让 $\epsilon_{\text{high}} > \epsilon_{\text{low}}$）、动态采样（Dynamic Sampling，过滤全对全错的样本）、Token 级损失（避免长回答主导梯度）、超长样本过滤（Overlong Filtering）。AIME 2024 上用 50% 的步数就超越了 R1-Zero。
-- **Dr.GRPO**（Liu et al., 2025, [arXiv:2508.10355](https://arxiv.org/abs/2508.10355)）发现 GRPO 中的标准差归一化和长度归一化会引入偏差，导致 reward hacking 与回答长度膨胀。移除这两项归一化后训练更稳定。
+- **Dr.GRPO**（Liu et al., 2025, [arXiv:2503.20783](https://arxiv.org/abs/2503.20783)）发现 GRPO 中的标准差归一化和长度归一化会引入偏差，导致 reward hacking 与回答长度膨胀。移除这两项归一化后训练更稳定。
 - **GSPO**（Zheng et al., Qwen3 团队，2025.07, [arXiv:2507.18071](https://arxiv.org/abs/2507.18071)）把重要性采样比从 token 级提升到**序列级**，专为 MoE 架构下的 RL 训练稳定性设计，成为 Qwen3 全系的训练基石。
 - **CISPO**（MiniMax，2025.06, [arXiv:2506.13585](https://arxiv.org/abs/2506.13585)）改写裁剪对象——**裁剪重要性采样权重，而非 token 更新**，保留所有 token 的梯度贡献，配合 lightning attention 实现 2 倍训练加速。
 - **VAPO**（字节 Seed，2025.04, [arXiv:2504.05118](https://arxiv.org/abs/2504.05118)）则反潮流——**重新引入 value model**，证明在长 CoT 推理任务中 critic 网络仍有不可替代的价值，AIME 60.4 超越同期所有 GRPO 变体。
@@ -184,7 +184,7 @@ RL 从 1890 年的迷笼走到 2026 年的工业集群，跨越了一百三十�
 
 [^12]: Yu, Q., et al. (2025). DAPO: An Open-Source LLM Reinforcement Learning System at Scale. _arXiv preprint_. [arXiv:2503.14476](https://arxiv.org/abs/2503.14476)
 
-[^13]: Liu, Y., et al. (2025). Understanding r1-zero-like training. _arXiv preprint_. [arXiv:2508.10355](https://arxiv.org/abs/2508.10355)
+[^13]: Liu, Y., et al. (2025). Understanding r1-zero-like training. _arXiv preprint_. [arXiv:2503.20783](https://arxiv.org/abs/2503.20783)
 
 [^14]: Zheng, C., et al. (2025). GSPO: Group Sequence Policy Optimization. _arXiv preprint_. [arXiv:2507.18071](https://arxiv.org/abs/2507.18071)
 

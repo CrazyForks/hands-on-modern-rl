@@ -35,7 +35,7 @@ RL 训练需要大量 rollout——每次 rollout 几分钟，让视频 RL 的�
 
 ### reward model 的稀缺
 
-图像 reward model 有 [LAION-Aesthetics](https://laion.ai/blog/laion-aesthetics/)、[PickScore](https://arxiv.org/abs/2305.03069) 等开源模型。视频 reward model 几乎没有——视频偏好数据标注成本是图像的 10 倍以上。
+图像 reward model 有 [LAION-Aesthetics](https://laion.ai/blog/laion-aesthetics/)、[PickScore](https://arxiv.org/abs/2305.01569) 等开源模型。视频 reward model 几乎没有——视频偏好数据标注成本是图像的 10 倍以上。
 
 这些挑战让视频生成 RL 在 2024 年进展缓慢。2025 年的工业突破主要来自两个方向：
 
@@ -44,7 +44,7 @@ RL 训练需要大量 rollout——每次 rollout 几分钟，让视频 RL 的�
 
 ## 11.6.2 DanceGRPO 与 Diffusion 的 GRPO
 
-[DanceGRPO](https://arxiv.org/abs/2501.08011)（字节 Seed, 2025.01）是 diffusion RL 的重要突破。它的核心贡献是：**把 GRPO 思想直接用到 diffusion 训练**。
+[DanceGRPO](https://arxiv.org/abs/2505.07818)（字节 Seed, 2025.05）是 diffusion RL 的重要突破。它的核心贡献是：**把 GRPO 思想直接用到 diffusion 训练**。
 
 ### DanceGRPO 的核心思想
 
@@ -191,7 +191,7 @@ Seedance 是中国视频生成 SOTA，超越 Sora 2 和 Veo 3。
 
 ## 11.6.4 LongCat-Video 与 高效长视频生成
 
-[LongCat-Video](https://arxiv.org/abs/2509.11018)（字节 Seed, 2025.09）是另一个重要工作——专注**长视频生成**。
+[LongCat-Video](https://arxiv.org/abs/2510.22200)（美团, 2025.10）是另一个重要工作——专注**长视频生成**。
 
 ### 长视频的挑战
 

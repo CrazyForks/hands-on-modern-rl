@@ -88,7 +88,7 @@ $$\rho_t^{\text{stale}} = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{gen
 
 #### LlamaRL
 
-[LlamaRL](https://github.com/meta-llama/llama-rl)（Meta, 2025）是 Llama 4 后训练使用的纯异步框架。它的设计哲学是 **完全 disaggregated**：rollout generation、policy training、reward evaluation 三个阶段用独立的 GPU 集群，通过分布式参数服务器（parameter server）做异步权重同步。LlamaRL 的设计假设是万亿参数 MoE 模型——在这个规模下，单集群无法承载所有模型，必须物理分离。
+[LlamaRL](https://arxiv.org/abs/2505.24034)（Meta, 2025）是 Llama 4 后训练使用的纯异步框架。它的设计哲学是 **完全 disaggregated**：rollout generation、policy training、reward evaluation 三个阶段用独立的 GPU 集群，通过分布式参数服务器（parameter server）做异步权重同步。LlamaRL 的设计假设是万亿参数 MoE 模型——在这个规模下，单集群无法承载所有模型，必须物理分离。
 
 ### 框架对比表
 
@@ -601,13 +601,13 @@ $$\text{成本} = 3300 \times 2 = \$6,600$$
 - [HybridFlow: A Flexible and Efficient RLHF Framework (veRL, arXiv:2409.19256)](https://arxiv.org/abs/2409.19256)
 - [OpenRLHF: An Easy-to-use, Scalable and High-performance RLHF Framework](https://arxiv.org/abs/2405.11143)
 - [AReaL: A Large-Scale Asynchronous Reinforcement Learning System for Language Reasoning (arXiv:2505.24298)](https://arxiv.org/abs/2505.24298)
-- [LlamaRL: A Distributed Asynchronous Reinforcement Learning Framework for LLMs (arXiv:2507.21240)](https://arxiv.org/abs/2507.21240)
-- [NeMo-Aligner: Scalable Toolkit for Efficient Model Alignment](https://arxiv.org/abs/2402.01969)
+- [LlamaRL: A Distributed Asynchronous Reinforcement Learning Framework for LLMs (arXiv:2505.24034)](https://arxiv.org/abs/2505.24034)
+- [NeMo-Aligner: Scalable Toolkit for Efficient Model Alignment](https://arxiv.org/abs/2405.01481)
 
 ### 奖励设计与数据策略
 
 - [Seed1.5-Thinking: Advancing Superb Reasoning Models with Reinforcement Learning (arXiv:2504.13914)](https://arxiv.org/abs/2504.13914)
-- [Generative Reward Models](https://arxiv.org/abs/2410.12840)
+- [Generative Reward Models](https://arxiv.org/abs/2410.12832)
 - [Skywork-OR1: Mitigating Premature Entropy Collapse in RL (arXiv:2505.22312)](https://arxiv.org/abs/2505.22312)
 - [DAPO: An Open-Source LLM RL System at Scale](https://arxiv.org/abs/2503.14476)
 
@@ -621,5 +621,5 @@ $$\text{成本} = 3300 \times 2 = \$6,600$$
 ### 分布式训练系统
 
 - [Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism](https://arxiv.org/abs/1909.08053)
-- [DeepSpeed: System Optimizations Enable Training Deep Learning Models with Over 100 Billion Parameters](https://arxiv.org/abs/2007.00072)
+- [DeepSpeed: System Optimizations Enable Training Deep Learning Models with Over 100 Billion Parameters](https://dl.acm.org/doi/10.1145/3394486.3406703)
 - [ZeRO: Memory Optimizations Toward Training Trillion Parameter Models](https://arxiv.org/abs/1910.02054)

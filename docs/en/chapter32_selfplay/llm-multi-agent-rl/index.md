@@ -95,7 +95,7 @@ Another representative work, **MetaGPT**, encodes Standardized Operating Procedu
 ![MetaGPT Pipeline](../../../chapter32_selfplay/llm-multi-agent-rl/images/metagpt.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>Figure 2: MetaGPT architecture. It not only encapsulates agents in different roles but also introduces Standardized Operating Procedures (SOPs) to constrain agent workflows and communication protocols, greatly alleviating the "information hallucination" problem during multi-agent communication. Source: <a href="https://arxiv.org/abs/2308.01432" target="_blank" rel="noopener noreferrer">MetaGPT Paper</a></em>
+  <em>Figure 2: MetaGPT architecture. It not only encapsulates agents in different roles but also introduces Standardized Operating Procedures (SOPs) to constrain agent workflows and communication protocols, greatly alleviating the "information hallucination" problem during multi-agent communication. Source: <a href="https://arxiv.org/abs/2308.00352" target="_blank" rel="noopener noreferrer">MetaGPT Paper</a></em>
 </div>
 
 ### Architecture 2: Debate and Competition

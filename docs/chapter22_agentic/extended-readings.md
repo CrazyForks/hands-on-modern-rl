@@ -60,7 +60,7 @@ GUI 智能体让 AI 能像人一样操作图形界面——点击按钮、填写
 | WebAgent-R1 **[开源]**                        | 端到端多轮 RL 框架，将 3B 模型成功率从 6.1% 提升至 33.9%     | [GitHub](https://github.com/WebAgent-R1/WebAgent-R1)           |
 | Web-Shepherd **[开源]**                       | 首个网页导航专用步骤级奖励模型，能评估每一步交互             | [GitHub](https://github.com/kyle8581/Web-Shepherd)             |
 | CRAFT-GUI                                     | 结合课程学习与 GRPO，提升 GUI 智能体性能                     | [arXiv](https://arxiv.org/abs/2508.11360)                      |
-| MobileRL **[开源]**                           | 移动端在线 RL 框架，使用 ADAGRPO 算法                        | [GitHub](https://github.com/MobileRL/MobileRL)                 |
+| MobileRL **[开源]**                           | 移动端在线 RL 框架，使用 ADAGRPO 算法                        | [GitHub](https://github.com/THUDM/MobileRL)                    |
 | Co-EPG                                        | 通过协同进化框架，同时优化 GUI 智能体的规划与接地能力        | [AAAI](https://ojs.aaai.org/index.php/AAAI/article/view/40981) |
 | Continual GUI Agents                          | 定义并解决 GUI 智能体在持续变化环境下的学习问题              | [arXiv](https://arxiv.org/abs/2601.20732)                      |
 | WebFactory                                    | 全自动闭环 RL 流程，将 LLM 的智能"压缩"到高效的 GUI 智能体中 | [OpenReview](https://openreview.net/forum?id=HaIEP2PD4S)       |

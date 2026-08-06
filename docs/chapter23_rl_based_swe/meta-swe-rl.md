@@ -1,6 +1,6 @@
 # 21.2 Meta SWE-RL 与 开源 SOTA 的代表
 
-[Meta SWE-RL](https://arxiv.org/abs/2502.18452)（2025.02）是开源 SWE-RL 的代表作。它的核心贡献是：
+[Meta SWE-RL](https://arxiv.org/abs/2502.18449)（2025.02）是开源 SWE-RL 的代表作。它的核心贡献是：
 
 - 用开源数据（SWE-bench + SWE-gym）训练
 - 用最简单的 GRPO + 测试 reward
@@ -50,7 +50,7 @@ Meta SWE-RL 的算法选择极其简单——**GRPO + 测试 binary reward**。
 
 ### 为什么用 GRPO？
 
-Meta 团队在 [SWE-RL 论文](https://arxiv.org/abs/2502.18452) 里对比了 PPO、GRPO、DPO：
+Meta 团队在 [SWE-RL 论文](https://arxiv.org/abs/2502.18449) 里对比了 PPO、GRPO、DPO：
 
 | 算法            | SWE-bench Verified |
 | --------------- | ------------------ |

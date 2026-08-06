@@ -13,7 +13,7 @@
 
 ## 12.3.1 Code World Model（CWM）
 
-[Code World Model](https://arxiv.org/abs/2503.02561)（CWM，2025.03）的核心思想：**把代码执行建模为 MDP，训练一个 world model 预测代码的状态变化**。
+[Code World Model](https://arxiv.org/abs/2510.02387)（CWM，2025.09）的核心思想：**把代码执行建模为 MDP，训练一个 world model 预测代码的状态变化**。
 
 ### CWM 的 MDP 定义
 
@@ -97,7 +97,7 @@ CWM 是 model-based RL 在 SWE 领域的应用。经典 model-based RL（如 MuZ
 
 ## 12.3.2 DeepSWE 与 长 horizon agent 的 RL
 
-[DeepSWE](https://arxiv.org/abs/2508.19298)（字节 Seed，2025.08）是另一个 SWE-RL 突破。它的核心贡献是：**用 verifiable reward 训练长 horizon agent（32 步以上 trajectory）**。
+[DeepSWE-Preview](https://www.together.ai/blog/deepswe)（Agentica × Together AI，2025.07）是另一个 SWE-RL 突破。它的核心贡献是：**用 verifiable reward 训练长 horizon agent（32 步以上 trajectory）**。
 
 ### DeepSWE 的核心思路
 

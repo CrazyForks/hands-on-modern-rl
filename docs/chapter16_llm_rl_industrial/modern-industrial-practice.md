@@ -155,7 +155,7 @@ LM Arena 上跑的 Maverick 是一个**经过专门优化的版本**——使用
 
 ## 9.9.3 Seed-Thinking 与 字节的 Reasoning 配方
 
-[Seed-Thinking 1.5](https://arxiv.org/abs/2505.07083)（字节 Seed, 2025.05）是字节对 reasoning model 工业训练的系统总结。
+[Seed1.5-Thinking](https://arxiv.org/abs/2504.13914)（字节 Seed, 2025.04）是字节对 reasoning model 工业训练的系统总结。
 
 ### Seed-Thinking 的核心贡献
 
@@ -224,11 +224,11 @@ Seed-Thinking 1.5 在多个 benchmark 上：
 
 ## 9.9.4 Kimi K2 的 MuonClip + QK-clip
 
-[Kimi K2](https://arxiv.org/abs/2507.14432)（Moonshot, 2025.07）的工业贡献之一是 **MuonClip + QK-clip**——训练稳定性的新工具。
+[Kimi K2](https://arxiv.org/abs/2507.20534)（Moonshot, 2025.07）的工业贡献之一是 **MuonClip + QK-clip**——训练稳定性的新工具。
 
 ### Muon optimizer
 
-[Muon](https://arxiv.org/abs/2502.14682)（2025.02）是新提出的 optimizer——Muon (Momentum + Orthogonalization)。它结合了：
+[Muon](https://kellerjordan.github.io/posts/muon/)（2025.02）是新提出的 optimizer——Muon (Momentum + Orthogonalization)。它结合了：
 
 - **Momentum**（来自 Adam）
 - **Orthogonalization**（对梯度做正交化）

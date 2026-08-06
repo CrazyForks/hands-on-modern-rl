@@ -221,7 +221,7 @@ Lean4 MCTS 训练的计算成本极高——每次 tactic 调用都要触发 Lea
 
 ### 自动形式化
 
-让 LLM 学会把自然语言自动翻译成 Lean4。这是 [AlphaProof 的形式化器](https://deepmind.google/discover/blog/ai-solves-imo-problems-at-silver-medal-level/) 和 [Autoformalization](https://arxiv.org/abs/2102.12365) 等研究的方向。
+让 LLM 学会把自然语言自动翻译成 Lean4。这是 [AlphaProof 的形式化器](https://deepmind.google/discover/blog/ai-solves-imo-problems-at-silver-medal-level/) 和 [Autoformalization with Large Language Models](https://arxiv.org/abs/2205.12615) 等研究的方向。
 
 ### Lean4 + LLM 混合
 

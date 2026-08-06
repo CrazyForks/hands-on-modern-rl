@@ -201,7 +201,7 @@ ThinkPRM 还报告了一个重要发现：**Verifier 自己也有 test-time comp
 
 1. **PRM 和 ORM 混合**：用 PRM 评估过程，用 ORM 评估结果，加权求和
 2. **生成式 + 判别式混合**：生成式 PRM 提供高质量评价，蒸馏到判别式 PRM 用于大规模训练
-3. **Self-PRM**：让模型自己评估自己的推理（与 [Self-Rewarding Language Models](https://arxiv.org/abs/2312.10017) 思路一致）
+3. **Self-PRM**：让模型自己评估自己的推理（与 [Self-Rewarding Language Models](https://arxiv.org/abs/2401.10020) 思路一致）
 
 ## 11.3.7 一个反思 与 PRM 还是 RLVR？
 

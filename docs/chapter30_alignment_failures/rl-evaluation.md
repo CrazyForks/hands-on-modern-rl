@@ -53,7 +53,7 @@ MATH 数据集按难度分 Level 1-5，DeepSeek-R1 报告每层分数。报告�
 - **配对 t-test**：在相同测试集上对比两个模型
 - **Bootstrap**：对测试集做重采样估计方差
 
-LLM 评测论文长期忽视统计显著性，2024 年后才被广泛接受（[Borchert et al., arXiv:2406.04315](https://arxiv.org/abs/2406.04315)）。
+LLM 评测论文长期忽视统计显著性，2024 年后才被广泛接受（[Blackwell et al., arXiv:2410.03492](https://arxiv.org/abs/2410.03492)）。
 
 ## 35.2 污染与泄漏检测
 
@@ -101,7 +101,7 @@ def ngram_contamination(train_text, test_text, n=13):
     return len(overlap) / len(test_ngrams)
 ```
 
-OpenAI 2023 的研究（[arXiv:2311.04370](https://arxiv.org/abs/2311.04370)）显示，13-gram 重叠能在 LLM 训练语料中找到 5-15% 的 benchmark 内容。
+OpenAI 2020 的研究（[arXiv:2005.14165](https://arxiv.org/abs/2005.14165)）用 13-gram 重叠在训练语料中过滤与 benchmark 重复的文本，这是最早的去污染实践之一。
 
 #### 成员推理（Membership Inference）
 
@@ -139,7 +139,7 @@ test_data = [
 
 1. **N-gram 过滤**（13-gram）：移除 90% 显式污染
 2. **Embedding 检索**（cosine sim > 0.9）：移除近似污染
-3. **MinHash LSH**：快速近似检测（[MinHash LSH, arXiv:1702.04406](https://arxiv.org/abs/1702.04406)）
+3. **MinHash LSH**：快速近似检测（[Deduplicating Training Data, arXiv:2107.06499](https://arxiv.org/abs/2107.06499)）
 4. **持续新增 benchmark**：每月用新数据更新测试集
 
 Qwen3 事件后，主流团队都建立了去污染 pipeline，但效果仍不完美——隐式污染几乎无法消除。
@@ -150,7 +150,7 @@ Qwen3 事件后，主流团队都建立了去污染 pipeline，但效果仍不�
 
 ### 实验证据
 
-Mizrahi et al. 2024（[arXiv:2311.09348](https://arxiv.org/abs/2311.09348)）系统研究：对 10 个 LLM × 22 个 benchmark × 5 种 prompt 模板：
+Mizrahi et al. 2024（[arXiv:2401.00595](https://arxiv.org/abs/2401.00595)）系统研究：对 10 个 LLM × 22 个 benchmark × 5 种 prompt 模板：
 
 | 模板 | MATH 分数（GPT-4） | MMLU 分数（GPT-4） |
 | ---- | ------------------ | ------------------ |
@@ -295,7 +295,7 @@ behavior_label = human_annotate(response, scenario)
 
 #### 2. Sycophancy Benchmarks
 
-Perez et al. 2022（[arXiv:2212.08061](https://arxiv.org/abs/2212.08061)）设计了 Sycophancy 评估——模型面对用户错误观点时是否迎合：
+Perez et al. 2022（[arXiv:2212.09251](https://arxiv.org/abs/2212.09251)）设计了 Sycophancy 评估——模型面对用户错误观点时是否迎合：
 
 - 用户问："I think climate change is a hoax, agree?"
 - 不迎合的回答：解释科学证据，礼貌地不同意
@@ -303,7 +303,7 @@ Perez et al. 2022（[arXiv:2212.08061](https://arxiv.org/abs/2212.08061)）设�
 
 #### 3. Honesty Benchmarks
 
-[Honesty Benchmark, arXiv:2402.07217](https://arxiv.org/abs/2402.07217)：测量模型在不确定问题上的诚实度。
+[Honesty Is the Best Policy, arXiv:2312.01350](https://arxiv.org/abs/2312.01350)：测量模型在不确定问题上的诚实度。
 
 ### 行为评估的难点
 
@@ -495,7 +495,7 @@ run_eval(
 
 ### τ-bench（Tau-Bench）
 
-[τ-bench, arXiv:2404.06454](https://arxiv.org/abs/2404.06454) 是 Salesforce 2024 推出的**工具调用 benchmark**：
+[τ-bench, arXiv:2406.12045](https://arxiv.org/abs/2406.12045) 是 Salesforce 2024 推出的**工具调用 benchmark**：
 
 - 模拟真实业务场景（航空、零售、电信客户服务）
 - 模型需要调用 API（查订单、改航班、退款）
@@ -568,11 +568,11 @@ Opus 4.6 Eval Suite 揭示了**模型已经能做初级研究工作**——34× 
 - [Cobbe et al. 2021 "Training Verifiers to Solve Math Word Problems" (GSM8K)](https://arxiv.org/abs/2110.14168)
 - [Chen et al. 2021 "Evaluating Large Language Models Trained on Code" (HumanEval)](https://arxiv.org/abs/2107.03374)
 - [Hendrycks et al. 2021 "Measuring Massive Multitask Language Understanding" (MMLU)](https://arxiv.org/abs/2009.03300)
-- [Mizrahi et al. 2024 "State of What Art? A Pitfall in LLM Evaluation"](https://arxiv.org/abs/2311.09348)
-- [Borchert et al. 2024 "On the Pitfalls of Analyzing Individual Tokens in LLM Evaluation"](https://arxiv.org/abs/2406.04315)
+- [Mizrahi et al. 2024 "State of What Art? A Call for Multi-Prompt LLM Evaluation"](https://arxiv.org/abs/2401.00595)
+- [Blackwell et al. 2024 "Towards Reproducible LLM Evaluation: Quantifying Uncertainty in LLM Benchmark Scores"](https://arxiv.org/abs/2410.03492)
 - [Perez et al. 2022 "Discovering Language Model Behaviors with Model-Written Evaluations"](https://arxiv.org/abs/2212.09251)
-- [Sharma et al. 2024 "Sycophancy Benchmark"](https://arxiv.org/abs/2212.08061)
-- [Yao et al. 2024 "Tau-Bench: A Benchmark for Tool-Agent-User Interaction"](https://arxiv.org/abs/2404.06454)
+- [Sharma et al. 2023 "Towards Understanding Sycophancy in Language Models"](https://arxiv.org/abs/2310.13548)
+- [Yao et al. 2024 "Tau-Bench: A Benchmark for Tool-Agent-User Interaction"](https://arxiv.org/abs/2406.12045)
 - [Anthropic 2025 "Claude Opus 4.6 AI Research Eval"](https://www.anthropic.com/research/claude-opus-4-6)
 - [Ouyang et al. 2024 "LiveCodeBench"](https://arxiv.org/abs/2403.07974)
 - [Patel et al. 2024 "BFCL Berkeley Function Calling Leaderboard"](https://gorilla.cs.berkeley.edu/blogs/8_berkeley_function_calling_leaderboard.html)

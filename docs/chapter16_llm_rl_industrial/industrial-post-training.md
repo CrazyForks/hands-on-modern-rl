@@ -848,7 +848,7 @@ Tulu 3 完整开源数据、代码和训练 recipe，主题就是 multi-stage po
 
 #### 美团 LongCat
 
-[^longcat_flash]: [LongCat-Flash-Thinking-2601 技术报告](https://tech.meituan.com/2026/02/02/longcat-flash-thinking-2601-techreport.html)
+[^longcat_flash]: [LongCat-Flash-Thinking-2601 技术报告](https://tech.meituan.com/2026/02/02/LongCat-Flash-Thinking-2601-techreport.html)
 
 #### 蚂蚁 Ling / Ring
 

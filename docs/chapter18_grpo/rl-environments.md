@@ -504,17 +504,17 @@ RL 环境质量最终要在公认基准上验证。2025 年主流的 agent RL �
 | ------------------------------------------------------ | ------------------------------ | ------------------------------- | ------------------- |
 | **[SWE-bench](https://arxiv.org/abs/2310.06770)**      | 修真实 GitHub issue            | 单元测试（已通过的 + 修复后的） | 业界 SWE agent 标杆 |
 | **[SWE-Gym](https://arxiv.org/abs/2412.21139)**        | SWE-bench 的训练集版本         | 同上                            | 专为 RL 训练设计    |
-| **[Terminal-Bench](https://arxiv.org/abs/2503.19805)** | 终端任务（git、ssh、文件操作） | 状态检查                        | 真实 shell 环境     |
+| **[Terminal-Bench](https://arxiv.org/abs/2601.11868)** | 终端任务（git、ssh、文件操作） | 状态检查                        | 真实 shell 环境     |
 | **[LiveCodeBench](https://arxiv.org/abs/2403.07974)**  | 算法题（每月更新）             | 单元测试                        | 抗污染设计          |
 | **[CyberGym](https://arxiv.org/abs/2506.02548)**       | CTF 安全任务                   | flag 匹配                       | 形式化              |
 
 ### 工具调用与 Function Calling
 
-| 基准                                                                                 | 任务                         | Verifier            |
-| ------------------------------------------------------------------------------------ | ---------------------------- | ------------------- |
-| **[BFCL](https://arxiv.org/abs/2407.13636)** (Berkeley Function Calling Leaderboard) | 调用正确函数 + 参数          | 精确匹配 + 类型检查 |
-| **[τ-bench](https://arxiv.org/abs/2404.44581)** (Salesforce)                         | 模拟客服 agent（航空、零售） | 任务完成 + 规则遵守 |
-| **[ToolBench](https://arxiv.org/abs/2307.16789)**                                    | 调用 16000+ 真实 API         | 端到端任务完成      |
+| 基准                                                                                                 | 任务                         | Verifier            |
+| ---------------------------------------------------------------------------------------------------- | ---------------------------- | ------------------- |
+| **[BFCL](https://proceedings.mlr.press/v267/patil25a.html)** (Berkeley Function Calling Leaderboard) | 调用正确函数 + 参数          | 精确匹配 + 类型检查 |
+| **[τ-bench](https://arxiv.org/abs/2406.12045)** (Salesforce)                                         | 模拟客服 agent（航空、零售） | 任务完成 + 规则遵守 |
+| **[ToolBench](https://arxiv.org/abs/2307.16789)**                                                    | 调用 16000+ 真实 API         | 端到端任务完成      |
 
 ### Web 与 Browser
 
@@ -530,7 +530,7 @@ RL 环境质量最终要在公认基准上验证。2025 年主流的 agent RL �
 | --------------------------------------------------------------- | ----------------------- | -------- |
 | **[Vending-Bench](https://arxiv.org/abs/2502.15840)** (V-BENCH) | 长期经营自动售货机      | 累计利润 |
 | **[GAIA](https://arxiv.org/abs/2311.12983)**                    | 通用 assistant 多步任务 | 答案匹配 |
-| **[Mind2Web](https://arxiv.org/abs/2305.04203)**                | 真实网页任务            | DOM 状态 |
+| **[Mind2Web](https://arxiv.org/abs/2306.06070)**                | 真实网页任务            | DOM 状态 |
 
 ### 选择基准的原则
 
@@ -668,9 +668,9 @@ RL 环境质量差会导致一系列 alignment failures——策略学到 verifi
 - [AgentRL: 多轮多任务 Agentic RL 框架 (arXiv:2510.04206)](https://arxiv.org/abs/2510.04206)
 - [CyberGym: CTF 训练环境 (arXiv:2506.02548)](https://arxiv.org/abs/2506.02548)
 - [Vending-Bench: 长程 benchmark (arXiv:2502.15840)](https://arxiv.org/abs/2502.15840)
-- [τ-bench: Salesforce agent benchmark (arXiv:2404.44581)](https://arxiv.org/abs/2404.44581)
+- [τ-bench: Salesforce agent benchmark (arXiv:2406.12045)](https://arxiv.org/abs/2406.12045)
 - [SWE-Gym: SWE-bench 训练版 (arXiv:2412.21139)](https://arxiv.org/abs/2412.21139)
-- [BFCL: Berkeley Function Calling Leaderboard (arXiv:2407.13636)](https://arxiv.org/abs/2407.13636)
+- [BFCL: Berkeley Function Calling Leaderboard (PMLR 2025)](https://proceedings.mlr.press/v267/patil25a.html)
 - [WebArena (arXiv:2307.13854)](https://arxiv.org/abs/2307.13854)
 - [BrowseComp (OpenAI 2025)](https://openai.com/index/browsecomp/)
 - [Firecracker microVM](https://firecracker-microvm.github.io/)

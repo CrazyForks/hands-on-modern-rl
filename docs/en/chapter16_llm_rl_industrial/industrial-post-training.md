@@ -852,7 +852,7 @@ A very small but complete exercise is: use 5K math problems or 1K code-fix probl
 
 #### Meituan LongCat
 
-[^longcat_flash]: [LongCat-Flash-Thinking-2601 Technical Report](https://tech.meituan.com/2026/02/02/longcat-flash-thinking-2601-techreport.html)
+[^longcat_flash]: [LongCat-Flash-Thinking-2601 Technical Report](https://tech.meituan.com/2026/02/02/LongCat-Flash-Thinking-2601-techreport.html)
 
 #### Ant Ling / Ring
 

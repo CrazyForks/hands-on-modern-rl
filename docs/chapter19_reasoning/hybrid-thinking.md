@@ -8,7 +8,7 @@
 
 ## 10.3.1 DeepSeek V3.1 与 Hybrid 模式融合
 
-[DeepSeek V3.1](https://arxiv.org/abs/2508.14112)（2025.08）是 Hybrid Thinking 的早期工业实现。V3.1 的设计思路是：
+[DeepSeek V3.1](https://api-docs.deepseek.com/news/news250821)（2025.08）是 Hybrid Thinking 的早期工业实现。V3.1 的设计思路是：
 
 - **同一个模型**：不维护两个独立的"思考模型"和"非思考模型"
 - **模式切换**：通过 prompt 中的特殊标记（如 `<think>` / `</think>`）控制是否进入思考模式
@@ -59,7 +59,7 @@ response = client.chat.completions.create(
 
 ## 10.3.3 NoThinking + Best-of-N 与 反直觉的发现
 
-2025 年 5 月，Ma et al. 发表了一篇有趣的研究——[NoThinking](https://arxiv.org/abs/2505.18681)。这篇论文提出了一个反直觉的主张：**在很多任务上，"不思考 + Best-of-N" 比 "思考" 效果更好**。
+2025 年 4 月，Ma et al. 发表了一篇有趣的研究——[Reasoning Models Can Be Effective Without Thinking](https://arxiv.org/abs/2504.09858)（常称 NoThinking）。这篇论文提出了一个反直觉的主张：**在很多任务上，"不思考 + Best-of-N" 比 "思考" 效果更好**。
 
 ### NoThinking 的核心实验
 
