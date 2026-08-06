@@ -33,7 +33,7 @@
 
 ### 准备偏好数据集
 
-偏好对齐的核心在于数据。我们为你准备了一个自动生成 Mock 数据的脚本：[1-generate_data.py](../../code/chapter17_dpo/1-generate_data.py)。该脚本默认生成 100 条偏好对，每条数据包含用户提出的错误或有偏差的观点，以及两种不同的回应方式。
+偏好对齐的核心在于数据。我们为你准备了一个自动生成 Mock 数据的脚本：[1-generate_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/1-generate_data.py)。该脚本默认生成 100 条偏好对，每条数据包含用户提出的错误或有偏差的观点，以及两种不同的回应方式。
 
 运行它：
 
@@ -62,7 +62,7 @@ python code/chapter17_dpo/1-generate_data.py
 
 ### 测试微调前的原始输出
 
-运行配套代码：[2-test_before.py](../../code/chapter17_dpo/2-test_before.py)，用一个**不在训练集中的全新问题**来测试模型的原始行为：
+运行配套代码：[2-test_before.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/2-test_before.py)，用一个**不在训练集中的全新问题**来测试模型的原始行为：
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -103,7 +103,7 @@ print("=" * 40)
 
 ### 运行 DPO 训练
 
-接下来，运行训练脚本：[3-train_dpo.py](../../code/chapter17_dpo/3-train_dpo.py)，利用 DPO 让模型学会不盲从：
+接下来，运行训练脚本：[3-train_dpo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/3-train_dpo.py)，利用 DPO 让模型学会不盲从：
 
 ```python
 import json
@@ -196,7 +196,7 @@ Step  Training Loss  Rewards/Margins  Rewards/Chosen  Rewards/Rejected  Rewards/
 
 ### 测试微调后的输出
 
-现在模型已经经过偏好对齐训练。运行验证脚本：[4-test_after.py](../../code/chapter17_dpo/4-test_after.py)，用**同一个不在训练集中的问题**来测试：
+现在模型已经经过偏好对齐训练。运行验证脚本：[4-test_after.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/4-test_after.py)，用**同一个不在训练集中的问题**来测试：
 
 ```python
 import os
@@ -242,7 +242,7 @@ print("=" * 40)
 
 ### 自定义偏好方向
 
-读者可以打开配套的 [1-generate_data.py](../../code/chapter17_dpo/1-generate_data.py) 脚本，修改其中的偏好对。例如：
+读者可以打开配套的 [1-generate_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/1-generate_data.py) 脚本，修改其中的偏好对。例如：
 
 - 将 chosen 改为更直接的"毒舌式"纠正。
 - 将 rejected 改为"虽然正确但过于啰嗦"的回答。
