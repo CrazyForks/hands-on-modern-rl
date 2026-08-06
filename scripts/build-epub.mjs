@@ -174,7 +174,10 @@ function renderKatex(content, displayMode) {
     .replace(/^<span class="katex">/, '')
     .replace(/<\/span>$/, '')
     .replace(/<semantics>/, '')
-    .replace(/<annotation encoding="application\/x-tex">[\s\S]*?<\/annotation><\/semantics>/, '')
+    .replace(
+      /<annotation encoding="application\/x-tex">[\s\S]*?<\/annotation><\/semantics>/,
+      ''
+    )
 }
 
 let mermaidAssetDir = null
@@ -199,7 +202,9 @@ let convertedAssetDir = null
 
 function getConvertedAssetDir() {
   if (!convertedAssetDir) {
-    convertedAssetDir = fs.mkdtempSync(path.join(os.tmpdir(), 'epub-converted-'))
+    convertedAssetDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'epub-converted-')
+    )
   }
   return convertedAssetDir
 }
@@ -217,8 +222,16 @@ function detectActualFormat(filePath) {
     fs.readSync(fd, buf, 0, 12, 0)
     fs.closeSync(fd)
 
-    if (buf[0] === 0x52 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x46 &&
-        buf[8] === 0x57 && buf[9] === 0x45 && buf[10] === 0x42 && buf[11] === 0x50) {
+    if (
+      buf[0] === 0x52 &&
+      buf[1] === 0x49 &&
+      buf[2] === 0x46 &&
+      buf[3] === 0x46 &&
+      buf[8] === 0x57 &&
+      buf[9] === 0x45 &&
+      buf[10] === 0x42 &&
+      buf[11] === 0x50
+    ) {
       return 'webp'
     }
     if (buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46) {
@@ -275,7 +288,9 @@ function findBrowserExecutable() {
 async function renderCoverToPng() {
   const browser = findBrowserExecutable()
   if (!browser) {
-    console.warn('Warning: No browser found for cover rendering, using logo fallback')
+    console.warn(
+      'Warning: No browser found for cover rendering, using logo fallback'
+    )
     return null
   }
 
@@ -348,7 +363,10 @@ h1 { color: #102033; font-size: 120px; line-height: 1.08; margin-bottom: 24px; }
     })
     const page = await instance.newPage()
     await page.setViewport({ width: 1600, height: 2560, deviceScaleFactor: 1 })
-    await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle0', timeout: 30000 })
+    await page.goto(`file://${htmlPath}`, {
+      waitUntil: 'networkidle0',
+      timeout: 30000
+    })
     await page.screenshot({ path: pngPath, type: 'png', fullPage: false })
     await instance.close()
 
@@ -377,11 +395,15 @@ function renderMermaidToPng(source) {
   for (let attempt = 1; attempt <= 3; attempt += 1) {
     fs.rmSync(pngPath, { force: true })
     try {
-      execFileSync(process.execPath, [renderBookAssetScript, 'mermaid', mmdPath, pngPath], {
-        cwd: path.resolve(path.dirname(renderBookAssetScript), '..'),
-        stdio: ['ignore', 'pipe', 'pipe'],
-        timeout: 30_000
-      })
+      execFileSync(
+        process.execPath,
+        [renderBookAssetScript, 'mermaid', mmdPath, pngPath],
+        {
+          cwd: path.resolve(path.dirname(renderBookAssetScript), '..'),
+          stdio: ['ignore', 'pipe', 'pipe'],
+          timeout: 30_000
+        }
+      )
     } catch {
       continue
     }
@@ -438,7 +460,10 @@ function headingIdPlugin(md) {
         }
       }
 
-      const title = inline.content.replace(/`([^`]+)`/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').trim()
+      const title = inline.content
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .trim()
       const baseSlug = customId || slugify(title)
       const count = slugCounts.get(baseSlug) || 0
       slugCounts.set(baseSlug, count + 1)
@@ -450,7 +475,12 @@ function headingIdPlugin(md) {
 }
 
 function createMarkdownRenderer(imageMap) {
-  const md = markdownIt({ html: true, xhtmlOut: true, linkify: true, typographer: false })
+  const md = markdownIt({
+    html: true,
+    xhtmlOut: true,
+    linkify: true,
+    typographer: false
+  })
 
   md.inline.ruler.before('text', 'math_inline', mathInline)
   md.block.ruler.after('blockquote', 'math_block', mathBlock, {
@@ -501,7 +531,8 @@ function createMarkdownRenderer(imageMap) {
 // --- Utility functions ---
 
 function htmlToXhtml(html) {
-  const voidElements = 'area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr'
+  const voidElements =
+    'area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr'
   const pattern = new RegExp(`<(${voidElements})(\\b[^>]*?)\\s*/?>`, 'gi')
   return html
     .replace(pattern, (match, tag, attrs) => {
@@ -542,35 +573,47 @@ function rewriteInternalLinks(html, linkMap, sourcePageLink) {
     ? sourcePageLink.replace(/^\//, '').replace(/\/[^/]*$/, '')
     : ''
 
-  return html.replace(/<a\s([^>]*?)href=["']([^"']+)["']([^>]*)>/gi, (match, pre, href, post) => {
-    if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('mailto:') || href.startsWith('#')) {
-      return match
+  return html.replace(
+    /<a\s([^>]*?)href=["']([^"']+)["']([^>]*)>/gi,
+    (match, pre, href, post) => {
+      if (
+        href.startsWith('http://') ||
+        href.startsWith('https://') ||
+        href.startsWith('mailto:') ||
+        href.startsWith('#')
+      ) {
+        return match
+      }
+
+      const hashIdx = href.indexOf('#')
+      const fragment = hashIdx >= 0 ? href.slice(hashIdx) : ''
+      const pathPart = hashIdx >= 0 ? href.slice(0, hashIdx) : href
+
+      let key
+      if (pathPart.startsWith('/')) {
+        key = normalizeLinkKey(pathPart)
+      } else if (
+        pathPart.startsWith('./') ||
+        pathPart.startsWith('../') ||
+        !pathPart.includes('://')
+      ) {
+        const resolved = path.posix.join(sourceDir, pathPart)
+        key = normalizeLinkKey(resolved)
+      } else {
+        key = normalizeLinkKey(pathPart)
+      }
+
+      const chapterId = linkMap.get(key)
+
+      if (chapterId) {
+        return `<a ${pre}href="${chapterId}.xhtml${fragment}"${post}>`
+      }
+
+      const docsPath = key.startsWith('code/') ? key : `docs/${key}`
+      const fallbackUrl = `${bookGithubUrl}/blob/main/${docsPath}`
+      return `<a ${pre}href="${escapeXml(fallbackUrl)}"${post}>`
     }
-
-    const hashIdx = href.indexOf('#')
-    const fragment = hashIdx >= 0 ? href.slice(hashIdx) : ''
-    const pathPart = hashIdx >= 0 ? href.slice(0, hashIdx) : href
-
-    let key
-    if (pathPart.startsWith('/')) {
-      key = normalizeLinkKey(pathPart)
-    } else if (pathPart.startsWith('./') || pathPart.startsWith('../') || !pathPart.includes('://')) {
-      const resolved = path.posix.join(sourceDir, pathPart)
-      key = normalizeLinkKey(resolved)
-    } else {
-      key = normalizeLinkKey(pathPart)
-    }
-
-    const chapterId = linkMap.get(key)
-
-    if (chapterId) {
-      return `<a ${pre}href="${chapterId}.xhtml${fragment}"${post}>`
-    }
-
-    const docsPath = key.startsWith('code/') ? key : `docs/${key}`
-    const fallbackUrl = `${bookGithubUrl}/blob/main/${docsPath}`
-    return `<a ${pre}href="${escapeXml(fallbackUrl)}"${post}>`
-  })
+  )
 }
 
 function mediaTypeForExt(ext) {
@@ -652,7 +695,11 @@ function collectMarkdownImages(markdown, sourcePagePath, imageMap) {
 
   for (const match of markdown.matchAll(imgPattern)) {
     const src = match[2]
-    if (src.startsWith('data:') || src.startsWith('http://') || src.startsWith('https://')) {
+    if (
+      src.startsWith('data:') ||
+      src.startsWith('http://') ||
+      src.startsWith('https://')
+    ) {
       continue
     }
 
@@ -1216,7 +1263,11 @@ async function main() {
   const linkMap = buildLinkMap(allPages)
   for (let i = 0; i < chapters.length; i++) {
     const page = allPages.find((p) => p._chapterId === chapters[i].id)
-    chapters[i].html = rewriteInternalLinks(chapters[i].html, linkMap, page?.link || '')
+    chapters[i].html = rewriteInternalLinks(
+      chapters[i].html,
+      linkMap,
+      page?.link || ''
+    )
   }
 
   console.log(
@@ -1250,9 +1301,12 @@ async function main() {
 
   const pageCount = chapters.length
 
-  archive.append(generateContentOpf(chapters, imageMap, pageCount, !!coverImagePath), {
-    name: 'OEBPS/content.opf'
-  })
+  archive.append(
+    generateContentOpf(chapters, imageMap, pageCount, !!coverImagePath),
+    {
+      name: 'OEBPS/content.opf'
+    }
+  )
 
   archive.append(generateNavXhtml(tocSections), {
     name: 'OEBPS/nav.xhtml'

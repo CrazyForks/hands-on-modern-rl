@@ -12,11 +12,11 @@
 
 ### 三大范式概览
 
-| 范式 | 核心思想 | 代表算法 | 适用场景 |
-|------|---------|---------|---------|
-| **Dyna** | 模型作为数据增强 | Dyna-Q | 离散动作，快速训练 |
-| **PETS** | 概率集成 + 轨迹采样 | PETS | 高精度控制，模型不确定性重要 |
-| **MBPO** | 短 horizon rollout | MBPO | 通用连续控制 |
+| 范式     | 核心思想            | 代表算法 | 适用场景                     |
+| -------- | ------------------- | -------- | ---------------------------- |
+| **Dyna** | 模型作为数据增强    | Dyna-Q   | 离散动作，快速训练           |
+| **PETS** | 概率集成 + 轨迹采样 | PETS     | 高精度控制，模型不确定性重要 |
+| **MBPO** | 短 horizon rollout  | MBPO     | 通用连续控制                 |
 
 下面逐一拆解。
 
@@ -69,7 +69,7 @@ PETS 的模型是 $K$ 个概率神经网络的集成：
 class PEtsModel:
     def __init__(self, n_models=5):
         self.models = [ProbabilisticNN() for _ in range(n_models)]
-    
+
     def predict(self, s, a):
         # 每个模型输出 (mean, var)
         means, vars = [], []
@@ -90,11 +90,11 @@ def cem_planning(model, s, horizon=10, n_samples=500, n_iters=5):
     # 初始化动作分布
     action_mean = zeros(horizon, action_dim)
     action_var = ones(horizon, action_dim)
-    
+
     for it in range(n_iters):
         # 1. 采样 N 条动作序列
         action_seqs = sample_normal(action_mean, action_var, n_samples)
-        
+
         # 2. 用模型 rollout，每条序列用随机一个集成模型
         rewards = []
         for seq in action_seqs:
@@ -105,12 +105,12 @@ def cem_planning(model, s, horizon=10, n_samples=500, n_iters=5):
                 s_pred, r = model[model_id].predict(s_pred, a)
                 total_r += r
             rewards.append(total_r)
-        
+
         # 3. 选 top 20% 的序列，更新分布
         elite = top_k_indices(rewards, k=0.2 * n_samples)
         action_mean = action_seqs[elite].mean(0)
         action_var = action_seqs[elite].var(0)
-    
+
     return action_mean[0]  # 只执行第一步（MPC 思想）
 ```
 
@@ -157,13 +157,14 @@ MBPO 在 MuJoCo 上达到 model-free SAC 同等性能，但**采样步数减少 
 
 ### Model-Based RL 三大算法对比
 
-| 算法 | 模型类型 | 规划方式 | 样本效率 | 计算成本 |
-|------|---------|---------|----------|----------|
-| Dyna | 确定性 | 1 步假数据 | ~10× | 低 |
-| PETS | 概率集成 | CEM MPC | ~50× | 高 |
-| MBPO | 确定性 | 短 rollout | ~100× | 中 |
+| 算法 | 模型类型 | 规划方式   | 样本效率 | 计算成本 |
+| ---- | -------- | ---------- | -------- | -------- |
+| Dyna | 确定性   | 1 步假数据 | ~10×     | 低       |
+| PETS | 概率集成 | CEM MPC    | ~50×     | 高       |
+| MBPO | 确定性   | 短 rollout | ~100×    | 中       |
 
 实战选择：
+
 - **快速实验**：Dyna（简单稳定）
 - **高精度控制**：PETS（机器人操作、精密加工）
 - **通用连续控制**：MBPO（MuJoCo 全套环境）

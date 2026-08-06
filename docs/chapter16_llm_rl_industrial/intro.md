@@ -4,11 +4,11 @@
 
 为了保持章节连贯，本章把同一主题的不同侧面分散到四个文件，本文件覆盖 17.1、17.3、17.5、17.7 四节。其余三节按下表跳转：
 
-| 小节                                                                | 主题                       | 文件                                                       |
-| ------------------------------------------------------------------- | -------------------------- | ---------------------------------------------------------- |
-| [17.2 现代后训练流水线范式](../chapter17_dpo/industrial-post-training) | 国内外大厂后训练全景       | `chapter17_dpo/industrial-post-training.md`          |
-| [17.4 优化器与训练稳定性](../chapter17_dpo/modern-industrial-practice)   | GLM-4.6、Llama 4、MuonClip | `chapter17_dpo/modern-industrial-practice.md`        |
-| [17.6 动手 veRL 代码生成 RL](../chapter18_grpo/verl-code-sandbox)         | 代码题 verifier + PPO 实战 | `chapter18_grpo/verl-code-sandbox.md`                 |
+| 小节                                                                   | 主题                       | 文件                                          |
+| ---------------------------------------------------------------------- | -------------------------- | --------------------------------------------- |
+| [17.2 现代后训练流水线范式](../chapter17_dpo/industrial-post-training) | 国内外大厂后训练全景       | `chapter17_dpo/industrial-post-training.md`   |
+| [17.4 优化器与训练稳定性](../chapter17_dpo/modern-industrial-practice) | GLM-4.6、Llama 4、MuonClip | `chapter17_dpo/modern-industrial-practice.md` |
+| [17.6 动手 veRL 代码生成 RL](../chapter18_grpo/verl-code-sandbox)      | 代码题 verifier + PPO 实战 | `chapter18_grpo/verl-code-sandbox.md`         |
 
 ## 17.1 训练框架对比
 
@@ -94,15 +94,15 @@ $$\rho_t^{\text{stale}} = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{gen
 
 下表把七个框架的关键维度对齐：
 
-| 框架          | 出处        | 训练后端      | 推理引擎   | 异步支持 | 典型规模   | 算法覆盖                | GitHub Stars (2026Q2) | 社区活跃度 |
-| ------------- | ----------- | ------------- | ---------- | -------- | ---------- | ----------------------- | --------------------- | ---------- |
-| **veRL**      | 字节跳动    | FSDP/Megatron | vLLM       | 部分     | 千卡       | PPO/GRPO/DPO/SPIN/RS    | 9.8k                  | 极高       |
-| **OpenRLHF**  | 开源社区    | DeepSpeed ZeRO| vLLM/SGLang| 否       | 百卡       | PPO/GRPO/DPO/KTO/SimPO  | 5.2k                  | 高         |
-| **TRL**       | HuggingFace | Accelerate    | 无原生     | 否       | 单机/小集群 | PPO/GRPO/DPO            | 11k                   | 高         |
-| **NeMo**      | NVIDIA      | Megatron-LM   | TRT-LLM    | 否       | 千卡       | PPO/DPO/SteerLM         | 1.8k                  | 中         |
-| **AReaL**     | Ant Group和清华 | FSDP      | vLLM/SGLang| 全异步   | 百-千卡    | PPO/GRPO + 异步         | 1.1k                  | 中         |
-| **AgentRL**   | THUDM/智谱  | FSDP/Ray      | SGLang     | 全异步   | 千卡       | GRPO + 多轮多任务       | 0.8k                  | 中         |
-| **LlamaRL**   | Meta        | Megatron      | 自研       | 全异步   | 万卡       | 内部 PPO 变体           | 0.5k                  | 低（内部） |
+| 框架         | 出处            | 训练后端       | 推理引擎    | 异步支持 | 典型规模    | 算法覆盖               | GitHub Stars (2026Q2) | 社区活跃度 |
+| ------------ | --------------- | -------------- | ----------- | -------- | ----------- | ---------------------- | --------------------- | ---------- |
+| **veRL**     | 字节跳动        | FSDP/Megatron  | vLLM        | 部分     | 千卡        | PPO/GRPO/DPO/SPIN/RS   | 9.8k                  | 极高       |
+| **OpenRLHF** | 开源社区        | DeepSpeed ZeRO | vLLM/SGLang | 否       | 百卡        | PPO/GRPO/DPO/KTO/SimPO | 5.2k                  | 高         |
+| **TRL**      | HuggingFace     | Accelerate     | 无原生      | 否       | 单机/小集群 | PPO/GRPO/DPO           | 11k                   | 高         |
+| **NeMo**     | NVIDIA          | Megatron-LM    | TRT-LLM     | 否       | 千卡        | PPO/DPO/SteerLM        | 1.8k                  | 中         |
+| **AReaL**    | Ant Group和清华 | FSDP           | vLLM/SGLang | 全异步   | 百-千卡     | PPO/GRPO + 异步        | 1.1k                  | 中         |
+| **AgentRL**  | THUDM/智谱      | FSDP/Ray       | SGLang      | 全异步   | 千卡        | GRPO + 多轮多任务      | 0.8k                  | 中         |
+| **LlamaRL**  | Meta            | Megatron       | 自研        | 全异步   | 万卡        | 内部 PPO 变体          | 0.5k                  | 低（内部） |
 
 ### 选型决策树
 
@@ -141,14 +141,14 @@ $$\mathcal{L}_{\text{RM}} = -\mathbb{E}\left[\log \sigma\left(R_\phi(q, o_w) - R
 
 训练好后，$R_\phi(q, o)$ 给出标量分数作为 RL 的奖励。PPR 的特征是**有噪声、有主观偏差**——它学的是"人类平均喜欢什么"，容易 reward hacking，也容易在 minority 偏好上犯错。
 
-| 维度       | Verifiable Reward      | Pairwise Preference Reward  |
-| ---------- | ---------------------- | --------------------------- |
-| 奖励来源   | 规则验证器 / 执行环境  | 学到的 Reward Model         |
-| 噪声水平   | 零（确定性）           | 高（依赖 RM 质量）          |
-| 标注成本   | 接近零（自动验证）     | 高（需 pairwise 比较）      |
-| 适用任务   | 数学、代码、逻辑、工具 | 开放对话、写作、安全、风格  |
-| Hacking 风险 | 低（验证器权威）       | 高（RM 可被钻空子）         |
-| 训练稳定性 | 高                     | 中（需要 KL 约束）          |
+| 维度         | Verifiable Reward      | Pairwise Preference Reward |
+| ------------ | ---------------------- | -------------------------- |
+| 奖励来源     | 规则验证器 / 执行环境  | 学到的 Reward Model        |
+| 噪声水平     | 零（确定性）           | 高（依赖 RM 质量）         |
+| 标注成本     | 接近零（自动验证）     | 高（需 pairwise 比较）     |
+| 适用任务     | 数学、代码、逻辑、工具 | 开放对话、写作、安全、风格 |
+| Hacking 风险 | 低（验证器权威）       | 高（RM 可被钻空子）        |
+| 训练稳定性   | 高                     | 中（需要 KL 约束）         |
 
 ### Pre-PPO 的 Prompt 选择策略
 
@@ -212,14 +212,14 @@ GenRM 的优势：
 def rtv_reward(prompt, code, test_cases):
     # Layer 1: Rule reward - 检查代码格式、长度、是否包含 forbidden pattern
     rule_score = check_format(code) + check_no_hardcode(code)
-    
+
     # Layer 2: Test reward - 运行公开测试用例
     test_score = run_tests(code, test_cases["public"])
-    
+
     # Layer 3: Verifier reward - 运行隐藏测试 + LLM judge 评分
     hidden_score = run_tests(code, test_cases["hidden"])
     judge_score = llm_judge(prompt, code, rubric="correctness, style, efficiency")
-    
+
     return 0.1 * rule_score + 0.5 * test_score + 0.3 * hidden_score + 0.1 * judge_score
 ```
 
@@ -265,15 +265,15 @@ $$\text{GPU-hours} = \frac{6 \cdot 671 \times 10^9 \cdot 14.8 \times 10^{12}}{98
 
 下表汇总了几个公开模型的训练成本（来自技术报告或可信估算）：
 
-| 模型                | 参数量     | 预训练 tokens | 预训练 GPU-hours | 后训练 GPU-hours | 总成本（H100 等价，$2/小时） |
-| ------------------- | ---------- | ------------- | ---------------- | ---------------- | ----------------------------- |
-| Llama 3 8B          | 8B         | 15T           | 1.3M             | 0.13M（10%）     | $2.86M                        |
-| Llama 3 70B         | 70B        | 15T           | 6.4M             | 0.64M（10%）     | $14.1M                        |
-| Llama 3 405B        | 405B       | 15T           | 30.8M            | 3.1M（10%）      | $67.8M                        |
-| Qwen2.5 72B         | 72B        | 18T           | 7.7M             | 1.5M（~20%）     | $18.4M                        |
-| DeepSeek-V3         | 671B (MoE) | 14.8T         | 2.664M (H800)    | ~0.3M            | ~$5.9M                        |
-| DeepSeek-R1-Zero    | 671B (MoE) | -             | -                | ~128K GPU-hours  | ~$0.26M                       |
-| GPT-4（推测）       | ~1.8T      | ~13T          | ~80M             | ~10M             | ~$180M                        |
+| 模型             | 参数量     | 预训练 tokens | 预训练 GPU-hours | 后训练 GPU-hours | 总成本（H100 等价，$2/小时） |
+| ---------------- | ---------- | ------------- | ---------------- | ---------------- | ---------------------------- |
+| Llama 3 8B       | 8B         | 15T           | 1.3M             | 0.13M（10%）     | $2.86M                       |
+| Llama 3 70B      | 70B        | 15T           | 6.4M             | 0.64M（10%）     | $14.1M                       |
+| Llama 3 405B     | 405B       | 15T           | 30.8M            | 3.1M（10%）      | $67.8M                       |
+| Qwen2.5 72B      | 72B        | 18T           | 7.7M             | 1.5M（~20%）     | $18.4M                       |
+| DeepSeek-V3      | 671B (MoE) | 14.8T         | 2.664M (H800)    | ~0.3M            | ~$5.9M                       |
+| DeepSeek-R1-Zero | 671B (MoE) | -             | -                | ~128K GPU-hours  | ~$0.26M                      |
+| GPT-4（推测）    | ~1.8T      | ~13T          | ~80M             | ~10M             | ~$180M                       |
 
 几个值得关注的观察：
 
@@ -289,12 +289,12 @@ $$C_{\text{RL-step}} = C_{\text{rollout}} + C_{\text{actor-update}} + C_{\text{r
 
 典型配比（7B 模型，每步 batch=512 prompts × 8 rollouts）：
 
-| 组件              | 计算量占比 | 说明                                       |
-| ----------------- | ---------- | ------------------------------------------ |
-| Rollout generation | 50%-60%    | 4096 个 2K-token rollout，vLLM 推理        |
-| Actor update      | 20%-25%    | FSDP 反向传播                              |
-| Reference forward | 10%-15%    | 计算 KL 散度（no_grad）                    |
-| Reward computation| 5%-10%     | VR 是 CPU 计算；GenRM 需要额外推理         |
+| 组件               | 计算量占比 | 说明                                |
+| ------------------ | ---------- | ----------------------------------- |
+| Rollout generation | 50%-60%    | 4096 个 2K-token rollout，vLLM 推理 |
+| Actor update       | 20%-25%    | FSDP 反向传播                       |
+| Reference forward  | 10%-15%    | 计算 KL 散度（no_grad）             |
+| Reward computation | 5%-10%     | VR 是 CPU 计算；GenRM 需要额外推理  |
 
 **Rollout generation 是瓶颈**——这也是为什么 veRL/AReaL 都把 vLLM 集成和异步 rollout 当作核心工程。
 
@@ -395,13 +395,13 @@ $$A_i = \frac{r_i - \text{mean}(r_1, \ldots, r_G)}{\text{std}(r_1, \ldots, r_G)}
 
 完整推导后，面试官常追问"每一步解决了什么问题"：
 
-| 演进         | 解决的问题               | 代价                       |
-| ------------ | ------------------------ | -------------------------- |
-| PG → REINFORCE | 形式化策略梯度           | 方差大                     |
-| REINFORCE → AC | 引入 baseline 降方差     | 需要 Critic 网络           |
-| AC → TRPO    | 限制策略更新幅度         | 约束优化复杂               |
-| TRPO → PPO   | 简化约束为 clip          | 超参 $\epsilon$ 敏感       |
-| PPO → GRPO   | 省掉 Critic              | 组大小敏感、丢失 token 级信号 |
+| 演进           | 解决的问题           | 代价                          |
+| -------------- | -------------------- | ----------------------------- |
+| PG → REINFORCE | 形式化策略梯度       | 方差大                        |
+| REINFORCE → AC | 引入 baseline 降方差 | 需要 Critic 网络              |
+| AC → TRPO      | 限制策略更新幅度     | 约束优化复杂                  |
+| TRPO → PPO     | 简化约束为 clip      | 超参 $\epsilon$ 敏感          |
+| PPO → GRPO     | 省掉 Critic          | 组大小敏感、丢失 token 级信号 |
 
 能讲清楚"为什么 GRPO 在数学上等价于用一个数据驱动的 baseline"，是从能背公式到真正理解的分水岭。
 
@@ -435,13 +435,13 @@ $$\mathcal{L}_{\text{DPO}} = -\mathbb{E}\left[\log \sigma\left(\beta \log \frac{
 
 #### DPO 家族对比
 
-| 方法    | 核心改动                       | 解决的问题                 |
-| ------- | ------------------------------ | -------------------------- |
-| **DPO** | BT 模型 + KL 约束闭式解        | 免去 RM 训练和 RL 循环     |
-| **IPO** | 用 squared loss 替代 log-sigmoid | DPO 在偏好强时过拟合       |
-| **KTO** | 用 Kahneman-Tversky 效用函数   | 不需要成对数据，只需好坏标签 |
-| **SimPO**| 移除 reference model，用长度归一化 | 省掉 ref 模型，部署简单    |
-| **ORPO**| SFT 和偏好优化合二为一         | 不需要单独 SFT 阶段        |
+| 方法      | 核心改动                           | 解决的问题                   |
+| --------- | ---------------------------------- | ---------------------------- |
+| **DPO**   | BT 模型 + KL 约束闭式解            | 免去 RM 训练和 RL 循环       |
+| **IPO**   | 用 squared loss 替代 log-sigmoid   | DPO 在偏好强时过拟合         |
+| **KTO**   | 用 Kahneman-Tversky 效用函数       | 不需要成对数据，只需好坏标签 |
+| **SimPO** | 移除 reference model，用长度归一化 | 省掉 ref 模型，部署简单      |
+| **ORPO**  | SFT 和偏好优化合二为一             | 不需要单独 SFT 阶段          |
 
 #### DPO 的正则化
 
@@ -484,16 +484,16 @@ ZeRO-3 让单卡显存从 $O(N)$ 降到 $O(N / \text{GPUs})$，代价是通信�
 
 #### 工程对比
 
-| 维度        | DeepSpeed ZeRO             | Megatron 3D Parallel          |
-| ----------- | -------------------------- | ----------------------------- |
-| 核心思想    | 状态分片（数据并行扩展）   | 维度正交（DP + TP + PP）      |
-| 通信模式    | All-gather / Reduce-scatter | All-reduce / All-to-all / P2P |
-| 互联要求    | 中（InfiniBand 即可）      | 高（NVLink 全互联最佳）       |
-| 显存效率    | ZeRO-3 最高                | 中（TP 切权重）               |
-| 易用性      | 配置简单                   | 配置复杂（需手调 TP/PP 维度） |
-| 典型用户    | 开源社区、HuggingFace      | NVIDIA、Llama、Qwen           |
-| MoE 支持    | 有（DeepSpeed-MoE）        | 有（Megatron-Core MoE）       |
-| 长上下文    | 有（DeepSpeed-Ulysses）    | 有（Megatron-Context）        |
+| 维度     | DeepSpeed ZeRO              | Megatron 3D Parallel          |
+| -------- | --------------------------- | ----------------------------- |
+| 核心思想 | 状态分片（数据并行扩展）    | 维度正交（DP + TP + PP）      |
+| 通信模式 | All-gather / Reduce-scatter | All-reduce / All-to-all / P2P |
+| 互联要求 | 中（InfiniBand 即可）       | 高（NVLink 全互联最佳）       |
+| 显存效率 | ZeRO-3 最高                 | 中（TP 切权重）               |
+| 易用性   | 配置简单                    | 配置复杂（需手调 TP/PP 维度） |
+| 典型用户 | 开源社区、HuggingFace       | NVIDIA、Llama、Qwen           |
+| MoE 支持 | 有（DeepSpeed-MoE）         | 有（Megatron-Core MoE）       |
+| 长上下文 | 有（DeepSpeed-Ulysses）     | 有（Megatron-Context）        |
 
 #### 选型经验
 

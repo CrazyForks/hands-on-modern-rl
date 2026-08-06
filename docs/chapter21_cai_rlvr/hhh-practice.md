@@ -56,11 +56,11 @@ $$
 
 Constitution 的不同原则分别对应不同 $\alpha$：有些原则强调 Helpfulness（"如果请求合法请尽量配合"），有些强调 Harmlessness（"不要协助暴力"）。AI judge 在打分时把这些原则按 Constitution 权重组合，等价于一个 implicit 的 HHH 加权。
 
-| 原则       | 典型失败模式               | CAI 的应对                              |
-| ---------- | -------------------------- | --------------------------------------- |
-| Helpful    | 长度膨胀、模板坍缩         | 长度惩罚 + 多样性 reward                |
-| Harmless   | 过度回避（over-refusal）   | Constitution 区分"敏感但合法" vs "危险" |
-| Honest     | 幻觉、假装知道             | 显式 "I don't know" 训练 + RLVR 验证    |
+| 原则     | 典型失败模式             | CAI 的应对                              |
+| -------- | ------------------------ | --------------------------------------- |
+| Helpful  | 长度膨胀、模板坍缩       | 长度惩罚 + 多样性 reward                |
+| Harmless | 过度回避（over-refusal） | Constitution 区分"敏感但合法" vs "危险" |
+| Honest   | 幻觉、假装知道           | 显式 "I don't know" 训练 + RLVR 验证    |
 
 ## Claude 训练中的 CAI 实际应用
 
@@ -106,11 +106,12 @@ $$
 ### Claude 3.5 的几个工程经验
 
 ::: tip 工业界共识（截至 2025）
+
 1. **纯 RLAIF 不可靠**：必须有少量人类 high-quality feedback 锚定。
 2. **Constitution 越长越难调**：80 条已经是边际收益递减点，更多原则会导致相互冲突。
 3. **Judge 模型必须比 generator 强**：否则 self-preference bias 严重。
 4. **安全训练和能力训练必须解耦**：否则 KL 约束会拖慢能力提升。
-:::
+   :::
 
 ## 本节总结
 

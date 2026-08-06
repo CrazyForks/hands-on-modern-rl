@@ -1621,7 +1621,7 @@ const zhSidebar = {
               ]
             }
           ]
-        },
+        }
       ]
     }
   ]

@@ -1,6 +1,6 @@
 # 第 19 章 · Constitutional AI 与 RLAIF
 
-> [第 13 章 RLHF](../chapter15_rlhf/intro) 把"人类标注偏好 → 奖励模型 → PPO"这条流水线讲通了；[第 15 章 DPO/GRPO](../chapter17_dpo/intro) 进一步把它精简成不需要 RM、不需要 Critic 的形式。但所有这些方法都默认一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，这个前提就崩了——人类既标不动（成本和速度），也标不准（在数学、代码、长上下文上判断力不够）。本章回答一个问题：**当人类标注成为对齐瓶颈时，训练信号从哪来？** Anthropic 2022 年的答案是 *Constitutional AI: Harmlessness from AI Feedback*——让 AI 自己当裁判、自己改作文、自己生成偏好对。
+> [第 13 章 RLHF](../chapter15_rlhf/intro) 把"人类标注偏好 → 奖励模型 → PPO"这条流水线讲通了；[第 15 章 DPO/GRPO](../chapter17_dpo/intro) 进一步把它精简成不需要 RM、不需要 Critic 的形式。但所有这些方法都默认一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，这个前提就崩了——人类既标不动（成本和速度），也标不准（在数学、代码、长上下文上判断力不够）。本章回答一个问题：**当人类标注成为对齐瓶颈时，训练信号从哪来？** Anthropic 2022 年的答案是 _Constitutional AI: Harmlessness from AI Feedback_——让 AI 自己当裁判、自己改作文、自己生成偏好对。
 
 ## 21.1 Constitutional AI 框架
 
@@ -9,7 +9,7 @@ RLHF 的痛点不是"训练算法不够好"，而是"标注数据不够用"。An
 1. **有害内容标注成本爆炸**。让标注员给"如何制造武器"的两种回答打分，既慢、又心理负担重、又容易不一致。
 2. **Helpful 与 Harmless 在 RLHF 里相互拉扯**。模型越想避免有害，就越容易回避一切稍敏感的问题，最后变成一个"什么都拒绝"的废柴助手。Anthropic 把这种现象叫 **evasiveness**（回避性）。
 
-Constitutional AI（CAI, Bai et al. 2022）的核心洞察：**不要让人类回答"哪个回答更安全"这种问题，而是给模型一组明确的原则，让模型自己评估自己的回答**。这组原则就叫 *Constitution*（宪法），来自三处来源：
+Constitutional AI（CAI, Bai et al. 2022）的核心洞察：**不要让人类回答"哪个回答更安全"这种问题，而是给模型一组明确的原则，让模型自己评估自己的回答**。这组原则就叫 _Constitution_（宪法），来自三处来源：
 
 - 联合国《世界人权宣言》
 - Trust & Safety 行业准则
@@ -123,14 +123,14 @@ $$
 
 ### RLHF vs RLAIF 与 本质区别
 
-| 维度           | RLHF                                       | RLAIF                                              |
-| -------------- | ------------------------------------------ | -------------------------------------------------- |
-| 偏好来源       | 人类标注员 pairwise                        | AI judge 按 Constitution 打分                      |
-| 标注成本       | 每条 $\$0.5\text{-}\$5$，需数百万条        | 仅推理成本，每条 $\sim\$10^{-4}$                   |
-| 标注速度       | 数周到数月                                 | 每天千万条                                         |
-| 标注一致性     | 标注员间 Cohen κ $\approx 0.4\text{-}0.6$  | 同一 judge 多次抽样 κ $\approx 0.7\text{-}0.9$     |
-| 适合的能力域   | 价值观、风格、常识                         | 数学、代码、长上下文、专业知识                     |
-| 不适合的能力域 | 超出标注员水平的推理                       | "模型本身也不知道答案"的开放问题                   |
+| 维度           | RLHF                                      | RLAIF                                          |
+| -------------- | ----------------------------------------- | ---------------------------------------------- |
+| 偏好来源       | 人类标注员 pairwise                       | AI judge 按 Constitution 打分                  |
+| 标注成本       | 每条 $\$0.5\text{-}\$5$，需数百万条       | 仅推理成本，每条 $\sim\$10^{-4}$               |
+| 标注速度       | 数周到数月                                | 每天千万条                                     |
+| 标注一致性     | 标注员间 Cohen κ $\approx 0.4\text{-}0.6$ | 同一 judge 多次抽样 κ $\approx 0.7\text{-}0.9$ |
+| 适合的能力域   | 价值观、风格、常识                        | 数学、代码、长上下文、专业知识                 |
+| 不适合的能力域 | 超出标注员水平的推理                      | "模型本身也不知道答案"的开放问题               |
 
 ::: warning RLAIF 的能力上限
 RLAIF 的质量受限于 judge 模型本身。在 Claude 2 阶段，让 Claude 2 judge Claude 2 会出现 **self-preference bias**——judge 倾向于选风格上更像自己的回答。当被 judge 的能力超出 judge 时，RLAIF 反而会强化错误答案。这正是 [第 28 章 Reward Hacking](../chapter30_alignment_failures/intro) 重点讨论的"sycophancy"（谄媚）与"reward model over-optimization"问题。
@@ -215,6 +215,7 @@ Meta 用 Llama 2-70B 做了三轮 self-rewarding（M1 → M2 → M3），结果�
 
 ::: details 为什么 Self-Rewarding 会收敛
 理论上 self-rewarding 可能陷入"自吹自擂"——模型只学怎么让 judge 满意，judge 又是它自己。Meta 的实验表明前三轮还有效，但**第四轮之后基本停滞**。原因有二：
+
 1. DPO 的参考模型 $\pi_{\text{ref}}$ 每轮更新，相当于 soft KL 约束，限制了 drift；
 2. 混入一定比例真实 SFT 数据防止 capability collapse。
 

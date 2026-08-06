@@ -24,11 +24,11 @@ $$\exists \, \pi^* \in \Pi, \quad J(\pi^*) > J(\pi_S), \quad \text{但 }\pi^*\te
 
 ### 三条研究路线
 
-| 路线 | 核心思想 | 代表方法 |
-|------|---------|---------|
-| **多智能体对抗** | 让多个 AI 互相揭穿，人类只做裁决 | AI Safety via Debate |
-| **递归分解** | 把难任务分解成可监督的子任务 | Recursive Reward Modeling, IDA |
-| **弱监督强** | 用弱模型的标签训练强模型 | Weak-to-Strong Generalization |
+| 路线             | 核心思想                         | 代表方法                       |
+| ---------------- | -------------------------------- | ------------------------------ |
+| **多智能体对抗** | 让多个 AI 互相揭穿，人类只做裁决 | AI Safety via Debate           |
+| **递归分解**     | 把难任务分解成可监督的子任务     | Recursive Reward Modeling, IDA |
+| **弱监督强**     | 用弱模型的标签训练强模型         | Weak-to-Strong Generalization  |
 
 下文逐节展开。
 
@@ -53,12 +53,12 @@ $$\text{胜方} = J(x, s_1, s_2, \ldots, s_T) \in \{A, B\}$$
 
 ### 与 RLHF 的对比
 
-| 维度 | RLHF | Debate |
-|------|------|--------|
-| **监督者负担** | 直接评估每个回答 | 仅作最终裁决 |
-| **对抗信号** | 无 | 两方互相揭穿 |
-| **可扩展性** | 受限于 $C_S$ | 受限于人类验证能力 |
-| **训练成本** | 单次反馈 | 多轮辩论 |
+| 维度           | RLHF             | Debate             |
+| -------------- | ---------------- | ------------------ |
+| **监督者负担** | 直接评估每个回答 | 仅作最终裁决       |
+| **对抗信号**   | 无               | 两方互相揭穿       |
+| **可扩展性**   | 受限于 $C_S$     | 受限于人类验证能力 |
+| **训练成本**   | 单次反馈         | 多轮辩论           |
 
 ### Debate 的工程问题
 
@@ -132,11 +132,11 @@ PGR 衡量"强模型从弱标签里恢复了多少差距"。PGR=0 意味着强�
 
 **实验结果**：
 
-| 任务 | 强模型 | 弱模型 | PGR |
-|------|--------|--------|-----|
-| Popular science quiz | GPT-4 | GPT-2 | 0.45 |
-| Chess move prediction | GPT-4 | GPT-3 | 0.20 |
-| Code generation | GPT-4 | GPT-2 | 0.40 |
+| 任务                  | 强模型 | 弱模型 | PGR  |
+| --------------------- | ------ | ------ | ---- |
+| Popular science quiz  | GPT-4  | GPT-2  | 0.45 |
+| Chess move prediction | GPT-4  | GPT-3  | 0.20 |
+| Code generation       | GPT-4  | GPT-2  | 0.40 |
 
 **核心洞察**：PGR 普遍在 0.2-0.5 之间——**弱标签确实能让强模型超越弱监督者**，但远未达到 1。这说明 weak-to-strong 是可能的，但有显著差距。
 
@@ -235,12 +235,12 @@ for principle in constitution:
 
 ### 红队测试的评估指标
 
-| 指标 | 定义 | 用途 |
-|------|------|------|
-| **Attack Success Rate (ASR)** | $\frac{\text{成功的攻击}}{\text{总攻击数}}$ | 模型鲁棒性 |
-| **Coverage** | $\frac{\text{红队发现的 harm 类别}}{\text{已定义 harm 类别}}$ | 红队全面性 |
-| **Diversity** | 攻击样本的语义多样性（用 embedding 距离衡量） | 避免重复 |
-| **Transferability** | 攻击从一个模型迁移到另一个的成功率 | 黑盒攻击能力 |
+| 指标                          | 定义                                                          | 用途         |
+| ----------------------------- | ------------------------------------------------------------- | ------------ |
+| **Attack Success Rate (ASR)** | $\frac{\text{成功的攻击}}{\text{总攻击数}}$                   | 模型鲁棒性   |
+| **Coverage**                  | $\frac{\text{红队发现的 harm 类别}}{\text{已定义 harm 类别}}$ | 红队全面性   |
+| **Diversity**                 | 攻击样本的语义多样性（用 embedding 距离衡量）                 | 避免重复     |
+| **Transferability**           | 攻击从一个模型迁移到另一个的成功率                            | 黑盒攻击能力 |
 
 工业级目标：ASR < 1%，Coverage > 95%，Diversity > 0.7（embedding 空间平均距离）。
 
@@ -363,12 +363,12 @@ $$R_{\text{weak-specialist}} = \text{TrainRM}(\text{expert feedback}) \quad \to 
 
 ### Sandwiching 与 Weak-to-Strong 的区别
 
-| 维度 | Sandwiching | Weak-to-Strong |
-|------|-------------|----------------|
-| **场景** | 模型强于普通标注，弱于专家 | 强模型 vs 弱模型 |
-| **监督源** | 仍是普通标注者 | 弱模型伪标签 |
-| **目标** | 让普通监督者也能训练中等强模型 | 让弱模型训练超人类模型 |
-| **风险** | 模型学到普通监督者的偏见 | 模型学到弱模型的错误 |
+| 维度       | Sandwiching                    | Weak-to-Strong         |
+| ---------- | ------------------------------ | ---------------------- |
+| **场景**   | 模型强于普通标注，弱于专家     | 强模型 vs 弱模型       |
+| **监督源** | 仍是普通标注者                 | 弱模型伪标签           |
+| **目标**   | 让普通监督者也能训练中等强模型 | 让弱模型训练超人类模型 |
+| **风险**   | 模型学到普通监督者的偏见       | 模型学到弱模型的错误   |
 
 Sandwiching 是当前 LLM 工业的实际问题——大多数 RLHF 标注者都不是领域专家。
 
@@ -430,13 +430,13 @@ $$\text{Diversity} = 1 - \frac{2}{n(n-1)} \sum_{i \neq j} \cos(\text{emb}(y_i), 
 
 ### 防 Exploration Hacking 的工程实践
 
-| 方法 | 机制 | 实现成本 |
-|------|------|---------|
-| **Reward Model Ensembling** | 多个 RM 平均，单点漏洞被稀释 | 中（训练多个 RM） |
-| **Constitutional Filtering** | 用规则过滤器二次审查高 reward 输出 | 低（一次性集成） |
-| **Multiple Verifier** | 不同原理的 verifier 都通过才给高 reward | 高（设计多 verifier） |
-| **Reward Decay** | 超出 SFT 分布的 reward 衰减 | 低 |
-| **Adversarial Reward Training** | 用 exploit search 生成的反例训练 RM | 高（需搜索算法） |
+| 方法                            | 机制                                    | 实现成本              |
+| ------------------------------- | --------------------------------------- | --------------------- |
+| **Reward Model Ensembling**     | 多个 RM 平均，单点漏洞被稀释            | 中（训练多个 RM）     |
+| **Constitutional Filtering**    | 用规则过滤器二次审查高 reward 输出      | 低（一次性集成）      |
+| **Multiple Verifier**           | 不同原理的 verifier 都通过才给高 reward | 高（设计多 verifier） |
+| **Reward Decay**                | 超出 SFT 分布的 reward 衰减             | 低                    |
+| **Adversarial Reward Training** | 用 exploit search 生成的反例训练 RM     | 高（需搜索算法）      |
 
 实战推荐：**Reward Model Ensembling + Constitutional Filtering + Reward Decay** 三件套，足以抵御 80% 的 exploration hacking。
 

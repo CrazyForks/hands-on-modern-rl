@@ -132,13 +132,13 @@ veRL 是第一个把这些维度都做成可配置的框架。DeepSpeed-Chat、O
 
 ### 与其他框架的核心差异
 
-| 维度 | veRL (HybridFlow) | OpenRLHF | NeMo-Aligner | TRL |
-|------|-------------------|----------|--------------|-----|
+| 维度         | veRL (HybridFlow) | OpenRLHF          | NeMo-Aligner     | TRL            |
+| ------------ | ----------------- | ----------------- | ---------------- | -------------- |
 | **编排方式** | Single-controller | Single-controller | Multi-controller | Single-process |
-| **资源分配** | 任意组合 | 严格分离 | NVIDIA 栈 | 单 GPU |
-| **训练后端** | FSDP + Megatron | FSDP/DeepSpeed | Megatron | Accelerate |
-| **推理后端** | vLLM/SGLang | vLLM | TRT-LLM | HF generate |
-| **典型规模** | 8-1024 GPU | 8-256 GPU | 8-512 GPU | 1-8 GPU |
+| **资源分配** | 任意组合          | 严格分离          | NVIDIA 栈        | 单 GPU         |
+| **训练后端** | FSDP + Megatron   | FSDP/DeepSpeed    | Megatron         | Accelerate     |
+| **推理后端** | vLLM/SGLang       | vLLM              | TRT-LLM          | HF generate    |
+| **典型规模** | 8-1024 GPU        | 8-256 GPU         | 8-512 GPU        | 1-8 GPU        |
 
 [第 7 章 GRPO 实践](../chapter09_grpo_rlvr/grpo-practice-and-mechanism) 用的就是 veRL。
 
@@ -205,12 +205,12 @@ trainer.train(dataset)
 
 ### 四框架对比
 
-| 框架 | 易用性 | 性能 | 规模上限 | 工业采用 |
-|------|--------|------|---------|---------|
-| **veRL** | 中 | 高 | 1024+ GPU | Qwen、DeepSeek、字节内部 |
-| **OpenRLHF** | 高 | 中 | 256 GPU | SimpleRL、部分开源 |
-| **NeMo-Aligner** | 低 | 极高 | 512+ GPU | NVIDIA 客户、Nemotron |
-| **TRL** | 极高 | 低 | 8 GPU | 研究、教学 |
+| 框架             | 易用性 | 性能 | 规模上限  | 工业采用                 |
+| ---------------- | ------ | ---- | --------- | ------------------------ |
+| **veRL**         | 中     | 高   | 1024+ GPU | Qwen、DeepSeek、字节内部 |
+| **OpenRLHF**     | 高     | 中   | 256 GPU   | SimpleRL、部分开源       |
+| **NeMo-Aligner** | 低     | 极高 | 512+ GPU  | NVIDIA 客户、Nemotron    |
+| **TRL**          | 极高   | 低   | 8 GPU     | 研究、教学               |
 
 **推荐选择**：
 
@@ -344,11 +344,11 @@ $$\text{Memory} = \underbrace{|\theta| \cdot 2}_{\text{权重（bf16）}} + \und
 
 [DeepSpeed ZeRO, arXiv:1910.02054](https://arxiv.org/abs/1910.02054) 把训练状态切分到多个 GPU：
 
-| 阶段 | 切分内容 | 节省倍数 | 通信开销 |
-|------|---------|---------|---------|
-| **ZeRO-1** | Optimizer state | 4× | 低 |
-| **ZeRO-2** | Optimizer + Gradient | 8× | 中 |
-| **ZeRO-3** | Optimizer + Gradient + Weight | $N$×（N=GPU 数） | 高 |
+| 阶段       | 切分内容                      | 节省倍数         | 通信开销 |
+| ---------- | ----------------------------- | ---------------- | -------- |
+| **ZeRO-1** | Optimizer state               | 4×               | 低       |
+| **ZeRO-2** | Optimizer + Gradient          | 8×               | 中       |
+| **ZeRO-3** | Optimizer + Gradient + Weight | $N$×（N=GPU 数） | 高       |
 
 ZeRO-3 把权重也切分，每个 GPU 只存 $1/N$ 的权重，但前向反向时需要 all-gather 还原。
 
@@ -406,12 +406,12 @@ class CheckpointedBlock(nn.Module):
 
 对 70B 模型（8 张 H100 80GB）：
 
-| 配置 | 单卡显存 | 训练速度 |
-|------|---------|---------|
-| 全参 + Adam（baseline） | 940 GB（炸） | - |
-| ZeRO-3 | 118 GB（炸） | - |
-| ZeRO-3 + Gradient Checkpointing | 30 GB | 1× |
-| ZeRO-3 + Gradient Checkpointing + LoRA | 8 GB | 1.2× |
+| 配置                                   | 单卡显存     | 训练速度 |
+| -------------------------------------- | ------------ | -------- |
+| 全参 + Adam（baseline）                | 940 GB（炸） | -        |
+| ZeRO-3                                 | 118 GB（炸） | -        |
+| ZeRO-3 + Gradient Checkpointing        | 30 GB        | 1×       |
+| ZeRO-3 + Gradient Checkpointing + LoRA | 8 GB         | 1.2×     |
 
 LoRA（[第 6 章](../chapter08_rlhf/industrial-post-training)）只训少量参数，显存需求大幅降低。工业级 70B RL 训练通常用 LoRA + FSDP。
 
@@ -504,11 +504,11 @@ controller.route_function_calls(task_workers)
 
 ### 三大异步框架对比
 
-| 框架 | 主要贡献者 | 核心机制 | 加速比 | 适用场景 |
-|------|-----------|---------|--------|---------|
-| **LlamaRL** | Meta | 完全去中心化 | 10.4× | 超大规模 Dense |
-| **AReaL** | Ant Group 和清华 | 全异步 rollout + staleness-aware PPO | 2.77× | 大规模 LLM RL |
-| **AgentRL** | THUDM/智谱 | 多轮多任务 + 统一环境接口 | 论文未标注 | Agent 训练 |
+| 框架        | 主要贡献者       | 核心机制                             | 加速比     | 适用场景       |
+| ----------- | ---------------- | ------------------------------------ | ---------- | -------------- |
+| **LlamaRL** | Meta             | 完全去中心化                         | 10.4×      | 超大规模 Dense |
+| **AReaL**   | Ant Group 和清华 | 全异步 rollout + staleness-aware PPO | 2.77×      | 大规模 LLM RL  |
+| **AgentRL** | THUDM/智谱       | 多轮多任务 + 统一环境接口            | 论文未标注 | Agent 训练     |
 
 ## 36.6 MoE + RL 训练
 
@@ -738,14 +738,14 @@ with RLProfiler() as p:
 
 ### 典型瓶颈与优化
 
-| 瓶颈 | 症状 | 优化 |
-|------|------|------|
-| **Rollout 慢** | rollout 占 80%+ 时间 | 增加 rollout GPU、用 vLLM prefix caching |
-| **Weight Sync 慢** | sync 占 5%+ 时间 | 用 LoRA、NCCL 打包传输 |
-| **通信开销** | all-reduce 占 10%+ 时间 | 增大 batch size、用 gradient accumulation |
-| **激活显存爆炸** | OOM | Gradient checkpointing |
-| **Expert 负载不均** | 部分 GPU 90%+、部分 30% | Expert balancing loss、动态路由 |
-| **慢人问题** | batch 内最长序列决定时间 | 长度分桶、Seer divided rollout |
+| 瓶颈                | 症状                     | 优化                                      |
+| ------------------- | ------------------------ | ----------------------------------------- |
+| **Rollout 慢**      | rollout 占 80%+ 时间     | 增加 rollout GPU、用 vLLM prefix caching  |
+| **Weight Sync 慢**  | sync 占 5%+ 时间         | 用 LoRA、NCCL 打包传输                    |
+| **通信开销**        | all-reduce 占 10%+ 时间  | 增大 batch size、用 gradient accumulation |
+| **激活显存爆炸**    | OOM                      | Gradient checkpointing                    |
+| **Expert 负载不均** | 部分 GPU 90%+、部分 30%  | Expert balancing loss、动态路由           |
+| **慢人问题**        | batch 内最长序列决定时间 | 长度分桶、Seer divided rollout            |
 
 ### MFU (Model FLOPs Utilization)
 
@@ -755,11 +755,11 @@ $$\text{MFU} = \frac{\text{实际 FLOPs}}{\text{峰值 FLOPs} \times \text{时�
 
 H100 bf16 峰值 ~1000 TFLOPS。典型 LLM RL 训练 MFU：
 
-| 配置 | MFU |
-|------|-----|
-| Dense + FSDP + checkpointing | 35-45% |
-| MoE + EP + DualPipe | 50-60% |
-| 异步 RL（生成/训练分离） | 70-80%（rollout 部分用 vLLM 加速） |
+| 配置                         | MFU                                |
+| ---------------------------- | ---------------------------------- |
+| Dense + FSDP + checkpointing | 35-45%                             |
+| MoE + EP + DualPipe          | 50-60%                             |
+| 异步 RL（生成/训练分离）     | 70-80%（rollout 部分用 vLLM 加速） |
 
 MFU < 30% 说明有显著优化空间——通常是通信或 rollout 瓶颈。
 
@@ -773,27 +773,27 @@ MFU < 30% 说明有显著优化空间——通常是通信或 rollout 瓶颈。
 
 ```yaml
 # 集群配置
-total_gpus: 12288  # 12k H100
-intra_node_bandwidth: 900 GB/s  # NVLink
-inter_node_bandwidth: 50 GB/s   # InfiniBand
+total_gpus: 12288 # 12k H100
+intra_node_bandwidth: 900 GB/s # NVLink
+inter_node_bandwidth: 50 GB/s # InfiniBand
 
 # 模型并行
-tensor_parallel: 8        # TP=8（节点内）
-pipeline_parallel: 4      # PP=4（跨节点）
-expert_parallel: 16       # EP=16
-data_parallel: 24         # DP=24
+tensor_parallel: 8 # TP=8（节点内）
+pipeline_parallel: 4 # PP=4（跨节点）
+expert_parallel: 16 # EP=16
+data_parallel: 24 # DP=24
 
 # 训练配置
-algorithm: GSPO            # MoE 优化的 GRPO 变体
+algorithm: GSPO # MoE 优化的 GRPO 变体
 batch_size_per_gpu: 1
 gradient_accumulation: 32
 seq_len: 32768
-group_size: 8              # GRPO 每个 prompt 生成 8 条
+group_size: 8 # GRPO 每个 prompt 生成 8 条
 
 # 异步配置
 async_mode: disaggregated
 rollout_buffer_size: 100000
-weight_sync: lora          # 只同步 LoRA adapter
+weight_sync: lora # 只同步 LoRA adapter
 weight_sync_method: nccl_packed
 ```
 
@@ -803,7 +803,7 @@ weight_sync_method: nccl_packed
 训练 1 epoch (10B tokens):
   Total time: 24 小时
   GPU hours: 294912
-  
+
 分项时间:
   Rollout: 18 小时 (75%)
   Actor update: 3 小时 (12.5%)

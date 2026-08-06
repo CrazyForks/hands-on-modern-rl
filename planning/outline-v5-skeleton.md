@@ -4,14 +4,15 @@
 
 ## 标题层级规则（强制统一）
 
-| 层级 | 用什么 | 含义 |
-|------|--------|------|
-| **Part** | `#` | 大章（Part I、Part II、序章…） |
-| **章节** | `##` | 一个教学单元，对应一个目录 `chapterNN_xxx/`，必须标 `[单篇文章]` 或 `[多篇章节]` |
-| **文章** | `###` | 仅 `[多篇章节]` 下出现，一个 `.md` 文件 |
-| **子大纲** | `-` 缩进列表 | 该文章内部要展开的 H2/H3 要点 |
+| 层级       | 用什么       | 含义                                                                             |
+| ---------- | ------------ | -------------------------------------------------------------------------------- |
+| **Part**   | `#`          | 大章（Part I、Part II、序章…）                                                   |
+| **章节**   | `##`         | 一个教学单元，对应一个目录 `chapterNN_xxx/`，必须标 `[单篇文章]` 或 `[多篇章节]` |
+| **文章**   | `###`        | 仅 `[多篇章节]` 下出现，一个 `.md` 文件                                          |
+| **子大纲** | `-` 缩进列表 | 该文章内部要展开的 H2/H3 要点                                                    |
 
 **强制规则：**
+
 - 单篇章节下**不允许**用 `###`（避免误导读者以为是独立文件）
 - 多篇章节下**必须**用 `###` 标每个文件
 - 设计理由、备注一律放进 `>` 引用块，不混入正文
@@ -21,13 +22,13 @@
 
 ## 阅读约定
 
-| 标记 | 含义 |
-|------|------|
+| 标记         | 含义                                                                 |
+| ------------ | -------------------------------------------------------------------- |
 | `[单篇文章]` | 这个章节只有 1 个 `.md` 文件，下方"内部小节"是这同一篇文章里的 H2/H3 |
-| `[多篇章节]` | 这个章节有多个 `.md` 文件，下方每一项是一个独立文章 |
-| `📄` | 文章（一个 `.md` 文件） |
-| `→ 路径` | 文件实际位置（含旧目录名历史遗留） |
-| `子大纲:` | 该文章内部要展开的 H2/H3 要点 |
+| `[多篇章节]` | 这个章节有多个 `.md` 文件，下方每一项是一个独立文章                  |
+| `📄`         | 文章（一个 `.md` 文件）                                              |
+| `→ 路径`     | 文件实际位置（含旧目录名历史遗留）                                   |
+| `子大纲:`    | 该文章内部要展开的 H2/H3 要点                                        |
 
 ---
 
@@ -40,6 +41,7 @@
 ### 写在开头（含 0.1-0.4 + 0.6）→ `docs/preface/intro.md`
 
 **内部小节：**
+
 - **0.1 先动手：30 秒玩转 CartPole** `[v5 新前置]`
   - ① 一键试玩（零安装）：ModelScope 主源 + HuggingFace 副源双部署
   - ② 一行命令本地跑：`pip install gymnasium[...] stable-baselines3 && python 1-ppo_cartpole.py`
@@ -52,6 +54,7 @@
 ### 强化学习简史（0.5）→ `docs/preface/brief-history/index.md`
 
 **内部小节：**
+
 - 1950s-1980s：试错学习、Bellman 方程、TD 学习诞生
 - 1992：TD-Gammon 首次战胜人类冠军
 - 2013：DQN 玩 Atari——深度 RL 元年
@@ -66,6 +69,7 @@
 ### 环境安装指南（0.7）→ `docs/preface/env-setup.md`
 
 **内部小节：**
+
 - Python 环境：conda / venv 选择
 - PyTorch 版本与 CUDA 配置
 - Gymnasium 安装与验证
@@ -82,6 +86,7 @@
 📄 文件：`chapter00_overview/intro.md`
 
 **内部小节：**
+
 - 1.1 从序章的直觉到形式化定义
 - 1.2 智能体-环境-奖励-状态的核心循环
 - 1.3 现代应用版图：控制、游戏、对齐、智能体
@@ -97,6 +102,7 @@
 ### 2.1 CartPole 入门与原理 → `chapter01_cartpole/intro.md` + `principles.md`
 
 **子大纲：**
+
 - CartPole 问题与 Gym/Gymnasium 接口
 - 状态、动作、奖励的工程化定义
 - 随机策略基线与失败模式
@@ -104,6 +110,7 @@
 ### 2.2 训练指标设计 → `chapter01_cartpole/metrics.md`
 
 **子大纲：**
+
 - 回报曲线、成功率、稳定性
 - 实验：从随机到收敛的完整流程
 
@@ -114,6 +121,7 @@
 📄 文件：`chapter03_bandits/intro.md`
 
 **内部小节：**
+
 - 3.1 多臂老虎机问题与基础策略
 - 3.2 ε-贪心与衰减调度
 - 3.3 上置信界（UCB）算法
@@ -134,6 +142,7 @@
 ### 17.1 训练框架对比 → `chapter17_llm_rl_industrial/01-frameworks.md`
 
 **子大纲：**
+
 - 同步框架：veRL（字节主流）/ OpenRLHF（开源友好）/ TRL（HF 生态）/ NeMo-Aligner（NVIDIA）
 - 异步框架：AReaL（清华+智谱）/ AgentRL（智谱+清华）/ SLIME / ROLL / LlamaRL
 - 框架对比表与选型决策树
@@ -141,6 +150,7 @@
 ### 17.2 现代后训练流水线范式 → `chapter17_llm_rl_industrial/02-pipelines.md`
 
 **子大纲：**
+
 - DeepSeek-R1 多阶段：冷启动 SFT → 推理 RL → 拒绝采样 → 全场景 RL
 - Llama 4：轻量 SFT → online RL → 轻量 DPO + pass@k 难度过滤
 - Qwen3：Thinking Mode Fusion + Thinking Budget + GSPO
@@ -151,6 +161,7 @@
 ### 17.3 双轨奖励设计 → `chapter17_llm_rl_industrial/03-dual-reward.md`
 
 **子大纲：**
+
 - Verifiable Reward（Math、Code）
 - Pairwise Preference Reward（开放对话）
 - Pre-PPO：Prompt 选择策略避免 reward hacking
@@ -159,6 +170,7 @@
 ### 17.4 优化器与训练稳定性 → `chapter09_alignment/modern-industrial-practice.md`（沿用现有）
 
 **子大纲：**
+
 - AdamW 在 RL 训练中的稳定性问题
 - MuonClip 优化器（Kimi K2）
 - QK-clip：注意力数值稳定性
@@ -167,6 +179,7 @@
 ### 17.5 训练成本估算 → `chapter17_llm_rl_industrial/05-cost.md`
 
 **子大纲：**
+
 - 不同模型规模的预训练成本
 - SFT / RLHF / RLVR 各阶段 GPU 小时
 - DeepSeek 公开数据参考：V3 预训练 2.664M H800 小时、R1-Zero 128K GPU 小时
@@ -175,6 +188,7 @@
 ### 17.6 工业实战：GSM8K 与 AIME → `chapter09_grpo_rlvr/verl-code-sandbox.md`（沿用现有）
 
 **子大纲：**
+
 - 实验：用 GRPO 训练 GSM8K
 - 实验：用 DAPO 训练 AIME 2024
 - 完整开源复现：Open-R1 / Sky-T1 / Tülu 3
@@ -182,6 +196,7 @@
 ### 17.7 中国对齐团队面试常见考点 → `chapter17_llm_rl_industrial/07-interview.md`
 
 **子大纲：**
+
 - PG → REINFORCE → TRPO → PPO → GRPO 完整推导链（智谱真题）
 - DPO 家族 + DPO 正则化
 - DeepSpeed vs Megatron 工程对比

@@ -151,8 +151,6 @@ BAIR 博客提供了 SAC 与 DDPG、TD3、PPO 在 MuJoCo 连续控制任务上�
   <em>图 5：SAC 在 HalfCheetah-v2 上的训练曲线。SAC（蓝色）的样本效率明显高于 PPO 和 DDPG，且在不同随机种子下表现更一致。来源：<a href="https://bair.berkeley.edu/blog/2018/12/14/sac/" target="_blank" rel="noopener noreferrer">BAIR Blog</a>。</em>
 </div>
 
-<!-- TODO: 需要 SAC Humanoid-v2 训练曲线网图 -->
-
 <img src="./images/sac-benchmark-humanoid.png" alt="SAC 在 Humanoid 任务上的训练曲线" width="1000" loading="eager" decoding="async">
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: 12px; margin-bottom: 24px; padding: 0 12px; line-height: 1.6;">

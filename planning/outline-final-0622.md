@@ -8,12 +8,12 @@
 
 ## 标题层级规则（强制统一）
 
-| 层级 | 用什么 | 含义 |
-|------|--------|------|
-| **Part** | `#` | 大章（Part I、Part II、序章…） |
-| **章节** | `##` | 一个教学单元，对应一个目录 `chapterNN_xxx/`，**必须标 `[单篇文章]` 或 `[多篇章节]`** |
-| **文章** | `###` | **仅 `[多篇章节]` 下出现**，一个 `.md` 文件 |
-| **子大纲** | `-` 缩进列表 | 该文章内部要展开的 H2/H3 要点（不是独立文件） |
+| 层级       | 用什么       | 含义                                                                                 |
+| ---------- | ------------ | ------------------------------------------------------------------------------------ |
+| **Part**   | `#`          | 大章（Part I、Part II、序章…）                                                       |
+| **章节**   | `##`         | 一个教学单元，对应一个目录 `chapterNN_xxx/`，**必须标 `[单篇文章]` 或 `[多篇章节]`** |
+| **文章**   | `###`        | **仅 `[多篇章节]` 下出现**，一个 `.md` 文件                                          |
+| **子大纲** | `-` 缩进列表 | 该文章内部要展开的 H2/H3 要点（不是独立文件）                                        |
 
 **强制规则：**
 
@@ -27,13 +27,13 @@
 
 ## 阅读约定
 
-| 标记 | 含义 |
-|------|------|
+| 标记         | 含义                                                         |
+| ------------ | ------------------------------------------------------------ |
 | `[单篇文章]` | 章节只有 1 个 `.md` 文件，下方"内部小节"是该文件内部的 H2/H3 |
-| `[多篇章节]` | 章节有多个 `.md` 文件，下方每一项 `###` 是一个独立文章 |
-| `📄` | 文章（一个 `.md` 文件） |
-| `→ 路径` | 文件实际位置 |
-| `子大纲:` | 该文章内部要展开的 H2/H3 要点（不是独立文件） |
+| `[多篇章节]` | 章节有多个 `.md` 文件，下方每一项 `###` 是一个独立文章       |
+| `📄`         | 文章（一个 `.md` 文件）                                      |
+| `→ 路径`     | 文件实际位置                                                 |
+| `子大纲:`    | 该文章内部要展开的 H2/H3 要点（不是独立文件）                |
 
 ---
 
@@ -49,15 +49,15 @@
 
 ### 与现有书籍的对比
 
-| 维度 | Sutton & Barto | CS285 | Raschka (in progress) | **本书 v5** |
-|-----|---------------|-------|---------------------|------------|
-| 经典 RL | ✅ 完整 | ✅ | ❌ | ✅ |
-| 深度 RL | ❌ | ✅ | ❌ | ✅ |
-| LLM RL | ❌ | 部分 | ✅ | ✅ 完整 |
-| Agentic RL | ❌ | ❌ | ❌ | **✅ 独立 5 章** |
-| 多模态 RL | ❌ | ❌ | ❌ | **✅ 独立 4 章** |
-| 安全/对齐 | ❌ | ❌ | ❌ | **✅ 独立 3 章** |
-| 工程系统 | ❌ | ❌ | 部分 | **✅ 独立 2 章** |
+| 维度       | Sutton & Barto | CS285 | Raschka (in progress) | **本书 v5**      |
+| ---------- | -------------- | ----- | --------------------- | ---------------- |
+| 经典 RL    | ✅ 完整        | ✅    | ❌                    | ✅               |
+| 深度 RL    | ❌             | ✅    | ❌                    | ✅               |
+| LLM RL     | ❌             | 部分  | ✅                    | ✅ 完整          |
+| Agentic RL | ❌             | ❌    | ❌                    | **✅ 独立 5 章** |
+| 多模态 RL  | ❌             | ❌    | ❌                    | **✅ 独立 4 章** |
+| 安全/对齐  | ❌             | ❌    | ❌                    | **✅ 独立 3 章** |
+| 工程系统   | ❌             | ❌    | 部分                  | **✅ 独立 2 章** |
 
 ---
 
@@ -125,6 +125,7 @@
 ### 0.4 强化学习简史 → `docs/preface/brief-history/index.md`
 
 **子大纲：**
+
 - 1950s-1980s：试错学习、Bellman 方程、TD 学习诞生
 - 1992：TD-Gammon——第一个战胜人类冠军的 RL 系统
 - 2013：DQN 玩 Atari——深度 RL 元年
@@ -139,6 +140,7 @@
 ### 0.5 环境安装指南 → `docs/preface/env-setup.md`
 
 **子大纲：**
+
 - Python 环境：conda / venv 选择
 - PyTorch 版本与 CUDA 配置
 - Gymnasium 安装与验证
@@ -157,6 +159,7 @@
 ### 1.1 CartPole 入门与原理 → `chapter01_cartpole/intro.md` + `principles.md`
 
 **子大纲：**
+
 - CartPole 问题与 Gym/Gymnasium 接口
 - 状态、动作、奖励的工程化定义
 - 随机策略基线与失败模式
@@ -164,12 +167,14 @@
 ### 1.2 训练指标设计 → `chapter01_cartpole/metrics.md`
 
 **子大纲：**
+
 - 回报曲线、成功率、稳定性
 - 实验：从随机到收敛的完整流程
 
 ### 1.3 PPO 训练实战与可视化 → `chapter01_cartpole/training.md`
 
 **子大纲：**
+
 - stable-baselines3 PPO 训练入口
 - 训练曲线可视化与超参含义
 - 失败模式诊断（收敛震荡、reward 停滞）
@@ -184,6 +189,7 @@
 ### 2.1 问题定义与 ε-贪心 → `chapter03_bandits/intro.md`
 
 **子大纲：**
+
 - 多臂老虎机问题与形式化定义
 - 遗憾（Regret）作为衡量标准
 - ε-贪心算法与衰减调度
@@ -192,6 +198,7 @@
 ### 2.2 UCB 与 Thompson 采样 → `chapter03_bandits/ucb-thompson.md`
 
 **子大纲：**
+
 - 上置信界（UCB）算法：乐观面对不确定性
 - Thompson 采样：贝叶斯视角与概率匹配
 - Bernoulli 奖励的 Beta 共轭先验
@@ -200,6 +207,7 @@
 ### 2.3 遗憾界、PAC 与上下文老虎机 → `chapter03_bandits/theory-contextual.md`
 
 **子大纲：**
+
 - Lai-Robbins 下界与渐近最优性 `[理论]`
 - PAC 框架与样本复杂度
 - 上下文老虎机（Contextual Bandits）：LinUCB / LinTS / NeuralUCB
@@ -214,6 +222,7 @@
 ### 3.1 MDP 基础与马尔可夫性 → `chapter03_mdp/mdp.md`
 
 **子大纲：**
+
 - 从老虎机到序列决策
 - 马尔可夫性的数学定义与直觉
 - 状态空间、动作空间、转移函数、奖励函数
@@ -221,6 +230,7 @@
 ### 3.2 策略、价值与回报 → `chapter03_mdp/policy-value.md`
 
 **子大纲：**
+
 - 策略的定义：确定性 vs 随机性
 - 回报与价值（V/Q 的初步引入，详见第 4 章）
 - 策略评估与回合制 vs 连续任务
@@ -228,6 +238,7 @@
 ### 3.3 折扣、轨迹与 POMDP → `chapter03_mdp/panorama.md`
 
 **子大纲：**
+
 - 折扣因子与回报的数学意义
 - 轨迹与回合
 - 部分可观测 MDP（POMDP） `[LLM 多轮前置]`
@@ -242,6 +253,7 @@
 ### 4.1 V/Q 函数与贝尔曼期望方程 → `chapter03_mdp/value-bellman.md`
 
 **子大纲：**
+
 - 状态价值函数 $V^\pi(s)$
 - 动作价值函数 $Q^\pi(s,a)$
 - 贝尔曼期望方程的推导
@@ -250,6 +262,7 @@
 ### 4.2 贝尔曼最优、压缩映射与最优策略 → `chapter03_mdp/value-q.md`
 
 **子大纲：**
+
 - 贝尔曼最优方程
 - 贝尔曼算子的压缩映射性质 `[理论]`
 - 最优策略的存在性与唯一性
@@ -258,6 +271,7 @@
 ### 4.3 价值函数数值实验 → `chapter03_mdp/value-experiment.md`
 
 **子大纲：**
+
 - 网格世界（Gridworld）上的策略评估
 - 价值迭代的收敛速度实证
 - V/Q 可视化与策略改进
@@ -272,6 +286,7 @@
 ### 5.1 动态规划 → `chapter03_mdp/dp-mc-td.md`
 
 **子大纲：**
+
 - 策略评估与策略改进
 - 策略迭代与价值迭代
 - DP 的局限：需要完美模型
@@ -279,6 +294,7 @@
 ### 5.2 蒙特卡洛方法 → `chapter03_mdp/dp-mc-td.md`
 
 **子大纲：**
+
 - 首次访问与每次访问 MC
 - MC 的 model-free 性质
 - 方差问题与控制
@@ -286,6 +302,7 @@
 ### 5.3 时序差分、n-step 与资格迹 → `chapter03_mdp/dp-mc-td.md`
 
 **子大纲：**
+
 - TD(0) 学习
 - n-step Bootstrap 与 TD(λ) 的偏差-方差权衡
 - 资格迹（Eligibility Traces）
@@ -300,6 +317,7 @@
 ### 6.1 on/off-policy、Q-Learning 与 SARSA → `chapter03_mdp/algorithm-taxonomy.md`
 
 **子大纲：**
+
 - 在策略（on-policy）与离策略（off-policy）的区别
 - Q-Learning 算法与收敛性
 - SARSA 算法
@@ -308,6 +326,7 @@
 ### 6.2 重要性采样与 Deadly Triad → `chapter03_mdp/algorithm-taxonomy.md`
 
 **子大纲：**
+
 - 重要性采样（Importance Sampling） `[关键前置，PPO/GRPO 基础]`
 - 函数逼近的挑战与 Deadly Triad（函数逼近 + bootstrapping + off-policy） `[理论]`
 - 离策略梯度方法初步
@@ -315,6 +334,7 @@
 ### 6.3 奖励函数设计入门 → `chapter03_mdp/reward-design.md`
 
 **子大纲：**
+
 - 稀疏 vs 稠密奖励
 - Reward shaping 与基于势能的整形（potential-based shaping）
 - Reward hacking 的早期案例
@@ -331,6 +351,7 @@
 ### 7.1 从 Q-Learning 到 DQN → `chapter04_dqn/from-q-to-dqn.md`
 
 **子大纲：**
+
 - 从 Q-Learning 到 DQN 的动机
 - 经验回放（Experience Replay）
 - 目标网络（Target Network）
@@ -338,6 +359,7 @@
 ### 7.2 DQN 改进家族 → `chapter04_dqn/dqn-family.md`
 
 **子大纲：**
+
 - Double DQN：解决过估计
 - Dueling DQN：状态-动作价值分解
 - 优先经验回放（PER）
@@ -346,12 +368,14 @@
 ### 7.3 Distributional RL → `chapter04_dqn/dqn-components.md`
 
 **子大纲：**
+
 - C51、QR-DQN、IQN
 - 分布式价值函数的数学基础
 
 ### 7.4 实验：LunarLander 与 Atari → `chapter04_dqn/lunar-lander.md` + `visual-game-projects.md`
 
 **子大纲：**
+
 - LunarLander 训练流程
 - Atari 游戏基准
 - 调参与可视化
@@ -365,6 +389,7 @@
 ### 8.1 策略梯度入门 → `chapter05_policy_gradient/intro.md` + `policy-gradient.md`
 
 **子大纲：**
+
 - 策略梯度方法的动机（连续动作、随机策略）
 - 策略表示：Softmax、高斯、Categorical
 - 策略梯度定理（完整推导） `[理论]`
@@ -372,12 +397,14 @@
 ### 8.2 REINFORCE 与基线 → `chapter05_policy_gradient/reinforce.md` + `baseline-experiment.md`
 
 **子大纲：**
+
 - REINFORCE 算法
 - 方差问题与基线（Baseline）
 
 ### 8.3 策略梯度改进与实验 → `chapter05_policy_gradient/pg-improvements.md` + `cartpole.md` + `cartpole-baseline.md` + `dice-game.md` + `pg-necessity.md`
 
 **子大纲：**
+
 - Off-policy 策略梯度
 - 实验：CartPole 与 Pendulum
 - 策略梯度必要性证明（Dice 游戏）
@@ -391,12 +418,14 @@
 ### 9.1 优势函数与 Critic 训练 → `chapter06_actor_critic/advantage-function.md` + `critic-training.md`
 
 **子大纲：**
+
 - 优势函数 $A(s,a) = Q(s,a) - V(s)$
 - Critic 网络的训练（价值函数拟合）
 
 ### 9.2 Actor-Critic 框架与同步更新 → `chapter06_actor_critic/actor-critic.md` + `ac-frontier.md`
 
 **子大纲：**
+
 - Actor-Critic 框架与同步更新
 - 广义优势估计（GAE） `[PPO 前置]`
 - A2C 与 A3C：异步并行
@@ -404,6 +433,7 @@
 ### 9.3 实验 → `chapter06_actor_critic/pendulum.md` + `bipedalwalker.md` + `alphago.md`
 
 **子大纲：**
+
 - 实验：Pendulum 与 BipedalWalker
 - AlphaGo 作为 Actor-Critic 的应用案例
 
@@ -416,6 +446,7 @@
 ### 10.1 TRPO 与信任域 → `chapter07_ppo/trust-region-clipping.md` + `ppo-math.md`
 
 **子大纲：**
+
 - 策略更新的稳定性问题
 - TRPO 与单调改进定理 `[理论]`
 - PPO 数学推导
@@ -423,6 +454,7 @@
 ### 10.2 PPO-Clip 工程实现 → `chapter07_ppo/intro.md`
 
 **子大纲：**
+
 - PPO-Clip 算法
 - PPO-Penalty 与自适应 KL
 - PPO 工程实现细节（entropy bonus、value clip）
@@ -430,12 +462,14 @@
 ### 10.3 GAE 与奖励模型 → `chapter07_ppo/gae-reward-model.md`
 
 **子大纲：**
+
 - GAE 在 PPO 中的应用
 - 奖励模型与 PPO 的接口（为第 15 章 RLHF 做铺垫）
 
 ### 10.4 长程任务与实验 → `chapter07_ppo/rl-long-horizon-planning.md` + `ppo-bipedal-walker.md` + `ppo-game-benchmark.md`
 
 **子大纲：**
+
 - 长程任务中的 PPO
 - PPO 在 LLM RL 时代的位置（详见第 18 章 GRPO 家族）
 - 实验：BipedalWalker 连续控制与游戏基准
@@ -449,6 +483,7 @@
 ### 11.1 确定性策略梯度与 DDPG → `chapter12_continuous_control/intro.md`
 
 **子大纲：**
+
 - 确定性策略梯度（DPG）定理
 - DDPG 算法：Actor-Critic + 经验回放 + 目标网络
 - DDPG 的缺陷：Q 值过估计、超参敏感、训练不稳定
@@ -456,6 +491,7 @@
 ### 11.2 TD3 与 SAC → `chapter12_continuous_control/td3-sac.md`
 
 **子大纲：**
+
 - TD3 三招修补：Twin Q / 延迟策略更新 / 目标策略平滑
 - Soft Actor-Critic：最大熵 RL 框架
 - Soft Bellman 方程与自动温度调节
@@ -464,6 +500,7 @@
 ### 11.3 Model-Based RL：Dyna、PETS、MBPO → `chapter12_continuous_control/model-based.md`
 
 **子大纲：**
+
 - 为什么用模型：样本效率的根本提升
 - Dyna：模型作为数据增强
 - PETS：概率轨迹采样与集成
@@ -472,6 +509,7 @@
 ### 11.4 AlphaZero、MuZero 与 Dreamer V3 → `chapter12_continuous_control/search-world-models.md`
 
 **子大纲：**
+
 - AlphaZero：MCTS + 神经网络估值 + 自我对弈
 - MuZero：隐式模型学习（表示 + 动力学 + 预测三网络）
 - Dreamer V3：RSSM 世界模型 + 想象中训练 actor-critic
@@ -488,6 +526,7 @@
 ### 12.1 离线 RL 挑战与经典方法 → `chapter13_offline_rl/intro.md`
 
 **子大纲：**
+
 - 离线 RL 的挑战：分布偏移与外推误差
 - 悲观主义原则：CQL、IQL、BCQ
 - AWAC 与 TD3+BC：保守约束的简化
@@ -496,6 +535,7 @@
 ### 12.2 Decision Transformer、Trajectory Transformer 与 Diffuser → `chapter13_offline_rl/sequence-modeling.md`
 
 **子大纲：**
+
 - Decision Transformer：RL 作为序列建模
 - Trajectory Transformer：规划式采样
 - Diffuser：扩散模型做决策
@@ -504,6 +544,7 @@
 ### 12.3 离线 RL 实验与 LLM 视角 → `chapter13_offline_rl/experiments.md`
 
 **子大纲：**
+
 - D4RL 基准与经典任务（HalfCheetah、AntMaze）
 - CQL / IQL / DT 实验对比
 - 从离线 RL 视角看 DPO/IPO 的统一性
@@ -518,6 +559,7 @@
 ### 13.1 行为克隆与 DAgger → `chapter14_imitation_meta_rl/bc-dagger.md`
 
 **子大纲：**
+
 - 行为克隆（BC）与 covariate shift 问题
 - DAgger：数据集聚合解决分布漂移
 - 与 SFT 的连接：监督学习范式
@@ -525,6 +567,7 @@
 ### 13.2 逆向 RL 与 GAIL → `chapter14_imitation_meta_rl/irl-gail.md`
 
 **子大纲：**
+
 - 最大熵逆向 RL（MaxEnt IRL）
 - GAIL：生成对抗模仿学习
 - 与 RLHF 的连接：奖励学习
@@ -532,6 +575,7 @@
 ### 13.3 元 RL：MAML、RL²、PEARL、In-Context RL → `chapter14_imitation_meta_rl/meta-rl.md`
 
 **子大纲：**
+
 - MAML：模型不可知元学习
 - RL²：用 RNN 隐式学习快速适应
 - PEARL：概率元 RL
@@ -546,6 +590,7 @@
 ### 14.1 探索：ICM、RND、NGU、Agent57 → `chapter15_exploration_marl_hierarchical/intro.md`
 
 **子大纲：**
+
 - 探索-利用的根本张力（理论回顾）
 - 内在好奇心（ICM）与随机网络蒸馏（RND）
 - NGU 与 Agent57：episodic + life-long 内在奖励
@@ -554,6 +599,7 @@
 ### 14.2 多智能体 RL：CTDE、MADDPG、MAPPO → `chapter15_exploration_marl_hierarchical/marl.md`
 
 **子大纲：**
+
 - 多智能体 RL 的挑战：非平稳环境
 - CTDE 框架：中心化训练、分布执行
 - MADDPG：每个 agent 一个 critic
@@ -562,6 +608,7 @@
 ### 14.3 分层 RL 与生成式世界模型引子 → `chapter15_exploration_marl_hierarchical/hierarchical.md`
 
 **子大纲：**
+
 - 分层 RL 的动机：长程任务的层次分解
 - Options 框架
 - FeUdal Networks 与 HIRO
@@ -578,24 +625,28 @@
 ### 15.1 基座模型与指令对齐 → `chapter08_rlhf/base-model-to-assistant.md`
 
 **子大纲：**
+
 - 基座模型与指令对齐
 - 现代三阶段范式：SFT → RLHF → RLVR
 
 ### 15.2 SFT 指令微调 → `chapter08_rlhf/imitation-learning-pipeline.md`
 
 **子大纲：**
+
 - SFT 指令微调
 - 数据构造与格式
 
 ### 15.3 奖励建模：Bradley-Terry 模型 → `chapter08_rlhf/reward-function-design.md`
 
 **子大纲：**
+
 - 奖励建模：Bradley-Terry 模型
 - Reward Model 训练流程
 
 ### 15.4 RL 微调（PPO 或 GRPO）→ `chapter08_rlhf/standard-rlhf-pipeline.md` + `ppo-rlhf-loop.md`
 
 **子大纲：**
+
 - 标准 RLHF 流水线
 - PPO 在 RLHF 中的循环结构
 - KL 约束与参考策略
@@ -603,24 +654,28 @@
 ### 15.5 双轨奖励与 Pre-PPO `[v5.1 扩展]` → `chapter08_rlhf/intro.md`
 
 **子大纲：**
+
 - 双轨奖励设计（Seed-Thinking，verifiable + pairwise）
 - Pre-PPO：Prompt 选择策略避免 reward hacking
 
 ### 15.6 扩展实战与大规模训练 → `chapter08_rlhf/extended-practice.md` + `scaling-to-large-models.md`
 
 **子大纲：**
+
 - 扩展实战
 - 大规模训练（含 Tülu 3 三阶段范式参考）
 
 ### 15.7 评测 → `chapter08_rlhf/evaluation.md`
 
 **子大纲：**
+
 - RLHF 训练后评测指标
 - 安全性与对齐评估
 
 ### 15.8 动手实验：veRL + PPO 训练 GSM8K → `chapter08_rlhf/verl-ppo-gsm8k.md`
 
 **子大纲：**
+
 - veRL 框架上手
 - GSM8K 数据集训练
 - 训练曲线与结果分析
@@ -638,6 +693,7 @@
 ### 16.1 训练框架对比 → `chapter17_llm_rl_industrial/01-frameworks.md`
 
 **子大纲：**
+
 - 同步框架：veRL（字节主流）/ OpenRLHF（开源友好）/ TRL（HF 生态）/ NeMo-Aligner（NVIDIA）
 - 异步框架：AReaL（清华+智谱）/ AgentRL（智谱+清华）/ SLIME / ROLL / LlamaRL
 - 框架对比表与选型决策树
@@ -645,6 +701,7 @@
 ### 16.2 现代后训练流水线范式 → `chapter09_alignment/industrial-post-training.md`（沿用现有）
 
 **子大纲：**
+
 - DeepSeek-R1 多阶段：冷启动 SFT → 推理 RL → 拒绝采样 → 全场景 RL
 - Llama 4：轻量 SFT → online RL → 轻量 DPO + pass@k 难度过滤
 - Qwen3：Thinking Mode Fusion + Thinking Budget + GSPO
@@ -655,6 +712,7 @@
 ### 16.3 双轨奖励设计 → `chapter17_llm_rl_industrial/03-dual-reward.md`
 
 **子大纲：**
+
 - Verifiable Reward（Math、Code）
 - Pairwise Preference Reward（开放对话）
 - Pre-PPO：Prompt 选择策略避免 reward hacking
@@ -663,6 +721,7 @@
 ### 16.4 优化器与训练稳定性 → `chapter09_alignment/modern-industrial-practice.md`（沿用现有）
 
 **子大纲：**
+
 - AdamW 在 RL 训练中的稳定性问题
 - MuonClip 优化器（Kimi K2）
 - QK-clip：注意力数值稳定性
@@ -671,6 +730,7 @@
 ### 16.5 分布式同步框架与 Rollout 引擎 → `chapter36_distributed_rl_training/intro.md`
 
 **子大纲：**
+
 - veRL 架构深度解析
 - OpenRLHF / NeMo-Aligner / TRL 对比
 - Rollout 引擎与 vLLM 集成
@@ -680,6 +740,7 @@
 ### 16.6 异步 RL 训练系统 → `chapter36_distributed_rl_training/async.md`
 
 **子大纲：**
+
 - 异步 RL 的 staleness 问题
 - LlamaRL（Meta）：纯异步 pipeline
 - AReaL（清华+智谱）：异构算力调度
@@ -689,6 +750,7 @@
 ### 16.7 MoE + RL 与万卡集群 → `chapter36_distributed_rl_training/scale.md`
 
 **子大纲：**
+
 - MoE + RL 训练（DeepSeek V3、Step Flash、GLM-4.5）
 - DualPipe 与 Best-Fit packing
 - Expert 负载均衡在 RL 阶段的稳定性
@@ -698,6 +760,7 @@
 ### 16.8 工业实战：GSM8K 与 AIME → `chapter09_grpo_rlvr/verl-code-sandbox.md`（沿用现有）
 
 **子大纲：**
+
 - 实验：用 GRPO 训练 GSM8K
 - 实验：用 DAPO 训练 AIME 2024
 - 完整开源复现：Open-R1 / Sky-T1 / Tülu 3
@@ -705,6 +768,7 @@
 ### 16.9 中国对齐团队面试常见考点 → `chapter17_llm_rl_industrial/07-interview.md`
 
 **子大纲：**
+
 - PG → REINFORCE → TRPO → PPO → GRPO 完整推导链（智谱真题）
 - DPO 家族 + DPO 正则化
 - DeepSpeed vs Megatron 工程对比
@@ -719,18 +783,21 @@
 ### 17.1 DPO 入门与推导 → `chapter02_dpo/intro.md` + `principles.md`
 
 **子大纲：**
+
 - DPO 的数学推导（从 RLHF 目标推导）
 - DPO 训练动态分析
 
 ### 17.2 DPO 训练指标 → `chapter02_dpo/metrics.md`
 
 **子大纲：**
+
 - 训练监控指标
 - reward margin、accuracy 等关键指标
 
 ### 17.3 DPO 原理、数学与家族选型 → `chapter09_alignment/dpo-theory-and-family.md`
 
 **子大纲：**
+
 - IPO：解决 DPO 的过拟合
 - KTO：无需成对偏好数据
 - SimPO：无参考策略方法
@@ -752,6 +819,7 @@
 ### 18.1 GRPO 训练与核心机制 → `chapter09_grpo_rlvr/grpo-practice-and-mechanism.md`
 
 **子大纲：**
+
 - 从 PPO 到 GRPO：为什么去掉 Critic
 - 群体归一化原理：同 prompt 多 rollout 相对优势
 - KL 约束与参考策略实现
@@ -759,6 +827,7 @@
 ### 18.2 R1-Zero 范式（DAPO）→ `chapter09_grpo_rlvr/deepseek-dapo.md`
 
 **子大纲：**
+
 - DAPO（字节+清华 2025.03，arXiv:2503.14476 NeurIPS 2025）
   - Clip-Higher：解耦 $\epsilon_{low} \neq \epsilon_{high}$
   - Dynamic Sampling：过滤全对/全错样本
@@ -770,6 +839,7 @@
 ### 18.3 RLVR 可验证奖励 → `chapter09_grpo_rlvr/rlvr.md`
 
 **子大纲：**
+
 - RLVR 定义：规则反馈替代人工标注
 - RLVR 的奖励来源：数学验证器、单元测试、形式化证明
 - RLVR 与 RLHF 的混合流水线
@@ -777,6 +847,7 @@
 ### 18.4 GRPO 改进家族（Dr.GRPO / GSPO / CISPO / VAPO / RPT）→ `chapter09_grpo_rlvr/grpo-family.md`
 
 **子大纲：**
+
 - GSPO（Zheng et al. 2025，Qwen3，arXiv:2507.18071）：序列级 IS ratio + 序列级 clip
 - CISPO（MiniMax 2025.06，arXiv:2506.13585）：Clip IS 权重而非 token 更新，2× speedup
 - VAPO（字节 Seed 2025.04，arXiv:2504.05118）：Value-based 反潮流，长 CoT 打败 GRPO
@@ -788,6 +859,7 @@
 ### 18.5 RL Environments 作为新瓶颈 → `chapter23_rl_environments/intro.md`
 
 **子大纲：**
+
 - Anthropic $1B 投资 RL Environments（The Information 2025.09）
 - Wing VC 数据：Anthropic 年花数千万美元，2026 扩展 3-5 倍
 - Karpathy："RLVR 是 LLM 训练流水线的新主要阶段"
@@ -797,6 +869,7 @@
 ### 18.6 Verifier 与 Sandbox 工程 → `chapter23_rl_environments/verifier-sandbox.md`
 
 **子大纲：**
+
 - Verifier 设计原则：正确性、效率、抗作弊
 - 形式化 verifier vs 启发式 verifier
 - Sandbox 工程：Docker 隔离、代码执行沙箱、网络白名单、资源配额
@@ -806,6 +879,7 @@
 ### 18.7 异步 RL 与评测基准 → `chapter23_rl_environments/async-eval.md`
 
 **子大纲：**
+
 - 同步 RL 训练（veRL、TRL、OpenRLHF 传统模式）
 - 异步 RL 训练的动机：rollout 与 training 解耦
 - AReaL（清华+智谱，arXiv:2505.24298）：Staleness-enhanced PPO，2.77× 加速
@@ -817,6 +891,7 @@
 ### 18.8 动手：金融 API 工具调用 GRPO → `chapter09_grpo_rlvr/financial-tool-calling-grpo.md`
 
 **子大纲：**
+
 - 金融 API 数据集
 - GRPO + Tool Use 训练流程
 - 工具调用准确率评估
@@ -824,6 +899,7 @@
 ### 18.9 OPD 在线蒸馏 → `chapter09_grpo_rlvr/on-policy-distillation.md`
 
 **子大纲：**
+
 - On-Policy Distillation 原理
 - 与 RL 的协同训练
 - 实战收益
@@ -831,6 +907,7 @@
 ### 18.10 动手：veRL 代码生成 RL → `chapter09_grpo_rlvr/verl-code-sandbox.md`
 
 **子大纲：**
+
 - veRL 框架上手
 - 代码生成 RL 训练
 - Sandbox 与 verifier 工程
@@ -844,6 +921,7 @@
 ### 19.1 推理模型的兴起：从 o1 到推理即产品 → `chapter13_reasoning_models/emergence-and-o1.md`
 
 **子大纲：**
+
 - OpenAI o1 → o3 → o4 演进
 - Competitive Programming with Large Reasoning Models（OpenAI 2025.02，arXiv:2502.06807）
 - 推理能力作为"涌现现象"的实证
@@ -851,6 +929,7 @@
 ### 19.2 R1-Zero 范式：无 SFT 的纯 RL → `chapter13_reasoning_models/intro.md`
 
 **子大纲：**
+
 - DeepSeek-R1-Zero（Nature 2025）：直接从基座模型做 RL
 - reflection、verification、aha moment 自发涌现
 - R1-Zero 的开源工业级对照（DAPO / VAPO / Qwen3）
@@ -859,6 +938,7 @@
 ### 19.3 Test-time Compute Scaling → `chapter13_reasoning_models/test-time-scaling.md`
 
 **子大纲：**
+
 - Test-time compute vs Train-time compute 的权衡
 - Gemini 3 Pro Deep Think（2025.10）/ 3.1 Deep Think（2026.02）
 - 并行推理"思考层"叠加在 MoE 上
@@ -867,6 +947,7 @@
 ### 19.4 Hybrid Thinking 与思考预算 → `chapter13_reasoning_models/hybrid-thinking.md`
 
 **子大纲：**
+
 - 单模型同时支持 think/non-think 双模式
 - DeepSeek V3.1（2025.08）：Hybrid 模式融合
 - Qwen3（arXiv:2505.09388 §4.3）：Thinking Mode Fusion + Thinking Budget
@@ -877,6 +958,7 @@
 ### 19.5 自适应思考 → `chapter13_reasoning_models/adaptive-thinking.md`
 
 **子大纲：**
+
 - Claude Opus 4.6 的自适应思考深度
 - Opus 4.6 内部 AI Research Eval Suite（LLM training / Text-RL / Quadruped-RL 子任务，34× 人类加速）
 - Anthropic 2026 80 页 Constitution 与推理能力
@@ -884,6 +966,7 @@
 ### 19.6 推理链的可读性与对齐 → `chapter13_reasoning_models/cot-visibility-alignment.md`
 
 **子大纲：**
+
 - 推理过程对齐（Reasoning Alignment）
 - Hidden CoT vs Visible CoT 的工程权衡
 - 推理链的安全过滤
@@ -900,6 +983,7 @@
 ### 20.1 Outcome vs Process 奖励 → `chapter14_prm_search/outcome-vs-process.md`
 
 **子大纲：**
+
 - Outcome Reward 的稀疏性问题
 - Process Reward 的细粒度优势
 - 为什么 PRM 在长 CoT 任务里不可替代
@@ -907,6 +991,7 @@
 ### 20.2 判别式 PRM（经典路线）→ `chapter14_prm_search/discriminative-prm.md`
 
 **子大纲：**
+
 - OpenAI "Let's Verify Step by Step"（Lightman et al. 2023，arXiv:2305.20050）
 - PRM800K 数据集与人工标注
 - PRM 作为 Re-ranking 模型
@@ -915,6 +1000,7 @@
 ### 20.3 生成式 PRM（新路线）→ `chapter14_prm_search/generative-prm.md`
 
 **子大纲：**
+
 - ThinkPRM（arXiv:2504.16828）：生成式 PRM 优于判别式
 - 标签少 100 倍的关键：让 verifier 自己生成评价
 - 验证器计算扩展（Verifier Compute Scaling）
@@ -923,6 +1009,7 @@
 ### 20.4 形式化 PRM（终极 verifier）→ `chapter14_prm_search/formal-prm.md`
 
 **子大纲：**
+
 - Lean4 / Coq 作为天然 verifier：零误判
 - AlphaProof（DeepMind 2024.07，IMO 银牌）：AlphaZero + Lean
 - AlphaGeometry 2（DeepMind）：几何题专用形式化
@@ -932,6 +1019,7 @@
 ### 20.5 推理时搜索 → `chapter14_prm_search/inference-time-search.md`
 
 **子大纲：**
+
 - Beam Search over Thoughts
 - MCTS over Thoughts：树形展开
 - Tree of Thoughts（ToT）
@@ -943,6 +1031,7 @@
 ### 20.6 并行协调推理与总结 → `chapter14_prm_search/parallel-reasoning-and-summary.md`
 
 **子大纲：**
+
 - PaCoRe vs DeepThink vs MCTS 的对比
 - 从深度扩展转向并行广度扩展 TTC
 - PRM 家族选型决策
@@ -956,6 +1045,7 @@
 ### 21.1 Constitutional AI 与 RLAIF 框架 → `chapter22_cai_rlvr/intro.md`
 
 **子大纲：**
+
 - Constitutional AI 框架（Anthropic 2022，arXiv:2212.08073）
 - RLAIF：用 AI 反馈替代人类标注
 - 自我修正（Self-Correction）与自我奖励（Self-Rewarding）
@@ -964,6 +1054,7 @@
 ### 21.2 HHH 原则与 Claude 实践 → `chapter22_cai_rlvr/hhh-practice.md`
 
 **子大纲：**
+
 - HHH 对齐原则：Helpful, Harmless, Honest
 - Claude 训练中的 CAI 实际应用
 - Anthropic 2026 80 页 Constitution 的工程意义
@@ -972,6 +1063,7 @@
 ### 21.3 RLAIF 工程化与宪法扩展 → `chapter22_cai_rlvr/rlaif-engineering.md`
 
 **子大纲：**
+
 - RLAIF 的 prompt 工程与反馈模型选择
 - 大规模 Constitution 的演化机制
 - 成本对比：RLHF / RLAIF / CAI 的标注预算
@@ -996,6 +1088,7 @@
 ### 22.1 多轮 MDP 建模与信用分配 → `chapter10_agentic_rl/multi-turn-rl.md`
 
 **子大纲：**
+
 - 从单轮到多轮：轨迹信用分配的根本变化
 - 多轮 MDP 建模：状态包含完整对话历史
 - 长程任务奖励设计：稀疏 vs 稠密、过程奖励（PRM）的角色
@@ -1004,6 +1097,7 @@
 ### 22.2 用户模拟器与多轮 RL 实验 → `chapter10_agentic_rl/multi-turn-rl.md`
 
 **子大纲：**
+
 - 用户模拟器设计：rule-based / model-based / human-in-loop
 - 多轮 vs 单轮 RL 的工程差异：context 管理、reward 延迟
 - 实验：多轮对话 RL 训练流程
@@ -1012,6 +1106,7 @@
 ### 22.3 工具调用 RL 入门 → `chapter10_agentic_rl/tool-use-and-trajectory.md`
 
 **子大纲：**
+
 - Tool Use 的动作空间扩展
 - Function Calling 的轨迹建模
 - Tool Reward 设计：执行结果 + 调用合理性
@@ -1020,6 +1115,7 @@
 ### 22.4 Search-Augmented RL → `chapter10_agentic_rl/tool-use-agents.md`
 
 **子大纲：**
+
 - Search-R1（arXiv:2503.09516）
 - R1-Searcher（arXiv:2503.05592）
 - 检索增强的 RL 训练流程
@@ -1027,6 +1123,7 @@
 ### 22.5 Code Interpreter RL 与工业实战 → `chapter10_agentic_rl/industrial-practice.md` + `industrial-evaluation.md`
 
 **子大纲：**
+
 - SimpleTIR / ReTool / AFM
 - 实验：工具调用 GRPO 训练
 - 工业评测：BFCL、τ-bench
@@ -1034,6 +1131,7 @@
 ### 22.6 多智能体协作与 Agent Swarm → `chapter10_agentic_rl/multi-agent-swarm.md` `[v5.2 新增]`
 
 **子大纲：**
+
 - LLM-era 多智能体 vs 经典 MARL（与第 14 章 CTDE/MADDPG/MAPPO 的差异）
 - Anthropic Orchestrator-worker 模式（90.2% 加速）
 - Karpathy "5-6 agents" 编排范式
@@ -1052,6 +1150,7 @@
 ### 23.1 任务定义与基准 → `chapter15_rl_based_swe/intro.md`
 
 **子大纲：**
+
 - SWE-bench：软件工程任务标准（Live/Verified）
 - SWE-bench-Lite / SWE-bench Multimodal
 - 评测指标：Resolved %、Pass@k、Edit Distance
@@ -1059,6 +1158,7 @@
 ### 23.2 SWE-RL 与基础实验 → `chapter15_rl_based_swe/swe-bench-and-rlvr.md`
 
 **子大纲：**
+
 - 第一代 SFT-based SWE Agent（SWE-Gym、SWE-Smith）的局限
 - SWE-RL（Meta 2025.02，arXiv:2502.18449 NeurIPS'25）：11M GitHub PR + 规则奖励
 - Llama3-70B 在 SWE-bench Verified 41%，首次观测到 "aha moment"
@@ -1067,6 +1167,7 @@
 ### 23.3 Code World Model 与 DeepSWE → `chapter15_rl_based_swe/world-model-and-deep-swe.md`
 
 **子大纲：**
+
 - Code World Model（CWM，Meta 2025.09，arXiv:2510.02387）：32B dense，SWE-bench 65.8%
 - DeepSWE（Luo et al. 2025）
 - World Model 范式：agent 学会"预测代码执行结果"
@@ -1074,6 +1175,7 @@
 ### 23.4 Self-Play SWE-RL 与总结 → `chapter15_rl_based_swe/self-play-ssr-and-summary.md` + `meta-swe-rl.md`
 
 **子大纲：**
+
 - Self-play SWE-RL（SSR，Meta 2025.12，arXiv:2512.18552）：单一策略双角色
 - 自生成训练数据飞轮
 - 代码 Verifier 设计（单元测试、Code Repair、SWE-RM arXiv:2512.21919）
@@ -1091,6 +1193,7 @@
 ### 24.1 Deep Research 任务定义与多步检索 → `chapter10_agentic_rl/deep-research-agent.md`
 
 **子大纲：**
+
 - Deep Research 任务定义：从单次问答到多步研究
 - Open Domain QA、金融调研、学术综述等场景
 - 多步检索策略：query 改写、迭代搜索、信息聚合
@@ -1099,6 +1202,7 @@
 ### 24.2 浏览器 RL 动作空间与 harness 工程 → `chapter10_agentic_rl/browser-rl-harness.md`
 
 **子大纲：**
+
 - 浏览器智能体动作空间：搜索、点击、滚动、提取、回退
 - Harness 工程与进度跟踪（claude-progress.txt、feature_list.json）
 - 长程任务的内存管理：上下文压缩、关键信息缓存
@@ -1108,6 +1212,7 @@
 ### 24.3 评测基准与开源项目 → `chapter10_agentic_rl/deep-research-eval.md`
 
 **子大纲：**
+
 - BrowseComp（Meta）：浏览器智能体基准
 - xbench-DeepSearch：深度研究评测
 - GAIA：通用 AI 助手基准
@@ -1125,6 +1230,7 @@
 ### 25.1 Computer Use 范式与 GUI Grounding RL → `chapter28_computer_use/intro.md`
 
 **子大纲：**
+
 - Computer Use 范式（Anthropic Computer Use / OpenAI Operator / Google Project Mariner）
 - 核心动作空间：点击、滚动、键入、截图
 - GUI Grounding RL：Set-of-Mark、视觉 grounding、动作映射
@@ -1134,6 +1240,7 @@
 ### 25.2 GUI Agent 训练实践 → `chapter28_computer_use/training.md`
 
 **子大纲：**
+
 - UI-TARS-2（字节 Seed 2025.09，arXiv:2509.02544）：Multi-Turn RL + 异步 rollout + Stateful envs + Value pretraining
 - AutoGLM / Open-AutoGLM（智谱 2025.12）：Self-evolving online curriculum RL
 - MobileRL（arXiv:2509.18119）/ ComputerRL（arXiv:2508.14040）
@@ -1143,6 +1250,7 @@
 ### 25.3 指令层级与 Prompt Injection 防御 → `chapter28_computer_use/safety-swarm.md`
 
 **子大纲：**
+
 - 指令层级（OpenAI 2024.04，arXiv:2404.13208）：系统/开发者/用户/工具指令的权限级别
 - GPT-5 Mini-R 把指令层级用作 RL 奖励（+0.11~0.21）
 - Prompt Injection 防御与"内核模式"类比
@@ -1160,6 +1268,7 @@
 ### 26.1 VLM RL 训练基础 → `chapter11_vlm_rl/intro.md` + `vlm-frameworks.md`
 
 **子大纲：**
+
 - 视觉-语言联合表征
 - 多模态奖励信号来源
 - 视觉 token 与文本 token 的 RL 处理
@@ -1168,6 +1277,7 @@
 ### 26.2 视觉奖励与挑战 → `chapter11_vlm_rl/vlm-challenges.md`
 
 **子大纲：**
+
 - 视觉问答正确性奖励
 - 视觉描述完整性奖励
 - 视觉幻觉惩罚
@@ -1176,6 +1286,7 @@
 ### 26.3 视觉反思 RL `[v5.1 新增]` → `chapter11_vlm_rl/qwen3-vl-reflection.md`
 
 **子大纲：**
+
 - Qwen3-VL（2025.11.26）：Reflection-driven visual re-attention
 - 视觉 grounding 的自我纠错
 - 反思机制 + RL 联合训练
@@ -1183,6 +1294,7 @@
 ### 26.4 中国多模态前沿 → `chapter11_vlm_rl/vlm-grpo-hands-on.md`
 
 **子大纲：**
+
 - Step3-VL-10B（arXiv:2601.09668）：1000+ RL iterations
 - GLM-4.6V：RLCS 课程采样
 - Seed1.5-VL（字节，arXiv:2505.07062）：20B-A200B MoE，GUI agent + 游戏 RL
@@ -1191,6 +1303,7 @@
 ### 26.5 实验：GeoQA 几何推理 → `chapter11_vlm_rl/easyr1-geoqa.md`
 
 **子大纲：**
+
 - EasyR1 框架上手
 - GeoQA 数据集
 - VLM GRPO 训练流程
@@ -1206,6 +1319,7 @@
 ### 27.1 音频语言模型概览与 Step-Audio 系列 → `chapter30_audio_rl/intro.md`
 
 **子大纲：**
+
 - 音频 token 化方案（codec、semantic/acoustic 分离）
 - 语音生成与文本生成的差异
 - 实时推理的工程挑战
@@ -1216,6 +1330,7 @@
 ### 27.2 RLVR → RLHF 演进与音频奖励设计 → `chapter30_audio_rl/reward-design.md`
 
 **子大纲：**
+
 - Step-Audio-R1.5：从 RLVR 转向 RLHF for Audio Reasoning
 - 声音自然度 + 推理能力的多目标 RL
 - 韵律（prosody）自然度保留
@@ -1225,6 +1340,7 @@
 ### 27.3 多模态音频 Agent 与未来方向 → `chapter30_audio_rl/future.md`
 
 **子大纲：**
+
 - 实时语音 Agent：GPT-4o Voice、GLM-4.6 Voice、Step-Audio-2
 - 情感感知与语音风格控制 RL
 - 与 VLM 的统一：音视联合 RL
@@ -1241,6 +1357,7 @@
 ### 28.1 VLA 模型概览 → `chapter12_future_trends/embodied-intelligence/index.md`
 
 **子大纲：**
+
 - π0（Physical Intelligence 2024）：diffusion policy + VLM
 - RT-2（Google 2023，作历史背景）
 - OpenVLA（开源旗舰）
@@ -1249,6 +1366,7 @@
 ### 28.2 机器人学习基础
 
 **子大纲：**
+
 - 观测空间（视觉、本体感觉、力觉）
 - 动作空间（关节角度、末端执行器位姿）
 - 奖励函数设计
@@ -1256,6 +1374,7 @@
 ### 28.3 Diffusion Policy 与多模态融合
 
 **子大纲：**
+
 - Diffusion 模型作为策略
 - 多模态动作分布
 - 视觉-语言-动作 token 化与跨模态对齐
@@ -1263,6 +1382,7 @@
 ### 28.4 Sim-to-Real 与遥操作
 
 **子大纲：**
+
 - 域随机化（Domain Randomization）
 - Sim-to-Real transfer 技术
 - System Identification
@@ -1281,6 +1401,7 @@
 ### 29.1 视觉生成任务定义 → `chapter11_vlm_rl/visual-generation-rl.md`
 
 **子大纲：**
+
 - 文生视频（Text-to-Video）
 - 图生视频（Image-to-Video）
 - 视频编辑与续写
@@ -1289,6 +1410,7 @@
 ### 29.2 DanceGRPO `[字节 Seed 创新]` → `chapter11_vlm_rl/visual-generation-rl.md`
 
 **子大纲：**
+
 - DanceGRPO（2025.05，arXiv:2505.07818）：把 GRPO 适配到 diffusion/flow
 - 算法核心：diffusion step 作为 RL 时间步
 - 与 DDPO 等先前方法对比
@@ -1297,6 +1419,7 @@
 ### 29.3 多奖励视频 RLHF → `chapter11_vlm_rl/video-generation-modern.md`
 
 **子大纲：**
+
 - Seedance 1.0（字节，arXiv:2506.09113）：Foundational reward / Motion reward / Aesthetic reward / Refiner RLHF
 - LongCat-Video（字节 2025.10，arXiv:2510.22200）：GRPO + 多奖励 stacking、LoRA stacking
 - 视频生成的奖励模型：VisionReward、多维度奖励分解、人类偏好对齐
@@ -1304,6 +1427,7 @@
 ### 29.4 物理感知视频生成与实验
 
 **子大纲：**
+
 - Hailuo-02（MiniMax，physics-aware NCR 架构）
 - 物理规律作为内在奖励
 - 时序一致性约束
@@ -1322,12 +1446,14 @@
 ### 30.1 经典失败模式 → `chapter16_alignment_failures/classical-failures.md` + `intro.md`
 
 **子大纲：**
+
 - 奖励黑客完整分类法：Specification Gaming / Reward Tampering / Goodhart's Law
 - Anthropic 2025.11 分类（arXiv:2511.18397）
 
 ### 30.2 RLVR 的"假性收益" `[v5.1 新增]` → `chapter16_alignment_failures/modern-incidents.md`
 
 **子大纲：**
+
 - 数据污染实证（arXiv:2507.10532 AAAI 2026）：Qwen 在 MATH-500 上的 "spurious reward RLVR" 收益主要来自数据污染
 - GRPO clipping bias 导致记忆激活
 - 评估 RLVR 真实收益的方法论
@@ -1336,12 +1462,14 @@
 ### 30.3 工业失败案例 `[v5.1 新增]`
 
 **子大纲：**
+
 - GPT-4o 谄媚回滚（OpenAI 2025.04-05）：用户反馈奖励稀释安全奖励、48 小时回滚
 - 字节 Seed RLHF 数据 scaling：Reward hacking 与多样性衰减、Pre-PPO prompt 选择策略
 
 ### 30.4 Anthropic 失准研究 → `chapter16_alignment_failures/sleeper-and-faking.md`
 
 **子大纲：**
+
 - School of Reward Hacks（Gao et al. 2025.08）
 - 自然涌现的失准（Anthropic 2025.11，arXiv:2511.18397）：HHH 奖励作为缓解
 - Sleeper Agents（Hubinger et al. 2024.01，arXiv:2401.05566）
@@ -1353,6 +1481,7 @@
 ### 30.5 防御机制与总结 → `chapter16_alignment_failures/scaling-and-defenses.md`
 
 **子大纲：**
+
 - Preference Models 与 Reward Hack Classifier
 - By Construction：从架构上防止 hacking
 - 多 verifier 集成
@@ -1361,6 +1490,7 @@
 ### 30.6 评估原则与污染鲁棒性 → `chapter35_rl_evaluation/intro.md`
 
 **子大纲：**
+
 - 评估基准设计原则
 - 污染与泄漏检测（呼应 29.2 节 RLVR 假性收益）
 - 提示敏感性分析
@@ -1371,6 +1501,7 @@
 ### 30.7 现代评估 Harness 与内部基准 → `chapter35_rl_evaluation/harness.md`
 
 **子大纲：**
+
 - 标准化评测 harness：lm-eval-harness、BigCode Eval、τ-bench、BFCL
 - Anthropic 内部 AI Research Eval Suite（Opus 4.6：LLM training / Text-RL / Quadruped-RL 子任务，34× 人类加速）
 - Claude 4.6 自我评估与对抗基线
@@ -1389,6 +1520,7 @@
 ### 31.1 AlphaEvolve 范式 → `chapter12_future_trends/llm-driven-discovery.md`
 
 **子大纲：**
+
 - AlphaEvolve（DeepMind 2025.05）：LLM 提出 diff + 自动评估器打分 + 进化算法挑选
 - 首次发现矩阵乘法 23% 加速
 - 改进 50 余个开放数学问题
@@ -1399,6 +1531,7 @@
 ### 31.2 生成式世界模型作为 RL 环境
 
 **子大纲：**
+
 - Genie 3（DeepMind 2025.08）：实时可交互世界模型、720p/24fps 生成、World memory 多分钟一致性
 - 生成式环境 vs 真实环境
 - 无限 RL 训练课程：agent 在生成世界中学习
@@ -1407,6 +1540,7 @@
 ### 31.3 递归自我改进
 
 **子大纲：**
+
 - Anthropic Funded Research / 递归自我改进（2026.04）：Claude 自身做 AI 研究、内部基准 52× 加速
 - "Claude Mythos Preview" 模型
 - RL 训练 AI 做 AI 研究的终极愿景
@@ -1420,6 +1554,7 @@
 ### 32.1 自我博弈基础与 LLM 自我博弈 → `chapter12_future_trends/self-play-outlook/index.md`
 
 **子大纲：**
+
 - AlphaGo → AlphaZero → MuZero 演进
 - 自我对弈的收敛性
 - Self-play 在围棋 / 国际象棋 / 星际争霸的应用
@@ -1431,6 +1566,7 @@
 ### 32.2 RL Scaling Laws 与 Foundation Model RL → `chapter12_future_trends/rl-scaling-outlook.md`
 
 **子大纲：**
+
 - RL Scaling Laws（类比 Chinchilla）
 - 奖励信号 vs 数据量 vs 模型规模
 - RLVR 的 scaling 极限
@@ -1441,6 +1577,7 @@
 ### 32.3 In-Context RL 与未来十年 → `chapter12_future_trends/llm-multi-agent-rl/index.md`
 
 **子大纲：**
+
 - In-Context RL 与 Algorithm Distillation（DeepMind 2022）
 - 元学习与持续学习
 - Karpathy 的"AGI 还需十年"反思
@@ -1459,6 +1596,7 @@
 ### A.1 数值稳定性与崩溃诊断 → `appendix_common_pitfalls/intro.md`
 
 **子大纲：**
+
 - 常见训练崩溃诊断
 - 梯度异常检测
 - KL 散度爆炸处理
@@ -1467,6 +1605,7 @@
 ### A.2 优化器与系统稳定性 → `appendix_common_pitfalls/optimizer-stability.md`
 
 **子大纲：**
+
 - MuonClip + QK-clip 优化器稳定性（Kimi K2）
 - MoE + RL 训练的 router 干扰问题
 - 异步 RL 训练的 staleness 调优
@@ -1474,6 +1613,7 @@
 ### A.3 Agent / Long-trace 排查清单 → `appendix_common_pitfalls/agentic-failure.md`
 
 **子大纲：**
+
 - Reward Hacking 早期信号（agent 特有形式）
 - Function Call 解析失败排查清单
 - 长轨迹 OOM 诊断决策树
@@ -1487,6 +1627,7 @@
 ### B.1 同步与异步训练系统 → `appendix_industrial_training/intro.md`
 
 **子大纲：**
+
 - 同步 RL 训练系统底座（veRL、TRL）
 - 异步 RL 训练系统（AReaL、AgentRL、SLIME、ROLL、LlamaRL）
 - Staleness、Cross-policy sampling 工程实现
@@ -1494,6 +1635,7 @@
 ### B.2 Agent 沙箱与评测工程 → `appendix_industrial_training/agentic-rl-infra.md`
 
 **子大纲：**
+
 - Agent 沙箱工程
 - 评测基准工程
 - 长轨迹 rollout 资源管理
@@ -1501,6 +1643,7 @@
 ### B.3 指标词典与实战练习 → `appendix_industrial_training/metrics-exercises.md`
 
 **子大纲：**
+
 - 训练指标词典
 - MoE + RL 训练工程（DeepSeek V3、Step Flash、GLM-4.5）
 - 工业实战练习
@@ -1514,6 +1657,7 @@
 ### C.1 SFT / PPO / DPO 实现 → `appendix_code_cheatsheet/intro.md`
 
 **子大纲：**
+
 - SFT 与 KL 散度实现
 - PPO 与 GAE 实现
 - DPO 家族实现
@@ -1521,6 +1665,7 @@
 ### C.2 GRPO 家族与 RPT 实现 → `appendix_code_cheatsheet/grpo-family.md`
 
 **子大纲：**
+
 - GRPO 基础实现
 - GRPO 改进家族实现（DAPO、Dr.GRPO、GSPO、CISPO、VAPO）
 - RPT（Reinforcement Pre-Training）实现
@@ -1529,6 +1674,7 @@
 ### C.3 采样、注意力与优化器实现 → `appendix_code_cheatsheet/numerical.md`
 
 **子大纲：**
+
 - Softmax 与交叉熵实现
 - 采样方法实现（top-k, top-p, min-p）
 - 注意力机制实现（MHA、GQA、MLA、DSA 稀疏注意力）
@@ -1544,12 +1690,14 @@
 ### D.1 论文与课程索引 → `appendix_resources/intro.md`
 
 **子大纲：**
+
 - 必读论文清单（按主题分类，100+ 篇）
 - 视频课程索引（CS285、CS234、Hugging Face Course）
 
 ### D.2 开源复现项目 → `appendix_resources/open-projects.md`
 
 **子大纲：**
+
 - 开源代码库索引（veRL / OpenRLHF / TRL / trl-X）
 - 复现项目推荐（Sky-T1、Open-R1、Tülu 3）
 - 中国实验室开源复现追踪
@@ -1563,12 +1711,14 @@
 ### E.1 线性代数与概率统计 → `appendix_math/probability-linear.md`
 
 **子大纲：**
+
 - 线性代数（贝尔曼矩阵、函数逼近、收敛性）
 - 概率与统计（回报、价值、采样估计、GAE）
 
 ### E.2 微积分与信息论 → `appendix_math/calculus-information.md`
 
 **子大纲：**
+
 - 微积分与优化（梯度、PG、PPO、Adam）
 - 信息论（熵、KL、交叉熵、互信息）
 
@@ -1581,12 +1731,14 @@
 ### F.1 经典与深度 RL 必读 → `appendix_paper_reading/classical-deep-rl.md`
 
 **子大纲：**
+
 - 经典 RL 必读（Sutton、Watkins、Mnih）
 - 深度 RL 必读（DQN、A3C、PPO、SAC）
 
 ### F.2 LLM RL 与安全研究必读 → `appendix_paper_reading/llm-rl-safety.md`
 
 **子大纲：**
+
 - LLM RL 必读（InstructGPT、CAI、DPO、GRPO、R1）
 - 安全研究必读（Sleeper Agents、Alignment Faking、Reward Hacking）
 - 2025-2026 前沿（DAPO、GSPO、CISPO、PRM、PaCoRe）
@@ -1600,6 +1752,7 @@
 ### G.1 预训练与后训练成本 → `appendix_gpu_hours/intro.md`
 
 **子大纲：**
+
 - 不同模型规模的预训练成本
 - SFT / RLHF / RLVR 各阶段成本
 - DeepSeek / Qwen / Step 公开训练数据参考
@@ -1607,6 +1760,7 @@
 ### G.2 自训预算规划 → `appendix_gpu_hours/budget-planning.md`
 
 **子大纲：**
+
 - 自训模型预算规划
 - 算力采购 vs 云租用对比
 - 不同 RL 范式的 GPU 小时单价
@@ -1620,12 +1774,14 @@
 ### H.1 符号与缩写表 → `appendix_terminology/intro.md`
 
 **子大纲：**
+
 - 全书符号统一表
 - 缩写表（RLHF、RLVR、PRM、CAI...）
 
 ### H.2 算法索引 → `appendix_terminology/algorithm-index.md`
 
 **子大纲：**
+
 - 算法名称索引（GRPO、PPO、DPO、SAC...）
 - 算法族关系图（PPO → GRPO → DAPO / GSPO / CISPO / VAPO）
 - 算法-章节交叉引用表
@@ -1648,40 +1804,40 @@
 > ⑨多智能体协作 / Agent Swarm → 并入第 22 章 22.6 节（LLM-era 多智能体本质是多轮 + 多角色）
 > Part V 由 3 章扩展为 4 章，全书从 31 章变 32 章。
 
-| Part | 主题 | 章节数 | 章节性质 |
-|------|-----|-------|---------|
-| 0 | 序章 · 导论 | 7 节 | 多篇章节（3 个文件） |
-| I | 基础与经典 RL | 6 | 6 多篇 |
-| II | 深度 RL | 5 | 5 多篇 |
-| III | 高级 RL 方法 | 3 | 3 多篇 |
-| IV | LLM 对齐与后训练 | 7 | 7 多篇 |
-| V | **Agentic RL** | **4** | 4 多篇 |
-| VI | **多模态 RL（含视觉生成）** | **4** | 4 多篇 |
-| VII | 安全、评估与研究前沿 | **3** | 3 多篇 |
-| **总计** | | **32 章** | **0 单篇 + 32 多篇** |
-| 附录 | A-H | 8 部分 | 0 单篇 + 8 多篇 |
+| Part     | 主题                        | 章节数    | 章节性质             |
+| -------- | --------------------------- | --------- | -------------------- |
+| 0        | 序章 · 导论                 | 7 节      | 多篇章节（3 个文件） |
+| I        | 基础与经典 RL               | 6         | 6 多篇               |
+| II       | 深度 RL                     | 5         | 5 多篇               |
+| III      | 高级 RL 方法                | 3         | 3 多篇               |
+| IV       | LLM 对齐与后训练            | 7         | 7 多篇               |
+| V        | **Agentic RL**              | **4**     | 4 多篇               |
+| VI       | **多模态 RL（含视觉生成）** | **4**     | 4 多篇               |
+| VII      | 安全、评估与研究前沿        | **3**     | 3 多篇               |
+| **总计** |                             | **32 章** | **0 单篇 + 32 多篇** |
+| 附录     | A-H                         | 8 部分    | 0 单篇 + 8 多篇      |
 
 ---
 
 # 与现有书的对比 `[v5.1 修订]`
 
-| 维度 | 当前书 | **v5.1 最终** |
-|-----|-------|------------|
-| 总章节数 | 12 | **32** |
-| 序章 | 哲学论述在前 | **0.1 先动手玩 CartPole + 未来剧透** |
-| Agentic 内容 | 1 章浅 | **4 章深入 + 第 25 章指令层级 / UI-TARS-2 / K2.5** |
-| 多模态 | 1 章浅 | **4 章（VLM / 音频 / VLA / 视觉生成）** |
-| 安全/对齐研究 | 0 | **1 章合并（奖励黑客 + 评估）** |
-| GRPO 家族 | DAPO 一个 | **6+ 变体算法细节（DAPO / Dr.GRPO / GSPO / CISPO / VAPO）+ Verifier 工程** |
-| PRM | 判别式为主 | **生成式（ThinkPRM）+ 形式化（Lean4 / AlphaProof）** |
-| RL Environments | 0 | **合并到第 18 章 GRPO 家族 + 异步 RL（AReaL / AgentRL）** |
-| 视觉生成 RL | 0 | **独立章节（DanceGRPO / Seedance / LongCat）** |
-| 工程系统 | 附录 | **正文 1 章 + 附录扩展** |
-| 实战代码 | 部分 | **每章带 lab** |
-| 中国实验室覆盖 | DeepSeek 一个 | **DeepSeek / Qwen / Kimi / Zhipu / Step / ByteDance / MiniMax 全覆盖** |
-| 真实论文出处 | 无 | **每个主题有 arXiv 编号 + 官方 URL** |
-| 前沿方向 | 0 | **AlphaEvolve / Genie 3 / 递归自我改进 / RPT** |
-| **标题层级** | **混乱（X.Y 歧义）** | **强制三层：Part / 章节 / 文章 / 子大纲** |
+| 维度            | 当前书               | **v5.1 最终**                                                              |
+| --------------- | -------------------- | -------------------------------------------------------------------------- |
+| 总章节数        | 12                   | **32**                                                                     |
+| 序章            | 哲学论述在前         | **0.1 先动手玩 CartPole + 未来剧透**                                       |
+| Agentic 内容    | 1 章浅               | **4 章深入 + 第 25 章指令层级 / UI-TARS-2 / K2.5**                         |
+| 多模态          | 1 章浅               | **4 章（VLM / 音频 / VLA / 视觉生成）**                                    |
+| 安全/对齐研究   | 0                    | **1 章合并（奖励黑客 + 评估）**                                            |
+| GRPO 家族       | DAPO 一个            | **6+ 变体算法细节（DAPO / Dr.GRPO / GSPO / CISPO / VAPO）+ Verifier 工程** |
+| PRM             | 判别式为主           | **生成式（ThinkPRM）+ 形式化（Lean4 / AlphaProof）**                       |
+| RL Environments | 0                    | **合并到第 18 章 GRPO 家族 + 异步 RL（AReaL / AgentRL）**                  |
+| 视觉生成 RL     | 0                    | **独立章节（DanceGRPO / Seedance / LongCat）**                             |
+| 工程系统        | 附录                 | **正文 1 章 + 附录扩展**                                                   |
+| 实战代码        | 部分                 | **每章带 lab**                                                             |
+| 中国实验室覆盖  | DeepSeek 一个        | **DeepSeek / Qwen / Kimi / Zhipu / Step / ByteDance / MiniMax 全覆盖**     |
+| 真实论文出处    | 无                   | **每个主题有 arXiv 编号 + 官方 URL**                                       |
+| 前沿方向        | 0                    | **AlphaEvolve / Genie 3 / 递归自我改进 / RPT**                             |
+| **标题层级**    | **混乱（X.Y 歧义）** | **强制三层：Part / 章节 / 文章 / 子大纲**                                  |
 
 ---
 
@@ -1690,30 +1846,36 @@
 **Phase 1（立即，零风险）**：序章重构 + 标题教材化 + 拆分第 3 章 MDP
 
 **Phase 2（本月，P0）**：补 Part IV 核心
+
 - 第 18 章 GRPO 家族 + Verifier 工程完整重构（DAPO / Dr.GRPO / GSPO / CISPO / VAPO / RPT）
 - 第 19 章 Reasoning 补 Hybrid Thinking + long2short + 涌现证据
 - 第 20 章 PRM 升级到生成式 + 形式化
 
 **Phase 3（下季，P0）**：补 Part V Agentic
+
 - 第 23 章代码 agent 重构为 RL-based SWE 主线
 - 第 24 章 Deep Research / 第 25 章 Computer Use 各自独立成章
 - 第 22 章新增 22.6 多智能体协作与 Agent Swarm
 
 **Phase 4（下半，P0）**：补 Part VI 多模态
+
 - 第 27 章音频 RL 深化 MGRD
 - 第 28 章 VLA 升级 Gemini Robotics 1.5
 - 第 29 章视觉生成 RL（DanceGRPO / Seedance）`[全新]`
 
 **Phase 5（持续，P1）**：Part VII 安全 + 前沿
+
 - 第 30 章 Reward Hacking + 评估（合并章）补 GPT-4o 回滚 / 数据污染 / Seed scaling
 - 第 31 章 AlphaEvolve / Genie 3 / 递归自我改进 `[全新]`
 
 **Phase 6（长期，P1-P2）**：附录扩充
+
 - 附录 A 补 MuonClip + QK-clip
 - 附录 B 补异步 RL 系统
 - 附录 C 补 DanceGRPO / RPT / PRM 实现
 
 **Phase 7（持续）**：旧目录重命名（可选）
+
 - `chapter01_cartpole/` → `chapter02_cartpole/`
 - `chapter02_dpo/` → 合并到 `chapter18_dpo/`
 - `chapter03_mdp/` → 拆分为 `chapter04_mdp/`、`chapter05_value/`、`chapter06_dp_mc_td/`、`chapter07_q_learning/`
@@ -1846,6 +2008,3 @@
 4. **持续更新**：2026 年会有新论文、新模型，本书需要每季小修、每年大修。
 5. **写作工作量估算**：38 章 × 每章约 3000-5000 字 + 代码 = 约 15-20 万字 + 大量代码。预计全职 6-12 个月。
 6. **本版（0622）的核心修正**：强制三层标题层级（Part / 章节 / 文章 / 子大纲），消除旧版 X.Y 编号歧义，让"单篇章节的内部小节"和"多篇章节的独立文章"在视觉上彻底分开。
-
-
-

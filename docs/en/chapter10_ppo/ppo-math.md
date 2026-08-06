@@ -725,11 +725,11 @@ In code, the Actor outputs action probabilities, then wraps them into a distribu
 
 `action_probs` is $\pi_\theta(\cdot \mid s_t)$, the probability distribution over all actions. `dist` provides several commonly-used methods:
 
-| Code                    | Meaning                               | Math Counterpart                      |
-| ----------------------- | ------------------------------------- | ------------------------------------- |
+| Code                    | Meaning                                | Math Counterpart                      |
+| ----------------------- | -------------------------------------- | ------------------------------------- |
 | `dist.sample()`         | sample an action from the distribution | $a_t \sim \pi_\theta(\cdot \mid s_t)$ |
-| `dist.log_prob(action)` | log probability of the sampled action | $\log \pi_\theta(a_t \mid s_t)$       |
-| `dist.entropy()`        | how random the distribution is        | $H[\pi_\theta]$                       |
+| `dist.log_prob(action)` | log probability of the sampled action  | $\log \pi_\theta(a_t \mid s_t)$       |
+| `dist.entropy()`        | how random the distribution is         | $H[\pi_\theta]$                       |
 
 If we run from the initial state until termination, we obtain a trajectory:
 

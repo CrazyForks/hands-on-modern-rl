@@ -16,14 +16,14 @@ def alphazero_search(state, neural_net, n_simulations=800):
         node = root
         while not node.is_leaf():
             node = node.select_child()
-        
+
         # 2. Expansion: 神经网络评估叶子
         policy, value = neural_net(node.state)
         node.expand(policy)
-        
+
         # 3. Backup: 把 value 反向传播到根
         node.backup(value)
-    
+
     # 返回根节点的访问次数分布作为动作概率
     return root.compute_action_distribution()
 ```
@@ -65,7 +65,7 @@ def self_play_training(network, n_games=10000):
             action = sample_from(policy)
             trajectory.append((state, policy, action))
             state = state.next(action)
-        
+
         # 2. 标注胜负
         winner = state.winner()
         for s, p, a in trajectory:
@@ -93,14 +93,14 @@ class MuZero:
         # 1. 编码真实状态到隐藏空间
         root_hidden = self.representation(state)
         root_policy, root_value = self.prediction(root_hidden)
-        
+
         # 2. MCTS 在隐藏空间搜索
         for _ in range(n_simulations):
             self._mcts_iteration(root_hidden)
-        
+
         # 3. 返回根的动作分布
         return root.action_distribution()
-    
+
     def _mcts_iteration(self, root):
         # 在隐藏空间选择、扩张、回溯
         path = self._select_path(root)
@@ -114,6 +114,7 @@ class MuZero:
 ### MuZero 的意义
 
 MuZero 不知道游戏规则也能学——它**自己学规则**。这让它能推广到：
+
 - **Atari**（不需要模拟器，直接从像素学）
 - **棋盘游戏**（围棋、象棋、将棋）
 - **扑克**（部分可观察）
@@ -141,20 +142,20 @@ class RSSM:
         h = zeros(batch, hidden_dim)
         posterior_zs = []
         prior_zs = []
-        
+
         for t in range(T):
             # 先验：从 h_t 预测 z_t
             prior_mean, prior_std = self.prior(h)
             prior_zs.append((prior_mean, prior_std))
-            
+
             # 后验：从 h_t 和 obs_t 推断 z_t
             posterior_mean, posterior_std = self.posterior(h, encoder(obs_seq[t]))
             z = reparameterize(posterior_mean, posterior_std)
             posterior_zs.append((posterior_mean, posterior_std))
-            
+
             # 更新 RNN hidden state
             h = self.rnn(h, z, action_seq[t])
-        
+
         return prior_zs, posterior_zs
 ```
 
@@ -198,14 +199,14 @@ Dreamer V3（Hafner et al. 2023）的关键贡献：**单一超参数设置**跨
 
 ## Model-Based vs Model-Free 与 何时用哪个
 
-| 维度 | Model-Free | Model-Based |
-|------|-----------|-------------|
-| **样本效率** | 低（百万步） | 高（万步） |
-| **渐进性能** | 高 | 受模型误差限制 |
+| 维度         | Model-Free       | Model-Based                |
+| ------------ | ---------------- | -------------------------- |
+| **样本效率** | 低（百万步）     | 高（万步）                 |
+| **渐进性能** | 高               | 受模型误差限制             |
 | **计算成本** | 低（直接用数据） | 高（训练模型 + 搜索/规划） |
-| **可解释性** | 黑盒 | 模型可分析 |
-| **迁移能力** | 弱 | 模型可迁移到下游任务 |
-| **超参敏感** | 中 | 高（模型质量决定一切） |
+| **可解释性** | 黑盒             | 模型可分析                 |
+| **迁移能力** | 弱               | 模型可迁移到下游任务       |
+| **超参敏感** | 中               | 高（模型质量决定一切）     |
 
 **何时选 Model-Free：**
 

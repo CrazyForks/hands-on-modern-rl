@@ -19,10 +19,10 @@ class TD3Critic:
     def __init__(self, state_dim, action_dim):
         self.Q1 = QNetwork(state_dim, action_dim)
         self.Q2 = QNetwork(state_dim, action_dim)  # 独立初始化
-    
+
     def forward(self, s, a):
         return self.Q1(s, a), self.Q2(s, a)
-    
+
     def target_min(self, s, a):
         return torch.min(self.Q1(s, a), self.Q2(s, a))
 ```
@@ -35,7 +35,7 @@ Critic 比 Actor 难学得多——Critic 要拟合 $Q(s,a)$ 这个二元函数�
 for step in range(total_steps):
     # 每步都更新 critic
     update_critic()
-    
+
     # 每 d=2 步才更新 actor + 目标网络
     if step_count % policy_delay == 0:
         update_actor()
@@ -61,7 +61,7 @@ class TD3:
     def update(self, batch_size=256):
         states, actions, rewards, next_states, dones = \
             self.replay_buffer.sample(batch_size)
-        
+
         # === Critic 更新（双 Q） ===
         with torch.no_grad():
             next_actions = self.actor_target(next_states)
@@ -72,18 +72,18 @@ class TD3:
             target_q1, target_q2 = self.critic_target(next_states, next_actions)
             target_q = torch.min(target_q1, target_q2)
             target_q = rewards + self.gamma * (1 - dones) * target_q
-        
+
         current_q1, current_q2 = self.critic(states, actions)
         critic_loss = F.mse_loss(current_q1, target_q) + F.mse_loss(current_q2, target_q)
         self.critic_optim.zero_grad(); critic_loss.backward()
         self.critic_optim.step()
-        
+
         # === Actor 更新（延迟） ===
         if self.step_count % self.policy_delay == 0:
             actor_loss = -self.critic.Q1(states, self.actor(states)).mean()
             self.actor_optim.zero_grad(); actor_loss.backward()
             self.actor_optim.step()
-            
+
             soft_update(self.actor_target, self.actor, self.tau)
             soft_update(self.critic_target, self.critic, self.tau)
 ```
@@ -155,14 +155,14 @@ SAC 在 MuJoCo 上长期霸榜，原因：
 
 ### 三大算法对比
 
-| 维度 | DDPG | TD3 | SAC |
-|------|------|-----|-----|
-| 策略类型 | 确定性 | 确定性 | 随机（高斯） |
-| Q 网络 | 1 个 | 2 个（Twin） | 2 个（Twin） |
-| 探索方式 | 外加噪声 | 外加噪声 | 熵奖励（内置） |
-| 稳定性 | 差 | 中 | 强 |
-| 超参敏感 | 高 | 中 | 低 |
-| 推荐首选 | ❌ | ⚠️ | ✅ |
+| 维度     | DDPG     | TD3          | SAC            |
+| -------- | -------- | ------------ | -------------- |
+| 策略类型 | 确定性   | 确定性       | 随机（高斯）   |
+| Q 网络   | 1 个     | 2 个（Twin） | 2 个（Twin）   |
+| 探索方式 | 外加噪声 | 外加噪声     | 熵奖励（内置） |
+| 稳定性   | 差       | 中           | 强             |
+| 超参敏感 | 高       | 中           | 低             |
+| 推荐首选 | ❌       | ⚠️           | ✅             |
 
 **实战建议**：连续控制首选 SAC；如果需要确定性策略（部署时无随机），选 TD3。
 
@@ -184,6 +184,7 @@ SAC 在 MuJoCo 上长期霸榜，原因：
 ```
 
 三个观察：
+
 - **SAC** 收敛最快、最稳——最大熵自带的探索让前期学得快
 - **TD3** 略慢于 SAC 但最终性能接近——稳定性补丁让 DDPG 可用
 - **DDPG** 大部分时间在发散——只在某些种子下偶有训练成功

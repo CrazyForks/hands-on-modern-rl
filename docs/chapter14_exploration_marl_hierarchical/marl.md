@@ -44,7 +44,7 @@ Multi-Agent DDPG（Lowe et al. 2017）直接把 DDPG 扩展到多智能体设定
 
 $$\nabla_{\theta_i} J(\mu_{\theta_i}) = \mathbb{E}\left[\nabla_{\theta_i} \mu_{\theta_i}(o_i) \cdot \nabla_{a_i} Q_i(o_1, a_1, \ldots, o_n, a_n)\big|_{a_i = \mu_{\theta_i}(o_i)}\right]$$
 
-注意 critic 的输入维度随智能体数线性增长，且**只为自己的 $a_i$ 求梯度**，其他智能体的动作当作已知条件。这种"我学我对别人的最佳响应"的结构让 MADDPG 在混合合作-竞争任务（如 *Particle Environments* 的 predator-prey）上稳定收敛。
+注意 critic 的输入维度随智能体数线性增长，且**只为自己的 $a_i$ 求梯度**，其他智能体的动作当作已知条件。这种"我学我对别人的最佳响应"的结构让 MADDPG 在混合合作-竞争任务（如 _Particle Environments_ 的 predator-prey）上稳定收敛。
 
 ```python
 class MADDPG:
@@ -106,17 +106,17 @@ def mappo_update(actors, critic, buffer, n_agents, clip_eps=0.2):
 MAPPO 的工程优势让它在过去两年成为 MARL 的**事实标准**：
 
 - **稳定性**：PPO 的 clip 比 DDPG 的 off-policy 更新更鲁棒
-- **超参统一**：单组超参在 *StarCraft Multi-Agent Challenge* (SMAC)、*Hanabi*、*Multi-Agent MuJoCo* 上都接近 SOTA
+- **超参统一**：单组超参在 _StarCraft Multi-Agent Challenge_ (SMAC)、_Hanabi_、_Multi-Agent MuJoCo_ 上都接近 SOTA
 - **扩展性**：critic 共享、actor 可分布式训练，适合大集群
 
 ### CTDE 算法对比
 
-| 算法 | critic 输入 | actor 输入 | on/off-policy | 代表任务 |
-|------|------------|-----------|---------------|----------|
-| IQL（独立学习） | $o_i$ | $o_i$ | off | 弱基线 |
-| VDN / QMIX | $s$（线性/单调分解） | $o_i$ | off | 合作任务 |
-| MADDPG | $(o_1,a_1,\ldots,o_n,a_n)$ | $o_i$ | off | 合作-竞争混合 |
-| MAPPO | $s$ | $o_i$ | on | SMAC、Hanabi |
+| 算法            | critic 输入                | actor 输入 | on/off-policy | 代表任务      |
+| --------------- | -------------------------- | ---------- | ------------- | ------------- |
+| IQL（独立学习） | $o_i$                      | $o_i$      | off           | 弱基线        |
+| VDN / QMIX      | $s$（线性/单调分解）       | $o_i$      | off           | 合作任务      |
+| MADDPG          | $(o_1,a_1,\ldots,o_n,a_n)$ | $o_i$      | off           | 合作-竞争混合 |
+| MAPPO           | $s$                        | $o_i$      | on            | SMAC、Hanabi  |
 
 ::: tip 价值分解是什么
 VDN 假设 $Q_{\text{tot}} = \sum_i Q_i(o_i, a_i)$，QMIX 推广为 $Q_{\text{tot}}$ 是各 $Q_i$ 的单调函数（保证 $\arg\max$ 可分解）。它们也是 CTDE，但属于"价值分解"分支，不在本章主线。MAPPO 在大多数合作任务上已超过 QMIX。

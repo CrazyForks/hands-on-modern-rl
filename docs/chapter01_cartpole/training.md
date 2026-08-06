@@ -45,7 +45,7 @@ class PolicyNetwork(nn.Module):
             nn.Tanh(),
             nn.Linear(hidden, action_dim)
         )
-    
+
     def forward(self, s):
         logits = self.net(s)
         return torch.distributions.Categorical(logits=logits)
@@ -61,7 +61,7 @@ class ValueNetwork(nn.Module):
             nn.Tanh(),
             nn.Linear(hidden, 1)
         )
-    
+
     def forward(self, s):
         return self.net(s).squeeze(-1)
 
@@ -86,82 +86,82 @@ def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
     policy = PolicyNetwork()
     value_fn = ValueNetwork()
     optimizer = optim.Adam(list(policy.parameters()) + list(value_fn.parameters()), lr=lr)
-    
+
     reward_history = deque(maxlen=20)
-    
+
     for iter in range(n_iters):
         # === 1. Rollout ===
         states, actions, rewards, dones, log_probs_old, values = [], [], [], [], [], []
         s, _ = env.reset()
         ep_reward = 0
-        
+
         for step in range(n_steps):
             s_tensor = torch.FloatTensor(s)
             dist = policy(s_tensor)
             v = value_fn(s_tensor)
             a = dist.sample()
-            
+
             s_next, r, terminated, truncated, _ = env.step(a.item())
             done = terminated or truncated
-            
+
             states.append(s); actions.append(a.item()); rewards.append(r)
             dones.append(done); log_probs_old.append(dist.log_prob(a).item()); values.append(v.item())
             ep_reward += r
-            
+
             if done:
                 reward_history.append(ep_reward)
                 ep_reward = 0
                 s, _ = env.reset()
             else:
                 s = s_next
-        
+
         # === 2. 计算 advantage ===
         advantages = compute_gae(rewards, values, gamma, lam)
         advantages = torch.FloatTensor(advantages)
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
         returns = advantages + torch.FloatTensor(values)
-        
+
         # === 3. PPO 更新（多个 epoch） ===
         states_t = torch.FloatTensor(np.array(states))
         actions_t = torch.LongTensor(actions)
         log_probs_old_t = torch.FloatTensor(log_probs_old)
-        
+
         for epoch in range(n_epochs):
             idx = torch.randperm(len(states_t))
             for start in range(0, len(states_t), batch_size):
                 end = start + batch_size
                 mb_idx = idx[start:end]
-                
+
                 mb_states = states_t[mb_idx]
                 mb_actions = actions_t[mb_idx]
                 mb_old_lp = log_probs_old_t[mb_idx]
                 mb_adv = advantages[mb_idx]
                 mb_ret = returns[mb_idx]
-                
+
                 dist = policy(mb_states)
                 new_lp = dist.log_prob(mb_actions)
                 ratio = (new_lp - mb_old_lp).exp()
-                
+
                 # PPO Clip
                 surr1 = ratio * mb_adv
                 surr2 = torch.clamp(ratio, 1 - clip_eps, 1 + clip_eps) * mb_adv
                 policy_loss = -torch.min(surr1, surr2).mean()
-                
+
                 # Value loss
                 v_pred = value_fn(mb_states)
                 value_loss = ((v_pred - mb_ret) ** 2).mean()
-                
+
                 loss = policy_loss + 0.5 * value_loss
-                
+
                 optimizer.zero_grad()
                 loss.backward()
                 nn.utils.clip_grad_norm_(policy.parameters(), 0.5)
                 optimizer.step()
-        
+
         if iter % 10 == 0:
             avg_r = np.mean(reward_history) if reward_history else 0
             print(f"Iter {iter}: avg_reward = {avg_r:.1f} / 500")
-    
+
     return policy
 
 if __name__ == '__main__':
@@ -186,25 +186,25 @@ reward
 
 观察 4 个关键阶段：
 
-| 阶段 | iteration | 平均 reward | 现象 |
-|------|-----------|-------------|------|
-| 探索期 | 0-20 | 10-30 | 智能体随机倒杆，几乎学不到信号 |
-| 学习期 | 20-100 | 30-200 | reward 快速上升，策略开始稳定 |
-| 收敛期 | 100-150 | 200-450 | 进步变慢，但仍稳定提升 |
-| 已解决 | 150+ | 475+ | Gymnasium 定义"解决"为最近 100 episode 平均 ≥ 475 |
+| 阶段   | iteration | 平均 reward | 现象                                              |
+| ------ | --------- | ----------- | ------------------------------------------------- |
+| 探索期 | 0-20      | 10-30       | 智能体随机倒杆，几乎学不到信号                    |
+| 学习期 | 20-100    | 30-200      | reward 快速上升，策略开始稳定                     |
+| 收敛期 | 100-150   | 200-450     | 进步变慢，但仍稳定提升                            |
+| 已解决 | 150+      | 475+        | Gymnasium 定义"解决"为最近 100 episode 平均 ≥ 475 |
 
 ## 超参数的影响
 
 PPO 在 CartPole 上对超参数不算敏感，但仍需理解每个参数的作用：
 
-| 超参数 | 默认值 | 影响范围 |
-|--------|--------|----------|
-| `lr` | 3e-4 | 学习率太高（>1e-3）训练崩溃；太低（<1e-5）训练慢 |
-| `clip_eps` | 0.2 | 越大越激进（更接近原 PG）；越小越保守 |
-| `gamma` | 0.99 | 折扣因子；CartPole 设 0.99 几乎等同于无折扣 |
-| `lam` (GAE) | 0.95 | 越大越接近 Monte Carlo；越小越接近 TD |
-| `n_epochs` | 10 | 每次 rollout 数据复用次数；太大 overfit |
-| `n_steps` | 2048 | rollout 长度；CartPole 短任务可减到 512 |
+| 超参数      | 默认值 | 影响范围                                         |
+| ----------- | ------ | ------------------------------------------------ |
+| `lr`        | 3e-4   | 学习率太高（>1e-3）训练崩溃；太低（<1e-5）训练慢 |
+| `clip_eps`  | 0.2    | 越大越激进（更接近原 PG）；越小越保守            |
+| `gamma`     | 0.99   | 折扣因子；CartPole 设 0.99 几乎等同于无折扣      |
+| `lam` (GAE) | 0.95   | 越大越接近 Monte Carlo；越小越接近 TD            |
+| `n_epochs`  | 10     | 每次 rollout 数据复用次数；太大 overfit          |
+| `n_steps`   | 2048   | rollout 长度；CartPole 短任务可减到 512          |
 
 ### 失败模式排查
 
@@ -224,7 +224,7 @@ writer = SummaryWriter('runs/cartpole_ppo')
 
 for iter in range(n_iters):
     # ... 训练代码 ...
-    
+
     writer.add_scalar('train/reward_mean', avg_r, iter)
     writer.add_scalar('train/policy_loss', policy_loss.item(), iter)
     writer.add_scalar('train/value_loss', value_loss.item(), iter)
@@ -290,6 +290,7 @@ plot_experiments(results)
 PPO 训练 CartPole 是 RL 入门最经典的"hello world"。本节给出了完整可运行的 PPO 实现，覆盖了 rollout 收集、GAE 优势估计、PPO Clip 更新、超参数调优、TensorBoard 可视化的全流程。
 
 关键收获：
+
 1. **PPO = Rollout + GAE + Clipped Update** 的三步循环
 2. **超参数不敏感** 是 PPO 流行的关键——默认值在 CartPole 上几乎一定 work
 3. **可视化训练** 是 debug RL 代码的核心工具——entropy、clip_frac 等辅助指标往往能提前发现训练问题

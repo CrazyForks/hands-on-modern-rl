@@ -69,11 +69,11 @@ $$\mathcal{L} = -\mathbb{E}_{z \sim q_\phi}\left[\sum_t r(s_t, a_t, z)\right] + 
 
 PEARL 在 Meta-World（50 个机器人任务）上仅用 5 步适应就能达到 80% 性能，远超 MAML（需要 50+ 步）。
 
-| 方法 | 适应机制 | 是否二阶梯度 | 样本效率 | 推断方式 |
-|------|---------|-------------|----------|---------|
-| MAML | 梯度下降 | ✅（一阶近似可避免） | 中 | 显式更新参数 |
-| RL² | RNN 隐状态 | ❌（端到端训练） | 高 | 隐式（黑盒） |
-| PEARL | 变分后验 $q(z\mid\tau)$ | ❌ | 最高 | 显式（可解释） |
+| 方法  | 适应机制                | 是否二阶梯度         | 样本效率 | 推断方式       |
+| ----- | ----------------------- | -------------------- | -------- | -------------- |
+| MAML  | 梯度下降                | ✅（一阶近似可避免） | 中       | 显式更新参数   |
+| RL²   | RNN 隐状态              | ❌（端到端训练）     | 高       | 隐式（黑盒）   |
+| PEARL | 变分后验 $q(z\mid\tau)$ | ❌                   | 最高     | 显式（可解释） |
 
 ### 元 RL 与 few-shot 学习
 
@@ -92,7 +92,7 @@ RL² 的隐式"任务推断"在 transformer 时代迎来复兴。DeepMind 2022 �
 数据组织：
 
 ```
-[episode_1 (poor policy): s0 a0 r0 s1 a1 r1 ... | 
+[episode_1 (poor policy): s0 a0 r0 s1 a1 r1 ... |
  episode_2 (slightly better): s0 a0 r0 ... |
  ...
  episode_N (expert): s0 a0 r0 ...]
@@ -103,12 +103,12 @@ RL² 的隐式"任务推断"在 transformer 时代迎来复兴。DeepMind 2022 �
 
 ### 与 RL² 的区别
 
-| 维度 | RL² | Algorithm Distillation |
-|------|------|----------------------|
-| 模型 | 小 RNN（LSTM/GRU） | 大 transformer |
-| 数据 | 在线 meta-training | **离线**学习历史 |
-| in-context 学什么 | 任务 ID（隐式） | **RL 算法本身** |
-| 跨算法泛化 | 单一算法 | 可蒸馏 DQN、PPO、A2C 等 |
+| 维度              | RL²                | Algorithm Distillation  |
+| ----------------- | ------------------ | ----------------------- |
+| 模型              | 小 RNN（LSTM/GRU） | 大 transformer          |
+| 数据              | 在线 meta-training | **离线**学习历史        |
+| in-context 学什么 | 任务 ID（隐式）    | **RL 算法本身**         |
+| 跨算法泛化        | 单一算法           | 可蒸馏 DQN、PPO、A2C 等 |
 
 AD 的关键实验：训练时只用 PPO 的历史，但 transformer 在测试时**能执行从未见过的 RL 算法的功能**——因为它学到了"如何用 reward 改进策略"的通用机制。
 
@@ -212,11 +212,12 @@ LLM 的 few-shot in-context learning 可以看作"**RL² 的零样本版本**"�
 
 ::: tip 为什么本章重要
 理解本章，你会看清 LLM 后训练的本质：
+
 - SFT 不是魔法，是 30 年前的行为克隆
 - RLHF 不是凭空发明的奖励，是反向 RL 的工业实现
 - DPO 不是新理论，是 GAIL 在 LLM 上的对偶形式
 - In-context RL 揭示了 LLM 的 few-shot 能力本质上是一种隐式 RL
-:::
+  :::
 
 ## 本章总结
 

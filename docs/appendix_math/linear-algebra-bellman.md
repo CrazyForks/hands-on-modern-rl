@@ -365,12 +365,12 @@ $$
 
 ## 对照总表
 
-| 概念           | 逐状态形式（第 3 章）                                                                  | 矩阵形式                                                                              |
-| -------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| 概念           | 逐状态形式（第 3 章）                                                                  | 矩阵形式                                                                  |
+| -------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | 贝尔曼期望方程 | $V^\pi(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^\pi(s')\right]$ | $\mathbf{v}_\pi = \mathbf{r}_\pi + \gamma P_\pi \mathbf{v}_\pi$           |
 | 贝尔曼最优方程 | $V^*(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^*(s')\right]$                 | $\mathbf{v}_* = \mathbf{r}_* + \gamma P_* \mathbf{v}_*$（逐行取 max）     |
-| 闭式解         | —                                                                                      | $\mathbf{v} = (I - \gamma P)^{-1}\mathbf{r}$                                  |
-| V-Q 关系       | $V^\pi(s)=\sum_a\pi(a\mid s)Q^\pi(s,a)$                                                | $\mathbf{v}_\pi = \Pi_\pi \mathbf{q}_\pi$                                     |
+| 闭式解         | —                                                                                      | $\mathbf{v} = (I - \gamma P)^{-1}\mathbf{r}$                              |
+| V-Q 关系       | $V^\pi(s)=\sum_a\pi(a\mid s)Q^\pi(s,a)$                                                | $\mathbf{v}_\pi = \Pi_\pi \mathbf{q}_\pi$                                 |
 | Q 贝尔曼期望   | $Q^\pi(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\sum_{a'}\pi(a'\mid s')Q^\pi(s',a')$    | $\mathbf{q}_\pi = \mathbf{r} + \gamma P \Pi_\pi \mathbf{q}_\pi$           |
 | Q 贝尔曼最优   | $Q^*(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)\max_{a'}Q^*(s',a')$                      | $\mathbf{q}_* = \mathbf{r} + \gamma P \cdot\mathrm{rowmax}(\mathbf{q}_*)$ |
 | DP 策略评估    | $V(s) \leftarrow \sum_a\pi(a\mid s)[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')]$         | $\mathbf{v}_{k+1} = \mathbf{r}_\pi + \gamma P_\pi \mathbf{v}_k$           |

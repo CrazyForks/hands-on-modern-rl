@@ -23,11 +23,11 @@ class CartPolePolicy(nn.Module):
             nn.Linear(4, 32), nn.Tanh(),
             nn.Linear(32, 2)  # 2 个动作的 logits
         )
-    
+
     def forward(self, state):
         logits = self.net(state)
         return torch.distributions.Categorical(logits=logits)
-    
+
     def act(self, state):
         dist = self.forward(state)
         action = dist.sample()
@@ -56,13 +56,13 @@ $\gamma \in [0, 1]$ 是**折扣因子**，让远期奖励权重递减。它有�
 2. **反映不确定性**：未来奖励本来就难预测，应该给低权重
 3. **稳定训练**：避免"延迟奖励"导致的高方差
 
-| γ 值 | 含义 | 应用 |
-|------|------|------|
-| 0 | 只看眼前（贪心） | 很少使用 |
-| 0.9 | 较短视野（10 步内） | 棋盘游戏、推荐系统 |
-| 0.99 | 中等视野（100 步） | Atari、CartPole |
-| 0.999 | 长视野（1000 步） | 长程任务、机器人导航 |
-| 1.0 | 无折扣 | 有限 horizon 任务 |
+| γ 值  | 含义                | 应用                 |
+| ----- | ------------------- | -------------------- |
+| 0     | 只看眼前（贪心）    | 很少使用             |
+| 0.9   | 较短视野（10 步内） | 棋盘游戏、推荐系统   |
+| 0.99  | 中等视野（100 步）  | Atari、CartPole      |
+| 0.999 | 长视野（1000 步）   | 长程任务、机器人导航 |
+| 1.0   | 无折扣              | 有限 horizon 任务    |
 
 ### CartPole 中的回报
 

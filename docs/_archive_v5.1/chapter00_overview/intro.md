@@ -8,13 +8,13 @@
 
 一个**强化学习问题**由五个要素定义：
 
-| 要素 | 符号 | 含义 | CartPole 例子 |
-|------|------|------|--------------|
-| 状态空间 | $\mathcal{S}$ | 环境所有可能的状态 | 杆子角度、角速度、小车位置、速度 |
-| 动作空间 | $\mathcal{A}$ | 智能体能选的动作 | $\{\text{左}, \text{右}\}$ |
-| 转移函数 | $P(s'\mid s,a)$ | 在状态 $s$ 做动作 $a$ 后转到 $s'$ 的概率 | 物理仿真器决定 |
-| 奖励函数 | $R(s,a)$ 或 $r_{t+1}$ | 智能体收到的标量反馈 | 杆子还直立：+1；倒了：0（回合结束） |
-| 折扣因子 | $\gamma \in [0,1)$ | 未来奖励的衰减系数 | 通常取 0.99 |
+| 要素     | 符号                  | 含义                                     | CartPole 例子                       |
+| -------- | --------------------- | ---------------------------------------- | ----------------------------------- |
+| 状态空间 | $\mathcal{S}$         | 环境所有可能的状态                       | 杆子角度、角速度、小车位置、速度    |
+| 动作空间 | $\mathcal{A}$         | 智能体能选的动作                         | $\{\text{左}, \text{右}\}$          |
+| 转移函数 | $P(s'\mid s,a)$       | 在状态 $s$ 做动作 $a$ 后转到 $s'$ 的概率 | 物理仿真器决定                      |
+| 奖励函数 | $R(s,a)$ 或 $r_{t+1}$ | 智能体收到的标量反馈                     | 杆子还直立：+1；倒了：0（回合结束） |
+| 折扣因子 | $\gamma \in [0,1)$    | 未来奖励的衰减系数                       | 通常取 0.99                         |
 
 把它们组合起来就得到了**马尔可夫决策过程（MDP）**的形式化定义：$\mathcal{M} = (\mathcal{S}, \mathcal{A}, P, R, \gamma)$。第 4 章会专门讨论 MDP，这里只需要建立直觉。
 
@@ -52,12 +52,12 @@ $$\pi^* = \arg\max_\pi \mathbb{E}_\pi\left[\sum_{t=0}^{\infty} \gamma^t r_{t+1}\
 
 RL 在 2025-2026 已经从游戏和控制走出，覆盖四大应用方向：
 
-| 方向 | 代表系统 | 本书章节 |
-|------|---------|---------|
-| **游戏与博弈** | AlphaGo、AlphaZero、MuZero、OpenAI Five | 第 8 章 DQN + 第 12 章 AlphaZero |
-| **机器人与具身智能** | RT-2、π0、Gemini Robotics 1.5、OpenVLA | 第 31 章 VLA |
-| **LLM 对齐与推理** | InstructGPT、DeepSeek-R1、Claude Opus 4.6、Qwen3 | 第 16-21 章 + 第 33 章 |
-| **Agentic 系统** | Claude Computer Use、SWE-Agent、Deep Research、AutoGLM | 第 24-28 章 |
+| 方向                 | 代表系统                                               | 本书章节                         |
+| -------------------- | ------------------------------------------------------ | -------------------------------- |
+| **游戏与博弈**       | AlphaGo、AlphaZero、MuZero、OpenAI Five                | 第 8 章 DQN + 第 12 章 AlphaZero |
+| **机器人与具身智能** | RT-2、π0、Gemini Robotics 1.5、OpenVLA                 | 第 31 章 VLA                     |
+| **LLM 对齐与推理**   | InstructGPT、DeepSeek-R1、Claude Opus 4.6、Qwen3       | 第 16-21 章 + 第 33 章           |
+| **Agentic 系统**     | Claude Computer Use、SWE-Agent、Deep Research、AutoGLM | 第 24-28 章                      |
 
 每条线背后都有 RL 算法的演进：
 
@@ -121,11 +121,11 @@ flowchart TB
 
 ### 三种读者的推荐路径
 
-| 读者类型 | 推荐路径 | 时间投入 |
-|---------|---------|---------|
-| **ML 工程师**（想转 LLM 对齐） | 序章 → Part IV LLM 对齐 → Part V Agentic → Part VII 安全 | 2-3 个月 |
-| **RL 背景读者**（想跟上 LLM 时代） | Part II 跳过 → Part IV GRPO/Reasoning → Part V Agentic → Part VIII 前沿 | 1-2 个月 |
-| **学生**（从零系统学） | Part I-VIII 全程 + 附录数学基础 + 动手实验 | 6-12 个月 |
+| 读者类型                           | 推荐路径                                                                | 时间投入  |
+| ---------------------------------- | ----------------------------------------------------------------------- | --------- |
+| **ML 工程师**（想转 LLM 对齐）     | 序章 → Part IV LLM 对齐 → Part V Agentic → Part VII 安全                | 2-3 个月  |
+| **RL 背景读者**（想跟上 LLM 时代） | Part II 跳过 → Part IV GRPO/Reasoning → Part V Agentic → Part VIII 前沿 | 1-2 个月  |
+| **学生**（从零系统学）             | Part I-VIII 全程 + 附录数学基础 + 动手实验                              | 6-12 个月 |
 
 ### 本书的写作承诺
 

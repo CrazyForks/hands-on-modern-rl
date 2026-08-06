@@ -58,12 +58,12 @@ PRM 看了从第 1 步到第 $t$ 步的完整历史，判断第 $t$ 步是否正
 
 PRM 的劣势是**标注成本极高**——为每一步都标注"对/错"比只标注最终结果的工作量大了 $T$ 倍。OpenAI 为此构建了 PRM800K 数据集。当前研究热点是**自动化 PRM**（如 Math-Shepherd 让模型自主判断每步质量）和**领域特化 PRM**（如 Web-Shepherd 专为网页导航设计）。
 
-|          | ORM                     | PRM                               |
-| -------- | ----------------------- | --------------------------------- |
-| 信号密度 | 稀疏（只有最终 reward） | 密集（每步都有 reward）           |
-| 标注成本 | 低（只看结果）          | 高（每步都要标注）                |
-| 学习速度 | 慢（信号少，方差大）    | 快（信号多，方差小）              |
-| 适用场景 | 可验证任务（代码/数学） | 复杂推理（需要精细指导）          |
+|          | ORM                     | PRM                      |
+| -------- | ----------------------- | ------------------------ |
+| 信号密度 | 稀疏（只有最终 reward） | 密集（每步都有 reward）  |
+| 标注成本 | 低（只看结果）          | 高（每步都要标注）       |
+| 学习速度 | 慢（信号少，方差大）    | 快（信号多，方差小）     |
+| 适用场景 | 可验证任务（代码/数学） | 复杂推理（需要精细指导） |
 
 ### SALT：从轨迹图里提取步骤级 advantage
 
@@ -85,7 +85,7 @@ ORM/PRM/SALT 之外，2025-2026 年发展出了一大批更精细的方法。[Xi
 
 #### GiGPO：同 state group 内相对回报
 
-[GiGPO](https://arxiv.org/abs/2604.18401)（Group-in-Group Policy Optimization）的想法是：同一个任务采多条 rollout，如果这些 rollout 中间遇到了相同的环境状态 $s$，那就可以比较"同样局面下，不同动作谁更好"。
+[GiGPO](https://arxiv.org/abs/2505.10978)（Group-in-Group Policy Optimization）的想法是：同一个任务采多条 rollout，如果这些 rollout 中间遇到了相同的环境状态 $s$，那就可以比较"同样局面下，不同动作谁更好"。
 
 先把所有在 state $s$ 下发生的动作聚成一个组：
 
@@ -111,11 +111,11 @@ $$
 
 **WebShop 例子**：多个 rollout 都来到同一个商品搜索结果页：
 
-| 动作 | 后续结果 | $R_t$ |
-|------|----------|-------|
-| 点正确商品 | 很快成功 | 1.00 |
-| 点错误商品，但后来返回并买对 | 晚一点成功 | 0.73 |
-| 点下一页 | 最终失败 | 0.00 |
+| 动作                         | 后续结果   | $R_t$ |
+| ---------------------------- | ---------- | ----- |
+| 点正确商品                   | 很快成功   | 1.00  |
+| 点错误商品，但后来返回并买对 | 晚一点成功 | 0.73  |
+| 点下一页                     | 最终失败   | 0.00  |
 
 组内平均值 $\bar R = 0.58$。三个动作的相对分数：
 
@@ -137,7 +137,7 @@ $$
 
 #### HGPO：还要看历史上下文
 
-[HGPO](https://arxiv.org/abs/2604.18401)（Hierarchical Group Policy Optimization）是对 GiGPO 的一个关键修正。GiGPO 在同一个 state 下比较动作，但 HGPO 指出：**同一个当前 state，不一定代表同一个决策上下文**。
+[HGPO](https://arxiv.org/abs/2602.22817)（Hierarchy-of-Groups Policy Optimization）是对 GiGPO 的一个关键修正。GiGPO 在同一个 state 下比较动作，但 HGPO 指出：**同一个当前 state，不一定代表同一个决策上下文**。
 
 最容易出错的场景是网页任务：两个 rollout 可能当前页面完全一样，但它们是怎么走到这个页面的并不一样。一个 agent 可能带着完整约束（"黑色、防水、低价的雨靴"）来到这里，另一个 agent 前面已经漏掉了"防水"约束（只搜了"black boots"）。此时同一个动作（"加入购物车"）的好坏含义就会不同——前者大概率是好动作，后者可能是坏动作（因为漏掉了关键约束）。HGPO 把这个问题叫 **historical context inconsistency**。
 
@@ -185,7 +185,7 @@ $\alpha$ 控制更深层 group 的权重——本质上是 bias-variance trade-o
 
 #### SPA-RL：把最终 reward 分摊成每步 progress
 
-[SPA-RL](https://arxiv.org/abs/2505.20732)（Step-level reward attribution via Path analysis）走的是 reward redistribution 路线：额外训练一个 **progress estimator**，让它学会判断"这一步让任务向完成目标推进了多少"。
+[SPA-RL](https://arxiv.org/abs/2505.20732)（Stepwise Progress Attribution）走的是 reward redistribution 路线：额外训练一个 **progress estimator**，让它学会判断"这一步让任务向完成目标推进了多少"。
 
 基本假设：长程任务最终完成，是每一步 incremental progress 累积出来的。所以不直接给每步打"绝对好坏分"，而是让模型预测每步贡献 $\hat c_t$，并要求这些贡献加起来能还原最终 reward：
 
@@ -209,13 +209,13 @@ $$
 
 **直觉例子**：一个搜索 agent 最终答对，轨迹里可能有 5 步：
 
-| 步骤 | 行为 | 可能的 progress |
-|------|------|----------------|
-| 1 | 生成一个模糊 query | 0.05 |
-| 2 | 打开无关网页 | 0.00 |
-| 3 | 改写 query 命中关键网页 | 0.30 |
-| 4 | 抽取关键证据 | 0.45 |
-| 5 | 组织成最终答案 | 0.20 |
+| 步骤 | 行为                    | 可能的 progress |
+| ---- | ----------------------- | --------------- |
+| 1    | 生成一个模糊 query      | 0.05            |
+| 2    | 打开无关网页            | 0.00            |
+| 3    | 改写 query 命中关键网页 | 0.30            |
+| 4    | 抽取关键证据            | 0.45            |
+| 5    | 组织成最终答案          | 0.20            |
 
 这些分数加起来约等于最终成功 reward。RL 训练时不再只有最后一步有信号，而是每一步都有 dense reward。
 
@@ -247,7 +247,7 @@ AgentPRM 在推理时还可以做 Best-of-N：每一步从 policy 采样 $N$ 个
 
 #### PAIR：prefix-aware internal reward
 
-[PAIR](https://arxiv.org/abs/2605.12345)（Prefix-Aware Internal Reward Model，2026-05）针对 AgentPRM 这类方法的训练成本问题——三阶段循环里 PRM 重训很贵。PAIR 训练一个 internal reward model，它在评估某一步时**显式感知前缀**：同一个动作在不同前缀下应该得到不同分数。
+[PAIR](https://arxiv.org/abs/2605.17877)（Prefix-Aware Internal Reward Model，2026-05）针对 AgentPRM 这类方法的训练成本问题——三阶段循环里 PRM 重训很贵。PAIR 训练一个 internal reward model，它在评估某一步时**显式感知前缀**：同一个动作在不同前缀下应该得到不同分数。
 
 #### Web-Shepherd：领域特化 PRM
 
@@ -259,7 +259,7 @@ AgentPRM 在推理时还可以做 Best-of-N：每一步从 policy 采样 $N$ 个
 
 #### ARPO：把 rollout 预算花在 entropy 飙升的位置
 
-[ARPO](https://arxiv.org/abs/2503.01234)（Asymmetric Rollout Policy Optimization）关注工具调用场景。它的关键观察是：**LLM 在收到工具返回结果之后，接下来生成的前 10 到 50 个 token 的 entropy 往往会明显升高**。
+[ARPO](https://arxiv.org/abs/2507.19849)（Agentic Reinforced Policy Optimization）关注工具调用场景。它的关键观察是：**LLM 在收到工具返回结果之后，接下来生成的前 10 到 50 个 token 的 entropy 往往会明显升高**。
 
 token entropy 的定义：
 
@@ -280,7 +280,7 @@ ARPO 的 rollout 分成两类：
 
 #### IGPO：用正确答案概率的增量当 turn-level reward
 
-[IGPO](https://arxiv.org/abs/2504.05678)（Information Gain Policy Optimization）的核心想法是：每一轮搜索、读证据、工具调用，本质上都应该让模型**更接近正确答案**。那就直接衡量这一轮之后，模型对 ground-truth answer 的概率有没有上升。
+IGPO（Information Gain Policy Optimization，出自 [DR-Venus](https://arxiv.org/abs/2604.19859)）的核心想法是：每一轮搜索、读证据、工具调用，本质上都应该让模型**更接近正确答案**。那就直接衡量这一轮之后，模型对 ground-truth answer 的概率有没有上升。
 
 设 ground-truth answer token 序列为 $a = (a_1, \ldots, a_L)$。第 $i$ 条 rollout 到第 $t$ 轮为止的历史是 $o_{i, \leq t}$。IGPO 用 teacher forcing 计算模型生成正确答案的平均 log probability：
 
@@ -370,23 +370,23 @@ def compute_turn_rewards(turn_rewards, gamma=0.9):
 
 ## 代表性框架对比
 
-| 框架 | 信号来源 | 主要贡献 | 适用场景 |
-|------|----------|----------|----------|
-| ORM (RLVR) | 最终结果 | 简单、便宜、可验证 | 短程任务（≤ 5 步）、有客观答案 |
-| PRM (PRM800K) | 人工标注每步 | 信号密集、定位精准 | 高标注预算、复杂推理 |
-| SALT | 轨迹图结构 | 不需额外标注 | GRPO 框架、长程任务 |
-| GiGPO | 同 state group | state-anchored 比较 | 状态可枚举（WebShop） |
-| HGPO | k-step context | 解决历史上下文不一致 | 网页导航、上下文敏感任务 |
-| Group-Graph PO | 轨迹 DAG | 长程 + 共享前缀 | 长程任务（10+ 步） |
-| SPA-RL | progress estimator | reward redistribution | 任意多步任务 |
-| AgentPRM | MC return + soft BCE | PRM as Q(s,a) | 需要 Best-of-N 推理 |
-| ARPO | entropy spike | 局部分叉采样 | 工具调用密集任务 |
-| IGPO | 正确答案 log-prob | information gain | 有 ground truth 的任务 |
-| AEM | 自适应 entropy | 无需额外监督 | 通用、易坍缩场景 |
-| RefGRPO | 校准 bonus | 缩小反思鸿沟 | 需要自评估能力的任务 |
-| StepPO | step-centric | granularity 对齐 | 任意 agentic RL |
-| Turn-PPO | turn-level PPO | 方差低于 GRPO | 长程多轮任务 |
-| AT²PO | turn + tree search | 探索 + 精细归因 | 高计算预算的长程任务 |
+| 框架           | 信号来源             | 主要贡献              | 适用场景                       |
+| -------------- | -------------------- | --------------------- | ------------------------------ |
+| ORM (RLVR)     | 最终结果             | 简单、便宜、可验证    | 短程任务（≤ 5 步）、有客观答案 |
+| PRM (PRM800K)  | 人工标注每步         | 信号密集、定位精准    | 高标注预算、复杂推理           |
+| SALT           | 轨迹图结构           | 不需额外标注          | GRPO 框架、长程任务            |
+| GiGPO          | 同 state group       | state-anchored 比较   | 状态可枚举（WebShop）          |
+| HGPO           | k-step context       | 解决历史上下文不一致  | 网页导航、上下文敏感任务       |
+| Group-Graph PO | 轨迹 DAG             | 长程 + 共享前缀       | 长程任务（10+ 步）             |
+| SPA-RL         | progress estimator   | reward redistribution | 任意多步任务                   |
+| AgentPRM       | MC return + soft BCE | PRM as Q(s,a)         | 需要 Best-of-N 推理            |
+| ARPO           | entropy spike        | 局部分叉采样          | 工具调用密集任务               |
+| IGPO           | 正确答案 log-prob    | information gain      | 有 ground truth 的任务         |
+| AEM            | 自适应 entropy       | 无需额外监督          | 通用、易坍缩场景               |
+| RefGRPO        | 校准 bonus           | 缩小反思鸿沟          | 需要自评估能力的任务           |
+| StepPO         | step-centric         | granularity 对齐      | 任意 agentic RL                |
+| Turn-PPO       | turn-level PPO       | 方差低于 GRPO         | 长程多轮任务                   |
+| AT²PO          | turn + tree search   | 探索 + 精细归因       | 高计算预算的长程任务           |
 
 ## 综合选型建议
 
@@ -677,31 +677,33 @@ PRM 的区分度是 ORM 的 19 倍。ORM 几乎无法区分正确步骤和错误
 
 [^salt]: Li J, Wang Y, et al. "[SALT: Step-level Advantage Assignment for Long-horizon Agents via Trajectory Graph](https://arxiv.org/abs/2510.20022)." EACL 2026 Findings. —— 通过轨迹图量化每步质量，为 GRPO 提供步骤级 advantage 分配，不需要额外奖励模型。
 
-[^gigpo]: XXX. "[GiGPO / HGPO: Group-in-Group / Hierarchical Group Policy Optimization](https://arxiv.org/abs/2604.18401)." 2026. —— State-anchored stepwise advantage with hierarchical historical context.
+[^gigpo]: Feng L, Xue Z, Liu T, et al. "[Group-in-Group Policy Optimization for LLM Agent Training](https://arxiv.org/abs/2505.10978)." NeurIPS 2025. —— 同 state group 内相对回报，state-anchored stepwise advantage。
+
+[^hgpo]: He S, Feng L, Wei Q, et al. "[Hierarchy-of-Groups Policy Optimization for Long-Horizon Agentic Tasks](https://arxiv.org/abs/2602.22817)." ICLR 2026. —— 用 k-step 历史上下文分层分组，修正 GiGPO 的 historical context inconsistency。
 
 [^spa]: Wang H, et al. "[SPA-RL: Reinforcing LLM Agents via Stepwise Progress Attribution](https://arxiv.org/abs/2505.20732)." arXiv, 2025. —— 通过步骤级进度归因精确分配每步贡献。
 
-[^agentprm]: PRM Team. "[AgentPRM: Process Reward Models for LLM Agents](https://arxiv.org/abs/2502.10325)." 2025. —— 把 PRM 当成 agent 的 Q(s,a)，三阶段循环训练。
+[^agentprm]: Choudhury S. "[Process Reward Models for LLM Agents: Practical Framework and Directions](https://arxiv.org/abs/2502.10325)." 2025. —— 提出 AgentPRM 与 InversePRM，把 PRM 当成 agent 的 Q(s,a)，三阶段循环训练。
 
-[^arpo]: XXX. "[ARPO: Asymmetric Rollout Policy Optimization](https://arxiv.org/abs/2503.01234)." 2025. —— entropy 飙升处局部分叉采样。
+[^arpo]: Dong G, Mao H, Ma K, et al. "[ARPO: Agentic Reinforced Policy Optimization](https://arxiv.org/abs/2507.19849)." 2025. —— entropy 飙升处局部分叉采样。
 
-[^igpo]: XXX. "[IGPO: Information Gain Policy Optimization](https://arxiv.org/abs/2504.05678)." 2025. —— 用正确答案 log-prob 增量作为 turn-level reward。
+[^igpo]: Venus Team, Dai S, et al. "[DR-Venus: Towards Frontier Edge-Scale Deep Research Agents with Only 10K Open Data](https://arxiv.org/abs/2604.19859)." 2026. —— 在该技术报告中提出 IGPO（Information Gain Policy Optimization），用正确答案 log-prob 增量作为 turn-level reward。
 
-[^aem]: XXX. "[AEM: Adaptive Entropy Modulation for Multi-Turn Agentic Reinforcement Learning](https://arxiv.org/abs/2605.00425)." 2026-05. —— 动态调节 entropy bonus 避免策略坍缩。
+[^aem]: Zhao H, Zhou S, Zhang Y, et al. "[AEM: Adaptive Entropy Modulation for Multi-Turn Agentic Reinforcement Learning](https://arxiv.org/abs/2605.00425)." 2026-05. —— 动态调节 entropy bonus 避免策略坍缩。
 
-[^refgrpo]: XXX. "[Closing the Reflection Gap: A Free Calibration Bonus for Agentic RL](https://arxiv.org/abs/2606.14211)." 2026-06. —— RefGRPO 通过校准 bonus 缩小反思鸿沟。
+[^refgrpo]: Zhu Y. "[Closing the Reflection Gap: A Free Calibration Bonus for Agentic RL](https://arxiv.org/abs/2606.14211)." 2026-06. —— RefGRPO 通过校准 bonus 缩小反思鸿沟。
 
-[^pair]: XXX. "[PAIR: Prefix-Aware Internal Reward Model for Multi-Turn Agent Optimization](https://arxiv.org/abs/2605.12345)." 2026-05. —— 前缀感知的 internal reward model。
+[^pair]: Kim W, In Y, Park S, et al. "[PAIR: Prefix-Aware Internal Reward Model for Multi-Turn Agent Optimization](https://arxiv.org/abs/2605.17877)." 2026-05. —— 前缀感知的 internal reward model。
 
-[^steppo]: XXX. "[StepPO: Step-Aligned Policy Optimization for Agentic Reinforcement Learning](https://arxiv.org/abs/2604.18401)." 2026-04. —— Step-centric paradigm，解决 token 与 step 的 granularity mismatch。
+[^steppo]: Wang D, Li Q, Cheng M, et al. "[StepPO: Step-Aligned Policy Optimization for Agentic Reinforcement Learning](https://arxiv.org/abs/2604.18401)." 2026-04. —— Step-centric paradigm，解决 token 与 step 的 granularity mismatch。
 
-[^turnppo]: XXX. "[Turn-PPO: Turn-Level Advantage Estimation with PPO for Improved Multi-Turn RL in Agentic LLMs](https://arxiv.org/abs/2512.17008)." 2025-12. —— Turn-level PPO 替代 GRPO，方差更低。
+[^turnppo]: Li J, Zhou P, Meng R, et al. "[Turn-PPO: Turn-Level Advantage Estimation with PPO for Improved Multi-Turn RL in Agentic LLMs](https://arxiv.org/abs/2512.17008)." EACL 2026. —— Turn-level PPO 替代 GRPO，方差更低。
 
-[^at2po]: XXX. "[AT²PO: Agentic Turn-based Policy Optimization via Tree Search](https://arxiv.org/abs/2601.04767)." 2026-01. —— Turn-based + tree search 统一框架。
+[^at2po]: Zong Z, Chen D, Li Y, et al. "[AT²PO: Agentic Turn-based Policy Optimization via Tree Search](https://arxiv.org/abs/2601.04767)." 2026-01. —— Turn-based + tree search 统一框架。
 
-[^groupgraph]: XXX. "[Group-Graph Policy Optimization for Long-Horizon Agentic Reinforcement Learning](https://arxiv.org/abs/2606.22995)." 2026-06. —— 把轨迹建模成 DAG。
+[^groupgraph]: Wang Y, Song M, Zhang Z, et al. "[Group-Graph Policy Optimization for Long-Horizon Agentic Reinforcement Learning](https://arxiv.org/abs/2606.22995)." 2026-06. —— 把轨迹建模成 DAG。
 
-[^casurvey]: XXX. "[From Reasoning to Agentic: Credit Assignment in Reinforcement Learning for Large Language Models](https://arxiv.org/abs/2604.09459)." 2026-04. —— 综述：reasoning RL 与 agentic RL 的信用分配全景。
+[^casurvey]: Zhang C. "[From Reasoning to Agentic: Credit Assignment in Reinforcement Learning for Large Language Models](https://arxiv.org/abs/2604.09459)." 2026-04. —— 综述：reasoning RL 与 agentic RL 的信用分配全景。
 
 [^webshepherd]: Chae H, et al. "[Web-Shepherd: Advancing PRMs for Reinforcing Web Agents](https://arxiv.org/abs/2505.15277)." NeurIPS 2025 Spotlight. —— 首个网页导航专用的步骤级 PRM。
 

@@ -65,11 +65,11 @@ assert two_sum([3, 3], 6) == [0, 1]
 
 本节配置针对**单张 GPU**（24GB 显存，如 RTX 3090 / 4090 / A5000）或**多卡**环境：
 
-| 模型                     | 参数量 | 训练方案         | 显存需求          |
-| ------------------------ | ------ | ---------------- | ----------------- |
-| Qwen2.5-Coder-0.5B      | 0.5B   | 全参 + vLLM      | ~18 GB（单卡）    |
-| Qwen2.5-Coder-1.5B      | 1.5B   | LoRA + vLLM      | ~20 GB（单卡）    |
-| Qwen2.5-Coder-7B        | 7B     | 全参训练         | ~80 GB（A100 单卡或多卡） |
+| 模型               | 参数量 | 训练方案    | 显存需求                  |
+| ------------------ | ------ | ----------- | ------------------------- |
+| Qwen2.5-Coder-0.5B | 0.5B   | 全参 + vLLM | ~18 GB（单卡）            |
+| Qwen2.5-Coder-1.5B | 1.5B   | LoRA + vLLM | ~20 GB（单卡）            |
+| Qwen2.5-Coder-7B   | 7B     | 全参训练    | ~80 GB（A100 单卡或多卡） |
 
 和 8.7 节一样，PPO 需要同时加载 Actor、Critic（可训练）和 Reference（冻结），加上 vLLM 推理引擎，所以显存压力比纯 SFT 大。0.5B 代码模型 + 全参训练是最安全的单卡起点。
 
@@ -183,7 +183,7 @@ print(f"已保存 {len(subset_df)} 条样本到 train1000.parquet")
 
 模型的输出通常是一段包含解释和代码的 markdown 文本。我们需要从中提取出 Python 代码部分：
 
-```python
+````python
 import re
 
 
@@ -199,7 +199,7 @@ def extract_code(response: str) -> str:
     if match:
         return match.group(1).strip()
     return response.strip()
-```
+````
 
 如果模型没按格式输出代码块，`extract_code` 会把整个回答当作代码返回——但这通常会导致语法错误，reward 为 0。这本身就是一种训练信号，迫使模型学会用正确的格式输出代码。
 
@@ -310,7 +310,7 @@ def compute_score(reward_input: dict[str, Any], **kwargs) -> dict[str, float]:
 
 把上面四步合在一起就是完整的 reward 文件：
 
-```python
+````python
 # code_reward.py
 # 代码生成 RLVR 的 reward 函数
 # veRL 通过 custom_reward_function 配置加载
@@ -378,7 +378,7 @@ def compute_score(reward_input: dict[str, Any], **kwargs) -> dict[str, float]:
         "pass_rate": score,
         "format": 1.0 if extract_code(response) else 0.0,
     }
-```
+````
 
 这个 reward 函数的核心思想是：**不评价文字风格，只评价代码能否跑通测试**。模型写了再长的解释，如果代码跑不通，reward 就是 0。这种硬信号比 RM 的软分数可靠得多。
 
@@ -562,12 +562,12 @@ python3 -m verl.trainer.main_ppo \
 
 和 8.7 节 GSM8K 的 PPO 配置相比，几个关键差异：
 
-| 配置项                    | GSM8K（8.7 节） | 代码生成（本节） | 原因                                   |
-| ------------------------- | --------------- | ---------------- | -------------------------------------- |
-| 数据集                    | GSM8K 数学题    | Eurus-2-RL-Data  | 代码任务需要函数签名和测试用例         |
-| reward 函数               | `gsm8k_reward`  | `code_reward`    | 代码需要提取 + 执行 + 测试             |
-| `max_response_length`     | 256             | 512              | 代码回答通常比数学推理更长             |
-| 基座模型                  | Qwen2.5-0.5B    | Qwen2.5-Coder    | 代码生成用 coder 变体效果更好          |
+| 配置项                | GSM8K（8.7 节） | 代码生成（本节） | 原因                           |
+| --------------------- | --------------- | ---------------- | ------------------------------ |
+| 数据集                | GSM8K 数学题    | Eurus-2-RL-Data  | 代码任务需要函数签名和测试用例 |
+| reward 函数           | `gsm8k_reward`  | `code_reward`    | 代码需要提取 + 执行 + 测试     |
+| `max_response_length` | 256             | 512              | 代码回答通常比数学推理更长     |
+| 基座模型              | Qwen2.5-0.5B    | Qwen2.5-Coder    | 代码生成用 coder 变体效果更好  |
 
 其他参数（学习率、clip_ratio、GAE 等）和 8.7 节保持一致——它们是 PPO 的算法参数，不随任务类型变化。
 
@@ -575,12 +575,12 @@ python3 -m verl.trainer.main_ppo \
 
 和 8.7 节一样，PPO 训练涉及四个模型角色：
 
-| 8.7 节角色 | 本节对应                          | 说明                               |
-| ---------- | --------------------------------- | ---------------------------------- |
-| Actor      | `actor_rollout_ref.actor.*`       | 可训练策略，生成候选代码并更新     |
-| Reference  | `actor_rollout_ref.ref.*`         | 冻结的 SFT 模型，计算 KL 约束      |
-| Critic     | `critic.*`                        | 可训练价值函数，GAE 估计 advantage |
-| RM/Reward  | `code_reward.py:compute_score`    | 代码验证：提取 + 执行 + 测试       |
+| 8.7 节角色 | 本节对应                       | 说明                               |
+| ---------- | ------------------------------ | ---------------------------------- |
+| Actor      | `actor_rollout_ref.actor.*`    | 可训练策略，生成候选代码并更新     |
+| Reference  | `actor_rollout_ref.ref.*`      | 冻结的 SFT 模型，计算 KL 约束      |
+| Critic     | `critic.*`                     | 可训练价值函数，GAE 估计 advantage |
+| RM/Reward  | `code_reward.py:compute_score` | 代码验证：提取 + 执行 + 测试       |
 
 关键区别是最后一行：8.7 节用数学答案匹配（抽取数字做数值比较），本节用代码执行验证（提取代码 → 子进程运行 → 断言测试）。reward 信号都是 0/1 二值，但代码 reward 的工程复杂度更高。
 
@@ -631,13 +631,13 @@ Ray 会在 `main_ppo` 内自动初始化。单卡场景下，所有 worker 在�
 
 ### 关键指标解读
 
-| 指标              | 健康信号               | 危险信号              |
-| ----------------- | ---------------------- | --------------------- |
-| `reward/pass_rate`| 缓慢上升               | 长期为 0 或突然暴涨   |
-| `reward/format`   | 先于 pass_rate 上升    | 一直很低（模型不输出代码） |
-| `kl`              | 缓慢增长               | 持续飙升              |
-| `actor_loss`      | 在 0.5~1.0 之间波动    | 爆炸到 >10 或 NaN     |
-| `response_length` | 稳定或略微增长         | 和 reward 同步暴涨    |
+| 指标               | 健康信号            | 危险信号                   |
+| ------------------ | ------------------- | -------------------------- |
+| `reward/pass_rate` | 缓慢上升            | 长期为 0 或突然暴涨        |
+| `reward/format`    | 先于 pass_rate 上升 | 一直很低（模型不输出代码） |
+| `kl`               | 缓慢增长            | 持续飙升                   |
+| `actor_loss`       | 在 0.5~1.0 之间波动 | 爆炸到 >10 或 NaN          |
+| `response_length`  | 稳定或略微增长      | 和 reward 同步暴涨         |
 
 ### 代码 RLVR 的典型训练曲线
 
@@ -651,10 +651,10 @@ Ray 会在 `main_ppo` 内自动初始化。单卡场景下，所有 worker 在�
 
 以下是基于火山引擎官方实验（Qwen2.5-7B-Instruct-1M，Eurus-2-RL-Data 约 1000 条训练数据，130 steps PPO）的评测数据[^volcengine-verl-code-sandbox]，使用 [EvalScope](https://github.com/modelscope/evalscope) 在三个 benchmark 上评测：
 
-| 模型                                      | GSM8K | HumanEval | LiveCodeBench |
-| ----------------------------------------- | ----- | --------- | ------------- |
-| Qwen2.5-7B-Instruct-1M（原始）            | 0.82  | 0.59      | 0.50          |
-| Qwen2.5-7B-Instruct-1M-step130（RL 后）   | 0.83  | 0.59      | 0.53          |
+| 模型                                    | GSM8K | HumanEval | LiveCodeBench |
+| --------------------------------------- | ----- | --------- | ------------- |
+| Qwen2.5-7B-Instruct-1M（原始）          | 0.82  | 0.59      | 0.50          |
+| Qwen2.5-7B-Instruct-1M-step130（RL 后） | 0.83  | 0.59      | 0.53          |
 
 可以看到：
 
@@ -712,13 +712,13 @@ evalscope eval \
 
 理解了单卡配置后，扩展到多卡只需要修改几个关键参数：
 
-| 参数                    | 单卡 | 8 卡 | 说明                                 |
-| ----------------------- | ---- | ---- | ------------------------------------ |
-| `NDEVICES_PER_NODE`     | 1    | 8    | GPU 数量                             |
-| `TRAIN_BATCH_SIZE`      | 128  | 1024 | 总 batch（FSDP 自动切分到各卡）      |
-| `PPO_MINI_BATCH_SIZE`   | 64   | 256  | 同上                                 |
-| `ROLLOUT_TP`            | 1    | 2    | vLLM 张量并行度                      |
-| `ROLLOUT_GPU_MEM_UTIL`  | 0.4  | 0.6  | 多卡时每卡可以多用一点               |
+| 参数                   | 单卡 | 8 卡 | 说明                            |
+| ---------------------- | ---- | ---- | ------------------------------- |
+| `NDEVICES_PER_NODE`    | 1    | 8    | GPU 数量                        |
+| `TRAIN_BATCH_SIZE`     | 128  | 1024 | 总 batch（FSDP 自动切分到各卡） |
+| `PPO_MINI_BATCH_SIZE`  | 64   | 256  | 同上                            |
+| `ROLLOUT_TP`           | 1    | 2    | vLLM 张量并行度                 |
+| `ROLLOUT_GPU_MEM_UTIL` | 0.4  | 0.6  | 多卡时每卡可以多用一点          |
 
 学习率、clip_ratio、GAE 参数等**不需要改**——它们是算法参数，不随硬件规模变化。
 
@@ -726,10 +726,10 @@ evalscope eval \
 
 本节和 [10.5](../chapter22_agentic/rllm-deepcoder-lab) 讲的是同一个大方向：用 sandbox reward 训练代码模型。区别在于关注点不同：
 
-| 小节     | 框架 | 重点                                       |
-| -------- | ---- | ------------------------------------------ |
-| 9.7 本节 | veRL | 把代码 verifier 接进 PPO/GRPO 训练框架     |
-| 10.5     | rLLM | 用 DeepCoder cookbook 跑完整 Agentic 实验  |
+| 小节     | 框架 | 重点                                      |
+| -------- | ---- | ----------------------------------------- |
+| 9.7 本节 | veRL | 把代码 verifier 接进 PPO/GRPO 训练框架    |
+| 10.5     | rLLM | 用 DeepCoder cookbook 跑完整 Agentic 实验 |
 
 如果你想先跑通一个端到端案例，优先看 10.5。如果你已经熟悉 veRL，想把数学 RLVR 扩展到代码任务，就沿着本节的 data、reward、trainer 三个接口补齐。
 

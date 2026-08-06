@@ -18,8 +18,7 @@ export const logoPath = '../public/readme/readmelogo.png'
 const sanbuGithubUrl =
   process.env.PDF_SANBU_GITHUB_URL || 'https://github.com/sanbuphy'
 
-export const bookVersion =
-  process.env.PDF_VERSION || '0.1.0'
+export const bookVersion = process.env.PDF_VERSION || '0.1.0'
 
 export const bookAuthor =
   process.env.PDF_AUTHORS ||
@@ -189,7 +188,7 @@ export const frontMatter = {
       '正文中如遇到仍处在快速迭代的章节，请优先参考最新 GitHub 仓库。欢迎通过 issue、pull request 或课程讨论渠道修正错误、补充案例和完善练习。',
     licenseSection: {
       title: '授权与引用',
-      text: '本书遵循仓库中的开源协议发布，适合学习、教学和非商业传播。引用本书时，请注明书名、版本、作者与 GitHub 仓库地址。',
+      text: '本书遵循仓库中的开源协议发布，适合学习、教学和非商业传播。引用本书时，请注明书名、版本、作者与 GitHub 仓库地址。'
     }
   }
 }

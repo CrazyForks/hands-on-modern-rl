@@ -974,7 +974,7 @@ Agentic RL 不是凭空出现的——它和前面章节学过的几乎所有概
 | 信用分配      | Token 级别 PPO/RLHF（第 7-8 章） | Turn 级别（跨多轮，ORM vs PRM）         |
 | GRPO 组内比较 | 多条回答对比（第 7 章）          | 多条轨迹对比（同样适用）                |
 | 经验回放      | DQN 的 Replay Buffer（第 4 章）  | 工具调用轨迹的回放（需要环境可复现）    |
-| 策略梯度定理  | REINFORCE（(第 6 章）             | 多轮策略梯度（Turn-Level Discounting）  |
+| 策略梯度定理  | REINFORCE（(第 6 章）            | 多轮策略梯度（Turn-Level Discounting）  |
 | Actor-Critic  | PPO（第 5 章）                   | Agentic PPO（Critic 评估轮次价值）      |
 | RLVR          | 可验证奖励（第 7 章）            | 工具执行结果的天然可验证性              |
 

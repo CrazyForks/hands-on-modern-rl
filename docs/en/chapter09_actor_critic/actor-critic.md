@@ -467,18 +467,18 @@ loss = actor_loss + critic_loss  # = tensor(4.7994)
 
 Summary of key values across the entire computation chain:
 
-| Variable      | Value      | Meaning                                           |
-| ------------- | ---------- | ------------------------------------------------- |
-| `probs`       | [0.6, 0.4] | Actor's probability distribution over two actions |
-| `value`       | 1.2        | Critic's estimate of the current state            |
-| `log_prob`    | -0.9163    | Log-probability of the chosen action (right)      |
-| `reward`      | 1.0        | Immediate reward returned by the environment      |
-| `next_value`  | 2.0        | Critic's estimate of the next state               |
-| `td_target`   | 2.98       | $r + \gamma V(s')$                                |
+| Variable      | Value      | Meaning                                            |
+| ------------- | ---------- | -------------------------------------------------- |
+| `probs`       | [0.6, 0.4] | Actor's probability distribution over two actions  |
+| `value`       | 1.2        | Critic's estimate of the current state             |
+| `log_prob`    | -0.9163    | Log-probability of the chosen action (right)       |
+| `reward`      | 1.0        | Immediate reward returned by the environment       |
+| `next_value`  | 2.0        | Critic's estimate of the next state                |
+| `td_target`   | 2.98       | $r + \gamma V(s')$                                 |
 | `td_error`    | 1.78       | $\delta = \text{td\textunderscore{}target} - V(s)$ |
-| `actor_loss`  | 1.6310     | $-\log\pi \cdot \delta$ (after .detach)           |
-| `critic_loss` | 3.1684     | $\delta^2$                                        |
-| `loss`        | 4.7994     | $L_{\text{actor}} + L_{\text{critic}}$            |
+| `actor_loss`  | 1.6310     | $-\log\pi \cdot \delta$ (after .detach)            |
+| `critic_loss` | 3.1684     | $\delta^2$                                         |
+| `loss`        | 4.7994     | $L_{\text{actor}} + L_{\text{critic}}$             |
 
 ### Actor-Critic Training Curve on CartPole
 
@@ -507,11 +507,11 @@ On CartPole, Actor-Critic typically stabilizes at 500 points (the maximum) withi
 
 Actor-Critic is not the destination; it is a skeleton. In later chapters you will encounter various extensions:
 
-| Chapter                                                              | Variant                          | Key improvement                                                                                  |
-| -------------------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------ |
-| [Chapter 7 PPO](../chapter10_ppo/intro)                              | PPO-Clip                         | Limit the size of policy updates to avoid "taking steps that are too big"                        |
-| [Chapter 7 GAE](../chapter10_ppo/gae-reward-model)                   | Generalized Advantage Estimation | Exponentially weighted sum of multi-step TD errors; precisely control the bias-variance tradeoff |
-| [Chapter 9 DPO](../chapter17_dpo/intro)                        | Implicit Actor-Critic            | Replace the Critic with preference data; remove the on-policy constraint                         |
+| Chapter                                                         | Variant                          | Key improvement                                                                                  |
+| --------------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [Chapter 7 PPO](../chapter10_ppo/intro)                         | PPO-Clip                         | Limit the size of policy updates to avoid "taking steps that are too big"                        |
+| [Chapter 7 GAE](../chapter10_ppo/gae-reward-model)              | Generalized Advantage Estimation | Exponentially weighted sum of multi-step TD errors; precisely control the bias-variance tradeoff |
+| [Chapter 9 DPO](../chapter17_dpo/intro)                         | Implicit Actor-Critic            | Replace the Critic with preference data; remove the on-policy constraint                         |
 | [Chapter 9 GRPO](../chapter18_grpo/grpo-practice-and-mechanism) | Remove the Critic                | Replace $V(s)$ with an in-group mean; save one network                                           |
 
 All variants share the same skeleton: one network responsible for choosing, plus one signal responsible for evaluating. What changes is only "where the evaluation signal comes from" and "how the selection network is updated."

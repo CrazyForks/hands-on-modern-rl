@@ -38,14 +38,14 @@ $$\mathcal{L} = -\mathbb{E}\left[\log \sigma\left(\hat{A}(x, y_w) - \hat{A}(x, y
 
 把 LLM 偏好数据集和 [第 10 章](../chapter11_continuous_control/intro) 的 D4RL 离线数据集对比：
 
-| 维度 | D4RL (MuJoCo) | LLM Preference Data |
-|------|---------------|----------------------|
-| 状态 $s$ | 机器人关节角 | prompt $x$ |
-| 动作 $a$ | 关节力矩 | response $y$ |
-| 奖励 $r$ | 标量 reward | 偏好 $y_w \succ y_l$（隐式 reward） |
-| 数据来源 | 某行为策略 $\pi_\beta$ | 人类标注 / RM 模型 |
-| 训练目标 | $\max Q^\pi$ s.t. $\pi \approx \pi_\beta$ | $\max$ 隐式 reward s.t. $\pi \approx \pi_{\text{ref}}$ |
-| 离线 RL 算法 | CQL / IQL / DT | DPO / IPO / KTO |
+| 维度         | D4RL (MuJoCo)                             | LLM Preference Data                                    |
+| ------------ | ----------------------------------------- | ------------------------------------------------------ |
+| 状态 $s$     | 机器人关节角                              | prompt $x$                                             |
+| 动作 $a$     | 关节力矩                                  | response $y$                                           |
+| 奖励 $r$     | 标量 reward                               | 偏好 $y_w \succ y_l$（隐式 reward）                    |
+| 数据来源     | 某行为策略 $\pi_\beta$                    | 人类标注 / RM 模型                                     |
+| 训练目标     | $\max Q^\pi$ s.t. $\pi \approx \pi_\beta$ | $\max$ 隐式 reward s.t. $\pi \approx \pi_{\text{ref}}$ |
+| 离线 RL 算法 | CQL / IQL / DT                            | DPO / IPO / KTO                                        |
 
 这种对应关系不是巧合——**DPO 本质上是离线 RL 在 LLM 上的特例**。理解了这一点，你就能理解为什么 LLM 后训练社区大量借鉴离线 RL 的工具：
 
@@ -96,6 +96,6 @@ graph LR
 - [Janner et al. 2021 "Offline Reinforcement Learning as One Big Sequence Modeling Problem" (Trajectory Transformer)](https://arxiv.org/abs/2106.02039)
 - [Janner et al. 2022 "Planning with Diffusion for Flexible Behavior Synthesis" (Diffuser)](https://arxiv.org/abs/2205.09991)
 - [Rafailov et al. 2023 "Direct Preference Optimization: Your Language Model is Secretly a Reward Model"](https://arxiv.org/abs/2305.18290)
-- [Rafailov et al. 2024 "From r to Q*: Your Language Model is Secretly a Q-Function" (DPO 与 Q-Learning 的形式等价)](https://arxiv.org/abs/2404.12358)
+- [Rafailov et al. 2024 "From r to Q\*: Your Language Model is Secretly a Q-Function" (DPO 与 Q-Learning 的形式等价)](https://arxiv.org/abs/2404.12358)
 - [Levine et al. 2020 "Offline Reinforcement Learning: Tutorial, Review, and Perspectives on Open Problems"](https://arxiv.org/abs/2005.01643)
 - [Laskin et al. 2022 "In-Context Reinforcement Learning with Algorithm Distillation"](https://arxiv.org/abs/2210.07129)

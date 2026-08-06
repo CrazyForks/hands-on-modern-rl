@@ -12,12 +12,12 @@
 
 **四家证据**:
 
-| Agent | 指出 |
-|-------|------|
-| #1 OpenAI/Anthropic | DAPO 显式命名,补 Clip-Higher/Dynamic Sampling/Token-level Loss/Overlong Filtering 四项技巧 |
-| #2 DeepMind/Meta | Dr.GRPO 移除 std 归一化和长度归一化,避免 reward hacking |
-| #3 DeepSeek/Qwen/Kimi | GSPO 序列级 IS + clip,Qwen3 全系基石;DAPO 工程技巧深化 |
-| #4 中国实验室组 | 完整谱系 CISPO/DAPO/VAPO/GSPO/ASPO,缺 **VAPO**(字节 Seed value-based 反潮流) |
+| Agent                 | 指出                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| #1 OpenAI/Anthropic   | DAPO 显式命名,补 Clip-Higher/Dynamic Sampling/Token-level Loss/Overlong Filtering 四项技巧 |
+| #2 DeepMind/Meta      | Dr.GRPO 移除 std 归一化和长度归一化,避免 reward hacking                                    |
+| #3 DeepSeek/Qwen/Kimi | GSPO 序列级 IS + clip,Qwen3 全系基石;DAPO 工程技巧深化                                     |
+| #4 中国实验室组       | 完整谱系 CISPO/DAPO/VAPO/GSPO/ASPO,缺 **VAPO**(字节 Seed value-based 反潮流)               |
 
 **修订建议**:第 19 章重构为:
 
@@ -44,11 +44,11 @@
 
 **三家证据**:
 
-| Agent | 指出 |
-|-------|------|
-| #1 | 生成式 PRM(ThinkPRM)优于判别式,标签少 100 倍;验证器计算扩展是新维度 |
-| #2 | AlphaProof + AlphaGeometry 2 用 Lean 形式语言 + AlphaZero MCTS 自训练,IMO 银牌 |
-| #3 | DeepSeek-Prover-V2 Lean4 形式定理证明 RL,MiniF2F 88.9% |
+| Agent | 指出                                                                           |
+| ----- | ------------------------------------------------------------------------------ |
+| #1    | 生成式 PRM(ThinkPRM)优于判别式,标签少 100 倍;验证器计算扩展是新维度            |
+| #2    | AlphaProof + AlphaGeometry 2 用 Lean 形式语言 + AlphaZero MCTS 自训练,IMO 银牌 |
+| #3    | DeepSeek-Prover-V2 Lean4 形式定理证明 RL,MiniF2F 88.9%                         |
 
 **修订建议**:第 21 章重构为:
 
@@ -70,12 +70,12 @@
 
 **三家证据**:
 
-| Agent | 指出 |
-|-------|------|
-| #1 | GPT-4o 谄媚回滚(2025.04-05,真实 RLHF 失败案例 + 根因分析) |
-| #2 | Anthropic 2025.11 emergent misalignment + HHH 缓解 |
-| #3 | 数据污染与 RLVR 评估陷阱(arXiv:2507.10532,Qwen 在 MATH-500 的"spurious reward") |
-| #4 | 字节 Seed RLHF 数据 scaling:reward hacking + 多样性衰减 |
+| Agent | 指出                                                                            |
+| ----- | ------------------------------------------------------------------------------- |
+| #1    | GPT-4o 谄媚回滚(2025.04-05,真实 RLHF 失败案例 + 根因分析)                       |
+| #2    | Anthropic 2025.11 emergent misalignment + HHH 缓解                              |
+| #3    | 数据污染与 RLVR 评估陷阱(arXiv:2507.10532,Qwen 在 MATH-500 的"spurious reward") |
+| #4    | 字节 Seed RLHF 数据 scaling:reward hacking + 多样性衰减                         |
 
 **修订建议**:第 32 章新增子节:
 
@@ -91,11 +91,11 @@
 
 **三家证据**:
 
-| Agent | 指出 |
-|-------|------|
-| #1 | Anthropic 多智能体研究系统(orchestrator-worker + OODA + 独立上下文,90.2% 加速) |
-| #3 | Agentic Rollout 基础设施(Qwen3-Coder 20000 envs,Kimi K2 agentic rollout infra) |
-| #4 | AReaL(清华+智谱,2.77x 加速)+ AgentRL(智谱+清华)+ SLIME + ROLL 四大异步系统已开源 |
+| Agent | 指出                                                                             |
+| ----- | -------------------------------------------------------------------------------- |
+| #1    | Anthropic 多智能体研究系统(orchestrator-worker + OODA + 独立上下文,90.2% 加速)   |
+| #3    | Agentic Rollout 基础设施(Qwen3-Coder 20000 envs,Kimi K2 agentic rollout infra)   |
+| #4    | AReaL(清华+智谱,2.77x 加速)+ AgentRL(智谱+清华)+ SLIME + ROLL 四大异步系统已开源 |
 
 **修订建议**:第 23 章和附录 B 都要补:
 
@@ -152,6 +152,7 @@
 **缺口**:字节 Seed 独有方向,DanceGRPO 把 GRPO 适配 diffusion/flow 视觉生成;Seedance 多维 RLHF(Foundational+Motion+Aesthetic);LongCat-Video GRPO+多奖励。v5 完全空白。
 
 **出处**:
+
 - DanceGRPO arXiv:2505.07818
 - Seedance arXiv:2506.09113
 - LongCat-Video arXiv:2510.22200
@@ -175,6 +176,7 @@
 **缺口**:**v5 整本书无一个智谱引用**。GLM-4.5 ARC(arXiv:2508.06471,MoE 355B/32A,难度课程 RL)、GLM-4.6 异步 RL + RLCS、GLM-5(arXiv:2602.15763)。
 
 **出处**:
+
 - GLM-4.5 arXiv:2508.06471
 - GLM-4.6 HuggingFace zai-org/GLM-4.6
 - GLM-5 arXiv:2602.15763
@@ -189,6 +191,7 @@
 **缺口**:MuonClip 优化器 + RL 稳定性、K2 Thinking 200-300 步 tool calling、K2.5 Agent Swarm 并行多 agent + 可训练 orchestrator + parallel-agent RL。
 
 **出处**:
+
 - K2 arXiv:2507.20534
 - K2.5 arXiv:2602.02276, kimi.com/blog/kimi-k2-5
 
@@ -201,6 +204,7 @@
 **缺口**:DeepSeek V3.1、Qwen3 单模型同时支持 think/non-think 模式;thinking budget 控制推理深度;NoThinking + best-of-N 可达 thinking 水平(Ma et al. arXiv:2505.18681)。
 
 **出处**:
+
 - Qwen3 报告 §4.3
 - DeepSeek V3.1 api-docs.deepseek.com/updates
 - Ma et al. arXiv:2505.18681
@@ -334,6 +338,7 @@
 ### Gap 28 · UI-TARS-2 + AutoGLM GUI Agent RL(P1,Agent #4)
 
 **出处**:
+
 - UI-TARS-2 arXiv:2509.02544
 - AutoGLM xiao9905.github.io/AutoGLM
 
@@ -393,30 +398,30 @@
 
 ## 四、修订优先级矩阵
 
-| 优先级 | Gap 编号 | 简述 | 工作量 |
-|-------|---------|------|-------|
-| **P0** | 1, 8 | GRPO 家族重构(含 VAPO) | 大 |
-| **P0** | 2 | PRM 升级(生成式 + 形式化) | 中 |
-| **P0** | 3 | Reward Hacking / 评估陷阱(补 GPT-4o + 数据污染) | 中 |
-| **P0** | 4 | Agentic RL 工程基础设施(异步系统) | 中 |
-| **P0** | 5 | Reinforcement Pre-Training(RPT) | 小 |
-| **P0** | 6 | AlphaEvolve 范式 | 中 |
-| **P0** | 7 | 指令层级 Instruction Hierarchy | 小 |
-| **P0** | 9 | 视频生成 RL(DanceGRPO/Seedance) | 大 |
-| **P0** | 10 | 音频 RL 深化(Step-Audio MGRD) | 中 |
-| **P0** | 13, 14 | Hybrid Thinking + long2short | 中 |
-| **P0** | 15 | Self-play SWE-RL (SSR) | 中 |
-| **P1** | 11 | GLM 系列训练范式 | 中 |
-| **P1** | 12 | Kimi K2/K2.5 + Agent Swarm | 中 |
-| **P1** | 16 | Code World Model + DeepSWE | 中 |
-| **P1** | 20 | Genie 3 生成式世界模型 | 中 |
-| **P1** | 21 | Llama 4 流水线 | 小 |
-| **P1** | 22 | 竞赛编程论文推理涌现 | 小 |
-| **P1** | 27 | MuonClip 优化器 | 小 |
-| **P1** | 28 | UI-TARS-2 + AutoGLM | 中 |
-| **P1** | 29 | MoE + RL 训练工程 | 中 |
-| **P1** | 30 | Seed-Thinking 双轨奖励 | 小 |
-| **P2** | 23, 24, 25, 26 | Titans/V3.2/市场数据/递归改进 | 各小 |
+| 优先级 | Gap 编号       | 简述                                            | 工作量 |
+| ------ | -------------- | ----------------------------------------------- | ------ |
+| **P0** | 1, 8           | GRPO 家族重构(含 VAPO)                          | 大     |
+| **P0** | 2              | PRM 升级(生成式 + 形式化)                       | 中     |
+| **P0** | 3              | Reward Hacking / 评估陷阱(补 GPT-4o + 数据污染) | 中     |
+| **P0** | 4              | Agentic RL 工程基础设施(异步系统)               | 中     |
+| **P0** | 5              | Reinforcement Pre-Training(RPT)                 | 小     |
+| **P0** | 6              | AlphaEvolve 范式                                | 中     |
+| **P0** | 7              | 指令层级 Instruction Hierarchy                  | 小     |
+| **P0** | 9              | 视频生成 RL(DanceGRPO/Seedance)                 | 大     |
+| **P0** | 10             | 音频 RL 深化(Step-Audio MGRD)                   | 中     |
+| **P0** | 13, 14         | Hybrid Thinking + long2short                    | 中     |
+| **P0** | 15             | Self-play SWE-RL (SSR)                          | 中     |
+| **P1** | 11             | GLM 系列训练范式                                | 中     |
+| **P1** | 12             | Kimi K2/K2.5 + Agent Swarm                      | 中     |
+| **P1** | 16             | Code World Model + DeepSWE                      | 中     |
+| **P1** | 20             | Genie 3 生成式世界模型                          | 中     |
+| **P1** | 21             | Llama 4 流水线                                  | 小     |
+| **P1** | 22             | 竞赛编程论文推理涌现                            | 小     |
+| **P1** | 27             | MuonClip 优化器                                 | 小     |
+| **P1** | 28             | UI-TARS-2 + AutoGLM                             | 中     |
+| **P1** | 29             | MoE + RL 训练工程                               | 中     |
+| **P1** | 30             | Seed-Thinking 双轨奖励                          | 小     |
+| **P2** | 23, 24, 25, 26 | Titans/V3.2/市场数据/递归改进                   | 各小   |
 
 ---
 

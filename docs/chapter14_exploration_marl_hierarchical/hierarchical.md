@@ -4,7 +4,7 @@
 
 ## 分层 RL 与 Options、FeUdal Networks 与 HIRO
 
-长 horizon 任务是 RL 的另一类硬骨头。考虑 *Atari Montezuma's Revenge*：智能体需要先拿钥匙、再开门、最后进下一关。直接用 PPO 训练，几千步后梯度信号已经被淹没。**分层 RL** 把决策分解成两层（或多层）：
+长 horizon 任务是 RL 的另一类硬骨头。考虑 _Atari Montezuma's Revenge_：智能体需要先拿钥匙、再开门、最后进下一关。直接用 PPO 训练，几千步后梯度信号已经被淹没。**分层 RL** 把决策分解成两层（或多层）：
 
 - **高层策略**：偶尔决策，输出"子目标"或"option"
 - **底层策略**：在高层给出的子目标下，执行原子动作直到子目标完成
@@ -38,7 +38,7 @@ $$\mathcal{L}_M = -\langle g_t,\ \hat{z}_{t+c} - \hat{z}_t\rangle$$
 
 其中 $\hat{z}$ 是共享编码器的输出。这是一个**自监督**目标——Manager 不需要任何外部奖励就能学会"指向有信息增量的方向"。Worker 仍然用环境奖励训练，但条件在 $g_t$ 上。
 
-FeUdal 在 *Montezuma's Revenge* 上首次让端到端深度 RL 拿到正分数，但训练不稳定、对超参敏感，工程复现困难。
+FeUdal 在 _Montezuma's Revenge_ 上首次让端到端深度 RL 拿到正分数，但训练不稳定、对超参敏感，工程复现困难。
 
 ### 异策略分层 RL
 
@@ -71,11 +71,11 @@ for step in range(total_steps):
 
 ### 分层 RL 算法对比
 
-| 算法 | 高层输出 | 底层目标 | 训练方式 | 主要问题 |
-|------|---------|---------|----------|---------|
-| Options | option id | 固定子策略 | SMDP-Q | 需预设 option |
-| FeUdal | 隐藏方向 $g$ | worker 内在 | on-policy，端到端 | 训练不稳定 |
-| HIRO | 状态位移 | 状态匹配 | off-policy | 目标转移设计 |
+| 算法    | 高层输出     | 底层目标    | 训练方式          | 主要问题      |
+| ------- | ------------ | ----------- | ----------------- | ------------- |
+| Options | option id    | 固定子策略  | SMDP-Q            | 需预设 option |
+| FeUdal  | 隐藏方向 $g$ | worker 内在 | on-policy，端到端 | 训练不稳定    |
+| HIRO    | 状态位移     | 状态匹配    | off-policy        | 目标转移设计  |
 
 ::: warning 分层 RL 的实际困境
 分层 RL 听起来优雅，但工业落地少。原因：(1) 层次结构本身是强归纳偏置，错配会反向伤害性能；(2) 高层与底层耦合训练易陷入"互相欺骗"局部解——Manager 给无意义方向，Worker 学着忽略它；(3) LLM 时代的"分层"已经从神经网络架构转移到 prompt 层（plan-then-act、ReAct），更易调试。但思想仍深刻影响 agentic RL（[第 23 章](../chapter22_agentic/tool-use-and-trajectory)）和 [第 38 章 多智能体](../chapter32_selfplay/llm-multi-agent-rl/)。

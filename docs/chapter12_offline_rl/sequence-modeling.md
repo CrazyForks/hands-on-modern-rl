@@ -120,10 +120,11 @@ $$\pi_\theta(a \mid s, \hat{R}) \approx \pi_\beta(a \mid s, \text{return} \appro
 这一观察催生了后续大量工作：online RL 中的 RL via supervised learning、in-context RL（Algorithm Distillation）、Star-Vector、Eyre et al. 的 "language modeling is all you need for RL" 等。
 
 ::: details DT 的局限
+
 1. **只能学到数据中存在的最优策略**——如果数据集里没有 expert 轨迹，再高的目标 RTG 也无法生成 expert 行为
 2. **stitching 能力差**——传统离线 RL 可以把两条次优轨迹的好的部分"缝合"成更优策略（subtrajectory stitching），DT 因为是纯监督，做不到这种组合泛化
 3. **RTG 选择敏感**——目标 RTG 设太高会生成不连贯动作，设太低则保守
-:::
+   :::
 
 ## Trajectory Transformer 与 Diffuser
 
@@ -157,15 +158,15 @@ $$\tilde{\epsilon}_\theta = (1 + w) \cdot \epsilon_\theta(\tau_t, t, c) - w \cdo
 
 ### DT / TT / Diffuser 对比
 
-| 维度 | Decision Transformer | Trajectory Transformer | Diffuser |
-|------|----------------------|------------------------|----------|
-| 建模对象 | 给定 RTG 的条件策略 | 整条轨迹的联合分布 | 整条轨迹的扩散模型 |
-| 离散化 | 否 | 是（state 每维都离散） | 否 |
-| 推理方式 | 自回归采样 | Beam search | 迭代去噪 |
-| Planning 能力 | 弱（隐式） | 强（显式） | 强（条件生成） |
-| Stitching 能力 | 弱 | 中 | 强 |
-| 推理速度 | 快 | 慢 | 中（需要几十步去噪） |
-| 与 LLM 训练栈兼容性 | 强（最像 GPT） | 强 | 弱（架构不同） |
+| 维度                | Decision Transformer | Trajectory Transformer | Diffuser             |
+| ------------------- | -------------------- | ---------------------- | -------------------- |
+| 建模对象            | 给定 RTG 的条件策略  | 整条轨迹的联合分布     | 整条轨迹的扩散模型   |
+| 离散化              | 否                   | 是（state 每维都离散） | 否                   |
+| 推理方式            | 自回归采样           | Beam search            | 迭代去噪             |
+| Planning 能力       | 弱（隐式）           | 强（显式）             | 强（条件生成）       |
+| Stitching 能力      | 弱                   | 中                     | 强                   |
+| 推理速度            | 快                   | 慢                     | 中（需要几十步去噪） |
+| 与 LLM 训练栈兼容性 | 强（最像 GPT）       | 强                     | 弱（架构不同）       |
 
 ## 本节总结
 

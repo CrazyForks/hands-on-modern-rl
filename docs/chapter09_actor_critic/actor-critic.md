@@ -463,18 +463,18 @@ loss = actor_loss + critic_loss  # = tensor(4.7994)
 
 整个计算链的关键数值汇总：
 
-| 变量          | 值         | 含义                                   |
-| ------------- | ---------- | -------------------------------------- |
-| `probs`       | [0.6, 0.4] | Actor 对两个动作的概率分布             |
-| `value`       | 1.2        | Critic 对当前状态的估计                |
-| `log_prob`    | -0.9163    | 所选动作 right 的对数概率              |
-| `reward`      | 1.0        | 环境返回的即时奖励                     |
-| `next_value`  | 2.0        | Critic 对下一状态的估计                |
-| `td_target`   | 2.98       | $r + \gamma V(s')$                     |
+| 变量          | 值         | 含义                                               |
+| ------------- | ---------- | -------------------------------------------------- |
+| `probs`       | [0.6, 0.4] | Actor 对两个动作的概率分布                         |
+| `value`       | 1.2        | Critic 对当前状态的估计                            |
+| `log_prob`    | -0.9163    | 所选动作 right 的对数概率                          |
+| `reward`      | 1.0        | 环境返回的即时奖励                                 |
+| `next_value`  | 2.0        | Critic 对下一状态的估计                            |
+| `td_target`   | 2.98       | $r + \gamma V(s')$                                 |
 | `td_error`    | 1.78       | $\delta = \text{td\textunderscore{}target} - V(s)$ |
-| `actor_loss`  | 1.6310     | $-\log\pi \cdot \delta$（.detach 后）  |
-| `critic_loss` | 3.1684     | $\delta^2$                             |
-| `loss`        | 4.7994     | $L_{\text{actor}} + L_{\text{critic}}$ |
+| `actor_loss`  | 1.6310     | $-\log\pi \cdot \delta$（.detach 后）              |
+| `critic_loss` | 3.1684     | $\delta^2$                                         |
+| `loss`        | 4.7994     | $L_{\text{actor}} + L_{\text{critic}}$             |
 
 ### CartPole 上的 Actor-Critic 训练曲线
 
@@ -503,11 +503,11 @@ Actor-Critic 在 CartPole 上通常在 200-300 个 episode 内就能稳定到 50
 
 Actor-Critic 不是终点，而是一个骨架。后续章节中你会看到它的各种变体：
 
-| 章节                                                               | 变体              | 关键改进                                          |
-| ------------------------------------------------------------------ | ----------------- | ------------------------------------------------- |
-| [第 8 章 PPO](../chapter10_ppo/intro)                              | PPO-Clip          | 限制策略更新幅度，防止"步子迈太大"                |
-| [第 8 章 GAE](../chapter10_ppo/gae-reward-model)                   | 广义优势估计      | 多步 TD Error 的指数加权和，精确控制偏差-方差权衡 |
-| [第 15 章 DPO](../chapter17_dpo/intro)                        | 隐式 Actor-Critic | 用偏好数据替代 Critic，去掉 on-policy 的限制      |
+| 章节                                                           | 变体              | 关键改进                                          |
+| -------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| [第 8 章 PPO](../chapter10_ppo/intro)                          | PPO-Clip          | 限制策略更新幅度，防止"步子迈太大"                |
+| [第 8 章 GAE](../chapter10_ppo/gae-reward-model)               | 广义优势估计      | 多步 TD Error 的指数加权和，精确控制偏差-方差权衡 |
+| [第 15 章 DPO](../chapter17_dpo/intro)                         | 隐式 Actor-Critic | 用偏好数据替代 Critic，去掉 on-policy 的限制      |
 | [第 16 章 GRPO](../chapter18_grpo/grpo-practice-and-mechanism) | 去掉 Critic       | 用组内均值替代 $V(s)$，省掉一个网络               |
 
 所有的变体都共享同一个骨架：一个负责选择的网络 + 一个负责评估的信号。变化的只是"评估信号怎么来"和"选择网络怎么更新"。

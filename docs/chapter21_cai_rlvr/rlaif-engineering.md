@@ -32,7 +32,7 @@
 
 ### Socialization——让模型"内化"价值
 
-80 页文档标题里的关键词是 *socialization*。Anthropic 借用社会学概念：**价值观不是通过规则灌输，而是通过"社会化"内化**。类比人类：孩子不是背法律条文长大的，而是在具体情境中观察、模仿、修正。
+80 页文档标题里的关键词是 _socialization_。Anthropic 借用社会学概念：**价值观不是通过规则灌输，而是通过"社会化"内化**。类比人类：孩子不是背法律条文长大的，而是在具体情境中观察、模仿、修正。
 
 工程实现上，Claude 4 训练引入了**情境化对齐（contextual alignment）**：
 
@@ -68,14 +68,14 @@ Entropy 项鼓励 attribution 不要坍缩到单一原则（多原则兼容时�
 
 ### Claude 4 Constitution 与前沿对齐研究
 
-| 维度         | Claude 2/3 Constitution | Claude 4 Constitution (2026) |
-| ------------ | ----------------------- | ---------------------------- |
-| 结构         | 扁平规则列表（~80 条）  | 层级化价值树（北极星 + 子树）|
-| 学习方式     | 规则匹配 + AI judge     | 情境化 socialization         |
-| 冲突处理     | 隐式（judge 主观）      | 显式优先级仲裁               |
-| 可解释性     | 隐式 reward             | 显式 attribution + CoT       |
-| OOD 鲁棒性   | 弱                      | 强（socialization 泛化）     |
-| 审计能力     | 黑盒                    | 每个决策可追溯到原则         |
+| 维度       | Claude 2/3 Constitution | Claude 4 Constitution (2026)  |
+| ---------- | ----------------------- | ----------------------------- |
+| 结构       | 扁平规则列表（~80 条）  | 层级化价值树（北极星 + 子树） |
+| 学习方式   | 规则匹配 + AI judge     | 情境化 socialization          |
+| 冲突处理   | 隐式（judge 主观）      | 显式优先级仲裁                |
+| 可解释性   | 隐式 reward             | 显式 attribution + CoT        |
+| OOD 鲁棒性 | 弱                      | 强（socialization 泛化）      |
+| 审计能力   | 黑盒                    | 每个决策可追溯到原则          |
 
 这条路线和 [第 34 章 Scalable Oversight](../chapter34_scalable_oversight/intro) 的"AI supervision"研究、[第 36 章 Distributed RL Training](../chapter36_distributed_rl_training/intro) 的大规模对齐训练形成了完整的工业级对齐体系。
 
