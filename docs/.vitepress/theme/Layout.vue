@@ -320,6 +320,32 @@ function toggleSidebar() {
   sidebarCollapsed.value = !sidebarCollapsed.value
 }
 
+/**
+ * 展开或折叠侧边栏里的全部可折叠分组。
+ * VitePress 每个分组用 .VPSidebarItem.collapsible 渲染，collapsed 状态
+ * 反映在 CSS class 上；点击组头的 .item 即可切换。深层分组始终在 DOM 里，
+ * 所以一次遍历就能处理所有层级。
+ */
+function setAllSidebarGroups(expand) {
+  document
+    .querySelectorAll('.VPSidebarItem.collapsible')
+    .forEach((groupEl) => {
+      const isCollapsed = groupEl.classList.contains('collapsed')
+      if ((expand && isCollapsed) || (!expand && !isCollapsed)) {
+        const itemEl = groupEl.querySelector(':scope > .item')
+        itemEl && itemEl.click()
+      }
+    })
+}
+
+function expandAllSidebarGroups() {
+  setAllSidebarGroups(true)
+}
+
+function collapseAllSidebarGroups() {
+  setAllSidebarGroups(false)
+}
+
 function closeReadingTools() {
   readingToolsOpen.value = false
 }
@@ -1248,6 +1274,27 @@ watch(
             </Transition>
           </PopoverPortal>
         </PopoverRoot>
+      </div>
+    </template>
+
+    <template v-if="showDocChrome" #sidebar-nav-before>
+      <div class="ct-sidebar-groups-toolbar">
+        <button
+          class="ct-sidebar-groups-button"
+          type="button"
+          @click="expandAllSidebarGroups"
+        >
+          <span class="ct-sidebar-groups-icon" aria-hidden="true">⤢</span>
+          全部展开
+        </button>
+        <button
+          class="ct-sidebar-groups-button"
+          type="button"
+          @click="collapseAllSidebarGroups"
+        >
+          <span class="ct-sidebar-groups-icon" aria-hidden="true">⤡</span>
+          全部折叠
+        </button>
       </div>
     </template>
 
@@ -2215,5 +2262,42 @@ watch(
   .ct-mermaid-viewer-actions button {
     flex: 1 1 0;
   }
+}
+
+/* 侧边栏「全部展开 / 全部折叠」工具栏 */
+.ct-sidebar-groups-toolbar {
+  display: flex;
+  gap: 6px;
+  padding: 4px 16px 8px;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.ct-sidebar-groups-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--vp-c-text-2);
+  background: transparent;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    color 0.25s,
+    border-color 0.25s,
+    background-color 0.25s;
+}
+
+.ct-sidebar-groups-button:hover {
+  color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-1);
+  background-color: var(--vp-c-brand-soft);
+}
+
+.ct-sidebar-groups-icon {
+  font-size: 13px;
+  line-height: 1;
 }
 </style>

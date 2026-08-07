@@ -671,7 +671,7 @@ const zhSidebar = {
   '/': [
     {
       text: '序章 · 导论',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '强化学习导论',
@@ -689,7 +689,7 @@ const zhSidebar = {
     },
     {
       text: 'Part I · 基础与经典强化学习',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '1. CartPole 入门',
@@ -775,7 +775,7 @@ const zhSidebar = {
     },
     {
       text: 'Part II · 深度强化学习',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '5. 深度 Q 网络',
@@ -887,7 +887,7 @@ const zhSidebar = {
     },
     {
       text: 'Part III · 高级 RL 方法',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '10. 离线强化学习',
@@ -947,7 +947,7 @@ const zhSidebar = {
     },
     {
       text: 'Part IV · 大语言模型对齐与后训练',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '13. RLHF 训练流水线',
@@ -1147,7 +1147,7 @@ const zhSidebar = {
     },
     {
       text: 'Part V · Agentic 强化学习',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '20. 工具调用、多轮交互与多智能体 RL',
@@ -1249,7 +1249,7 @@ const zhSidebar = {
     },
     {
       text: 'Part VI · 多模态强化学习',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '24. 视觉语言模型 RL',
@@ -1323,7 +1323,7 @@ const zhSidebar = {
     },
     {
       text: 'Part VII · 安全、评估与研究前沿',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '28. 奖励黑客与 RL 评估',
@@ -1388,7 +1388,7 @@ const zhSidebar = {
       items: [
         {
           text: 'A. 训练调试与工程实践',
-          collapsed: false,
+          collapsed: true,
           items: [
             {
               text: 'A.0 附录导读',
@@ -1414,7 +1414,7 @@ const zhSidebar = {
         },
         {
           text: 'B. 核心算法实现',
-          collapsed: false,
+          collapsed: true,
           items: [
             {
               text: 'B.0 附录导读',
@@ -1482,7 +1482,7 @@ const zhSidebar = {
         },
         {
           text: 'D. 数学基础',
-          collapsed: false,
+          collapsed: true,
           items: [
             {
               text: 'D.0 附录导读',
@@ -1631,7 +1631,7 @@ const enSidebar = {
   '/en/': [
     {
       text: 'Preface · Introduction',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: 'Introduction to RL',
@@ -1649,7 +1649,7 @@ const enSidebar = {
     },
     {
       text: 'Part I · Fundamentals & Classical RL',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '1. CartPole',
@@ -1731,7 +1731,7 @@ const enSidebar = {
     },
     {
       text: 'Part II · Deep Reinforcement Learning',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '5. Deep Q-Networks',
@@ -1839,7 +1839,7 @@ const enSidebar = {
     },
     {
       text: 'Part III · Advanced RL Methods',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '10. Offline Reinforcement Learning (Translation pending)',
@@ -1890,7 +1890,7 @@ const enSidebar = {
     },
     {
       text: 'Part IV · LLM Alignment & Post-Training',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '13. RLHF Pipeline',
@@ -2066,7 +2066,7 @@ const enSidebar = {
     },
     {
       text: 'Part V · Agentic Reinforcement Learning',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '20. Tool Use, Multi-Turn & Multi-Agent RL',
@@ -2145,7 +2145,7 @@ const enSidebar = {
     },
     {
       text: 'Part VI · Multimodal Reinforcement Learning',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '24. Vision-Language Model RL',
@@ -2209,7 +2209,7 @@ const enSidebar = {
     },
     {
       text: 'Part VII · Safety, Evaluation & Research Frontiers',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: '28. Reward Hacking & RL Evaluation (Translation pending)',
@@ -2261,11 +2261,11 @@ const enSidebar = {
     },
     {
       text: 'Appendices',
-      collapsed: false,
+      collapsed: true,
       items: [
         {
           text: 'A. Training Debugging & Engineering Practice',
-          collapsed: false,
+          collapsed: true,
           items: [
             {
               text: 'A.0 Appendix Overview',
@@ -2290,7 +2290,7 @@ const enSidebar = {
         },
         {
           text: 'B. Core Algorithm Implementations',
-          collapsed: false,
+          collapsed: true,
           items: [
             {
               text: 'B.0 Appendix Overview',
@@ -2356,7 +2356,7 @@ const enSidebar = {
         },
         {
           text: 'D. Math Foundations',
-          collapsed: false,
+          collapsed: true,
           items: [
             {
               text: 'D.0 Appendix Overview',
