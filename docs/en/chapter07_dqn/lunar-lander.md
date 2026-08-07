@@ -6,7 +6,7 @@ title: '4.3 Hands-On: LunarLander'
 
 > **Goal of this section**: start from a reproducible experiment, train DQN on `LunarLander-v3`, and use evaluation curves, replay GIFs, and failure diagnosis to answer the only question that matters: what did the policy actually learn?
 
-> **Code for this section**: [dqn_gym_sb3.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_dqn/dqn_gym_sb3.py) · [export_dqn_curves.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_dqn/export_dqn_curves.py) · [render_lunarlander_split.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_dqn/render_lunarlander_split.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_dqn/requirements.txt)
+> **Code for this section**: [dqn_gym_sb3.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/dqn_gym_sb3.py) · [export_dqn_curves.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/export_dqn_curves.py) · [render_lunarlander_split.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/render_lunarlander_split.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/requirements.txt)
 
 ## 4.3.1 Run the LunarLander Training
 
@@ -29,13 +29,13 @@ If you only want to sanity-check that the pipeline runs, reduce `--total-timeste
 First install the dependencies for this chapter:
 
 ```bash
-pip install -r code/chapter07_dqn/requirements.txt
+pip install -r code/chapter04_dqn/requirements.txt
 ```
 
 Then run the training:
 
 ```bash
-python code/chapter07_dqn/dqn_gym_sb3.py \
+python code/chapter04_dqn/dqn_gym_sb3.py \
   --env-id LunarLander-v3 \
   --total-timesteps 100000 \
   --learning-rate 0.0005 \
@@ -76,7 +76,7 @@ tensorboard --logdir output/dqn_gym_runs/LunarLander-v3/tb
 To export the local evaluation CSV into images used in the notes:
 
 ```bash
-python code/chapter07_dqn/export_dqn_curves.py --run lunarlander
+python code/chapter04_dqn/export_dqn_curves.py --run lunarlander
 ```
 
 ## 4.3.2 Read Curves First, Then Watch Replays
@@ -117,7 +117,7 @@ The final evaluation reached `253.12`, showing that this training run learned an
 To re-render replays:
 
 ```bash
-python code/chapter07_dqn/render_lunarlander_split.py \
+python code/chapter04_dqn/render_lunarlander_split.py \
   --model output/dqn_gym_runs/LunarLander-v3/final_model.zip \
   --output-dir output/lunarlander_episodes \
   --episodes 3 \
@@ -252,7 +252,7 @@ Next: [The DQN family](./dqn-family)
 ## Section Summary
 
 - `LunarLander-v3` is a suitable continuation for this chapter's DQN hands-on: low-dimensional continuous states, discrete actions, and a richer reward structure than CartPole.
-- The training entry point is `code/chapter07_dqn/dqn_gym_sb3.py`; curve export uses `export_dqn_curves.py`; replay GIFs use `render_lunarlander_split.py`.
+- The training entry point is `code/chapter04_dqn/dqn_gym_sb3.py`; curve export uses `export_dqn_curves.py`; replay GIFs use `render_lunarlander_split.py`.
 - During evaluation, first check whether multi-episode average return has departed from the random baseline, then use replays to verify whether the policy actually completes deceleration, attitude correction, and landing zone control.
 - A single episode above `200` usually indicates a high-quality successful landing; `100` to `200` is mostly a medium success; significantly below `100` requires examining replays to determine the failure cause.
 - Curve fluctuation in LunarLander is normal; to judge whether training is effective, consider the mean, variance, checkpoints, and replays across different seeds simultaneously.

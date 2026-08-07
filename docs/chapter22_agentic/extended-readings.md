@@ -57,7 +57,7 @@ GUI 智能体让 AI 能像人一样操作图形界面——点击按钮、填写
 
 | 工作名称                                      | 核心亮点                                                     | 链接                                                           |
 | --------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------------- |
-| WebAgent-R1 **[开源]**                        | 端到端多轮 RL 框架，将 3B 模型成功率从 6.1% 提升至 33.9%     | [GitHub](https://github.com/WebAgent-R1/WebAgent-R1)           |
+| WebAgent-R1 **[开源]**                        | 端到端多轮 RL 框架，将 3B 模型成功率从 6.1% 提升至 33.9%     | [GitHub](https://github.com/weizhepei/WebAgent-R1)           |
 | Web-Shepherd **[开源]**                       | 首个网页导航专用步骤级奖励模型，能评估每一步交互             | [GitHub](https://github.com/kyle8581/Web-Shepherd)             |
 | CRAFT-GUI                                     | 结合课程学习与 GRPO，提升 GUI 智能体性能                     | [arXiv](https://arxiv.org/abs/2508.11360)                      |
 | MobileRL **[开源]**                           | 移动端在线 RL 框架，使用 ADAGRPO 算法                        | [GitHub](https://github.com/THUDM/MobileRL)                    |
@@ -75,7 +75,7 @@ GUI 智能体让 AI 能像人一样操作图形界面——点击按钮、填写
 | 工作名称                         | 核心亮点                                                       | 链接                                            |
 | -------------------------------- | -------------------------------------------------------------- | ----------------------------------------------- |
 | Robot-R1                         | 用 RL 直接优化机器人的推理过程，7B 模型空间推理能力超越 GPT-4o | [arXiv](https://arxiv.org/abs/2506.00070)       |
-| WMPO **[开源]**                  | 在像素级视觉世界模型中进行 RL 训练，涌现出自我纠错能力         | [GitHub](https://github.com/HKUST-PEI-Lab/WMPO) |
+| WMPO **[开源]**                  | 在像素级视觉世界模型中进行 RL 训练，涌现出自我纠错能力         | [GitHub](https://github.com/WM-PO/WMPO) |
 | ViVa                             | 使用预训练视频生成模型作为价值函数估计器，评估状态价值         | [arXiv](https://arxiv.org/abs/2604.08168)       |
 | RoboAgent                        | 通过组合基础能力，实现具身任务规划                             | [arXiv](https://arxiv.org/abs/2604.07774)       |
 | Cross-Embodiment Offline RL      | 通过形态学分组策略，实现跨不同形态机器人的离线 RL              | [arXiv](https://arxiv.org/abs/2602.18025)       |
@@ -92,7 +92,7 @@ GUI 智能体让 AI 能像人一样操作图形界面——点击按钮、填写
 | MAPoRL                     | 多智能体协作训练新范式                                                    | [arXiv](https://arxiv.org/abs/2502.18439)    |
 | M-GRPO                     | 将 GRPO 算法扩展至多智能体场景                                            | [arXiv](https://arxiv.org/abs/2511.13288)    |
 | SAGE                       | 闭环自进化多智能体 RL 框架                                                | [arXiv](https://arxiv.org/abs/2603.15255)    |
-| MARTI **[开源]**           | 多智能体辩论框架                                                          | [GitHub](https://github.com/MARTI-LLM/MARTI) |
+| MARTI **[开源]**           | 多智能体辩论框架                                                          | [GitHub](https://github.com/TsinghuaC3I/MARTI) |
 | KD-MARL                    | 通过知识蒸馏，将集中式专家的协调行为迁移到轻量级去中心化智能体中          | [arXiv](https://arxiv.org/abs/2604.06691)    |
 | Value-Guidance MeanFlow    | 用于离线多智能体 RL 的价值引导流模型                                      | [arXiv](https://arxiv.org/abs/2604.08174)    |
 | FlexMARL                   | 首个端到端训练框架，联合优化采样、训练及其编排，用于大规模 LLM-based MARL | [arXiv](https://arxiv.org/abs/2602.09578)    |
@@ -107,7 +107,7 @@ GUI 智能体让 AI 能像人一样操作图形界面——点击按钮、填写
 | ----------------------- | ------------------------------------------------ | ------------------------------------------- |
 | GIRL                    | 通过信息论幻觉控制，实现生成式想象 RL            | [arXiv](https://arxiv.org/abs/2604.07426)   |
 | World4RL                | 扩散世界模型，用于机器人操作的策略精炼           | [arXiv](https://arxiv.org/abs/2509.19080)   |
-| Dreamer-CDP             | 无需重建原始像素观察的 Dreamer 变体              | [Project](https://zenkelab.org/dreamer-cdp) |
+| Dreamer-CDP             | 无需重建原始像素观察的 Dreamer 变体              | —                                             |
 | RLVR-World              | 使用 RLVR 直接优化世界模型                       | [arXiv](https://arxiv.org/abs/2505.13934)   |
 | OC-STORM                | 利用对象中心表征增强世界模型，实现样本高效的 RL  | [arXiv](https://arxiv.org/abs/2501.16443)   |
 | Imagine-then-Plan (ITP) | 让策略模型与世界模型交互，在"想象"中生成多步轨迹 | [arXiv](https://arxiv.org/abs/2601.08955)   |

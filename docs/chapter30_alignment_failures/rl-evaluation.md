@@ -574,5 +574,5 @@ Opus 4.6 Eval Suite 揭示了**模型已经能做初级研究工作**——34× 
 - [Sharma et al. 2023 "Towards Understanding Sycophancy in Language Models"](https://arxiv.org/abs/2310.13548)
 - [Yao et al. 2024 "Tau-Bench: A Benchmark for Tool-Agent-User Interaction"](https://arxiv.org/abs/2406.12045)
 - [Anthropic 2025 "Claude Opus 4.6 AI Research Eval"](https://www.anthropic.com/research/claude-opus-4-6)
-- [Ouyang et al. 2024 "LiveCodeBench"](https://arxiv.org/abs/2403.07974)
-- [Patel et al. 2024 "BFCL Berkeley Function Calling Leaderboard"](https://gorilla.cs.berkeley.edu/blogs/8_berkeley_function_calling_leaderboard.html)
+- [Jain et al. 2024 "LiveCodeBench"](https://arxiv.org/abs/2403.07974)
+- [Patil et al. 2024 "BFCL Berkeley Function Calling Leaderboard"](https://gorilla.cs.berkeley.edu/blogs/8_berkeley_function_calling_leaderboard.html)

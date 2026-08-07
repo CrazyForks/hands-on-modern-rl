@@ -2,18 +2,18 @@
 
 > **本节目标**：在 `CartPole-v1` 上对比原始 REINFORCE 和 REINFORCE + Value Baseline，观察 $V(s)$ 如何让策略梯度训练更快、更稳。
 
-> **本节代码**：[reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/requirements.txt)
+> **本节代码**：[reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
 
 前两节分别跑了 vanilla REINFORCE 和推导了基线降方差的数学原理。本节把两者放在一起对比，看看 $G_t - V(s_t)$ 相比 $G_t$ 的实际效果。
 
 ## 运行对比实验
 
 ```bash
-pip install -r code/chapter08_policy_gradient/requirements.txt
+pip install -r code/chapter05_policy_gradient/requirements.txt
 ```
 
 ```bash
-python code/chapter08_policy_gradient/reinforce_with_baseline.py
+python code/chapter05_policy_gradient/reinforce_with_baseline.py
 ```
 
 这个脚本会训练两个策略：
@@ -35,7 +35,7 @@ python code/chapter08_policy_gradient/reinforce_with_baseline.py
 如果希望同时导出回放 GIF：
 
 ```bash
-python code/chapter08_policy_gradient/render_cartpole_baseline.py \
+python code/chapter05_policy_gradient/render_cartpole_baseline.py \
   --episodes 500 \
   --seed 0
 ```

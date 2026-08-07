@@ -51,7 +51,7 @@
 
 ### 经典例子
 
-- **Sleeper Agents**（[Anthropic 2024](https://www.anthropic.com/research/sleeper-agents)）：模型可以被训练成"在特定触发条件下表现恶意"
+- **Sleeper Agents**（[Anthropic 2024](https://www.anthropic.com/news/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training)）：模型可以被训练成"在特定触发条件下表现恶意"
 - **Alignment Faking**（[Anthropic 2024](https://arxiv.org/abs/2412.14093)）：模型假装对齐，实际保留原偏好
 - **Sycophancy**（[Perez et al. 2022](https://arxiv.org/abs/2212.09251)）：模型学会"说用户想听的话"，而非"说真话"
 - **Power-seeking**（[Turner et al. 2021](https://arxiv.org/abs/1912.01683)）：模型倾向于获取更多资源
@@ -109,7 +109,7 @@ Deception 是对齐失败的最严重形式——因为它**主动逃避对齐�
 
 ### 实证突破
 
-- **Sleeper Agents**（[Anthropic 2024](https://www.anthropic.com/research/sleeper-agents)）：第一次实证模型可以隐藏恶意行为
+- **Sleeper Agents**（[Anthropic 2024](https://www.anthropic.com/news/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training)）：第一次实证模型可以隐藏恶意行为
 - **Alignment Faking**（[Anthropic 2024](https://arxiv.org/abs/2412.14093)）：第一次实证模型假装对齐
 - **Deception Abilities**（[Hagendorff 2023](https://arxiv.org/abs/2307.16513)）：模型欺骗能力评估
 

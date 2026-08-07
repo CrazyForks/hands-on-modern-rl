@@ -204,10 +204,10 @@ ALE 里有几十款游戏，难度差异很大。
 
 Pong 之外，ALE 还提供了 Breakout、Space Invaders、Seaquest 等几十款游戏，
 安装 `gymnasium[atari,accept-rom-license]` 和 `ale-py` 后通过 Gymnasium 环境 ID 即可创建。[^ale-complete-list]
-训练脚本不变，还是 `code/chapter07_dqn/dqn_atari_sb3.py`，换游戏只需改 `--env-id`：
+训练脚本不变，还是 `code/chapter04_dqn/dqn_atari_sb3.py`，换游戏只需改 `--env-id`：
 
 ```bash
-python code/chapter07_dqn/dqn_atari_sb3.py \
+python code/chapter04_dqn/dqn_atari_sb3.py \
   --env-id BreakoutNoFrameskip-v4 \
   --total-timesteps 5000000 \
   --learning-starts 100000 \
@@ -264,7 +264,7 @@ Pong 的规则很直观：像素输入、离散动作、短反馈链。画面上
 
 这里有一个常见误解需要澄清：**球拍会动，不等于学会 Pong**。随机策略或刚起步的网络也可能让球拍移动，但这往往只是反复输出同一个动作，或者碰巧跟上了几帧。真正的判断标准，是在多局确定性评估中，平均回报持续脱离 `-21`，逐步接近并超过 `0`。
 
-本节使用 `PongNoFrameskip-v4` 作为主实验环境。这样选不是因为 `ALE/Pong-v5` 不能训练，而是为了和 SB3 / RL-Zoo 已验证的 Pong DQN 链路保持一致，减少环境版本、默认帧跳过和 sticky action 带来的额外差异。算法入口是 `code/chapter07_dqn/dqn_atari_sb3.py`，基于 Stable-Baselines3 的 `DQN("CnnPolicy", ...)` 实现。它不再是前面那个手写 CNN 的教学片段，而是一套包含 Atari wrapper、经验回放、目标网络、评估回调和模型保存的完整训练脚本。
+本节使用 `PongNoFrameskip-v4` 作为主实验环境。这样选不是因为 `ALE/Pong-v5` 不能训练，而是为了和 SB3 / RL-Zoo 已验证的 Pong DQN 链路保持一致，减少环境版本、默认帧跳过和 sticky action 带来的额外差异。算法入口是 `code/chapter04_dqn/dqn_atari_sb3.py`，基于 Stable-Baselines3 的 `DQN("CnnPolicy", ...)` 实现。它不再是前面那个手写 CNN 的教学片段，而是一套包含 Atari wrapper、经验回放、目标网络、评估回调和模型保存的完整训练脚本。
 
 在这个实验里，左边的橙色球拍是对手，右边的绿色球拍是智能体控制的一侧。这个区分对人类读者很直观，但对 DQN 来说，输入并不是“左边是对手、右边是自己”这样的符号说明，而只是像素画面。经过 Atari wrapper 之后，图像会先缩放为 84×84 灰度图，再把连续 4 帧堆叠起来，并按通道优先的形式送入 CNN。动作空间是 Pong 的离散摇杆动作，包括 `NOOP`、`FIRE`、`RIGHT`、`LEFT`、`RIGHTFIRE` 和 `LEFTFIRE`。所以，网络真正要学的不是记住“绿色代表自己”，而是从像素在屏幕中的位置、亮度和运动变化里恢复球的位置、速度和方向，并把这些信息转化为稳定的防守和击球动作。
 
@@ -275,10 +275,10 @@ Atari Pong 的短实验只适合检查管线：ALE 环境能否启动，wrapper 
 ::: details 复现实验与导出素材
 
 ```bash
-pip install -r code/chapter07_dqn/requirements.txt
+pip install -r code/chapter04_dqn/requirements.txt
 
 # 与成功链路对齐的长实验 与 观察评估回报是否持续脱离随机水平
-python code/chapter07_dqn/dqn_atari_sb3.py \
+python code/chapter04_dqn/dqn_atari_sb3.py \
   --env-id PongNoFrameskip-v4 \
   --total-timesteps 10000000 \
   --buffer-size 10000 \
@@ -304,13 +304,13 @@ python code/chapter07_dqn/dqn_atari_sb3.py \
 tensorboard --logdir output/dqn_atari_long
 
 # 将本地 eval CSV 重新导出为讲义图片
-python code/chapter07_dqn/export_dqn_curves.py --run pong
+python code/chapter04_dqn/export_dqn_curves.py --run pong
 ```
 
 渲染 GIF 时使用同一个脚本，只需要替换 checkpoint 和输出路径：
 
 ```bash
-python code/chapter07_dqn/render_atari.py \
+python code/chapter04_dqn/render_atari.py \
   --env-id PongNoFrameskip-v4 \
   --model output/dqn_atari_long/PongNoFrameskip-v4_dqn_seed0_10m_zoo_aligned/checkpoints/dqn_atari_500000_steps.zip \
   --output docs/chapter07_dqn/images/dqn-atari-pong-500k.gif \

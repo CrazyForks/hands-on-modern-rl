@@ -585,7 +585,7 @@ If you only remember one decision sequence: first determine LLM RL vs non-LLM RL
 
 [^sglang_pd]: SGLang Documentation, [PD Disaggregation](https://docs.sglang.io/docs/advanced_features/pd_disaggregation), 2026.
 
-[^sglang_router]: SGLang Documentation, [SGLang Router](https://docs.sglang.io/advanced_features/router.html), 2026.
+[^sglang_router]: SGLang Documentation, [SGLang Router](https://docs.sglang.io/docs/advanced_features/sgl_model_gateway), 2026.
 
 [^openrlhf]: OpenRLHF Team, [OpenRLHF: An Easy-to-use, Scalable and High-performance RLHF Framework](https://arxiv.org/abs/2405.11143), 2024. [GitHub](https://github.com/OpenRLHF/OpenRLHF).
 

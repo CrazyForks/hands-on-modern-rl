@@ -90,7 +90,7 @@ Anthropic 在 Opus 4.6 发布时，重点宣传了一个内部 benchmark——**
 
 ## 10.5.4 Anthropic 的 80 页 Constitution
 
-2026 年 2 月，Anthropic 发布了一个 [80 页的 Constitution 2.0](https://www.anthropic.com/research/constitutional-ai-2)——详细规定了 Claude 在推理时应该遵循的价值观。这个 Constitution 与推理模型的关系是：
+2026 年 2 月，Anthropic 发布了一个 80 页的 Constitution 2.0——详细规定了 Claude 在推理时应该遵循的价值观。这个 Constitution 与推理模型的关系是：
 
 ### Constitution 作为推理约束
 
@@ -134,7 +134,7 @@ Anthropic 的应对是在训练时加入"思考质量"奖励——CoT 的内容�
 
 自适应思考让推理链更长、更复杂——攻击者有更多机会在 CoT 中注入恶意触发器。比如 prompt injection 可以诱导模型在 CoT 中泄露系统 prompt 内容。
 
-这是 [OpenAI 的 Instruction Hierarchy](https://openai.com/index/introducing-instruction-hierarchy/)（2025）要解决的问题——明确系统 prompt、用户 prompt、工具返回结果的优先级，防止低优先级内容劫持高优先级行为。
+这是 [OpenAI 的 Instruction Hierarchy](https://openai.com/index/the-instruction-hierarchy/)（2025）要解决的问题——明确系统 prompt、用户 prompt、工具返回结果的优先级，防止低优先级内容劫持高优先级行为。
 
 ## 10.5.6 自适应思考 vs 固定深度思考
 

@@ -399,7 +399,7 @@ RT-2（2023）证明了 VLA 范式的可行性，但还有几个根本限制：
 - **缺少长 horizon 规划**：无法处理多步任务（如"做一道菜"，需要切菜、调味、烹饪）
 - **没有显式推理**：模型直接给动作，没有"思考"过程
 
-2025 年 3 月，Google DeepMind 发布了 [Gemini Robotics 1.0](https://deepmind.google/models/gemini-robotics/)——基于 Gemini 2.0 的 VLA 模型。2025 年 6 月又发布了 [Gemini Robotics 1.5](https://blog.google/technology/google-deepmind/gemini-robotics-1-5/)，带来几个关键突破：
+2025 年 3 月，Google DeepMind 发布了 [Gemini Robotics 1.0](https://deepmind.google/models/gemini-robotics/)——基于 Gemini 2.0 的 VLA 模型。2025 年 6 月又发布了 [Gemini Robotics 1.5](https://deepmind.google/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/)，带来几个关键突破：
 
 **突破 1：Embodied Thinking**
 

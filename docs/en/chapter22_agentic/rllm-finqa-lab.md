@@ -358,4 +358,4 @@ rLLM-FinQA demonstrates a clear template for Agentic RL on enterprise tasks: the
 
 The key takeaway: **the difficulty of Agentic RL lies not only in the algorithm but in connecting the task environment, tools, reward, and benchmark into a closed loop.** The financial Agent is valuable because it is realistic enough yet controllable — a good first step from code RL toward enterprise Agent post-training.
 
-[^rllm-finqa]: rLLM official case page: [FinQA Financial Agent](https://docs.rllm-project.com/projects/finqa), including model, data, tools, training commands, and benchmark results.
+[^rllm-finqa]: rLLM official case page: [FinQA Financial Agent](https://github.com/rllm-org/rllm/tree/main/cookbooks/finqa), including model, data, tools, training commands, and benchmark results.

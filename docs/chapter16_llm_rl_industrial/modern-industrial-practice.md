@@ -11,7 +11,7 @@
 
 ## 9.9.1 智谱 GLM-4.5 / GLM-4.6
 
-[GLM-4.5](https://github.com/zhipuai-llm/GLM-4.5)（智谱 AI, 2025.07 发布）和 [GLM-4.6](https://github.com/zhipuai-llm/GLM-4.6)（2025.10）是中国开源推理模型的重要进展。
+[GLM-4.5](https://github.com/zai-org/GLM-4.5)（智谱 AI, 2025.07 发布）和 GLM-4.6（2025.10）是中国开源推理模型的重要进展。
 
 ### GLM 系列的特点
 
@@ -351,7 +351,7 @@ MuonClip 是训练**超大规模 LLM**的关键工具：
 ### 问题根源：$\pi_{\text{rollout}}$ 与 $\pi_{\text{old}}$ 不是同一个策略
 
 > **"When Speed Kills Stability: Demystifying RL Collapse from the Training-Inference Mismatch"**
-> _(Richard Li et al., 2025)_
+> _(Liu et al., 2025)_
 
 在绝大多数 LLM-RL 实现中，$\pi_{\text{rollout}}$（负责采样数据的推理策略）和 $\pi_{\text{old}}$（训练框架里记录的"旧策略"）**根本就不是同一个策略**：
 

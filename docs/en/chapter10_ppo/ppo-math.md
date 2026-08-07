@@ -580,7 +580,7 @@ Each term does a different job:
 
 **policy loss drives Actor improvement, value loss ensures the Critic provides accurate advantage signals, and entropy bonus preserves exploration.**
 
-They collaborate through the shared Actor-Critic network. In [ppo_from_scratch.py](../../../code/chapter10_ppo/ppo_from_scratch.py), the Actor and Critic share the same backbone network (`shared_net`), so one backpropagation updates both.
+They collaborate through the shared Actor-Critic network. In [ppo_from_scratch.py](../../../code/chapter07_ppo/ppo_from_scratch.py), the Actor and Critic share the same backbone network (`shared_net`), so one backpropagation updates both.
 
 ### Hyperparameter Summary
 

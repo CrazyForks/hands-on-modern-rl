@@ -2,7 +2,7 @@
 
 > **本节目标**：从一个可复现实验开始，训练 DQN 控制 `LunarLander-v3`，并用评估曲线、回放 GIF 和失败诊断判断策略到底学到了什么。
 
-> **本节代码**：[dqn_gym_sb3.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_dqn/dqn_gym_sb3.py) · [export_dqn_curves.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_dqn/export_dqn_curves.py) · [render_lunarlander_split.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_dqn/render_lunarlander_split.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_dqn/requirements.txt)
+> **本节代码**：[dqn_gym_sb3.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/dqn_gym_sb3.py) · [export_dqn_curves.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/export_dqn_curves.py) · [render_lunarlander_split.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/render_lunarlander_split.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/requirements.txt)
 
 ## 4.3.1 运行 LunarLander 训练
 
@@ -21,13 +21,13 @@ LunarLander 的任务很直观：飞船从空中下降，智能体要通过主�
 首先安装本章依赖：
 
 ```bash
-pip install -r code/chapter07_dqn/requirements.txt
+pip install -r code/chapter04_dqn/requirements.txt
 ```
 
 然后运行 LunarLander 训练：
 
 ```bash
-python code/chapter07_dqn/dqn_gym_sb3.py \
+python code/chapter04_dqn/dqn_gym_sb3.py \
   --env-id LunarLander-v3 \
   --total-timesteps 100000 \
   --learning-rate 0.0005 \
@@ -64,7 +64,7 @@ tensorboard --logdir output/dqn_gym_runs/LunarLander-v3/tb
 如果希望把本地评估 CSV 重新导出为讲义里的图片，可以运行：
 
 ```bash
-python code/chapter07_dqn/export_dqn_curves.py --run lunarlander
+python code/chapter04_dqn/export_dqn_curves.py --run lunarlander
 ```
 
 这一步对应的是“看训练结果”的代码；后面渲染 GIF 用的是另一个脚本。
@@ -100,7 +100,7 @@ timesteps  mean_reward  std_reward
 重新渲染回放可以使用：
 
 ```bash
-python code/chapter07_dqn/render_lunarlander_split.py \
+python code/chapter04_dqn/render_lunarlander_split.py \
   --model output/dqn_gym_runs/LunarLander-v3/final_model.zip \
   --output-dir output/lunarlander_episodes \
   --episodes 3 \
@@ -235,7 +235,7 @@ LunarLander 的状态是 8 维连续向量，动作是 4 个离散选择。8 个
 ## 本节小结
 
 - `LunarLander-v3` 适合承接本章 DQN 实战：低维连续状态、离散动作、奖励结构比 CartPole 更丰富。
-- 本节训练入口是 `code/chapter07_dqn/dqn_gym_sb3.py`，曲线导出用 `export_dqn_curves.py`，回放 GIF 用 `render_lunarlander_split.py`。
+- 本节训练入口是 `code/chapter04_dqn/dqn_gym_sb3.py`，曲线导出用 `export_dqn_curves.py`，回放 GIF 用 `render_lunarlander_split.py`。
 - 评估时要先看多局平均回报是否脱离随机基线，再用回放检查策略是否真的完成减速、修姿态和落地区域控制。
 - 单局超过 `200` 通常代表高质量成功降落，`100` 到 `200` 多半是中等成功，明显低于 `100` 需要结合回放判断失败原因。
 - LunarLander 的曲线波动是正常现象；判断训练是否有效，要同时看均值、方差、checkpoint 和不同 seed 下的回放。

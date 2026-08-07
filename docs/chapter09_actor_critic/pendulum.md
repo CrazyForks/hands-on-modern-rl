@@ -2,7 +2,7 @@
 
 > **本节目标**：用 A2C 训练 `Pendulum-v1`，理解连续动作 Actor-Critic 为什么要输出高斯分布，以及 Critic 如何帮助 Actor 在连续控制中稳定学习。
 
-> **本节代码**：[actor_critic_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/actor_critic_pendulum.py) · [render_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/render_pendulum.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/requirements.txt)
+> **本节代码**：[actor_critic_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/actor_critic_pendulum.py) · [render_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/render_pendulum.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/requirements.txt)
 
 前面我们用 CartPole、LunarLander 这类任务理解了“从几个动作里选一个”的强化学习。这样的动作空间很适合 DQN，也很适合用 Softmax 策略来解释：向左、向右、点火、不点火，每个动作都有一个明确的概率。
 
@@ -144,20 +144,20 @@ loss = actor_loss + 0.5 * critic_loss - 0.001 * entropy
 安装依赖：
 
 ```bash
-pip install -r code/chapter09_actor_critic/requirements.txt
+pip install -r code/chapter06_actor_critic/requirements.txt
 ```
 
 快速验证脚本能跑通：
 
 ```bash
-python code/chapter09_actor_critic/actor_critic_pendulum.py \
+python code/chapter06_actor_critic/actor_critic_pendulum.py \
   --total-timesteps 20000
 ```
 
 本节脚本使用 Stable-Baselines3 的 **A2C（Advantage Actor-Critic）** 实现。A2C 仍然是 Actor-Critic：Actor 学连续动作策略，Critic 学 $V(s)$，只是工程上使用并行环境和回报归一化，让这个教学实验更容易复现。运行完整训练：
 
 ```bash
-python code/chapter09_actor_critic/actor_critic_pendulum.py \
+python code/chapter06_actor_critic/actor_critic_pendulum.py \
   --total-timesteps 300000
 ```
 
@@ -180,7 +180,7 @@ cp output/actor_critic_pendulum_*.png docs/chapter09_actor_critic/images/
 训练完成后，可以渲染一个回放 GIF：
 
 ```bash
-python code/chapter09_actor_critic/render_pendulum.py \
+python code/chapter06_actor_critic/render_pendulum.py \
   --model output/actor_critic_pendulum.zip \
   --output output/pendulum_actor_critic.gif
 ```

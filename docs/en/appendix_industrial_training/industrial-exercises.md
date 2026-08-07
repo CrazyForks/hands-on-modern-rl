@@ -306,9 +306,9 @@ If you are targeting China post-training roles, prioritize showing "domain data 
 
 [^tencent-hunyuan]: Third-party repost of Tencent role, "Hunyuan LLM Post-Training Algorithm Engineer", <https://jobs.niuqizp.com/job-vmU55NnaZ.html>
 
-[^mistral-forge]: Mistral AI, "Product Manager, Forge", <https://jobs.lever.co/mistral/11087966-f183-44b1-adc9-3a400c1f52ad>
+[^mistral-forge]: Mistral AI, "Product Manager, Forge" (position no longer available)
 
-[^mistral-ai4engineering]: Mistral AI, "Applied Scientist / Research Engineer, AI4Engineering - EMEA", <https://jobs.lever.co/mistral/249d0ec9-1824-41cb-8c4f-cb17a1d5d111>
+[^mistral-ai4engineering]: Mistral AI, "Applied Scientist / Research Engineer, AI4Engineering - EMEA" (position no longer available)
 
 [^helsing-rl]: Helsing, "AI Research Engineer - Reinforcement Learning", <https://helsing.ai/jobs/4676357101>
 

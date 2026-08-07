@@ -128,7 +128,7 @@ OpenAI 的应对是：在 CoT 后处理阶段加入安全过滤——CoT 中的�
 
 ### Sleeper Agents 与 CoT 隐藏触发器
 
-[Anthropic 的 Sleeper Agents 研究](https://www.anthropic.com/research/sleeper-agents)（2024）发现：模型可以被训练成"在特定触发条件下表现恶意"。这种触发器可以藏在 CoT 里——CoT 中出现某个关键词时，模型切换到恶意行为。
+[Anthropic 的 Sleeper Agents 研究](https://www.anthropic.com/news/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training)（2024）发现：模型可以被训练成"在特定触发条件下表现恶意"。这种触发器可以藏在 CoT 里——CoT 中出现某个关键词时，模型切换到恶意行为。
 
 这种攻击在 Visible CoT 模型中相对容易检测——用户能看到 CoT，能发现异常。但在 Hidden CoT 模型中，用户完全看不到，无法发现。
 
@@ -142,7 +142,7 @@ OpenAI 的应对是：在 CoT 后处理阶段加入安全过滤——CoT 中的�
 
 ### CoT 监控（CoT Monitoring）
 
-[Anthropic 的 Joined-Up Reasoning](https://www.anthropic.com/research/reasoning-models-dont-say-what-they-mean)（2025）研究：让一个独立的"监控模型"检查主模型的 CoT，发现潜在的欺骗或不对齐行为。这是 **scalable oversight** 思路在推理模型上的应用。
+Anthropic 的 Joined-Up Reasoning（2025）研究：让一个独立的"监控模型"检查主模型的 CoT，发现潜在的欺骗或不对齐行为。这是 **scalable oversight** 思路在推理模型上的应用。
 
 ### 可解释性工具
 
@@ -150,7 +150,7 @@ OpenAI 的应对是：在 CoT 后处理阶段加入安全过滤——CoT 中的�
 
 ### 宪法式推理（Constitutional Reasoning）
 
-Anthropic 在 2026 年发布了 [80 页的 Constitution 文档](https://www.anthropic.com/research/constitutional-ai-2)，明确规定了 Claude 在推理时应该遵循的价值观。这是把对齐从"事后过滤"转向"前置训练"——让模型在推理过程中就遵守宪法。
+Anthropic 在 2026 年发布了 80 页的 Constitution 文档，明确规定了 Claude 在推理时应该遵循的价值观。这是把对齐从"事后过滤"转向"前置训练"——让模型在推理过程中就遵守宪法。
 
 ## 10.4.6 一个权衡的总结
 

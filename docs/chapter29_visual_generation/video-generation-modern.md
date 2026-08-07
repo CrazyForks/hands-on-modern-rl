@@ -102,7 +102,7 @@ DanceGRPO 在工业上已经替代 DDPO/DPOK 成为 diffusion RL 的默认选择
 
 ## 11.6.3 Seedance 与 字节跳动的视频生成旗舰
 
-[Seedance](https://seedance.bytedance.com/)（字节跳动，2025.03 发布，2025.10 升级 1.0 Pro）是中国视频生成 SOTA 之一。它在 VBench（视频生成 benchmark）上多次排名第一。
+[Seedance](https://seed.bytedance.com/)（字节跳动，2025.03 发布，2025.10 升级 1.0 Pro）是中国视频生成 SOTA 之一。它在 VBench（视频生成 benchmark）上多次排名第一。
 
 ### Seedance 的训练流程
 

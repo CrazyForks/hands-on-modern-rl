@@ -6,7 +6,7 @@ title: '6.5 Hands-On: BipedalWalker'
 
 > **Goal**: Train `BipedalWalker-v3` with A2C, observe how Actor-Critic handles high-dimensional continuous control — and understand why the next chapter needs PPO.
 
-> **Code**: [actor_critic_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/actor_critic_bipedalwalker.py) · [render_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/render_bipedalwalker.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/requirements.txt)
+> **Code**: [actor_critic_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/actor_critic_bipedalwalker.py) · [render_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/render_bipedalwalker.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/requirements.txt)
 
 The previous section's Pendulum had just 1 continuous action and a 3-dimensional state. BipedalWalker raises the complexity by an order of magnitude: a 24-dimensional state (joint angles, angular velocities, ground-contact sensors, etc.) and 4 continuous actions (two hip joints and two knee joints). The goal is to teach a bipedal robot to walk.
 
@@ -48,20 +48,20 @@ The real difficulty going from Pendulum to BipedalWalker is not just the state d
 Install dependencies:
 
 ```bash
-pip install -r code/chapter09_actor_critic/requirements.txt
+pip install -r code/chapter06_actor_critic/requirements.txt
 ```
 
 Quick smoke test:
 
 ```bash
-python code/chapter09_actor_critic/actor_critic_bipedalwalker.py \
+python code/chapter06_actor_critic/actor_critic_bipedalwalker.py \
   --total-timesteps 100000
 ```
 
 This section uses Stable-Baselines3's A2C implementation — the same algorithm as the Pendulum experiment, but adjusted for BipedalWalker's complexity: 16 parallel environments and a larger `[128, 128]` network. Run the full training:
 
 ```bash
-python code/chapter09_actor_critic/actor_critic_bipedalwalker.py \
+python code/chapter06_actor_critic/actor_critic_bipedalwalker.py \
   --total-timesteps 3000000
 ```
 
@@ -149,7 +149,7 @@ To get an intuitive feel for A2C's learning process, we compare the policy at th
 After training, use the rendering script to generate replay GIFs:
 
 ```bash
-python code/chapter09_actor_critic/render_bipedalwalker.py \
+python code/chapter06_actor_critic/render_bipedalwalker.py \
   --model output/actor_critic_bipedalwalker.zip \
   --output-dir output/bipedalwalker_a2c_episodes \
   --episodes 3 --seeds 0 1 2

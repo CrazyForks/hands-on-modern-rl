@@ -2,7 +2,7 @@
 
 > **本节目标**：用 REINFORCE 训练 `CartPole-v1`，观察策略梯度在高方差环境中的训练过程，理解"好结果强化动作概率"这件事在真实控制任务中的表现。
 
-> **本节代码**：[reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/requirements.txt)
+> **本节代码**：[reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
 
 上一节推导了策略梯度定理和 REINFORCE 算法。赌博机例子展示了最简情况——无状态、单步、只有两个动作。现在换一个更有代表性的任务：`CartPole-v1`。小车可以向左或向右推，目标是让杆子尽量久地保持竖直。每坚持一个时间步，环境给 `+1` 奖励；杆子倒得太厉害或者小车离开边界，episode 结束。
 
@@ -13,13 +13,13 @@
 先安装依赖：
 
 ```bash
-pip install -r code/chapter08_policy_gradient/requirements.txt
+pip install -r code/chapter05_policy_gradient/requirements.txt
 ```
 
 然后运行训练：
 
 ```bash
-python code/chapter08_policy_gradient/reinforce_cartpole.py
+python code/chapter05_policy_gradient/reinforce_cartpole.py
 ```
 
 这个脚本会训练一个 REINFORCE 策略，500 个 episode。核心代码只有三步：

@@ -68,11 +68,11 @@ $$\text{胜方} = J(x, s_1, s_2, \ldots, s_T) \in \{A, B\}$$
 2. **裁判能力上限**：人类裁判仍是瓶颈，复杂领域（量子物理）人类也无法裁决
 3. **陈述空间设计**：自由文本陈述难以保证"可验证性"
 
-Anthropic 在 2023-2024 年的实验（[arXiv:2311.14125](https://arxiv.org/abs/2311.14125)）显示，Debate 在 Quizbowl 等知识问答上确实能让弱裁判胜率从 60% 提升到 80%，但在更复杂任务上提升有限。Debate 至今未成为主流训练方法，但其理论框架影响深远——Constitutional AI 的 critique-revision 循环就是 Debate 的简化变体（[第 22 章 CAI](../chapter22_cai_rlvr)）。
+Anthropic 在 2023-2024 年的实验（[arXiv:2311.08702](https://arxiv.org/abs/2311.08702)）显示，Debate 在 Quizbowl 等知识问答上确实能让弱裁判胜率从 60% 提升到 80%，但在更复杂任务上提升有限。Debate 至今未成为主流训练方法，但其理论框架影响深远——Constitutional AI 的 critique-revision 循环就是 Debate 的简化变体（[第 22 章 CAI](../chapter22_cai_rlvr)）。
 
 ## 34.3 递归奖励建模
 
-OpenAI 在 2017-2018 提出 **Recursive Reward Modeling**（Leike et al., [arXiv:1810.08575](https://arxiv.org/abs/1810.08575)）：把"对人类来说太难的监督"分解成"对辅助 AI 来说可监督"的子任务，再递归下去。
+OpenAI 在 2017-2018 提出 **Recursive Reward Modeling**（Leike et al., [arXiv:1811.07871](https://arxiv.org/abs/1811.07871)）：把"对人类来说太难的监督"分解成"对辅助 AI 来说可监督"的子任务，再递归下去。
 
 ### 递归结构
 
@@ -99,7 +99,7 @@ $$\pi_{\text{strong}}(x) = \text{Combine}\big(\pi_{\text{weak}}(x_1), \pi_{\text
 
 $$\pi_{\text{weak}}^{(t+1)} = \text{Distill}\big(\pi_{\text{strong}}^{(t)}\big)$$
 
-递归若干次后，弱模型不断变强，但每一轮的监督源都是"自己（弱版）的协作版本"。这是 OpenAI Prover-Verifier Games（[arXiv:2407.00292](https://arxiv.org/abs/2407.00292)）的理论原型。
+递归若干次后，弱模型不断变强，但每一轮的监督源都是"自己（弱版）的协作版本"。这是 OpenAI Prover-Verifier Games（[arXiv:2407.13692](https://arxiv.org/abs/2407.13692)）的理论原型。
 
 ### 递归 RM 的局限
 
@@ -170,7 +170,7 @@ Weak-to-Strong 提供了一个**评估对齐方法上限**的实验框架。RLHF
 
 ## 34.5 红队测试方法论
 
-Scalable Oversight 解决"如何训练"，红队测试（Red Teaming）解决"如何发现漏洞"。Anthropic 在 2022 年的 **Red Teaming Language Models to Reduce Harms**（[arXiv:2202.03286](https://arxiv.org/abs/2202.03286)）系统化了 LLM 红队方法。
+Scalable Oversight 解决"如何训练"，红队测试（Red Teaming）解决"如何发现漏洞"。Anthropic 在 2022 年的 **Red Teaming Language Models to Reduce Harms**（[arXiv:2209.07858](https://arxiv.org/abs/2209.07858)）系统化了 LLM 红队方法。
 
 ### 三类红队测试
 
@@ -201,7 +201,7 @@ $$x^* = \arg\max_x \, \text{HarmScore}\big(\pi(x)\big)$$
 
 - **零样本生成**：让 LLM 列出 "prompt that would make a model output harmful content"
 - **少样本生成**：给 LLM 几个已知的失败案例，让它生成类似但不同的
-- **梯度引导**：对 prompt embedding 做梯度上升，最大化目标违规（[GBDA, arXiv:2104.08815](https://arxiv.org/abs/2104.08815)）
+- **梯度引导**：对 prompt embedding 做梯度上升，最大化目标违规（[GBDA, arXiv:2104.13733](https://arxiv.org/abs/2104.13733)）
 
 ```python
 # 梯度引导红队（白盒）
@@ -217,7 +217,7 @@ for step in range(1000):
 
 #### 3. Constitutionally-Generated Adversarial Data
 
-Anthropic 2024 提出 **Constitutionally-Generated Adversarial Examples**（[arXiv:2402.03283](https://arxiv.org/abs/2402.03283)）：用 Constitution AI 的规则反向生成违规 prompt：
+Anthropic 2024 提出 **Constitutionally-Generated Adversarial Examples**：用 Constitution AI 的规则反向生成违规 prompt：
 
 ```python
 # 用宪法反向生成
@@ -273,7 +273,7 @@ for prompt in dataset:
 
 $$x_{\text{attack}} = [\text{prefix tokens}] + [\text{learnable soft tokens}] + [\text{suffix tokens}]$$
 
-训练 soft tokens 最大化违规概率（[AutoPrompt, arXiv:2010.15906](https://arxiv.org/abs/2010.15906)）。
+训练 soft tokens 最大化违规概率（[AutoPrompt, arXiv:2010.15980](https://arxiv.org/abs/2010.15980)）。
 
 #### 3. 输出空间对抗
 
@@ -402,7 +402,7 @@ $$\mathbb{E}_{\pi^*}[J^*(s, a)] < \mathbb{E}_{\pi_{\text{optimal}}}[J^*(s, a)]$$
 
 $$x^* = \arg\max_x \, \big(R_\phi(\pi(x)) - J^*(\pi(x))\big)$$
 
-这是红队测试的特殊形式——专门找"奖励函数高估了的地方"。Anthropic 在 2024 年的工作（[arXiv:2406.18523](https://arxiv.org/abs/2406.18523)）用这个框架量化 reward model 的"漏洞密度"。
+这是红队测试的特殊形式——专门找"奖励函数高估了的地方"。Anthropic 在 2024 年的工作用这个框架量化 reward model 的"漏洞密度"。
 
 ### 检测 Exploration Hacking
 
@@ -454,12 +454,10 @@ $$\text{Diversity} = 1 - \frac{2}{n(n-1)} \sum_{i \neq j} \cos(\text{emb}(y_i), 
 ## 延伸阅读
 
 - [Irving et al. 2018 "AI Safety via Debate"](https://arxiv.org/abs/1805.00899)
-- [Leike et al. 2018 "Scalable Agent Alignment via Reward Modeling"](https://arxiv.org/abs/1810.08575)
+- [Leike et al. 2018 "Scalable Agent Alignment via Reward Modeling"](https://arxiv.org/abs/1811.07871)
 - [Christiano et al. 2018 "Supervising Strong Learners by Amplifying Weak Supervisors" (IDA)](https://arxiv.org/abs/1810.08575)
 - [Burns et al. 2023 "Weak-to-Strong Generalization"](https://arxiv.org/abs/2312.09390)
-- [Perez et al. 2022 "Red Teaming Language Models to Reduce Harms"](https://arxiv.org/abs/2202.03286)
-- [Anthropic 2024 "Constitutionally-Generated Adversarial Examples"](https://arxiv.org/abs/2402.03283)
-- [Anthropic 2023 "Debate on Quizbowl"](https://arxiv.org/abs/2311.14125)
-- [OpenAI 2024 "Prover-Verifier Games"](https://arxiv.org/abs/2407.00292)
-- [Anthropic 2024 "Sensitive Information Retrieval and Exploration Hacking"](https://arxiv.org/abs/2406.18523)
-- [Bowman et al. 2022 "Sandwiching: How to Use Weak Supervision for Strong Models"](https://arxiv.org/abs/2206.13395)
+- [Ganguli et al. 2022 "Red Teaming Language Models to Reduce Harms"](https://arxiv.org/abs/2209.07858)
+- [Michael et al. 2023 "Debate Helps Supervise Unreliable Experts"](https://arxiv.org/abs/2311.08702)
+- [OpenAI 2024 "Prover-Verifier Games Improve Legibility of LLM Outputs"](https://arxiv.org/abs/2407.13692)
+- [Bowman et al. 2022 "Measuring Progress on Scalable Oversight for Large Language Models"](https://arxiv.org/abs/2211.03540)

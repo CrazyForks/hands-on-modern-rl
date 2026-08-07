@@ -338,7 +338,7 @@ $$F(s, s') = \gamma \Phi(s') - \Phi(s)$$
 ![奖励塑形](./images/reward-shaping-concept.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>图 9：通过学习获得的奖励函数示例。智能体从稀疏的环境中学习到一个稠密的奖励信号（颜色越亮奖励越高），为策略训练提供了更丰富的梯度信息。来源：<a href="https://arxiv.org/abs/1907.02025" target="_blank" rel="noopener noreferrer">Singh et al., 2019</a></em>
+  <em>图 9：通过学习获得的奖励函数示例。智能体从稀疏的环境中学习到一个稠密的奖励信号（颜色越亮奖励越高），为策略训练提供了更丰富的梯度信息。来源：<a href="https://arxiv.org/abs/1904.07854" target="_blank" rel="noopener noreferrer">Singh et al., 2019</a></em>
 </div>
 
 但设计好的势能函数 $\Phi$ 本身就需要领域知识——你需要知道什么是"好的中间状态"。为了减少对人工设计的依赖，研究者发展了多种自动推断奖励的方法：

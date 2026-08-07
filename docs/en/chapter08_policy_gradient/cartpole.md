@@ -6,7 +6,7 @@ title: '5.3 Hands-On: Policy Gradient CartPole'
 
 > **Goal of this section**: Train `CartPole-v1` with REINFORCE, observe what policy gradients look like in a high-variance setting, and connect the slogan "good outcomes increase the probability of the actions that produced them" to a real control task.
 
-> **Code for this section**: [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/requirements.txt)
+> **Code for this section**: [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
 
 In the previous section, we derived the policy gradient theorem and the REINFORCE algorithm. The bandit example showed the simplest possible setting: no state, a single step, and only two actions.
 
@@ -19,13 +19,13 @@ Unlike a bandit, CartPole has state (a 4D vector: cart position, cart velocity, 
 Install dependencies first:
 
 ```bash
-pip install -r code/chapter08_policy_gradient/requirements.txt
+pip install -r code/chapter05_policy_gradient/requirements.txt
 ```
 
 Then run training:
 
 ```bash
-python code/chapter08_policy_gradient/reinforce_cartpole.py
+python code/chapter05_policy_gradient/reinforce_cartpole.py
 ```
 
 This script trains a REINFORCE policy for 500 episodes. The core code has only three steps:

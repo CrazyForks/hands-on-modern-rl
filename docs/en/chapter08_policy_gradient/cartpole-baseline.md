@@ -6,18 +6,18 @@ title: '5.5 Hands-On: Policy Gradient with Baseline'
 
 > **Goal of this section**: On `CartPole-v1`, compare vanilla REINFORCE against REINFORCE + Value Baseline, and observe how $V(s)$ can make policy-gradient training faster and more stable.
 
-> **Code for this section**: [reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/requirements.txt)
+> **Code for this section**: [reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
 
 In the previous two sections, we (1) ran vanilla REINFORCE end-to-end, and (2) derived, mathematically, why introducing a baseline reduces variance. In this section, we put them side by side and look at the practical effect of replacing $G_t$ with $G_t - V(s_t)$.
 
 ## Run The Comparison Experiment
 
 ```bash
-pip install -r code/chapter08_policy_gradient/requirements.txt
+pip install -r code/chapter05_policy_gradient/requirements.txt
 ```
 
 ```bash
-python code/chapter08_policy_gradient/reinforce_with_baseline.py
+python code/chapter05_policy_gradient/reinforce_with_baseline.py
 ```
 
 This script trains two policies:
@@ -39,7 +39,7 @@ After the script finishes, it will produce two figures:
 If you also want to export replay GIFs:
 
 ```bash
-python code/chapter08_policy_gradient/render_cartpole_baseline.py \
+python code/chapter05_policy_gradient/render_cartpole_baseline.py \
   --episodes 500 \
   --seed 0
 ```

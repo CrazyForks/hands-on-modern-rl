@@ -85,7 +85,7 @@ Claude 3 系列把 Constitution 从 40 条扩到 ~80 条，新增维度包括：
 - **减少过度回避**：增加原则 "拒绝请求应基于实际风险而非话题敏感度"。
 - **多语言对齐**：Constitution 翻译成 20+ 语言，但保留**单一英文 master 版本**作为 ground truth，避免翻译引入的价值漂移。
 
-工程上，Claude 3 用 **Constitutional Hindsight**（Bai et al. 2024 follow-up）：让模型对历史回答做"事后批评"，把这些批评作为额外的 SFT 数据。这相当于把部署数据闭环回训练。
+工程上，Claude 3 延续 Constitutional AI 的 critique-revision 循环（Bai et al. 2022）：让模型对历史回答做事后批评，把这些批评作为额外的 SFT 数据。这相当于把部署数据闭环回训练。
 
 ### Claude 3.5（2024-2025） 与 CAI 与 RLVR 的融合
 

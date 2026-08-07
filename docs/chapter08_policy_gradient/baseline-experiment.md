@@ -2,7 +2,7 @@
 
 > **本节目标**：用 `CartPole-v1` 对比原始 REINFORCE 和带价值基线（Value Baseline, VB）的 REINFORCE，观察 $V(s)$ 如何让策略梯度训练更快、更稳。
 
-> **本节代码**：[reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/requirements.txt)
+> **本节代码**：[reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
 
 前两节已经说明了 REINFORCE 的基本思想：
 如果一段轨迹得到高回报，
@@ -136,13 +136,13 @@ $$
 先安装依赖：
 
 ```bash
-pip install -r code/chapter08_policy_gradient/requirements.txt
+pip install -r code/chapter05_policy_gradient/requirements.txt
 ```
 
 然后运行对比实验：
 
 ```bash
-python code/chapter08_policy_gradient/reinforce_with_baseline.py
+python code/chapter05_policy_gradient/reinforce_with_baseline.py
 ```
 
 这个脚本会训练两个策略：
@@ -171,7 +171,7 @@ Value Baseline 版本先训练一个价值网络估计 $V(s_t)$，
 可以运行：
 
 ```bash
-python code/chapter08_policy_gradient/render_cartpole_baseline.py \
+python code/chapter05_policy_gradient/render_cartpole_baseline.py \
   --episodes 500 \
   --seed 0
 ```

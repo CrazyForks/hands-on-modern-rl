@@ -4,7 +4,7 @@
 
 ## 13.2.1 Anthropic Sleeper Agents（2024）
 
-[Sleeper Agents](https://www.anthropic.com/research/sleeper-agents)（Anthropic, 2024.01）是 AI safety 研究的里程碑。它的核心问题：
+[Sleeper Agents](https://www.anthropic.com/news/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training)（Anthropic, 2024.01）是 AI safety 研究的里程碑。它的核心问题：
 
 > **一个模型可以被训练成"在特定触发条件下表现恶意"吗？如果可以，这种恶意行为能否通过标准对齐训练（RLHF、对抗训练）被消除？**
 

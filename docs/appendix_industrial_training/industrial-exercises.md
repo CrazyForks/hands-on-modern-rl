@@ -292,9 +292,9 @@ OpenAI、Anthropic 这类岗位把 post-training 放在最终产品模型发布�
 
 [^tencent-hunyuan]: 牛企直聘转载腾讯官网岗位, "混元大语言模型后训练算法工程师", <https://jobs.niuqizp.com/job-vmU55NnaZ.html>
 
-[^mistral-forge]: Mistral AI, "Product Manager, Forge", <https://jobs.lever.co/mistral/11087966-f183-44b1-adc9-3a400c1f52ad>
+[^mistral-forge]: Mistral AI, "Product Manager, Forge"（职位已下线）
 
-[^mistral-ai4engineering]: Mistral AI, "Applied Scientist / Research Engineer, AI4Engineering - EMEA", <https://jobs.lever.co/mistral/249d0ec9-1824-41cb-8c4f-cb17a1d5d111>
+[^mistral-ai4engineering]: Mistral AI, "Applied Scientist / Research Engineer, AI4Engineering - EMEA"（职位已下线）
 
 [^helsing-rl]: Helsing, "AI Research Engineer - Reinforcement Learning", <https://helsing.ai/jobs/4676357101>
 

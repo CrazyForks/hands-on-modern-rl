@@ -6,7 +6,7 @@ title: '6.4 Hands-on: Pendulum Swing-Up and Balance'
 
 > **Goal of this section**: Train `Pendulum-v1` with A2C, understand why continuous-action Actor-Critic outputs a Gaussian distribution, and see how the Critic helps the Actor learn stable control in continuous spaces.
 
-> **Code for this section**: [actor_critic_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/actor_critic_pendulum.py) · [render_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/render_pendulum.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/requirements.txt)
+> **Code for this section**: [actor_critic_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/actor_critic_pendulum.py) · [render_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/render_pendulum.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/requirements.txt)
 
 Earlier in the chapter, we used CartPole and LunarLander to understand RL where the agent picks one of a few discrete actions. Those action spaces fit DQN naturally and are easy to explain via a Softmax policy: left, right, fire, or do nothing, each action with a clear probability.
 
@@ -148,20 +148,20 @@ The `critic_loss` pushes the Critic's estimate toward the TD target. The final `
 Install dependencies:
 
 ```bash
-pip install -r code/chapter09_actor_critic/requirements.txt
+pip install -r code/chapter06_actor_critic/requirements.txt
 ```
 
 A quick smoke test to confirm the script runs:
 
 ```bash
-python code/chapter09_actor_critic/actor_critic_pendulum.py \
+python code/chapter06_actor_critic/actor_critic_pendulum.py \
   --total-timesteps 20000
 ```
 
 This section's script uses Stable-Baselines3's **A2C (Advantage Actor-Critic)** implementation. A2C is still Actor-Critic: the Actor learns a continuous-action policy, the Critic learns $V(s)$. The engineering additions — parallel environments and return normalization — simply make this teaching experiment easier to reproduce. Run the full training:
 
 ```bash
-python code/chapter09_actor_critic/actor_critic_pendulum.py \
+python code/chapter06_actor_critic/actor_critic_pendulum.py \
   --total-timesteps 300000
 ```
 
@@ -184,7 +184,7 @@ cp output/actor_critic_pendulum_*.png docs/chapter09_actor_critic/images/
 After training, you can render a replay GIF:
 
 ```bash
-python code/chapter09_actor_critic/render_pendulum.py \
+python code/chapter06_actor_critic/render_pendulum.py \
   --model output/actor_critic_pendulum.zip \
   --output output/pendulum_actor_critic.gif
 ```

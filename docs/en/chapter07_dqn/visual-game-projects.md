@@ -150,10 +150,10 @@ ALE contains dozens of games with widely varying difficulty. This section choose
 
 ### Where Are Other Atari Games
 
-Beyond Pong, ALE provides Breakout, Space Invaders, Seaquest, and dozens of other games. After installing `gymnasium[atari,accept-rom-license]` and `ale-py`, they can be created via Gymnasium environment IDs.[^ale-complete-list] The training script remains `code/chapter07_dqn/dqn_atari_sb3.py`; changing games only requires changing `--env-id`:
+Beyond Pong, ALE provides Breakout, Space Invaders, Seaquest, and dozens of other games. After installing `gymnasium[atari,accept-rom-license]` and `ale-py`, they can be created via Gymnasium environment IDs.[^ale-complete-list] The training script remains `code/chapter04_dqn/dqn_atari_sb3.py`; changing games only requires changing `--env-id`:
 
 ```bash
-python code/chapter07_dqn/dqn_atari_sb3.py \
+python code/chapter04_dqn/dqn_atari_sb3.py \
   --env-id BreakoutNoFrameskip-v4 \
   --total-timesteps 5000000 \
   --learning-starts 100000 \
@@ -203,7 +203,7 @@ To judge learning quality, look at where the mean evaluation return falls: `-21`
 
 A common misconception needs clarification: **the paddle moving does not mean the agent has learned Pong**. A random policy or an early network may also move the paddle, but this is often just repeating the same action or coincidentally tracking a few frames. The real criterion is whether the mean return in multi-game deterministic evaluation consistently moves away from `-21` and gradually approaches and exceeds `0`.
 
-This section uses `PongNoFrameskip-v4` as the main experiment environment. This choice is not because `ALE/Pong-v5` cannot be trained, but to stay consistent with the validated Pong DQN pipeline in SB3 / RL-Zoo, reducing extra variance from environment version, default frame skipping, and sticky actions. The algorithm entry point is `code/chapter07_dqn/dqn_atari_sb3.py`, based on Stable-Baselines3's `DQN("CnnPolicy", ...)` implementation. This is no longer the hand-written CNN teaching snippet from earlier — it is a complete training script including Atari wrappers, experience replay, target network, evaluation callbacks, and model saving.
+This section uses `PongNoFrameskip-v4` as the main experiment environment. This choice is not because `ALE/Pong-v5` cannot be trained, but to stay consistent with the validated Pong DQN pipeline in SB3 / RL-Zoo, reducing extra variance from environment version, default frame skipping, and sticky actions. The algorithm entry point is `code/chapter04_dqn/dqn_atari_sb3.py`, based on Stable-Baselines3's `DQN("CnnPolicy", ...)` implementation. This is no longer the hand-written CNN teaching snippet from earlier — it is a complete training script including Atari wrappers, experience replay, target network, evaluation callbacks, and model saving.
 
 In this experiment, the orange paddle on the left is the opponent, and the green paddle on the right is the agent's side. This distinction is intuitive for human readers, but for DQN, the input is not a symbolic description like "left is opponent, right is self" — it is just pixels. After Atari wrappers, the image is first resized to 84×84 grayscale, then 4 consecutive frames are stacked and fed to the CNN in channel-first format. The action space is Pong's discrete joystick actions: `NOOP`, `FIRE`, `RIGHT`, `LEFT`, `RIGHTFIRE`, and `LEFTFIRE`. So what the network must learn is not memorizing "green means me," but recovering the ball's position, velocity, and direction from pixel positions, brightness, and motion changes on screen, and converting this information into stable defense and hitting actions.
 
@@ -214,10 +214,10 @@ Short Atari Pong experiments are only suitable for checking the pipeline: whethe
 ::: details Reproducing the Experiment and Exporting Assets
 
 ```bash
-pip install -r code/chapter07_dqn/requirements.txt
+pip install -r code/chapter04_dqn/requirements.txt
 
 # Long experiment aligned with the validated pipeline: observe whether eval return consistently rises above random level
-python code/chapter07_dqn/dqn_atari_sb3.py \
+python code/chapter04_dqn/dqn_atari_sb3.py \
   --env-id PongNoFrameskip-v4 \
   --total-timesteps 10000000 \
   --buffer-size 10000 \
@@ -240,13 +240,13 @@ Training logs will be written to `output/dqn_atari_long/PongNoFrameskip-v4_dqn_s
 tensorboard --logdir output/dqn_atari_long
 
 # Re-export local eval CSV as textbook images
-python code/chapter07_dqn/export_dqn_curves.py --run pong
+python code/chapter04_dqn/export_dqn_curves.py --run pong
 ```
 
 To render GIFs, use the same script with different checkpoints and output paths:
 
 ```bash
-python code/chapter07_dqn/render_atari.py \
+python code/chapter04_dqn/render_atari.py \
   --env-id PongNoFrameskip-v4 \
   --model output/dqn_atari_long/PongNoFrameskip-v4_dqn_seed0_10m_zoo_aligned/checkpoints/dqn_atari_500000_steps.zip \
   --output docs/chapter07_dqn/images/dqn-atari-pong-500k.gif \

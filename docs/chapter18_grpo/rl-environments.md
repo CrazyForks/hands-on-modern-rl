@@ -36,7 +36,7 @@ $$\text{吞吐量} = \frac{N_{\text{parallel\_sandboxes}}}{T_{\text{rollout}}}$$
 
 ## 23.2 Evals 与 RL Environments 的等价性
 
-[Pash 2025](https://blog.evalworkshop.com/) 提出一个被业界广泛接受的命题：
+Pash 2025 提出一个被业界广泛接受的命题：
 
 > **Evals = RL Environments**
 
@@ -306,7 +306,7 @@ results = ray.get(futures)
 
 ## 23.5 长程任务 Harness
 
-[Anthropic 2025.11 Effective Harnesses](https://www.anthropic.com/engineering/effective-harnesses) 总结了"如何让 agent 在 100+ 步长程任务中稳定工作"。核心结论：**harness（任务脚手架）的质量决定 agent 表现的上限**。
+[Anthropic 2025.11 Effective Harnesses](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) 总结了"如何让 agent 在 100+ 步长程任务中稳定工作"。核心结论：**harness（任务脚手架）的质量决定 agent 表现的上限**。
 
 ### Progress File 模式 与 `claude-progress.txt`
 
@@ -441,7 +441,7 @@ for step in range(n_steps):
 
 ### 异步模式
 
-[AReaL (arXiv:2505.24298)](https://arxiv.org/abs/2505.24298)、[AgentRL (arXiv:2510.04206)](https://arxiv.org/abs/2510.04206)、[slime](https://github.com/THUDM/slime)、[ROLL](https://github.com/alibaba/ROLL)、[LlamaRL](https://github.com/meta-llama/llama-rl) 等异步框架的思路：**rollout 和 training 解耦**，rollout actor 持续采样，trainer 用最新可用数据更新策略。
+[AReaL (arXiv:2505.24298)](https://arxiv.org/abs/2505.24298)、[AgentRL (arXiv:2510.04206)](https://arxiv.org/abs/2510.04206)、[slime](https://github.com/THUDM/slime)、[ROLL](https://github.com/alibaba/ROLL)、LlamaRL 等异步框架的思路：**rollout 和 training 解耦**，rollout actor 持续采样，trainer 用最新可用数据更新策略。
 
 ```python
 # 异步主循环（伪代码）
@@ -661,8 +661,8 @@ RL 环境质量差会导致一系列 alignment failures——策略学到 verifi
 
 ## 延伸阅读
 
-- [Pash 2025 "Evals = RL Environments"](https://blog.evalworkshop.com/)
-- [Anthropic 2025.11 "Effective Harnesses"](https://www.anthropic.com/engineering/effective-harnesses)
+- Pash 2025, "Evals = RL Environments"（博客已下线）
+- [Anthropic 2025.11 "Effective Harnesses"](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)
 - [Mechanize: RL Environments for All Digital Work](https://mechanize.dev/)
 - [AReaL: Asynchronous RL for LLMs (arXiv:2505.24298)](https://arxiv.org/abs/2505.24298)
 - [AgentRL: 多轮多任务 Agentic RL 框架 (arXiv:2510.04206)](https://arxiv.org/abs/2510.04206)

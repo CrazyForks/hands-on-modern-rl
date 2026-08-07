@@ -6,7 +6,7 @@ title: '5.3 Hands-on: Value Baseline on CartPole'
 
 > **Goal of this section**: On `CartPole-v1`, compare vanilla REINFORCE with REINFORCE plus a Value Baseline (VB), and observe how learning an estimate of $V(s)$ can make policy-gradient training faster and more stable.
 
-> **Code for this section**: [reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_policy_gradient/requirements.txt)
+> **Code for this section**: [reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
 
 In the previous two sections, we already established the core idea behind REINFORCE:
 if a trajectory achieves high return, then increase the probability of the actions taken along that trajectory.
@@ -103,13 +103,13 @@ it does not give the cart extra actions, but it makes the policy less likely to 
 First install the dependencies:
 
 ```bash
-pip install -r code/chapter08_policy_gradient/requirements.txt
+pip install -r code/chapter05_policy_gradient/requirements.txt
 ```
 
 Then run the comparison experiment:
 
 ```bash
-python code/chapter08_policy_gradient/reinforce_with_baseline.py
+python code/chapter05_policy_gradient/reinforce_with_baseline.py
 ```
 
 This script trains two policies:
@@ -136,7 +136,7 @@ The figures in this handout are exported by this script.
 If you also want to export replay GIFs, run:
 
 ```bash
-python code/chapter08_policy_gradient/render_cartpole_baseline.py \
+python code/chapter05_policy_gradient/render_cartpole_baseline.py \
   --episodes 500 \
   --seed 0
 ```

@@ -79,9 +79,9 @@ PEARL 在 Meta-World（50 个机器人任务）上仅用 5 步适应就能达到
 
 元 RL 与监督 few-shot learning 共享思想：**用大量相似任务训练先验，新任务上少量样本快速适应**。这一思想直接启发了 LLM 的 in-context learning——见下一节。
 
-## In-Context RL 与 Algorithm Distillation 与 Algorithm Distillation
+## In-Context RL 与 Algorithm Distillation
 
-RL² 的隐式"任务推断"在 transformer 时代迎来复兴。DeepMind 2022 的两篇论文——**Algorithm Distillation**（Laskin et al.）与 **Decision Pretrained Transformer**（Lee et al.）——证明：**transformer 的 in-context 能力可以蒸馏整个 RL 算法**。
+RL² 的隐式"任务推断"在 transformer 时代迎来复兴。DeepMind 2022 的 **Algorithm Distillation**（Laskin et al.）证明：**transformer 的 in-context 能力可以蒸馏整个 RL 算法**。
 
 ### 把 RL 历史当作序列建模
 
@@ -234,13 +234,12 @@ LLM 的 few-shot in-context learning 可以看作"**RL² 的零样本版本**"�
 
 ## 延伸阅读
 
-- [Pomerleau 1989 "ALVINN: An Autonomous Land Vehicle in a Neural Network"（最早的 BC）](https://papers.nips.cc/paper/95-alvinn-an-autonomous-land-vehicle-in-a-neural-network)
+- [Pomerleau 1989 "ALVINN: An Autonomous Land Vehicle in a Neural Network"（最早的 BC）](https://www.ri.cmu.edu/publications/alvinn-an-autonomous-land-vehicle-in-a-neural-network/)
 - [Ross, Gordon & Bagnell 2011 "A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning"（DAgger）](https://arxiv.org/abs/1011.0686)
 - [Ziebart et al. 2008 "Maximum Entropy Inverse Reinforcement Learning"](https://www.aaai.org/Papers/AAAI/2008/AAAI08-227.pdf)
 - [Ho & Ermon 2016 "Generative Adversarial Imitation Learning"（GAIL）](https://arxiv.org/abs/1606.03476)
 - [Finn, Abbeel & Levine 2017 "Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks"（MAML）](https://arxiv.org/abs/1703.03400)
 - [Duan et al. 2016 "RL²: Fast Reinforcement Learning via Slow Reinforcement Learning"](https://arxiv.org/abs/1611.02779)
 - [Rakelly et al. 2019 "Efficient Off-Policy Meta-Reinforcement Learning via Probabilistic Context Variables"（PEARL）](https://arxiv.org/abs/1903.08254)
-- [Laskin et al. 2022 "In-Context Reinforcement Learning with Algorithm Distillation"](https://arxiv.org/abs/2210.07139)
-- [Lee et al. 2022 "Decision Pretrained Transformer"](https://arxiv.org/abs/2206.15474)
+- [Laskin et al. 2022 "In-Context Reinforcement Learning with Algorithm Distillation"](https://arxiv.org/abs/2210.14215)
 - [Chen et al. 2021 "Decision Transformer: Reinforcement Learning via Sequence Modeling"](https://arxiv.org/abs/2106.01345)

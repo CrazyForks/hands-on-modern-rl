@@ -898,7 +898,7 @@ A very small but complete exercise is: use 5K math problems or 1K code-fix probl
 
 [^keye_vl]: [Kwai Keye-VL Technical Report](https://arxiv.org/abs/2507.01949)
 
-[^sensenova_u1]: [SenseNova U1](https://www.sensetime.com/en/news-detail/51170629?categoryId=1072)
+[^sensenova_u1]: [SenseNova U1](https://www.sensetime.com/en/news/51170629)
 
 [^spark_x1]: [Spark X1 deep reasoning model](https://news.cgtn.com/news/2025-01-15/China-releases-Spark-X1-deep-reasoning-model-that-packs-a-punch-1AbIq8PzzEI/index.html)
 

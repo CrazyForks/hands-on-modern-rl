@@ -875,7 +875,7 @@ def monitor_expert_balance(model):
 - [Sheng et al. 2024 "HybridFlow: A Flexible and Efficient RLHF Framework"](https://arxiv.org/abs/2409.19256)
 - [Hu et al. 2024 "OpenRLHF: An Easy-to-use, Scalable and High-performance RLHF Framework"](https://arxiv.org/abs/2405.11143)
 - [Kwon et al. 2023 "Efficient Memory Management for Large Language Model Serving with PagedAttention" (vLLM)](https://arxiv.org/abs/2309.06180)
-- [Rajaseharan et al. 2024 "SGLang"](https://arxiv.org/abs/2312.07104)
+- [Zheng et al. 2023 "SGLang"](https://arxiv.org/abs/2312.07104)
 - [Rajbhandari et al. 2020 "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models"](https://arxiv.org/abs/1910.02054)
 - [LlamaRL (Meta GenAI) 2025 "LlamaRL: A Distributed Asynchronous Reinforcement Learning Framework"](https://arxiv.org/abs/2505.24034)
 - [Fu et al. 2025 "AReaL: A Large-Scale Asynchronous Reinforcement Learning System for Language Reasoning"](https://arxiv.org/abs/2505.24298)

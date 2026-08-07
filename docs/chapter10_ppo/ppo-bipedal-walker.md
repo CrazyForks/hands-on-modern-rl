@@ -2,7 +2,7 @@
 
 > **本节目标**：训练 PPO 控制二足机器人在随机地形上行走，理解连续动作空间下的策略学习与离散动作的本质区别。
 
-> **本节代码**：[ppo_bipedal_walker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter10_ppo/ppo_bipedal_walker.py) · [render_bipedal_walker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter10_ppo/render_bipedal_walker.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter10_ppo/requirements.txt)
+> **本节代码**：[ppo_bipedal_walker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_ppo/ppo_bipedal_walker.py) · [render_bipedal_walker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_ppo/render_bipedal_walker.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_ppo/requirements.txt)
 
 前面几章我们已经用 CartPole 和 LunarLander 看过离散动作任务：策略只需要在几个动作里选一个。但现实中的控制问题——机器人关节扭矩、汽车油门刹车、无人机旋翼转速——通常都是**连续动作空间**。PPO 的一个核心优势是原生处理连续动作：策略网络直接输出高斯分布的均值和标准差，从中采样得到连续动作，不需要把动作空间离散化。BipedalWalker-v3 就是这样一个连续控制任务。
 
@@ -19,13 +19,13 @@ BipedalWalker 的任务是控制一个二足机器人在随机生成的地形上
 安装依赖：
 
 ```bash
-pip install -r code/chapter10_ppo/requirements.txt
+pip install -r code/chapter07_ppo/requirements.txt
 ```
 
 运行训练：
 
 ```bash
-python code/chapter10_ppo/ppo_bipedal_walker.py \
+python code/chapter07_ppo/ppo_bipedal_walker.py \
   --total-timesteps 2000000
 ```
 
@@ -202,7 +202,7 @@ print(f"最差一轮: {np.min(returns):.1f}")
 训练完成后，可以用渲染脚本生成回放 GIF：
 
 ```bash
-python code/chapter10_ppo/render_bipedal_walker.py \
+python code/chapter07_ppo/render_bipedal_walker.py \
   --model output/ppo_bipedal_walker.zip \
   --output-dir output/bipedalwalker_episodes \
   --episodes 10 --seeds 0 1 2 3 4 5 6 7 8 9
@@ -329,7 +329,7 @@ BipedalWalker 在教学上有几个关键优点：
 - `BipedalWalker-v3` 直接展示连续动作空间下的 PPO：4 维连续扭矩、24 维状态、随机地形。
 - PPO 通过高斯策略（输出均值和标准差，从中采样）原生支持连续动作，不需要离散化。
 - BipedalWalker 的学习过程通常经历"站立→挪步→行走"三个阶段，训练步数需求远高于常见离散动作任务。
-- 本节使用 Stable-Baselines3 的 PPO 实现，训练入口是 `code/chapter10_ppo/ppo_bipedal_walker.py`，回放 GIF 用 `render_bipedal_walker.py`。
+- 本节使用 Stable-Baselines3 的 PPO 实现，训练入口是 `code/chapter07_ppo/ppo_bipedal_walker.py`，回放 GIF 用 `render_bipedal_walker.py`。
 - 环境定义的"解决"标准是 100 回合平均奖励 $\geq$ 300；本节 2M 步训练达到 282.5 ± 59.7，大多数回合稳定在 290-299 区间。
 
 ## 参考文献

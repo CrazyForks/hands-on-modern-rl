@@ -2,7 +2,7 @@
 
 > **本节目标**：用 A2C 训练 `BipedalWalker-v3`，观察 Actor-Critic 处理高维连续控制的能力与局限——并理解为什么下一章需要 PPO。
 
-> **本节代码**：[actor_critic_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/actor_critic_bipedalwalker.py) · [render_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/render_bipedalwalker.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter09_actor_critic/requirements.txt)
+> **本节代码**：[actor_critic_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/actor_critic_bipedalwalker.py) · [render_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/render_bipedalwalker.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/requirements.txt)
 
 上一节的 Pendulum 只有 1 维连续动作、3 维状态。BipedalWalker 把复杂度提升了一个量级：24 维状态（关节角度、角速度、地面接触传感器等），4 维连续动作（髋关节和膝关节各两个），目标是让一个双足机器人学会走路。
 
@@ -44,20 +44,20 @@ BipedalWalker 的核心挑战是**协调**：4 个关节需要同时以正确的
 安装依赖：
 
 ```bash
-pip install -r code/chapter09_actor_critic/requirements.txt
+pip install -r code/chapter06_actor_critic/requirements.txt
 ```
 
 快速验证脚本能跑通：
 
 ```bash
-python code/chapter09_actor_critic/actor_critic_bipedalwalker.py \
+python code/chapter06_actor_critic/actor_critic_bipedalwalker.py \
   --total-timesteps 100000
 ```
 
 本节使用 Stable-Baselines3 的 A2C 实现，与上一节 Pendulum 实验相同的算法，但针对 BipedalWalker 的复杂度做了调整：16 个并行环境、`[128, 128]` 更大的网络。运行完整训练：
 
 ```bash
-python code/chapter09_actor_critic/actor_critic_bipedalwalker.py \
+python code/chapter06_actor_critic/actor_critic_bipedalwalker.py \
   --total-timesteps 3000000
 ```
 
@@ -145,7 +145,7 @@ model = A2C(
 训练完成后，可以用渲染脚本生成回放 GIF：
 
 ```bash
-python code/chapter09_actor_critic/render_bipedalwalker.py \
+python code/chapter06_actor_critic/render_bipedalwalker.py \
   --model output/actor_critic_bipedalwalker.zip \
   --output-dir output/bipedalwalker_a2c_episodes \
   --episodes 3 --seeds 0 1 2
