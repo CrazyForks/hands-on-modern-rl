@@ -8,9 +8,9 @@
 
 本节参考了火山引擎的 veRL Code Sandbox 教程[^volcengine-verl-code-sandbox]，具体参考了以下内容：
 
-- **训练配置**：Eurus-2-RL-Data 数据集 + Qwen2.5 系列模型 + PPO（GAE advantage 估计）的整体方案。
+- **训练配置**：Eurus-2-RL-Data 数据集（仅 code 样本）+ Qwen2.5 系列模型 + PPO（GAE advantage 估计）的整体方案。
 - **数据处理**：filter 超长 prompt、随机采样 1000 条训练数据的流程。
-- **Reward 设计思路**：格式检查 → 编译/语法检查 → 单元测试的三层验证结构。
+- **Reward 设计思路**：把模型生成的代码当独立程序，跑 stdin/stdout 测试算通过率（详见下文 Reward 函数设计）。
 - **评测方法与数据**：使用 EvalScope 在 GSM8K、HumanEval、LiveCodeBench 上的评测流程，以及 RL 训练前后的对比数据。
 
 火山引擎原始教程使用 VKE 集群 + SandboxFusion 云沙箱做大规模分布式训练。本节把这些方案适配到**本地 GPU 环境**：用子进程隔离代替云沙箱，用单卡/多卡脚本代替集群部署，保留相同的算法逻辑和参数配置。完整的工业级代码 Agent 实验放在 [10.5 用 rLLM 训练 DeepCoder Agent](../chapter22_agentic/rllm-deepcoder-lab)，那里更关注 AgentFlow 和 sandbox cookbook；本节更关注如何把代码 verifier 接进 veRL 训练框架。
@@ -99,79 +99,48 @@ pip install flash-attn --no-build-isolation
 
 ### 数据准备
 
-本节使用 [Eurus-2-RL-Data](https://huggingface.co/datasets/PRIME-RL/Eurus-2-RL-Data) 数据集，来自 PRIME-RL 项目，是一个专门为代码强化学习设计的数据集。每条样本包含一道编程题的完整信息：题目描述、函数签名和对应的测试用例。数据集已经分好了 train 和 validation 两个 split。
+本节使用 [Eurus-2-RL-Data](https://huggingface.co/datasets/PRIME-RL/Eurus-2-RL-Data) 数据集，来自 PRIME-RL 项目，是一个专门为强化学习设计的**数学 + 代码**推理数据集。
 
-第一步，下载数据并转为 veRL 要求的 parquet 格式：
+> **注意（issue #53）**：Eurus-2-RL-Data **没有** `entry_point`、`tests` 这类顶层字段。它的真实结构是 veRL 原生格式，验证信息存在 `reward_model` 列里：
+>
+> | 字段           | 含义                                                                 |
+> | -------------- | -------------------------------------------------------------------- |
+> | `prompt`       | chat 消息数组：`[{"role":"system",...}, {"role":"user",...}]`。system 是 PRIME 推理动作模板（`[ASSESS]`/`[ADVANCE]`/…），user 才是题目 |
+> | `ability`      | `"math"` 或 `"code"`，本实验只取 `code`                              |
+> | `reward_model` | `{"ground_truth": <答案>, "style": "rule"}`。code 样本的 `ground_truth` 是 JSON 字符串 `{"inputs": [...], "outputs": [...]}`，即 stdin/stdout 测试对 |
+> | `data_source`  | 题目来源：`codecontests` / `taco` / `apps` / `codeforces`            |
+> | `extra_info`   | `{"index": ..., "split": ...}`                                       |
 
-```python
-# download_data.py
-from datasets import load_dataset
-from pathlib import Path
+也就是说，这些 code 样本是**"读 stdin、写 stdout"的竞赛编程题**，不是"实现某个函数签名"的题目——所以没有 `entry_point`，测试也不是 assert 语句，而是输入输出对。reward 函数要把模型生成的代码当独立程序运行，喂入输入、比对输出。
 
-output_dir = Path.home() / "data" / "eurus2"
-output_dir.mkdir(parents=True, exist_ok=True)
+数据集已分好 split：train 48 万条（其中 `ability=="code"` 2.5 万条），validation 2048 条（其中 code 1024 条）。
 
-ds = load_dataset("PRIME-RL/Eurus-2-RL-Data")
+处理数据的脚本见 [code/chapter18_grpo/verl_code_rlvr/prepare_data.py](../../code/chapter18_grpo/verl_code_rlvr/prepare_data.py)，一键生成 veRL 需要的 parquet：
 
-for split in ["train", "validation"]:
-    df = ds[split].to_pandas()
-    df.to_parquet(output_dir / f"{split}.parquet")
-    print(f"{split}: {len(df)} 条样本，字段: {list(df.columns)}")
+```bash
+conda activate test
+python code/chapter18_grpo/verl_code_rlvr/prepare_data.py
 ```
 
-下载完成后，`~/data/eurus2/` 下会生成两个文件。先看一下数据长什么样：
+脚本做的事：
 
-```python
-import pandas as pd
+1. **过滤 code 样本**：`ability == "code"`，得到 2.5 万条代码题。
+2. **重建 prompt**：去掉 system 消息里的 PRIME 推理动作模板（对代码生成没有意义），只保留 user 的题目，重建为 **chat 消息格式** `[{"role":"system","content":"You are a competitive programming assistant."}, {"role":"user","content":"读 stdin 写 stdout 指令 + 题目"}]`。⚠️ 不要用纯文本字符串——veRL 会对 prompt 做 `apply_chat_template`，字符串会被丢弃（见下方字段表注意事项）。
+3. **过滤 + 采样**：过滤 prompt 超过 512 token 的样本（1 token ≈ 4 字符），然后随机采样 1000 条，存为 `~/data/eurus2/train1000.parquet`；validation 直接存为 `~/data/eurus2/validation.parquet`。
 
-df = pd.read_parquet("~/data/eurus2/train.parquet")
-print(f"训练集总条数: {len(df)}")
-print(f"字段列表: {list(df.columns)}")
-print(f"prompt 平均长度: {df['prompt'].str.len().mean():.0f}")
-print(f"prompt 最大长度: {df['prompt'].str.len().max():.0f}")
-
-# 看一条样本
-example = df.iloc[0]
-print(f"\n=== 样本 0 ===")
-print(f"prompt:\n{example['prompt'][:500]}...")
-print(f"\ntests:\n{str(example.get('tests', ''))[:300]}...")
-```
-
-第二步，处理数据。Eurus-2-RL-Data 的部分样本 prompt 非常长（超过 `max_prompt_length=512`），如果不做 filter，这些样本会被截断或报错。参考火山引擎教程的做法，过滤超长样本后随机采样 1000 条：
-
-```python
-# prepare_data.py — 过滤超长样本 + 随机采样
-import pandas as pd
-from pathlib import Path
-
-data_dir = Path.home() / "data" / "eurus2"
-
-df = pd.read_parquet(data_dir / "train.parquet")
-print(f"原始训练集: {len(df)} 条")
-
-# 过滤 prompt 超过 512 token 的样本
-# 1 token ≈ 4 字符
-MAX_PROMPT_CHARS = 512 * 4
-df = df[df["prompt"].str.len() < MAX_PROMPT_CHARS]
-print(f"过滤超长 prompt 后: {len(df)} 条")
-
-# 随机采样 1000 条（设置 random_state 确保可复现）
-n_samples = min(1000, len(df))
-subset_df = df.sample(n=n_samples, random_state=42)
-subset_df.to_parquet(data_dir / "train1000.parquet")
-print(f"已保存 {len(subset_df)} 条样本到 train1000.parquet")
-```
-
-处理完成后，`train1000.parquet` 就是我们的训练数据。数据里的每条样本至少包含：
+处理完成后，`train1000.parquet` 的列就是 veRL 原生格式：
 
 | 字段           | 含义                                 | 示例                                        |
 | -------------- | ------------------------------------ | ------------------------------------------- |
-| `prompt`       | 题目描述和输出格式要求               | "Write a function `two_sum(nums, target)`…" |
-| `entry_point`  | 需要实现的函数名                     | `"two_sum"`                                 |
-| `tests`        | 可执行测试用例（Python assert 语句） | `assert two_sum([2,7,11,15], 9) == [0,1]`   |
-| `ground_truth` | 可选，代码任务通常不直接用           | —                                           |
+| `prompt`       | **chat 消息列表**（system 指令 + user 题目） | `[{"role":"system","content":"You are a competitive programming assistant."}, {"role":"user","content":"Read the problem…"}]` |
+| `reward_model` | `{"ground_truth": I/O 测试 JSON, "style": "rule"}` | `'{"inputs": [...], "outputs": [...]}'` |
+| `data_source`  | 题目来源                             | `"codecontests"` / `"taco"` / `"apps"`      |
+| `ability`      | `"code"`                             | `"code"`                                    |
+| `extra_info`   | `{index, split}`                     | `{"index": 0, "split": "dummy"}`            |
 
-训练时模型只看到 `prompt`，reward 函数拿到模型回答后再调用 `tests` 做验证。这就是代码 RLVR 的核心——**reward 函数不评价文字风格，只评价代码能否跑通测试**。
+> **为什么 prompt 必须是 chat 消息格式，而不是纯文本？** veRL 的 RLHFDataset 会把 `prompt` 交给模型的 `apply_chat_template`。如果 `prompt` 是纯字符串，Qwen 的模板会直接丢弃内容，只生成 system + assistant 两个特殊 token（实测只有 24 个 token），模型根本看不到题目、reward 恒为 0。所以 `prepare_data.py` 重建 prompt 时用的是 `[{"role": "system", ...}, {"role": "user", ...}]` 结构。
+
+训练时模型只看到 `prompt`，veRL 会把 `reward_model.ground_truth` 传给 reward 函数做验证。这就是代码 RLVR 的核心——**reward 函数不评价文字风格，只评价代码能否跑通测试**。
 
 ## Reward 函数设计
 
@@ -186,16 +155,18 @@ print(f"已保存 {len(subset_df)} 条样本到 train1000.parquet")
 ````python
 import re
 
+_CODE_BLOCK_RE = re.compile(r"```(?:python)?\n(.*?)```", re.DOTALL)
+
 
 def extract_code(response: str) -> str:
     """从模型输出中提取 Python 代码块。
 
     模型通常输出类似这样的文本：
-        "这道题用哈希表解决：\n```python\ndef two_sum(nums, target):\n    ..."
+        "```python\nimport sys\n\nfor line in sys.stdin: ...```"
     我们只需要 ```python 和 ``` 之间的部分。
     如果模型没有用代码块格式输出，则把整个回答当作代码（兜底）。
     """
-    match = re.search(r"```(?:python)?\n(.*?)```", response, re.DOTALL)
+    match = _CODE_BLOCK_RE.search(response)
     if match:
         return match.group(1).strip()
     return response.strip()
@@ -203,182 +174,106 @@ def extract_code(response: str) -> str:
 
 如果模型没按格式输出代码块，`extract_code` 会把整个回答当作代码返回——但这通常会导致语法错误，reward 为 0。这本身就是一种训练信号，迫使模型学会用正确的格式输出代码。
 
-### 在隔离环境中运行测试
+### 运行 stdin/stdout 测试（I/O 验证）
 
-提取到代码后，下一步是运行测试。这里有一个关键的安全问题：模型生成的代码可能包含死循环、文件操作、网络请求等危险操作。不能直接在主进程中 `exec`，否则一条 `while True: pass` 就能让整个训练卡死。
+这里是本节和 8.7 节最大的差异。Eurus-2-RL-Data 的 code 样本**没有 `tests`（assert 语句）**，`reward_model.ground_truth` 是 JSON 字符串 `{"inputs": [...], "outputs": [...]}`——也就是**把生成的代码当独立程序跑**：对每个 input 喂入 stdin，比对 stdout 和期望 output。
 
-解决方案是用 `multiprocessing.Process` 在子进程中执行，配合超时机制：
+用 `subprocess` 起一个真实子进程执行，比 `exec` 更安全：完整进程隔离，模型写的死循环、文件操作、网络请求都影响不到训练进程：
 
 ```python
-import multiprocessing as mp
+import json
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
 
 
-def run_tests(code: str, tests: str, queue: mp.Queue) -> None:
-    """在独立进程中执行代码和测试。
+def run_io_tests(code: str, ground_truth_json: str, timeout_s: float = 10.0):
+    """把 code 作为独立程序运行，用 ground_truth 里的 inputs/outputs 测试。
 
-    流程：
-    1. exec(code, namespace) — 执行模型生成的代码，定义函数
-    2. exec(tests, namespace) — 执行测试用例，调用断言
-    3. 如果全部通过，通过 queue 传回 passed=True
-    4. 如果任何步骤出错，传回错误信息
-
-    注意：这里用 exec 而不是 subprocess，是因为我们需要在 Python
-    层面直接操作 namespace，而不是通过文件或命令行。代价是隔离性
-    不如 Docker 容器，但对训练实验够用。
+    返回 (pass_rate, 前几个测试的详细结果)。任何异常（语法错误、崩溃、
+    超时、输出不匹配）都只影响对应用例，不会中断打分。
     """
-    namespace = {}
+    tests = json.loads(ground_truth_json)
+    inputs, outputs = tests["inputs"], tests["outputs"]
+
+    with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as f:
+        f.write(code)
+        tmp_path = f.name
+
     try:
-        exec(code, namespace)
-        exec(tests, namespace)
-        queue.put({"passed": True, "error": ""})
-    except Exception as exc:
-        queue.put({"passed": False, "error": repr(exc)})
+        passed = 0
+        for inp, expected in zip(inputs, outputs):
+            try:
+                proc = subprocess.run(
+                    [sys.executable, tmp_path],
+                    input=inp, capture_output=True, text=True, timeout=timeout_s,
+                )
+                got = proc.stdout.strip()
+                if proc.returncode == 0 and got == expected.strip():
+                    passed += 1
+            except subprocess.TimeoutExpired:
+                pass  # 超时（死循环/低效代码）只算这一题不过
+        return passed / len(inputs)
+    finally:
+        Path(tmp_path).unlink(missing_ok=True)
 ```
 
-### 组合成完整的评分函数
-
-有了提取和执行，组合起来就是完整的评分函数：
-
-```python
-def score_code(response: str, tests: str, timeout_s: float = 3.0) -> float:
-    """对模型输出评分：提取代码 → 运行测试 → 返回分数。
-
-    返回 0/1 二值 reward：测试全过=1.0，否则=0.0。
-    如果 3 秒内没有执行完（死循环），强制 kill 并返回 0。
-    """
-    code = extract_code(response)
-
-    # 第一层 reward：格式检查
-    if not code:
-        return 0.0
-
-    # 创建子进程执行
-    queue = mp.Queue()
-    process = mp.Process(target=run_tests, args=(code, tests, queue))
-    process.start()
-    process.join(timeout=timeout_s)
-
-    # 超时处理：kill 子进程
-    if process.is_alive():
-        process.kill()
-        process.join()
-        return 0.0
-
-    if queue.empty():
-        return 0.0
-
-    result = queue.get()
-    return 1.0 if result["passed"] else 0.0
-```
-
-超时设为 3 秒。大部分 LeetCode 级别的函数实现都能在 1 秒内完成，3 秒已经留了余量。如果超时，说明模型可能写了死循环或极其低效的代码，直接返回 0 分。
+超时设为 10 秒。大部分竞赛题的单测都能在 1 秒内完成，10 秒留足了余量。如果超时，说明模型可能写了死循环或极其低效的代码，只扣这一题的分。
 
 ### 包装成 veRL 的 reward 接口
 
-veRL 的 reward 函数需要遵循统一的接口规范。`compute_score` 是 veRL 调用的入口函数：
+veRL 的 RewardManager（`verl/workers/reward_manager/naive.py`）调用 reward 函数的签名是：
 
 ```python
-from typing import Any
+score = self.compute_score(
+    data_source=data_source,   # 数据集 data_source 列
+    solution_str=response_str, # 模型生成的完整回答
+    ground_truth=ground_truth, # 数据集 reward_model["ground_truth"]
+    extra_info=extra_info,     # 数据集 extra_info 列
+)
+```
 
+所以 `compute_score` 要按这个签名写。返回 dict 时，veRL 以 `"score"` 作为 PPO 的主奖励，其余 key（`pass_rate`、`format`）会作为日志附加信息：
 
-def compute_score(reward_input: dict[str, Any], **kwargs) -> dict[str, float]:
+```python
+def compute_score(data_source, solution_str, ground_truth, extra_info=None):
     """veRL reward 入口函数。
 
-    veRL 会自动传入 reward_input 字典，包含：
-    - response: 模型生成的完整回答
-    - extra_info: 数据集中的附加信息（包含 tests 字段）
-    - ground_truth: 标准答案（代码任务通常不用）
+    Args:
+        data_source: 数据集来源（codecontests/taco/apps/codeforces）
+        solution_str: 模型生成的完整回答（markdown 文本）
+        ground_truth: reward_model["ground_truth"]，code 样本是 I/O 测试的 JSON 字符串
+        extra_info: 数据集 extra_info 列（本数据集只有 index/split，未使用）
 
-    返回字典中：
-    - overall: PPO 使用的总奖励
-    - pass_rate: 测试通过率（用于日志分析）
-    - format: 是否提取到代码（用于日志分析）
+    Returns:
+        {"score": pass_rate, "pass_rate": pass_rate, "format": 是否提取到代码}
     """
-    response = reward_input["response"]
-    extra_info = reward_input.get("extra_info", {})
-    tests = extra_info.get("tests", "")
+    match = _CODE_BLOCK_RE.search(solution_str)
+    format_ok = 1.0 if match else 0.0
+    code = extract_code(solution_str)
+    if not code:
+        return {"score": 0.0, "pass_rate": 0.0, "format": 0.0}
 
-    score = score_code(response, tests)
-    return {
-        "overall": score,
-        "pass_rate": score,
-        "format": 1.0 if extract_code(response) else 0.0,
-    }
+    pass_rate, _ = run_io_tests(code, ground_truth)
+    return {"score": pass_rate, "pass_rate": pass_rate, "format": format_ok}
 ```
 
 ### 完整代码
 
-把上面四步合在一起就是完整的 reward 文件：
+完整文件见 [code/chapter18_grpo/verl_code_rlvr/code_reward.py](../../code/chapter18_grpo/verl_code_rlvr/code_reward.py)。可以直接自检（不依赖训练环境）：
 
-````python
-# code_reward.py
-# 代码生成 RLVR 的 reward 函数
-# veRL 通过 custom_reward_function 配置加载
+```bash
+python code/chapter18_grpo/verl_code_rlvr/code_reward.py
+```
 
-import multiprocessing as mp
-import re
-from typing import Any
+输出示例：
 
-REWARD_NAME = "code_rlvr"
-REWARD_TYPE = "sequential"
-
-
-def extract_code(response: str) -> str:
-    """从模型输出中提取 Python 代码块。"""
-    match = re.search(r"```(?:python)?\n(.*?)```", response, re.DOTALL)
-    if match:
-        return match.group(1).strip()
-    return response.strip()
-
-
-def run_tests(code: str, tests: str, queue: mp.Queue) -> None:
-    """在独立进程中执行代码和测试。"""
-    namespace = {}
-    try:
-        exec(code, namespace)
-        exec(tests, namespace)
-        queue.put({"passed": True, "error": ""})
-    except Exception as exc:
-        queue.put({"passed": False, "error": repr(exc)})
-
-
-def score_code(response: str, tests: str, timeout_s: float = 3.0) -> float:
-    """对模型输出评分：提取代码 → 运行测试 → 返回分数。"""
-    code = extract_code(response)
-
-    if not code:
-        return 0.0
-
-    queue = mp.Queue()
-    process = mp.Process(target=run_tests, args=(code, tests, queue))
-    process.start()
-    process.join(timeout=timeout_s)
-
-    if process.is_alive():
-        process.kill()
-        process.join()
-        return 0.0
-
-    if queue.empty():
-        return 0.0
-
-    result = queue.get()
-    return 1.0 if result["passed"] else 0.0
-
-
-def compute_score(reward_input: dict[str, Any], **kwargs) -> dict[str, float]:
-    """veRL reward 入口。"""
-    response = reward_input["response"]
-    extra_info = reward_input.get("extra_info", {})
-    tests = extra_info.get("tests", "")
-
-    score = score_code(response, tests)
-    return {
-        "overall": score,
-        "pass_rate": score,
-        "format": 1.0 if extract_code(response) else 0.0,
-    }
-````
+```
+正确代码 -> score=1.00 pass_rate=1.00 format=1
+错误代码 -> score=0.00 pass_rate=0.00 format=1
+无代码   -> score=0.00 pass_rate=0.00 format=0
+```
 
 这个 reward 函数的核心思想是：**不评价文字风格，只评价代码能否跑通测试**。模型写了再长的解释，如果代码跑不通，reward 就是 0。这种硬信号比 RM 的软分数可靠得多。
 
@@ -386,177 +281,47 @@ def compute_score(reward_input: dict[str, Any], **kwargs) -> dict[str, float]:
 
 训练代码模型时，prompt 要尽量约束输出格式。早期不要让模型自由写长解释，否则 verifier 需要花很多精力抽取代码。
 
-````text
-You are a competitive programming assistant.
+Eurus-2-RL-Data 的 code 样本是"读 stdin、写 stdout"的竞赛题，**没有** `entry_point`/`problem_statement` 这种字段拆分。`prepare_data.py` 重建 prompt 时用 **chat 消息格式**（见 [prepare_data.py](../../code/chapter18_grpo/verl_code_rlvr/prepare_data.py) 里的 `CODE_GEN_SYSTEM` / `CODE_GEN_USER_TEMPLATE`）：
 
-Solve the following problem in Python.
-Return only one Python code block.
-
-Function name: {entry_point}
-
-Problem:
-{problem_statement}
-
-Your answer:
-```python
-```
+````json
+[
+  {"role": "system", "content": "You are a competitive programming assistant."},
+  {"role": "user", "content": "Read the problem below and write a Python solution that reads from stdin and writes to stdout.\nReturn only one Python code block, with no explanations.\n\nProblem:\n{problem}"}
+]
 ````
 
-如果要训练 Chat 模型，可以把系统提示和用户题目分开；如果要训练 base coder，则可以直接拼成纯文本 prompt。关键是保持训练和评测模板一致。
+其中 `{problem}` 是数据集 user 消息里的题目（保留 Input/Output 格式说明和示例）。相比文档早期的方案，这里去掉了 `Function name: {entry_point}`——因为这类题目不要求实现某个函数签名，而是要求程序自己读 stdin 并写 stdout。
+
+**为什么必须是 chat 格式？** veRL 会把 `prompt` 交给 `apply_chat_template`。纯文本字符串会被 Qwen 模板直接丢弃（只留下 system + assistant 特殊 token），模型看不到题目。所以即使训练 base coder，也建议保持 chat 结构，让模板能正确拼出完整 prompt。关键是保持训练和评测模板一致。
 
 ## 单卡训练脚本
 
-基于 8.7 节的 veRL PPO 脚本结构，适配代码生成任务。整体框架不变，关键差异有三处：数据集换成 Eurus-2-RL-Data、reward 函数换成代码验证、`max_response_length` 从 256 增大到 512（代码回答通常比数学推理更长）。
+基于 8.7 节的 veRL PPO 脚本结构，适配代码生成任务。整体框架不变，关键差异有三处：数据集换成 Eurus-2-RL-Data（只取 code 样本）、reward 函数换成代码验证、`max_response_length` 从 256 增大到 512（代码回答通常比数学推理更长）。
 
-脚本的设计思路和 8.7 节完全一致：所有参数通过环境变量设置默认值，需要调整时不用改脚本，直接在命令行覆盖就行。
+脚本的设计思路和 8.7 节完全一致：所有参数通过环境变量设置默认值，需要调整时不用改脚本，直接在命令行覆盖就行。完整脚本见 [code/chapter18_grpo/verl_code_rlvr/run_qwen_coder_ppo_single_gpu.sh](../../code/chapter18_grpo/verl_code_rlvr/run_qwen_coder_ppo_single_gpu.sh)。
+
+和 8.7 节 GSM8K 脚本相比，本节新增的关键配置是 **Reward 接线**——不配 `custom_reward_function` 的话 reward 根本不会生效（这是文档早期版本漏掉的）：
 
 ```bash
-#!/bin/bash
-# run_qwen_coder_ppo_single_gpu.sh
-# PPO | Eurus-2 代码生成 | 单卡 | Qwen2.5-Coder-0.5B
-
-set -xeuo pipefail
-
-# ==================== 可调参数 ====================
-# Qwen2.5-Coder 是代码专用变体，比通用 Instruct 更适合代码任务
-MODEL_PATH=${MODEL_PATH:-Qwen/Qwen2.5-Coder-0.5B-Instruct}
-CRITIC_MODEL_PATH=${CRITIC_MODEL_PATH:-$MODEL_PATH}  # Critic 从同一模型初始化
-
-# 硬件设置
-NNODES=${NNODES:-1}
-NDEVICES_PER_NODE=${NDEVICES_PER_NODE:-1}
-
-# 训练参数
-# batch_size=128 表示每步从 128 个 prompt 中采样回答
-# mini_batch=64 表示 PPO 更新时分 2 个 mini-batch（128/64）
-TRAIN_BATCH_SIZE=${TRAIN_BATCH_SIZE:-128}
-PPO_MINI_BATCH_SIZE=${PPO_MINI_BATCH_SIZE:-64}
-
-# 序列长度
-# 代码任务的 max_response_length 需要比 GSM8K 大（512 vs 256）
-# 因为一个函数实现通常比一道数学题的推理过程更长
-MAX_PROMPT_LENGTH=${MAX_PROMPT_LENGTH:-512}
-MAX_RESPONSE_LENGTH=${MAX_RESPONSE_LENGTH:-512}
-
-# 学习率
-# Actor lr 比 Critic lr 小一个量级，这是 PPO 的常见实践
-# Actor 需要保守更新，Critic 需要快速学会 value function
-ACTOR_LR=${ACTOR_LR:-1e-6}
-CRITIC_LR=${CRITIC_LR:-1e-5}
-
-# 推理参数
-# vLLM 张量并行度，单卡=1
-ROLLOUT_TP=${ROLLOUT_TP:-1}
-# vLLM 预分配显存比例，单卡需要和训练模型共享显存
-ROLLOUT_GPU_MEM_UTIL=${ROLLOUT_GPU_MEM_UTIL:-0.4}
-# 每个 prompt 生成几条回答（PPO 组大小）
-ROLLOUT_N=${ROLLOUT_N:-1}
-
-# 训练控制
-TOTAL_EPOCHS=${TOTAL_EPOCHS:-20}
-SAVE_FREQ=${SAVE_FREQ:-20}
-TEST_FREQ=${TEST_FREQ:-5}
-
-# 数据路径
-TRAIN_FILE=${TRAIN_FILE:-$HOME/data/eurus2/train1000.parquet}
-VAL_FILE=${VAL_FILE:-$HOME/data/eurus2/validation.parquet}
-
-EXPERIMENT_NAME=${EXPERIMENT_NAME:-coder_ppo_eurus2_$(date +%Y%m%d_%H%M)}
-# ==================== 可调参数结束 ====================
-
-# ---- 数据配置 ----
-# filter_overlong_prompts=True: 过滤超过 max_prompt_length 的样本
-# truncation='error': 超长样本直接报错而不是截断，防止训练数据被静默截断
-DATA=(
-    algorithm.adv_estimator=gae
-    data.train_files="['$TRAIN_FILE']"
-    data.val_files="['$VAL_FILE']"
-    data.train_batch_size=${TRAIN_BATCH_SIZE}
-    data.max_prompt_length=${MAX_PROMPT_LENGTH}
-    data.max_response_length=${MAX_RESPONSE_LENGTH}
-    data.filter_overlong_prompts=True
-    data.truncation='error'
+# ---- Reward 配置 ----
+# 用 code_reward.py 做规则奖励（跑 stdin/stdout 测试），不训练 Reward Model
+# 这是本节和 8.7 节最大的不同：reward 来自代码执行验证，而不是预训练的 RM
+REWARD=(
+    reward_model.enable=False
+    custom_reward_function.path="$REWARD_FILE"
+    custom_reward_function.name=compute_score
 )
-
-# ---- 模型配置 ----
-# enable_gradient_checkpointing=True: 用时间换显存，单卡必备
-# use_remove_padding=True: 去掉 padding token 的冗余计算
-MODEL=(
-    actor_rollout_ref.model.path="$MODEL_PATH"
-    actor_rollout_ref.model.use_remove_padding=True
-    actor_rollout_ref.model.enable_gradient_checkpointing=True
-)
-
-# ---- Actor 配置 ----
-# clip_ratio=0.2: PPO 标准裁剪范围，限制策略更新幅度
-# param_offload=False: 单卡不开启参数卸载（卸载到 CPU 更慢）
-ACTOR=(
-    actor_rollout_ref.actor.optim.lr=${ACTOR_LR}
-    actor_rollout_ref.actor.ppo_mini_batch_size=${PPO_MINI_BATCH_SIZE}
-    actor_rollout_ref.actor.use_dynamic_bsz=True
-    actor_rollout_ref.actor.ppo_max_token_len_per_gpu=16384
-    actor_rollout_ref.actor.clip_ratio=0.2
-    actor_rollout_ref.actor.fsdp_config.param_offload=False
-    actor_rollout_ref.actor.fsdp_config.optimizer_offload=False
-)
-
-# ---- Rollout 配置 ----
-# name=vllm: 使用 vLLM 做 continuous batching 推理
-# gpu_memory_utilization=0.4: vLLM 只用 40% 显存，剩下的给训练
-ROLLOUT=(
-    actor_rollout_ref.rollout.name=vllm
-    actor_rollout_ref.rollout.tensor_model_parallel_size=${ROLLOUT_TP}
-    actor_rollout_ref.rollout.gpu_memory_utilization=${ROLLOUT_GPU_MEM_UTIL}
-    actor_rollout_ref.rollout.n=${ROLLOUT_N}
-)
-
-# ---- Reference 配置 ----
-# param_offload=True: Reference 是冻结的，可以卸载到 CPU 省显存
-REF=(
-    actor_rollout_ref.ref.log_prob_use_dynamic_bsz=True
-    actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=16384
-    actor_rollout_ref.ref.fsdp_config.param_offload=True
-)
-
-# ---- Critic 配置 ----
-# Critic 学习率比 Actor 高一个量级（1e-5 vs 1e-6）
-# Critic 需要快速收敛才能给 Actor 提供准确的 advantage 估计
-CRITIC=(
-    critic.model.path="$CRITIC_MODEL_PATH"
-    critic.model.use_remove_padding=True
-    critic.model.enable_gradient_checkpointing=True
-    critic.optim.lr=${CRITIC_LR}
-    critic.use_dynamic_bsz=True
-    critic.ppo_max_token_len_per_gpu=16384
-    critic.fsdp.param_offload=False
-    critic.fsdp.optimizer_offload=False
-)
-
-# ---- Trainer 配置 ----
-TRAINER=(
-    trainer.balance_batch=True
-    trainer.critic_warmup=0
-    trainer.logger='["console","wandb"]'
-    trainer.project_name=verl_ppo_code
-    trainer.experiment_name=${EXPERIMENT_NAME}
-    trainer.n_gpus_per_node=${NDEVICES_PER_NODE}
-    trainer.nnodes=${NNODES}
-    trainer.save_freq=${SAVE_FREQ}
-    trainer.test_freq=${TEST_FREQ}
-    trainer.total_epochs=${TOTAL_EPOCHS}
-)
-
-# ---- 启动训练 ----
-python3 -m verl.trainer.main_ppo \
-    "${DATA[@]}" \
-    "${MODEL[@]}" \
-    "${ACTOR[@]}" \
-    "${ROLLOUT[@]}" \
-    "${REF[@]}" \
-    "${CRITIC[@]}" \
-    "${TRAINER[@]}" \
-    "$@"
 ```
+
+其中 `$REWARD_FILE` 默认指向和脚本同目录的 `code_reward.py`，`custom_reward_function.name=compute_score` 告诉 veRL 调用 `code_reward.py` 里的 `compute_score` 函数。启动训练时把 `${REWARD[@]}` 加进 `main_ppo` 的参数列表：
+
+```bash
+python3 -m verl.trainer.main_ppo \
+    "${DATA[@]}" "${MODEL[@]}" "${ACTOR[@]}" "${ROLLOUT[@]}" \
+    "${REF[@]}" "${CRITIC[@]}" "${REWARD[@]}" "${TRAINER[@]}" "$@"
+```
+
+脚本其余部分（数据、模型、Actor/Reference/Critic、Trainer 配置）和 8.7 节基本一致。
 
 ### 配置解读
 
@@ -564,10 +329,11 @@ python3 -m verl.trainer.main_ppo \
 
 | 配置项                | GSM8K（8.7 节） | 代码生成（本节） | 原因                           |
 | --------------------- | --------------- | ---------------- | ------------------------------ |
-| 数据集                | GSM8K 数学题    | Eurus-2-RL-Data  | 代码任务需要函数签名和测试用例 |
-| reward 函数           | `gsm8k_reward`  | `code_reward`    | 代码需要提取 + 执行 + 测试     |
+| 数据集                | GSM8K 数学题    | Eurus-2-RL-Data（仅 code 样本） | 代码任务需要可验证的测试用例 |
+| reward 函数           | `gsm8k_reward`  | `code_reward`    | 代码需要提取 + 运行 stdin/stdout 测试 |
 | `max_response_length` | 256             | 512              | 代码回答通常比数学推理更长     |
 | 基座模型              | Qwen2.5-0.5B    | Qwen2.5-Coder    | 代码生成用 coder 变体效果更好  |
+| reward 接线           | —               | `custom_reward_function` | 代码 reward 是自定义函数，必须显式接线 |
 
 其他参数（学习率、clip_ratio、GAE 等）和 8.7 节保持一致——它们是 PPO 的算法参数，不随任务类型变化。
 
@@ -580,17 +346,17 @@ python3 -m verl.trainer.main_ppo \
 | Actor      | `actor_rollout_ref.actor.*`    | 可训练策略，生成候选代码并更新     |
 | Reference  | `actor_rollout_ref.ref.*`      | 冻结的 SFT 模型，计算 KL 约束      |
 | Critic     | `critic.*`                     | 可训练价值函数，GAE 估计 advantage |
-| RM/Reward  | `code_reward.py:compute_score` | 代码验证：提取 + 执行 + 测试       |
+| RM/Reward  | `code_reward.py:compute_score` | 代码验证：提取 + 子进程跑 stdin/stdout 测试 |
 
-关键区别是最后一行：8.7 节用数学答案匹配（抽取数字做数值比较），本节用代码执行验证（提取代码 → 子进程运行 → 断言测试）。reward 信号都是 0/1 二值，但代码 reward 的工程复杂度更高。
+关键区别是最后一行：8.7 节用数学答案匹配（抽取数字做数值比较），本节用代码执行验证（提取代码 → 子进程运行 → 比对输入输出）。reward 信号按测试通过率给 0~1 的分数，但代码 reward 的工程复杂度更高。
 
 ## 启动训练
 
 ### 直接运行脚本
 
 ```bash
-chmod +x run_qwen_coder_grpo_single_gpu.sh
-bash run_qwen_coder_grpo_single_gpu.sh
+chmod +x run_qwen_coder_ppo_single_gpu.sh
+bash run_qwen_coder_ppo_single_gpu.sh
 ```
 
 ### 通过环境变量覆盖参数
@@ -600,7 +366,7 @@ bash run_qwen_coder_grpo_single_gpu.sh
 MODEL_PATH=Qwen/Qwen2.5-Coder-1.5B-Instruct \
 TRAIN_BATCH_SIZE=64 \
 PPO_MINI_BATCH_SIZE=16 \
-bash run_qwen_coder_grpo_single_gpu.sh
+bash run_qwen_coder_ppo_single_gpu.sh
 ```
 
 ```bash
@@ -609,7 +375,7 @@ NNODES=1 NDEVICES_PER_NODE=8 \
 TRAIN_BATCH_SIZE=1024 \
 PPO_MINI_BATCH_SIZE=256 \
 ROLLOUT_TP=2 \
-bash run_qwen_coder_grpo_single_gpu.sh
+bash run_qwen_coder_ppo_single_gpu.sh
 ```
 
 Ray 会在 `main_ppo` 内自动初始化。单卡场景下，所有 worker 在同一张 GPU 上交替执行；多卡时 Ray 自动分配，不需要手动管理集群。
@@ -619,11 +385,13 @@ Ray 会在 `main_ppo` 内自动初始化。单卡场景下，所有 worker 在�
 训练开始后，终端会输出关键指标：
 
 ```
-[Step 1]  train | reward/overall=0.03 | reward/pass_rate=0.03 | reward/format=0.15 | kl=0.000
-[Step 5]  val   | reward/overall=0.08 | reward/pass_rate=0.08
-[Step 6]  train | reward/overall=0.12 | reward/pass_rate=0.12 | reward/format=0.45 | kl=0.002
-[Step 10] val   | reward/overall=0.21 | reward/pass_rate=0.21
+[Step 1]  train | reward/score=0.03 | reward/pass_rate=0.03 | reward/format=0.15 | kl=0.000
+[Step 5]  val   | reward/score=0.08 | reward/pass_rate=0.08
+[Step 6]  train | reward/score=0.12 | reward/pass_rate=0.12 | reward/format=0.45 | kl=0.002
+[Step 10] val   | reward/score=0.21 | reward/pass_rate=0.21
 ```
+
+> 指标名用的是 `reward/score`（即 `compute_score` 返回字典里的 `score` 键，veRL 以它作为 PPO 主奖励），`pass_rate` 和 `format` 是额外的日志指标。
 
 注意 `format` 指标通常比 `pass_rate` 先上升——模型先学会"按格式输出代码块"，然后才逐渐学会"写出能通过测试的代码"。这是代码 RLVR 的典型训练动态。
 

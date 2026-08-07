@@ -23,6 +23,7 @@ docs/public/optimized/
 !docs/**/*.png
 output/
 code/**/output/
+code/**/outputs/
 code/**/*.zip
 code/**/dpo_results/
 code/**/sft_results/
