@@ -4,6 +4,10 @@ title: Course Overview
 
 # Course Overview
 
+::: warning 📣 Announcement
+We sincerely thank everyone for your support of this tutorial! A new version is coming soon. Many sections are still being organized and refined, so we appreciate your patience. Suggestions and feedback are always welcome!
+:::
+
 ::: info Note
 We hope this open-source tutorial gives more people the courage to push toward the frontier of intelligence, tackling ever more problems on the path to AGI.
 

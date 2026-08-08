@@ -31,9 +31,9 @@
   </p>
 </div>
 
-> **📣 公告**
+> **📣 Announcement**
 >
-> 感谢大家对教程的支持！近期将会有版本更新，目前很多内容还在整理和完善中，请大家多点耐心。也欢迎大家多提建议。
+> We sincerely thank everyone for your support of this tutorial! A new version is coming soon. Many sections are still being organized and refined, so we appreciate your patience. Suggestions and feedback are always welcome!
 
 ## Course Preview
 
