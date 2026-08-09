@@ -1295,19 +1295,19 @@ watch(
           class="ct-sidebar-groups-button"
           type="button"
           title="全部展开"
+          aria-label="全部展开"
           @click="expandAllSidebarGroups"
         >
-          <UnfoldVertical :size="14" :stroke-width="2" aria-hidden="true" />
-          <span>展开</span>
+          <UnfoldVertical :size="16" :stroke-width="2" aria-hidden="true" />
         </button>
         <button
           class="ct-sidebar-groups-button"
           type="button"
           title="全部折叠"
+          aria-label="全部折叠"
           @click="collapseAllSidebarGroups"
         >
-          <FoldVertical :size="14" :stroke-width="2" aria-hidden="true" />
-          <span>折叠</span>
+          <FoldVertical :size="16" :stroke-width="2" aria-hidden="true" />
         </button>
       </div>
     </template>
@@ -2296,15 +2296,13 @@ watch(
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  padding: 5px 12px;
-  font-size: 12px;
-  line-height: 1;
-  font-weight: 500;
+  width: 30px;
+  height: 30px;
+  padding: 0;
   color: var(--vp-c-text-2);
   background: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 999px;
+  border-radius: 8px;
   cursor: pointer;
   transition:
     color 0.2s,
@@ -2320,6 +2318,6 @@ watch(
 }
 
 .ct-sidebar-groups-button:active {
-  transform: scale(0.96);
+  transform: scale(0.92);
 }
 </style>
