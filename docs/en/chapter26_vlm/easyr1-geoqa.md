@@ -2,7 +2,7 @@
 title: '11.5 Hands-On: Train GeoQA Geometry Reasoning with EasyR1'
 ---
 
-# 9.5 Hands-On: Train GeoQA Geometry Reasoning with EasyR1
+# 9.5 Hands-on: Train GeoQA Geometry Reasoning with EasyR1
 
 In Section 11.1 we wrote a VLM GRPO training loop by hand -- a few dozen lines of code running on synthetic data. In this section we change posture: we use the industrial-grade framework [EasyR1](https://github.com/hiyouga/EasyR1) to train a VLM for geometry reasoning on the real dataset GeoQA-8K.
 

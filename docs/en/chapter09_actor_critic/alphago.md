@@ -2,7 +2,7 @@
 title: '6.4 Hands-On: Reproducing AlphaGo'
 ---
 
-# 6.4 Hands-On: Reproducing AlphaGo
+# 6.4 Hands-on: Reproducing AlphaGo
 
 After learning policy gradients and Actor-Critic, we already have two weapons in hand:
 the **policy network** (deciding where to play next; review: [policy $\pi_\theta(a|s)$](../chapter08_policy_gradient/reinforce))

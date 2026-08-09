@@ -2,7 +2,7 @@
 title: '22.5 Hands-On: rLLM DeepCoder'
 ---
 
-# 20.4 Hands-On: Training a DeepCoder Agent with rLLM
+# 20.8 Hands-on: Training a DeepCoder Agent with rLLM
 
 The previous sections covered the conceptual framework of Agentic RL—rollouts, credit assignment, tool use, and evaluation. Now it is time for hands-on work: **use an industrial-grade framework (rLLM) to run the full RL training pipeline for a code-generation agent—from what the data looks like, to how training runs, to how to judge whether the results are good or bad.**
 

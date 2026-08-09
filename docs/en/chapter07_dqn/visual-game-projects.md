@@ -3,7 +3,7 @@ outline:
   level: [2, 3]
 ---
 
-# 4.5 Hands-On: Visual Game Projects
+# 4.5 Hands-on: Visual Game Projects
 
 The previous sections have discussed DQN's three core components separately: the Q-network estimates action values, experience replay breaks sample correlation, and the target network stabilizes TD targets. Section 4.3 placed these components into a LunarLander experiment: observing real training, evaluation returns, replay animations, training curves, Q-values, and ablation studies. By this point, low-dimensional state tasks have served their pedagogical purpose: they let us see clearly how DQN learns action values between 8 numbers and 4 discrete actions.
 

@@ -1,4 +1,4 @@
-# 20.4 动手：用 rLLM 训练 DeepCoder Agent
+# 20.8 动手：用 rLLM 训练 DeepCoder Agent
 
 前面几节讨论了 Agentic RL 的概念框架——rollout、信用分配、工具调用、评测体系。现在是动手时间：**用一个工业级框架（rLLM），从头到尾跑通"代码生成 Agent 的 RL 训练"全流程——从数据长什么样，到训练怎么跑，到结果怎么判断好还是不好。**
 

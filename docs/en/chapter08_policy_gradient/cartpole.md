@@ -2,7 +2,7 @@
 title: '5.3 Hands-On: Policy Gradient CartPole'
 ---
 
-# 5.3 Hands-On: Policy Gradient CartPole
+# 5.3 Hands-on: Policy Gradient CartPole
 
 > **Goal of this section**: Train `CartPole-v1` with REINFORCE, observe what policy gradients look like in a high-variance setting, and connect the slogan "good outcomes increase the probability of the actions that produced them" to a real control task.
 

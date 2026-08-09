@@ -2,7 +2,7 @@
 title: '22.5 Hands-On: Financial QA Agent'
 ---
 
-# 20.5 Hands-On: Training a Financial Analysis Agent with rLLM
+# 20.9 Hands-on: Training a Financial Analysis Agent with rLLM
 
 In the previous section, DeepCoder showed a typical code post-training case: the model writes code, a sandbox runs tests, and test results provide verifiable reward. That example is rigorous but has a prerequisite: code-task reward is clean, while real business tasks are rarely so simple.
 

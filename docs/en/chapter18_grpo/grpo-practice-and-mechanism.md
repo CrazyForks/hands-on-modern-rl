@@ -2,7 +2,7 @@
 title: 9.2 GRPO Training and Core Mechanisms
 ---
 
-# 7.3 Hands-on: GRPO Training and Core Mechanisms
+# 7.3 GRPO Training and Core Mechanisms
 
 In the previous chapter, we studied DPO theory and practice and saw that it can learn directly from fixed preference data: under the same prompt, the chosen answer should become more likely than the rejected answer. Now we return to **online training**. The model no longer only reads preference pairs labeled by someone else. During training, it generates its own answers, receives feedback, and uses that feedback to update itself.
 

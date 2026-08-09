@@ -1,4 +1,4 @@
-# 20.7 Hands-On: Building an Agentic RL Training System from Scratch
+# 20.10 Hands-on: Building an Agentic RL Training System from Scratch
 
 In Sections 22.1 and 10.2, we discussed the decision framework and environment interaction design for Agentic RL. In Sections 22.3 through 10.5, we analyzed the architectures of frameworks such as OpenRLHF, veRL, and Relax. This section starts from those discussions and turns the concepts into a runnable implementation.
 

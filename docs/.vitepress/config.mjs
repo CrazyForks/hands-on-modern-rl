@@ -796,6 +796,10 @@ const zhSidebar = {
             {
               text: '5.4 动手：LunarLander / Atari 实验',
               link: '/chapter07_dqn/lunar-lander'
+            },
+            {
+              text: '5.5 动手：视觉游戏项目',
+              link: '/chapter07_dqn/visual-game-projects'
             }
           ]
         },
@@ -818,6 +822,22 @@ const zhSidebar = {
             {
               text: '6.3 策略梯度改进',
               link: '/chapter08_policy_gradient/pg-improvements'
+            },
+            {
+              text: '6.4 动手：摇骰子赌博机',
+              link: '/chapter08_policy_gradient/dice-game'
+            },
+            {
+              text: '6.5 动手：策略梯度实战 CartPole',
+              link: '/chapter08_policy_gradient/cartpole'
+            },
+            {
+              text: '6.6 动手：Value Baseline 平衡小车挑战',
+              link: '/chapter08_policy_gradient/baseline-experiment'
+            },
+            {
+              text: '6.7 动手：带基线的策略梯度',
+              link: '/chapter08_policy_gradient/cartpole-baseline'
             }
           ]
         },
@@ -836,6 +856,14 @@ const zhSidebar = {
             {
               text: '7.3 动手：Pendulum 实验',
               link: '/chapter09_actor_critic/pendulum'
+            },
+            {
+              text: '7.4 动手：AlphaGo 复现',
+              link: '/chapter09_actor_critic/alphago'
+            },
+            {
+              text: '7.5 动手：BipedalWalker 双足行走',
+              link: '/chapter09_actor_critic/bipedalwalker'
             }
           ]
         },
@@ -858,6 +886,10 @@ const zhSidebar = {
             {
               text: '8.4 长程任务实验',
               link: '/chapter10_ppo/rl-long-horizon-planning'
+            },
+            {
+              text: '8.5 动手：BipedalWalker 连续控制',
+              link: '/chapter10_ppo/ppo-bipedal-walker'
             }
           ]
         },
@@ -1024,6 +1056,10 @@ const zhSidebar = {
             {
               text: '15.3 DPO 原理、数学与家族选型',
               link: '/chapter17_dpo/dpo-theory-and-family'
+            },
+            {
+              text: '15.4 动手：DPO 对齐实验',
+              link: '/chapter17_dpo/dpo-hands-on'
             }
           ]
         },
@@ -1184,6 +1220,18 @@ const zhSidebar = {
             {
               text: '20.7 多智能体协作与 Agent Swarm',
               link: '/chapter22_agentic/multi-agent-swarm'
+            },
+            {
+              text: '20.8 动手：用 rLLM 训练 DeepCoder Agent',
+              link: '/chapter22_agentic/rllm-deepcoder-lab'
+            },
+            {
+              text: '20.9 动手：用 rLLM 训练金融分析 Agent',
+              link: '/chapter22_agentic/rllm-finqa-lab'
+            },
+            {
+              text: '20.10 动手：从零实现一个 Agentic RL 训练系统',
+              link: '/chapter22_agentic/build-agentic-training-system'
             }
           ]
         },
@@ -1752,6 +1800,10 @@ const enSidebar = {
             {
               text: '5.4 Hands-on: LunarLander / Atari Experiments',
               link: '/en/chapter07_dqn/lunar-lander'
+            },
+            {
+              text: '5.5 Hands-on: Visual Game Projects',
+              link: '/en/chapter07_dqn/visual-game-projects'
             }
           ]
         },
@@ -1774,6 +1826,22 @@ const enSidebar = {
             {
               text: '6.3 Policy Gradient Improvements',
               link: '/en/chapter08_policy_gradient/pg-improvements'
+            },
+            {
+              text: '6.4 Hands-on: A Two-Armed Bandit (Dice-Game Slot Machine)',
+              link: '/en/chapter08_policy_gradient/dice-game'
+            },
+            {
+              text: '6.5 Hands-on: Policy Gradient CartPole',
+              link: '/en/chapter08_policy_gradient/cartpole'
+            },
+            {
+              text: '6.6 Hands-on: Value Baseline for the CartPole Challenge',
+              link: '/en/chapter08_policy_gradient/baseline-experiment'
+            },
+            {
+              text: '6.7 Hands-on: Policy Gradient with a Baseline',
+              link: '/en/chapter08_policy_gradient/cartpole-baseline'
             }
           ]
         },
@@ -1792,6 +1860,14 @@ const enSidebar = {
             {
               text: '7.3 Hands-on: Pendulum Experiments',
               link: '/en/chapter09_actor_critic/pendulum'
+            },
+            {
+              text: '7.4 Hands-on: Reproducing AlphaGo',
+              link: '/en/chapter09_actor_critic/alphago'
+            },
+            {
+              text: '7.5 Hands-on: BipedalWalker',
+              link: '/en/chapter09_actor_critic/bipedalwalker'
             }
           ]
         },
@@ -1814,6 +1890,10 @@ const enSidebar = {
             {
               text: '8.4 Long-Horizon Task Experiments',
               link: '/en/chapter10_ppo/rl-long-horizon-planning'
+            },
+            {
+              text: '8.5 Hands-on: BipedalWalker Continuous Control',
+              link: '/en/chapter10_ppo/ppo-bipedal-walker'
             }
           ]
         },
@@ -1964,6 +2044,10 @@ const enSidebar = {
             {
               text: '15.3 DPO Theory, Math & Family Selection',
               link: '/en/chapter17_dpo/dpo-theory-and-family'
+            },
+            {
+              text: '15.4 Hands-on: A DPO Alignment Experiment',
+              link: '/en/chapter17_dpo/dpo-hands-on'
             }
           ]
         },
@@ -2099,6 +2183,18 @@ const enSidebar = {
             },
             {
               text: '20.7 Multi-Agent Collaboration & Agent Swarm (Translation pending)'
+            },
+            {
+              text: '20.8 Hands-on: Training a DeepCoder Agent with rLLM',
+              link: '/en/chapter22_agentic/rllm-deepcoder-lab'
+            },
+            {
+              text: '20.9 Hands-on: Training a Financial Analysis Agent with rLLM',
+              link: '/en/chapter22_agentic/rllm-finqa-lab'
+            },
+            {
+              text: '20.10 Hands-on: Building an Agentic RL Training System from Scratch',
+              link: '/en/chapter22_agentic/build-agentic-training-system'
             }
           ]
         },

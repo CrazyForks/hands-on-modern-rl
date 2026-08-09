@@ -2,7 +2,7 @@
 title: '4.3 Hands-On: LunarLander'
 ---
 
-# 4.3 Hands-On: LunarLander
+# 4.3 Hands-on: LunarLander
 
 > **Goal of this section**: start from a reproducible experiment, train DQN on `LunarLander-v3`, and use evaluation curves, replay GIFs, and failure diagnosis to answer the only question that matters: what did the policy actually learn?
 

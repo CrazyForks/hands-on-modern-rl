@@ -2,7 +2,7 @@
 title: '5.5 Hands-On: Policy Gradient with Baseline'
 ---
 
-# 5.5 Hands-On: Policy Gradient with a Baseline
+# 5.5 Hands-on: Policy Gradient with a Baseline
 
 > **Goal of this section**: On `CartPole-v1`, compare vanilla REINFORCE against REINFORCE + Value Baseline, and observe how $V(s)$ can make policy-gradient training faster and more stable.
 

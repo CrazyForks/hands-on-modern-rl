@@ -2,7 +2,7 @@
 title: '7.1 Hands-On: BipedalWalker Continuous Control'
 ---
 
-# 5.1 Hands-On: BipedalWalker Continuous Control
+# 5.1 Hands-on: BipedalWalker Continuous Control
 
 > **Goal of this section**: Train PPO to control a bipedal robot to walk over randomized terrain, and understand what really changes when we move from discrete actions to continuous actions.
 
