@@ -97,7 +97,8 @@ const alternateLanguageLink = computed(() => {
 
   const enPath =
     mobileRoutePath.value === '/' ? '/en/' : `/en${mobileRoutePath.value}`
-  return withBase(enPath)
+  const englishRoutes = theme.value.englishRoutes || []
+  return withBase(englishRoutes.includes(enPath) ? enPath : '/en/')
 })
 const alternateLanguageShort = computed(() =>
   isEnglishRoute.value ? '中' : 'EN'
@@ -1277,7 +1278,11 @@ watch(
                     >
                       <img
                         src="https://github.com/walkinglabs/.github/raw/main/profile/wechat.png"
-                        alt="WalkingLab 微信二维码"
+                        :alt="
+                          isEnglishRoute
+                            ? 'WalkingLab community QR code'
+                            : 'WalkingLab 微信二维码'
+                        "
                         loading="lazy"
                         decoding="async"
                         @load="updateSupportQrRatio"
@@ -1341,7 +1346,9 @@ watch(
 
     <template #nav-screen-content-after>
       <div class="ct-mobile-language-switcher">
-        <div class="ct-mobile-language-title">切换语言</div>
+        <div class="ct-mobile-language-title">
+          {{ isEnglishRoute ? 'Change language' : '切换语言' }}
+        </div>
         <div class="ct-mobile-language-options">
           <span class="ct-mobile-language-current">
             {{ currentLanguage }}
@@ -1372,7 +1379,15 @@ watch(
         class="ct-sidebar-toggle-btn"
         :class="{ collapsed: sidebarCollapsed }"
         type="button"
-        :aria-label="sidebarCollapsed ? '展开目录' : '收起目录'"
+        :aria-label="
+          isEnglishRoute
+            ? sidebarCollapsed
+              ? 'Expand sidebar'
+              : 'Collapse sidebar'
+            : sidebarCollapsed
+              ? '展开目录'
+              : '收起目录'
+        "
         @click="toggleSidebar"
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -1406,7 +1421,7 @@ watch(
       <div
         v-if="routeLoading"
         class="ct-route-loading"
-        aria-label="页面加载中"
+        :aria-label="isEnglishRoute ? 'Loading page' : '页面加载中'"
         aria-live="polite"
       >
         <span class="ct-route-loading-spinner" aria-hidden="true"></span>
@@ -1421,36 +1436,44 @@ watch(
         class="ct-mermaid-viewer"
         role="dialog"
         aria-modal="true"
-        aria-label="查看图表"
+        :aria-label="isEnglishRoute ? 'View diagram' : '查看图表'"
         @click.self="closeMermaidViewer"
       >
         <div class="ct-mermaid-viewer-toolbar">
           <div class="ct-mermaid-viewer-help">
             <strong>{{ mermaidViewerScaleLabel }}</strong>
-            <span>滚轮缩放 · 拖拽移动 · + / - 缩放 · 0 重置 · Esc 关闭</span>
+            <span>
+              {{
+                isEnglishRoute
+                  ? 'Wheel to zoom · Drag to pan · + / - to zoom · 0 to reset · Esc to close'
+                  : '滚轮缩放 · 拖拽移动 · + / - 缩放 · 0 重置 · Esc 关闭'
+              }}
+            </span>
           </div>
           <div class="ct-mermaid-viewer-actions">
             <button
               type="button"
-              aria-label="缩小图表"
+              :aria-label="isEnglishRoute ? 'Zoom out' : '缩小图表'"
               @click="zoomMermaidViewer(-MERMAID_VIEWER_SCALE_STEP)"
             >
               -
             </button>
-            <button type="button" @click="resetMermaidViewerZoom">重置</button>
+            <button type="button" @click="resetMermaidViewerZoom">
+              {{ isEnglishRoute ? 'Reset' : '重置' }}
+            </button>
             <button
               type="button"
-              aria-label="放大图表"
+              :aria-label="isEnglishRoute ? 'Zoom in' : '放大图表'"
               @click="zoomMermaidViewer(MERMAID_VIEWER_SCALE_STEP)"
             >
               +
             </button>
             <button
               type="button"
-              aria-label="关闭图表"
+              :aria-label="isEnglishRoute ? 'Close diagram' : '关闭图表'"
               @click="closeMermaidViewer"
             >
-              关闭
+              {{ isEnglishRoute ? 'Close' : '关闭' }}
             </button>
           </div>
         </div>

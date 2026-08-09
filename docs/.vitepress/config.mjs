@@ -2676,6 +2676,39 @@ function compactCourseSidebar(sidebar, groups) {
   )
 }
 
+function removeUnlinkedSidebarPlaceholders(sidebar) {
+  const retainLinkedItems = (items) =>
+    items.filter((item) => {
+      if (item.items) {
+        item.items = retainLinkedItems(item.items)
+      }
+
+      return Boolean(item.link || item.items?.length)
+    })
+
+  Object.keys(sidebar).forEach((routePrefix) => {
+    sidebar[routePrefix] = retainLinkedItems(sidebar[routePrefix])
+  })
+}
+
+function collectEnglishRoutes(directory, relativeDirectory = '') {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const relativePath = path.posix.join(relativeDirectory, entry.name)
+    const absolutePath = path.join(directory, entry.name)
+
+    if (entry.isDirectory()) {
+      return collectEnglishRoutes(absolutePath, relativePath)
+    }
+
+    if (!entry.isFile() || !entry.name.endsWith('.md')) return []
+
+    const routePath = relativePath.replace(/\.md$/, '').replace(/\/index$/, '/')
+    return [routePath === 'index' ? '/en/' : `/en/${routePath}`]
+  })
+}
+
+const englishRoutes = collectEnglishRoutes(path.join(docsRoot, 'en'))
+
 compactCourseSidebar(zhSidebar, [
   {
     chapter: '13.',
@@ -2815,6 +2848,8 @@ compactCourseSidebar(enSidebar, [
   }
 ])
 
+removeUnlinkedSidebarPlaceholders(enSidebar)
+
 const logger = createLogger()
 const originalWarn = logger.warn
 logger.warn = (msg, options) => {
@@ -2916,6 +2951,7 @@ export default defineConfig({
       title: 'Hands-on Modern RL',
       description: '现代强化学习实战——从代码到原理',
       themeConfig: {
+        englishRoutes,
         nav: zhNav,
         sidebar: zhSidebar,
         editLink: {
@@ -2961,6 +2997,7 @@ export default defineConfig({
       description:
         'Modern Reinforcement Learning in Practice — From Code to Theory',
       themeConfig: {
+        englishRoutes,
         nav: enNav,
         sidebar: enSidebar,
         editLink: {
@@ -2968,12 +3005,12 @@ export default defineConfig({
           text: 'Edit this page on GitHub'
         },
         footer: {
-          message: '现代强化学习实战课程',
+          message: 'Hands-on Modern Reinforcement Learning',
           copyright: 'Copyright © WalkingLabs'
         },
         outline: {
           level: [2, 3],
-          label: '大纲'
+          label: 'On this page'
         },
         lastUpdated: {
           text: 'Last updated'
