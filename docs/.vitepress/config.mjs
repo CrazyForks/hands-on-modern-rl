@@ -1668,7 +1668,7 @@ const enSidebar = {
               link: '/en/chapter01_cartpole/metrics'
             },
             {
-              text: '1.3 PPO Training Visualization (Translation pending)'
+              text: '1.3 Hands-on: PPO Training Visualization (Translation pending)'
             }
           ]
         },
@@ -1706,7 +1706,7 @@ const enSidebar = {
               link: '/en/chapter03_mdp/value-q'
             },
             {
-              text: '3.3 Value Function Experiments (Translation pending)'
+              text: '3.3 Hands-on: Value Function Experiments (Translation pending)'
             }
           ]
         },
@@ -1750,7 +1750,7 @@ const enSidebar = {
               link: '/en/chapter07_dqn/dqn-components'
             },
             {
-              text: '5.4 LunarLander / Atari Experiments',
+              text: '5.4 Hands-on: LunarLander / Atari Experiments',
               link: '/en/chapter07_dqn/lunar-lander'
             }
           ]
@@ -1790,7 +1790,7 @@ const enSidebar = {
               link: '/en/chapter09_actor_critic/actor-critic'
             },
             {
-              text: '7.3 Pendulum Experiments',
+              text: '7.3 Hands-on: Pendulum Experiments',
               link: '/en/chapter09_actor_critic/pendulum'
             }
           ]
@@ -1925,7 +1925,7 @@ const enSidebar = {
               link: '/en/chapter15_rlhf/evaluation'
             },
             {
-              text: '13.7 veRL PPO on GSM8K',
+              text: '13.7 Hands-on: veRL PPO on GSM8K',
               link: '/en/chapter15_rlhf/verl-ppo-gsm8k'
             }
           ]
@@ -2164,10 +2164,10 @@ const enSidebar = {
               link: '/en/chapter26_vlm/vlm-grpo-hands-on'
             },
             {
-              text: '24.3 Multimodal Frontiers (Translation pending)'
+              text: '24.3 Hands-on: Multimodal Frontiers (Translation pending)'
             },
             {
-              text: '24.4 GeoQA Geometric Reasoning Experiment',
+              text: '24.4 Hands-on: GeoQA Geometric Reasoning Experiment',
               link: '/en/chapter26_vlm/easyr1-geoqa'
             }
           ]
