@@ -8,7 +8,15 @@ import {
   PopoverRoot,
   PopoverTrigger
 } from 'reka-ui'
-import { HandHeart, MessageCircle, Moon, Settings, Sun } from 'lucide-vue-next'
+import {
+  FoldVertical,
+  HandHeart,
+  MessageCircle,
+  Moon,
+  Settings,
+  Sun,
+  UnfoldVertical
+} from 'lucide-vue-next'
 import ReadingProgress from './components/ReadingProgress.vue'
 import SidebarFooter from './components/SidebarFooter.vue'
 import TextType from './components/TextType.vue'
@@ -1278,22 +1286,28 @@ watch(
     </template>
 
     <template v-if="showDocChrome" #sidebar-nav-before>
-      <div class="ct-sidebar-groups-toolbar">
+      <div
+        class="ct-sidebar-groups-toolbar"
+        role="group"
+        aria-label="侧边栏分组控制"
+      >
         <button
           class="ct-sidebar-groups-button"
           type="button"
+          title="全部展开"
           @click="expandAllSidebarGroups"
         >
-          <span class="ct-sidebar-groups-icon" aria-hidden="true">⤢</span>
-          全部展开
+          <UnfoldVertical :size="14" :stroke-width="2" aria-hidden="true" />
+          <span>展开</span>
         </button>
         <button
           class="ct-sidebar-groups-button"
           type="button"
+          title="全部折叠"
           @click="collapseAllSidebarGroups"
         >
-          <span class="ct-sidebar-groups-icon" aria-hidden="true">⤡</span>
-          全部折叠
+          <FoldVertical :size="14" :stroke-width="2" aria-hidden="true" />
+          <span>折叠</span>
         </button>
       </div>
     </template>
@@ -2264,30 +2278,39 @@ watch(
   }
 }
 
-/* 侧边栏「全部展开 / 全部折叠」工具栏 */
+/* 侧边栏「展开全部 / 折叠全部」工具栏 */
 .ct-sidebar-groups-toolbar {
   display: flex;
-  gap: 6px;
-  padding: 4px 16px 8px;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--vp-c-divider);
+  background: linear-gradient(
+    to bottom,
+    var(--vp-c-bg-alt),
+    transparent
+  );
 }
 
 .ct-sidebar-groups-button {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 12px;
   font-size: 12px;
   line-height: 1;
+  font-weight: 500;
   color: var(--vp-c-text-2);
-  background: transparent;
+  background: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  border-radius: 999px;
   cursor: pointer;
   transition:
-    color 0.25s,
-    border-color 0.25s,
-    background-color 0.25s;
+    color 0.2s,
+    border-color 0.2s,
+    background-color 0.2s,
+    transform 0.15s;
 }
 
 .ct-sidebar-groups-button:hover {
@@ -2296,8 +2319,7 @@ watch(
   background-color: var(--vp-c-brand-soft);
 }
 
-.ct-sidebar-groups-icon {
-  font-size: 13px;
-  line-height: 1;
+.ct-sidebar-groups-button:active {
+  transform: scale(0.96);
 }
 </style>
