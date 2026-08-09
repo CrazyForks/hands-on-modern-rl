@@ -3,7 +3,7 @@ title: '11.5 Hands-On: Train GeoQA Geometry Reasoning with EasyR1'
 ---
 
 # 24.4 Hands-on: Train GeoQA Geometry Reasoning with EasyR1
-In Section 11.1 we wrote a VLM GRPO training loop by hand -- a few dozen lines of code running on synthetic data. In this section we change posture: we use the industrial-grade framework [EasyR1](https://github.com/hiyouga/EasyR1) to train a VLM for geometry reasoning on the real dataset GeoQA-8K.
+In Section 24.2 we wrote a VLM GRPO training loop by hand -- a few dozen lines of code running on synthetic data. In this section we change posture: we use the industrial-grade framework [EasyR1](https://github.com/hiyouga/EasyR1) to train a VLM for geometry reasoning on the real dataset GeoQA-8K.
 
 The handwritten loop helps you understand the principles; EasyR1 helps you run real experiments. The relationship between the two is similar to hand-writing CartPole in Chapter 1 versus using Stable Baselines3 -- the algorithm is the same, but the framework handles distributed training, memory optimization, data pipeline management, and other engineering details.
 
@@ -638,7 +638,7 @@ model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
 
 If LoRA was enabled, `model_merger.py` automatically merges the LoRA weights back into the base model. The merged model is used exactly the same way as a full-parameter trained model, with no dependency on any LoRA inference library.
 
-## Comparison with the Handwritten Experiment in Section 11.1
+## Comparison with the Handwritten Experiment in Section 24.2
 
 | Aspect              | 11.1 Handwritten GRPO                       | EasyR1 in this section                       |
 | ------------------- | ------------------------------------------- | -------------------------------------------- |

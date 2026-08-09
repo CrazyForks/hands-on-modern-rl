@@ -1,5 +1,5 @@
 # 13.7 Hands-on: Running PPO on GSM8K with veRL
-In Section 8.5, we explained the four-model collaboration behind PPO-RLHF: the roles of the Actor, Reference, Reward Model, and Critic, and the mathematical relationship between the KL penalty, token-level rewards, and advantage estimation. In this section, we take a more practical route: we will use the industrial-grade framework [veRL](https://github.com/volcengine/verl) to run PPO training end-to-end on the GSM8K mathematical reasoning dataset.
+In Section 13.4, we explained the four-model collaboration behind PPO-RLHF: the roles of the Actor, Reference, Reward Model, and Critic, and the mathematical relationship between the KL penalty, token-level rewards, and advantage estimation. In this section, we take a more practical route: we will use the industrial-grade framework [veRL](https://github.com/volcengine/verl) to run PPO training end-to-end on the GSM8K mathematical reasoning dataset.
 
 Handwritten pseudo-code helps you internalize the principles; veRL helps you run a real experiment. The relationship is similar to Chapter 7, where we run PPO with Stable Baselines3: the algorithm is the same, but the framework takes care of engineering details such as distributed scheduling, VRAM optimizations, and inference acceleration.
 
@@ -7,7 +7,7 @@ Handwritten pseudo-code helps you internalize the principles; veRL helps you run
 
 [veRL](https://github.com/volcengine/verl) (Volcano Engine Reinforcement Learning), initiated by ByteDance's Seed team, is one of the most active LLM RL training frameworks in the community (10k+ GitHub stars). Its paper, _HybridFlow_, was published at EuroSys 2025.
 
-Compared with the small-model TRL experiments we mentioned in Section 8.5, veRL's main value-adds are:
+Compared with the small-model TRL experiments we mentioned in Section 13.4, veRL's main value-adds are:
 
 | Feature                   | TRL for Small Models            | veRL                                                             |
 | ------------------------- | ------------------------------- | ---------------------------------------------------------------- |
@@ -49,7 +49,7 @@ flowchart LR
 
 [GSM8K](https://huggingface.co/datasets/openai/gsm8k) (Grade School Math 8K) is a grade-school math word-problem dataset released by OpenAI, with about 7,500 training examples and 1,319 test examples. It has become a standard benchmark for RL for LLMs for three reasons:
 
-1. **It naturally supports rule-based rewards**: whether an answer is correct can be verified automatically, so you do not need to train a Reward Model. This differs from RLHF in Section 8.5, where an RM provides preference signals; for math problems, directly checking the numeric answer is sufficient.
+1. **It naturally supports rule-based rewards**: whether an answer is correct can be verified automatically, so you do not need to train a Reward Model. This differs from RLHF in Section 13.4, where an RM provides preference signals; for math problems, directly checking the numeric answer is sufficient.
 2. **The reasoning chain length is moderate**: typical answers are 50 to 200 tokens. This is long enough for token-level advantages to matter, but not so long that it blows up VRAM like long code generation.
 3. **There are abundant community baselines**: Volcano Engine provides a complete tutorial and evaluation results for running PPO on Qwen2.5-0.5B on a VKE cluster (42.08% → 54.89%), giving you a reference point.
 
@@ -156,7 +156,7 @@ In practice, prefer veRL's built-in script: it tracks veRL version changes and h
 
 ## Designing the Reward Function
 
-For GSM8K, you do not need to train a Reward Model. You can directly validate the final answer with rules. This is different from RLHF in Section 8.5: RLHF uses an RM to produce preference signals, while math reasoning uses **verifiable rewards**. Section 9.4 will discuss the RLVR paradigm in detail; here we start with a simple implementation.
+For GSM8K, you do not need to train a Reward Model. You can directly validate the final answer with rules. This is different from RLHF in Section 13.4: RLHF uses an RM to produce preference signals, while math reasoning uses **verifiable rewards**. Section 16.3 will discuss the RLVR paradigm in detail; here we start with a simple implementation.
 
 This repository provides the course adaptation here: [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py`](../../../code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py). If you are working inside the veRL repository, you can also create the same file manually:
 
@@ -229,7 +229,7 @@ Key design points of this reward function:
 - **`check_answer`**: numeric comparison. For example, `1,000` and `1000` are treated as the same; `42` and `42.0` are also treated as the same.
 - **`compute_score`**: returns `overall` (the total reward used by PPO) and two auxiliary metrics (`accuracy` and `format`) that will be logged.
 
-Why no Reward Model? Because GSM8K answers are **objectively verifiable**: correct is 1.0; incorrect is 0.0. The signal is sparse (an entire response yields a single 0/1), but it is precise, noise-free, and hard to game. This is exactly the core idea behind RLVR, which we will revisit in Section 9.4.
+Why no Reward Model? Because GSM8K answers are **objectively verifiable**: correct is 1.0; incorrect is 0.0. The signal is sparse (an entire response yields a single 0/1), but it is precise, noise-free, and hard to game. This is exactly the core idea behind RLVR, which we will revisit in Section 16.3.
 
 ## Single-GPU Training Script
 
@@ -383,11 +383,11 @@ vLLM pre-allocates memory for KV cache. In the single-GPU setup, vLLM and traini
 
 This is a common practice in PPO-RLHF. The Critic needs to learn a reasonably accurate value function quickly; otherwise the advantage estimate becomes too noisy. The Actor learning rate is kept smaller so that policy updates stay conservative, working together with PPO clipping and KL constraints to prevent the policy from drifting.
 
-### Mapping Back to the Four-Model Setup in Section 8.5
+### Mapping Back to the Four-Model Setup in Section 13.4
 
-Recall the four-model collaboration in Section 8.5. In veRL, each role maps cleanly to configuration fields:
+Recall the four-model collaboration in Section 13.4. In veRL, each role maps cleanly to configuration fields:
 
-| Role in Section 8.5 | veRL config                     | Notes                                                         |
+| Role in Section 13.4 | veRL config                     | Notes                                                         |
 | ------------------- | ------------------------------- | ------------------------------------------------------------- |
 | Actor               | `actor_rollout_ref.actor.*`     | trainable policy; generates outputs and gets updated          |
 | Reference           | `actor_rollout_ref.ref.*`       | frozen SFT model; used to compute KL constraints              |
@@ -397,7 +397,7 @@ Recall the four-model collaboration in Section 8.5. In veRL, each role maps clea
 | PPO clip            | `actor.clip_ratio=0.2`          | limits update magnitude                                       |
 | GAE                 | `algorithm.adv_estimator=gae`   | advantage estimation method                                   |
 
-One important difference to keep in mind: here we replace the **Reward Model** from Section 8.5 with a **rule-based reward** (automatic answer verification). That means we do not need to train an RM, nor do we need preference data. The trade-off is that the reward signal is binary (0/1) instead of a smooth scalar indicating "how much better" one response is than another. For math reasoning, however, a 0/1 signal is often sufficient.
+One important difference to keep in mind: here we replace the **Reward Model** from Section 13.4 with a **rule-based reward** (automatic answer verification). That means we do not need to train an RM, nor do we need preference data. The trade-off is that the reward signal is binary (0/1) instead of a smooth scalar indicating "how much better" one response is than another. For math reasoning, however, a 0/1 signal is often sufficient.
 
 ## Launching Training
 
@@ -449,7 +449,7 @@ If you enable WandB, these metrics will be uploaded automatically and you can in
 
 ## Interpreting Training Metrics
 
-For PPO-RLHF, it is not enough to see "reward goes up". As we emphasized in Section 8.5, you should monitor multiple metrics together.
+For PPO-RLHF, it is not enough to see "reward goes up". As we emphasized in Section 13.4, you should monitor multiple metrics together.
 
 ### Key Metrics
 
@@ -700,7 +700,7 @@ algorithm.kl_ctrl.kl_coef=0.001
 algorithm.kl_ctrl.type=fixed
 ```
 
-`kl_coef` controls the strength of the KL penalty. In Section 8.5, we described this as the $\beta$ knob: too large and learning stalls; too small and you invite reward hacking. On GSM8K, because the reward is a 0/1 verifiable signal (harder to hack), you can often relax the KL penalty slightly.
+`kl_coef` controls the strength of the KL penalty. In Section 13.4, we described this as the $\beta$ knob: too large and learning stalls; too small and you invite reward hacking. On GSM8K, because the reward is a 0/1 verifiable signal (harder to hack), you can often relax the KL penalty slightly.
 
 ### Priority 3: PPO update strength
 
@@ -721,17 +721,17 @@ actor_rollout_ref.actor.clip_ratio=0.2     # standard clipping range
 | responses get longer but accuracy does not improve | length hacking                    | check whether reward correlates with length |
 | training is extremely slow                         | insufficient VRAM for vLLM        | lower `ROLLOUT_GPU_MEM_UTIL`                |
 
-## Summary: How This Relates to Section 8.5
+## Summary: How This Relates to Section 13.4
 
-The PPO training we ran with veRL is algorithmically identical to the PPO-RLHF principles in Section 8.5, but there are three engineering differences worth highlighting:
+The PPO training we ran with veRL is algorithmically identical to the PPO-RLHF principles in Section 13.4, but there are three engineering differences worth highlighting:
 
-**1. Reward source**: Section 8.5 uses a Reward Model to provide continuous preference signals learned from data; this section uses rule-based verification to provide a 0/1 correctness signal computed automatically. This is the core idea of RLVR and will be covered in detail in Section 9.4.
+**1. Reward source**: Section 13.4 uses a Reward Model to provide continuous preference signals learned from data; this section uses rule-based verification to provide a 0/1 correctness signal computed automatically. This is the core idea of RLVR and will be covered in detail in Section 16.3.
 
-**2. How the four models co-exist**: the TRL setup in Section 8.5 manages four models in a single process, which is simple but memory-inefficient. veRL uses Ray + FSDP to place Actor/Critic (trainable) and Reference/Reward (frozen) onto the same GPU pool, and switches between training and inference using the 3D-HybridEngine for better memory efficiency.
+**2. How the four models co-exist**: the TRL setup in Section 13.4 manages four models in a single process, which is simple but memory-inefficient. veRL uses Ray + FSDP to place Actor/Critic (trainable) and Reference/Reward (frozen) onto the same GPU pool, and switches between training and inference using the 3D-HybridEngine for better memory efficiency.
 
 **3. Inference engine**: TRL uses item-by-item `model.generate()`, while veRL uses vLLM continuous batching, which can increase generation throughput by 5 to 10x. In on-policy RL, generation speed directly impacts training efficiency: PPO continuously generates fresh responses with the current policy, and rollout is often the bottleneck.
 
-From an algorithmic viewpoint, this experiment follows the same six-step loop from Section 8.5: sample prompts → Actor generates → Reward scores → Reference computes KL → Critic estimates advantages → PPO updates. veRL simply accelerates each step with engineering optimizations.
+From an algorithmic viewpoint, this experiment follows the same six-step loop from Section 13.4: sample prompts → Actor generates → Reward scores → Reference computes KL → Critic estimates advantages → PPO updates. veRL simply accelerates each step with engineering optimizations.
 
 ## Extended Experiments
 
@@ -755,8 +755,8 @@ This section depends on external veRL and does not copy veRL source code. This r
 
 ## Exercises
 
-1. Why is the PPO reward signal on GSM8K binary (0/1), while RLHF in Section 8.5 uses a continuous reward? How do these signals affect PPO updates differently?
-2. Change `ACTOR_LR` from `1e-6` to `1e-4` and observe how the training curves change. Explain what happened using the stability analysis framework from Section 8.5.
+1. Why is the PPO reward signal on GSM8K binary (0/1), while RLHF in Section 13.4 uses a continuous reward? How do these signals affect PPO updates differently?
+2. Change `ACTOR_LR` from `1e-6` to `1e-4` and observe how the training curves change. Explain what happened using the stability analysis framework from Section 13.4.
 3. Add an auxiliary metric to `compute_score` that counts the number of reasoning lines in the response. How does this correlate with accuracy?
 4. Design an experiment comparing "pure accuracy reward" vs "accuracy + format reward". Which configuration achieves higher final accuracy, and why?
-5. Read veRL's `verl/trainer/main_ppo.py` source code. Draw the execution flow of the main function and label which code corresponds to each step of the six-step loop from Section 8.5.
+5. Read veRL's `verl/trainer/main_ppo.py` source code. Draw the execution flow of the main function and label which code corresponds to each step of the six-step loop from Section 13.4.
