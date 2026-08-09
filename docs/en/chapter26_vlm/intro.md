@@ -2,7 +2,7 @@
 title: 11. VLM Reinforcement Learning
 ---
 
-# VLM Reinforcement Learning
+# Chapter 24: VLM Reinforcement Learning
 
 In earlier chapters, we pushed RL from classic control to LLM post-training:
 

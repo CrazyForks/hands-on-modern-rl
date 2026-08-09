@@ -2,7 +2,7 @@
 title: 12. Future Trends
 ---
 
-# Future Trends
+# Chapter 29: Future Trends
 
 From Chapter 1 (CartPole) to Chapter 9 (GRPO), we walked through the core arc of modern reinforcement learning:
 

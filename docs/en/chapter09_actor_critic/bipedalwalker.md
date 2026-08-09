@@ -182,9 +182,9 @@ Evaluation comparison across the three phases (20-episode average):
 
 ## 6.6.5 A2C vs PPO: Same Task, Different Stability
 
-This section and Section 15.3 of Chapter 7 use the identical environment (BipedalWalker-v3), but train with A2C and PPO respectively. Comparing the two experiments:
+This section and Section 8.5 of Chapter 7 use the identical environment (BipedalWalker-v3), but train with A2C and PPO respectively. Comparing the two experiments:
 
-| Metric                 | A2C (this section) | PPO (Section 15.3) |
+| Metric                 | A2C (this section) | PPO (Section 8.5) |
 | ---------------------- | ------------------ | ----------------- |
 | Training steps         | 3M                 | 2M                |
 | 20-episode mean reward | 221.8              | 282.5             |

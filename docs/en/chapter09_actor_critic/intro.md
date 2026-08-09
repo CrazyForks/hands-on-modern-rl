@@ -2,7 +2,7 @@
 title: 6. Actor-Critic
 ---
 
-# Chapter 6: Actor-Critic, Where Two Lines of Thought Converge
+# Chapter 7: Actor-Critic, Where Two Lines of Thought Converge
 
 Chapter 4 followed Line 1 (Value-Based): learn $Q(s,a)$ and pick the action with the highest score (review: [Q(s,a) and the Greedy Policy](../chapter03_mdp/value-q)). This tends to produce accurate scoring, but it is not good at exploration, and it can only handle discrete actions. Chapter 5 followed Line 2 (Policy-Based): directly optimize $J(\theta)$ (review: [Policy Objective](../chapter03_mdp/policy-objective)). This is good at exploration and supports continuous actions, but its variance is too large: run the same policy twice, and the gradient estimates can be wildly different.
 

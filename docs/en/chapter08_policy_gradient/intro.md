@@ -1,8 +1,8 @@
 ---
-title: 'Chapter 5: Policy-Based Methods'
+title: 'Chapter 6: Policy-Based Methods'
 ---
 
-# Chapter 5: Policy-Based Methods: Policy Gradients and REINFORCE
+# Chapter 6: Policy-Based Methods: Policy Gradients and REINFORCE
 
 In Chapter 4, we followed Route 1: learn $Q(s,a)$ to score each action, then pick the action with the highest score (review: [Q(s,a) and the greedy policy](../chapter03_mdp/value-q)). DQN performs well on CartPole and Atari, but it has a fundamental limitation:
 

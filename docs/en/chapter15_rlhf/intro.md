@@ -2,7 +2,7 @@
 title: 8. The RLHF Pipeline
 ---
 
-# The RLHF Pipeline
+# Chapter 13: The RLHF Pipeline
 
 ## Chapter Overview
 

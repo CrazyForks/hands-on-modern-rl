@@ -459,16 +459,6 @@ npm run verify        # 运行格式检查、Lint、构建和产物验证
 
 您可以出于非商业目的共享和修改本材料，前提是必须给出适当的署名，并且衍生作品也必须在相同的协议下分发。
 
-## Star History
-
-<a href="https://star-history.com/#walkinglabs/hands-on-modern-rl&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=walkinglabs/hands-on-modern-rl&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=walkinglabs/hands-on-modern-rl&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=walkinglabs/hands-on-modern-rl&type=Date" />
-  </picture>
-</a>
-
 ---
 
 <div align="center">

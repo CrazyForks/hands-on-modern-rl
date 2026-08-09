@@ -1,8 +1,8 @@
 ---
-title: 'Chapter 7: PPO'
+title: 'Chapter 8: PPO'
 ---
 
-# Chapter 7: PPO — The Art of Stable Training
+# Chapter 8: PPO — The Art of Stable Training
 
 In the previous chapter, we built the [Actor-Critic architecture](../chapter09_actor_critic/actor-critic): the Actor is responsible for choosing actions, and the Critic is responsible for judging whether those actions are good or bad. The two cooperate through the [advantage function](../chapter09_actor_critic/advantage-function) $A(s,a)$. On CartPole, Actor-Critic performs quite well. But when you move the same architecture to more complex environments (for example, LunarLander) or to much larger models (for example, language models with billions of parameters), a serious issue starts to surface: **training instability**.
 

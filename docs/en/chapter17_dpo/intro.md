@@ -2,7 +2,7 @@
 title: 2. DPO Preference Tuning
 ---
 
-# DPO Preference Tuning
+# Chapter 15: DPO Preference Tuning
 
 > **Chapter code**: [0-download_model.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/0-download_model.py) · [1-generate_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/1-generate_data.py) · [2-test_before.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/2-test_before.py) · [3-train_dpo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/3-train_dpo.py) · [4-test_after.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/4-test_after.py)
 

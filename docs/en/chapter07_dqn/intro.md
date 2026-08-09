@@ -2,7 +2,7 @@
 title: 4. Deep Q-Networks
 ---
 
-# Deep Q-Networks
+# Chapter 5: Deep Q-Networks
 
 ## Chapter Guide
 

@@ -2,7 +2,7 @@
 title: 22. Agentic RL
 ---
 
-# Chapter 22: Agentic RL
+# Chapter 20: Agentic RL
 
 The RL problems covered in earlier chapters are essentially **single-turn decision-making**: the model receives a prompt, emits a complete response, a reward model scores it, and the policy is updated once. Whether the underlying algorithm is PPO or GRPO, the skeleton of "one prompt, one response, one score" never changes.
 

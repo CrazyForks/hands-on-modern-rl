@@ -25,7 +25,7 @@ AlphaGo consists of three core components:
 | Component               | Role                                                | Related Concept In This Chapter                                     |
 | ----------------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
 | Policy network          | Outputs probabilities over legal moves              | [Chapter 5 Policy Gradient](../chapter08_policy_gradient/reinforce) |
-| Value network           | Evaluates the win rate of the current position      | [Section 13.4 Training the Critic](./critic-training)                |
+| Value network           | Evaluates the win rate of the current position      | [Section 6.2 Training the Critic](./critic-training)                |
 | Monte Carlo Tree Search | Looks ahead for several moves to find the best play | Newly introduced in this section                                    |
 
 Their relationship is simple: MCTS is the "brain," the policy network provides "intuition" (which branches to prioritize),

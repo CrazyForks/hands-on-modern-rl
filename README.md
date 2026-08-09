@@ -459,16 +459,6 @@ This course is released under the [Creative Commons Attribution-NonCommercial-Sh
 
 You may share and adapt the material for non-commercial purposes, provided that you give appropriate credit and distribute derivative works under the same license.
 
-## Star History
-
-<a href="https://star-history.com/#walkinglabs/hands-on-modern-rl&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=walkinglabs/hands-on-modern-rl&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=walkinglabs/hands-on-modern-rl&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=walkinglabs/hands-on-modern-rl&type=Date" />
-  </picture>
-</a>
-
 ---
 
 <div align="center">

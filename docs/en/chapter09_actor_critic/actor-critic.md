@@ -351,7 +351,7 @@ for episode in range(500):
         # Actor loss: policy gradient x advantage
         actor_loss = -log_prob * td_error.detach()
 
-        # Critic loss: make V(s) close to TD target (review: Section 13.4 L = delta^2)
+        # Critic loss: make V(s) close to TD target (review: Section 7.2 L = delta^2)
         critic_loss = td_error.pow(2)
 
         # Total loss

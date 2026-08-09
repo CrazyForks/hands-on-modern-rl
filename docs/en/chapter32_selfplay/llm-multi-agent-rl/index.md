@@ -147,7 +147,7 @@ Traditional MARL already has non-stationarity problems -- when you learn a new p
 
 ### Challenge 2: Cross-Role Credit Assignment
 
-Chapter 9 discussed credit assignment in multi-turn interaction (Section 24.2) -- if a 7-turn interaction fails, who is to blame? Multi-agent extends this dimension further: **multiple independent decision-makers are simultaneously acting; whose contribution is greatest?**
+Chapter 9 discussed credit assignment in multi-turn interaction (Section 20.3) -- if a 7-turn interaction fails, who is to blame? Multi-agent extends this dimension further: **multiple independent decision-makers are simultaneously acting; whose contribution is greatest?**
 
 In a software project, the Coder writes code, the Reviewer spots a potential bug and suggests a fix, and the Coder revises and passes the tests. How should the final "passed tests" reward be distributed?
 
@@ -223,7 +223,7 @@ MARTI [^marti] improves reasoning quality through multi-agent debate. The core i
 | DQN experience replay (Chapter 4)                  | Memory mechanisms: from raw reuse to preference distillation    |
 | PPO (Chapter 7)                                    | Foundation algorithm for multi-agent policy optimization        |
 | Training stability (Chapter 7)                     | Amplified non-stationarity requires stronger stability controls |
-| Bespoke Labs KL=0.001 (Section 24.4)                | KL constraints are equally critical in multi-agent scenarios    |
+| Bespoke Labs KL=0.001 (Section 9.5)                | KL constraints are equally critical in multi-agent scenarios    |
 
 The deepest connection may be: **LLM multi-agent RL is the "highest-difficulty comprehensive application" of all core concepts in this book**. It requires simultaneously handling multi-turn credit assignment (Section 24.2), policy gradient optimization (Chapters 5-6), training stability (Chapter 7), reward design (Section 24.4) -- only extended from single-agent to multi-agent, where each problem's difficulty increases by an order of magnitude.
 
