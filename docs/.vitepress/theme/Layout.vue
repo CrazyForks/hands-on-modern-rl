@@ -1291,24 +1291,26 @@ watch(
         role="group"
         aria-label="侧边栏分组控制"
       >
-        <button
-          class="ct-sidebar-groups-button"
-          type="button"
-          title="全部展开"
-          aria-label="全部展开"
-          @click="expandAllSidebarGroups"
-        >
-          <UnfoldVertical :size="16" :stroke-width="2" aria-hidden="true" />
-        </button>
-        <button
-          class="ct-sidebar-groups-button"
-          type="button"
-          title="全部折叠"
-          aria-label="全部折叠"
-          @click="collapseAllSidebarGroups"
-        >
-          <FoldVertical :size="16" :stroke-width="2" aria-hidden="true" />
-        </button>
+        <div class="ct-sidebar-groups-control">
+          <button
+            class="ct-sidebar-groups-button"
+            type="button"
+            title="全部展开"
+            aria-label="全部展开"
+            @click="expandAllSidebarGroups"
+          >
+            <UnfoldVertical :size="13" :stroke-width="2" aria-hidden="true" />
+          </button>
+          <button
+            class="ct-sidebar-groups-button"
+            type="button"
+            title="全部折叠"
+            aria-label="全部折叠"
+            @click="collapseAllSidebarGroups"
+          >
+            <FoldVertical :size="13" :stroke-width="2" aria-hidden="true" />
+          </button>
+        </div>
       </div>
     </template>
 
@@ -2282,8 +2284,7 @@ watch(
 .ct-sidebar-groups-toolbar {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  padding: 8px 12px;
+  padding: 5px 12px;
   border-bottom: 1px solid var(--vp-c-divider);
   background: linear-gradient(
     to bottom,
@@ -2292,32 +2293,43 @@ watch(
   );
 }
 
+/* 扁平的分段控件：一条矮栏，两个图标用竖线隔开 */
+.ct-sidebar-groups-control {
+  display: flex;
+  align-items: stretch;
+  padding: 2px;
+  background: var(--vp-c-bg-alt);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+}
+
 .ct-sidebar-groups-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 19px;
   padding: 0;
   color: var(--vp-c-text-2);
-  background: var(--vp-c-bg);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
   transition:
     color 0.2s,
-    border-color 0.2s,
-    background-color 0.2s,
-    transform 0.15s;
+    background-color 0.2s;
+}
+
+.ct-sidebar-groups-button + .ct-sidebar-groups-button {
+  border-left: 1px solid var(--vp-c-divider);
 }
 
 .ct-sidebar-groups-button:hover {
   color: var(--vp-c-brand-1);
-  border-color: var(--vp-c-brand-1);
   background-color: var(--vp-c-brand-soft);
 }
 
 .ct-sidebar-groups-button:active {
-  transform: scale(0.92);
+  background-color: var(--vp-c-brand-soft);
 }
 </style>
