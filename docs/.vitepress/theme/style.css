@@ -658,23 +658,20 @@
    4. Sidebar (Easy-Vibe compact book navigation)
    =================================================== */
 aside.VPSidebar {
-  background-color: transparent !important;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 0 0 !important;
+  background-color: var(--vp-c-bg) !important;
   border-right: none;
   font-family: var(--font-sans);
-  opacity: 0.92;
-  transition: opacity 0.3s ease;
-}
-
-aside.VPSidebar:hover {
   opacity: 1;
+  overflow: hidden !important;
 }
 
 @media (max-width: 959px) {
   aside.VPSidebar {
     width: calc(100vw - 20px) !important;
     max-width: 320px !important;
-    padding-right: 16px !important;
-    padding-left: 20px !important;
     background: rgba(255, 255, 255, 0.98) !important;
     border-right: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: 16px 0 40px rgba(15, 23, 42, 0.14);
@@ -688,16 +685,43 @@ aside.VPSidebar:hover {
   }
 }
 
-/* Keep one scroll container for the whole sidebar. Nested scrolling on every
-   course group makes trackpad and wheel input stall at group boundaries. */
+@media (min-width: 960px) {
+  aside.VPSidebar {
+    padding-top: var(--vp-nav-height) !important;
+  }
+}
+
+/* Keep one scroll container for the course navigation. The controls sit in a
+   separate flex row above it, so content never scrolls underneath them. */
 .VPSidebar .curtain {
   display: none !important;
 }
 
 .VPSidebar > .nav {
   display: flex !important;
+  flex: 1 1 auto;
   flex-direction: column !important;
-  min-height: 100%;
+  min-height: 0;
+  padding: 24px 16px 96px 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 960px) {
+  .VPSidebar > .nav {
+    padding-right: 32px;
+    padding-left: 32px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .VPSidebar > .nav {
+    padding-left: max(
+      32px,
+      calc((100vw - (var(--vp-layout-max-width) - 64px)) / 2)
+    );
+  }
 }
 
 .VPSidebar > .nav > .group {
@@ -711,20 +735,20 @@ aside.VPSidebar:hover {
 }
 
 /* Sidebar scrollbar */
-.VPSidebar::-webkit-scrollbar {
+.VPSidebar > .nav::-webkit-scrollbar {
   width: 3px;
 }
 
-.VPSidebar::-webkit-scrollbar-track {
+.VPSidebar > .nav::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.VPSidebar::-webkit-scrollbar-thumb {
+.VPSidebar > .nav::-webkit-scrollbar-thumb {
   background-color: rgba(134, 134, 139, 0.2);
   border-radius: var(--radius-full);
 }
 
-.dark .VPSidebar::-webkit-scrollbar-thumb {
+.dark .VPSidebar > .nav::-webkit-scrollbar-thumb {
   background-color: rgba(152, 152, 157, 0.15);
 }
 
@@ -739,11 +763,6 @@ aside.VPSidebar:hover {
   border-top: 0 !important;
   margin-top: 2px !important;
   padding-top: 2px !important;
-}
-
-/* Keep the first course group visually separate from the sticky controls. */
-:where(html) .ct-sidebar-groups-toolbar + .group {
-  padding-top: 24px !important;
 }
 
 :where(html) .VPSidebar .group-title {

@@ -314,6 +314,11 @@ function updateSidebarEdgePosition() {
   )
 }
 
+function getSidebarScrollContainer() {
+  if (typeof document === 'undefined') return null
+  return document.querySelector('.VPSidebar > .nav')
+}
+
 function setSidebarWidth(value, persist = true) {
   const normalized = clampSidebarWidth(value)
   sidebarWidth.value = normalized
@@ -362,7 +367,7 @@ function collapseAllSidebarGroups() {
 
   // 长目录收起后高度会骤减。归位到顶部，避免首个分组被吸顶工具栏遮住。
   requestAnimationFrame(() => {
-    document.querySelector('.VPSidebar')?.scrollTo({ top: 0 })
+    getSidebarScrollContainer()?.scrollTo({ top: 0 })
   })
 }
 
@@ -757,7 +762,7 @@ function scrollOutlineToActiveItem(activeLink) {
 }
 
 function scrollSidebarToActiveItem(activeItem) {
-  const sidebarContainer = document.querySelector('.VPSidebar')
+  const sidebarContainer = getSidebarScrollContainer()
   if (!sidebarContainer || !activeItem) return
 
   const target =
@@ -834,7 +839,7 @@ function initNavigationSync() {
 
   navigationSyncTimer = window.setTimeout(() => {
     const outlineContainer = document.querySelector('.VPDocAsideOutline')
-    const sidebarContainer = document.querySelector('.VPSidebar')
+    const sidebarContainer = getSidebarScrollContainer()
 
     if (outlineContainer) {
       outlineObserver = new MutationObserver((mutations) => {
@@ -1302,34 +1307,36 @@ watch(
     </template>
 
     <template v-if="showDocChrome" #sidebar-nav-before>
-      <div
-        class="ct-sidebar-groups-toolbar"
-        role="group"
-        :aria-label="isEnglishRoute ? 'Sidebar controls' : '侧边栏分组控制'"
-      >
-        <div class="ct-sidebar-groups-control">
-          <button
-            class="ct-sidebar-groups-button"
-            type="button"
-            title="Expand all"
-            aria-label="Expand all"
-            @click="expandAllSidebarGroups"
-          >
-            <ChevronsDown :size="14" :stroke-width="1.8" aria-hidden="true" />
-            <span>Expand all</span>
-          </button>
-          <button
-            class="ct-sidebar-groups-button"
-            type="button"
-            title="Collapse all"
-            aria-label="Collapse all"
-            @click="collapseAllSidebarGroups"
-          >
-            <ChevronsUp :size="14" :stroke-width="1.8" aria-hidden="true" />
-            <span>Collapse all</span>
-          </button>
+      <Teleport defer to=".VPSidebar">
+        <div
+          class="ct-sidebar-groups-toolbar"
+          role="group"
+          :aria-label="isEnglishRoute ? 'Sidebar controls' : '侧边栏分组控制'"
+        >
+          <div class="ct-sidebar-groups-control">
+            <button
+              class="ct-sidebar-groups-button"
+              type="button"
+              title="Expand all"
+              aria-label="Expand all"
+              @click="expandAllSidebarGroups"
+            >
+              <ChevronsDown :size="14" :stroke-width="1.8" aria-hidden="true" />
+              <span>Expand all</span>
+            </button>
+            <button
+              class="ct-sidebar-groups-button"
+              type="button"
+              title="Collapse all"
+              aria-label="Collapse all"
+              @click="collapseAllSidebarGroups"
+            >
+              <ChevronsUp :size="14" :stroke-width="1.8" aria-hidden="true" />
+              <span>Collapse all</span>
+            </button>
+          </div>
         </div>
-      </div>
+      </Teleport>
     </template>
 
     <template v-if="showDocChrome" #sidebar-nav-after>
@@ -2316,12 +2323,40 @@ watch(
 
 /* 侧边栏「展开全部 / 全部收起」工具栏 */
 .ct-sidebar-groups-toolbar {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 2;
+  order: -1;
+  flex: 0 0 auto;
+  margin: 0 16px 0 20px;
   padding: 4px 0 5px;
   border-bottom: 0;
   background: var(--vp-c-bg);
+}
+
+@media (min-width: 960px) {
+  .ct-sidebar-groups-toolbar {
+    margin-right: 32px;
+    margin-left: 32px;
+  }
+}
+
+/* VitePress shows its 48px local-outline bar between 960px and 1279px.
+   Match that row exactly so its divider cannot cut through sidebar content. */
+@media (min-width: 960px) and (max-width: 1279px) {
+  .ct-sidebar-groups-toolbar {
+    min-height: 48px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .ct-sidebar-groups-toolbar {
+    margin-left: max(
+      32px,
+      calc((100vw - (var(--vp-layout-max-width) - 64px)) / 2)
+    );
+  }
 }
 
 .ct-sidebar-groups-control {
