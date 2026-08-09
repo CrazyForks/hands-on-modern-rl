@@ -9,13 +9,13 @@ import {
   PopoverTrigger
 } from 'reka-ui'
 import {
-  FoldVertical,
+  ChevronsDown,
+  ChevronsUp,
   HandHeart,
   MessageCircle,
   Moon,
   Settings,
-  Sun,
-  UnfoldVertical
+  Sun
 } from 'lucide-vue-next'
 import ReadingProgress from './components/ReadingProgress.vue'
 import SidebarFooter from './components/SidebarFooter.vue'
@@ -31,7 +31,7 @@ const FONT_SIZE_STORAGE_KEY = 'ct-doc-font-size'
 const LINE_HEIGHT_STORAGE_KEY = 'ct-doc-line-height'
 const DOC_WIDTH_STORAGE_KEY = 'ct-doc-content-width'
 const SIDEBAR_COLLAPSED_KEY = 'ct-sidebar-collapsed'
-const SIDEBAR_WIDTH_KEY = 'ct-sidebar-width-compact-v3'
+const SIDEBAR_WIDTH_KEY = 'ct-sidebar-width-reading-v5'
 const DISCORD_URL = 'https://discord.gg/XU7DQmpqk'
 
 const MIN_FONT_SIZE = 15
@@ -44,8 +44,8 @@ const MIN_DOC_WIDTH = 780
 const MAX_DOC_WIDTH = 1280
 const DEFAULT_DOC_WIDTH = 980
 
-const DEFAULT_SIDEBAR_WIDTH = 212
-const MIN_SIDEBAR_WIDTH = 160
+const DEFAULT_SIDEBAR_WIDTH = 280
+const MIN_SIDEBAR_WIDTH = 264
 const MAX_SIDEBAR_WIDTH = 520
 
 const fontSize = ref(DEFAULT_FONT_SIZE)
@@ -331,19 +331,25 @@ function toggleSidebar() {
 /**
  * 展开或折叠侧边栏里的全部可折叠分组。
  * VitePress 每个分组用 .VPSidebarItem.collapsible 渲染，collapsed 状态
- * 反映在 CSS class 上；点击组头的 .item 即可切换。深层分组始终在 DOM 里，
+ * 反映在 CSS class 上；点击组头的 .caret 即可切换。深层分组始终在 DOM 里，
  * 所以一次遍历就能处理所有层级。
  */
 function setAllSidebarGroups(expand) {
-  document
-    .querySelectorAll('.VPSidebarItem.collapsible')
-    .forEach((groupEl) => {
-      const isCollapsed = groupEl.classList.contains('collapsed')
-      if ((expand && isCollapsed) || (!expand && !isCollapsed)) {
-        const itemEl = groupEl.querySelector(':scope > .item')
-        itemEl && itemEl.click()
-      }
-    })
+  const groups = Array.from(
+    document.querySelectorAll('.VPSidebarItem.collapsible')
+  )
+
+  // 展开时先处理父级，收起时先处理子级，避免隐藏节点的点击冒泡
+  // 反复切换父级，导致“全部收起”最终又回到展开状态。
+  const orderedGroups = expand ? groups : groups.reverse()
+
+  orderedGroups.forEach((groupEl) => {
+    const isCollapsed = groupEl.classList.contains('collapsed')
+    if ((expand && isCollapsed) || (!expand && !isCollapsed)) {
+      const toggleEl = groupEl.querySelector(':scope > .item > .caret')
+      toggleEl && toggleEl.click()
+    }
+  })
 }
 
 function expandAllSidebarGroups() {
@@ -352,6 +358,11 @@ function expandAllSidebarGroups() {
 
 function collapseAllSidebarGroups() {
   setAllSidebarGroups(false)
+
+  // 长目录收起后高度会骤减。归位到顶部，避免首个分组被吸顶工具栏遮住。
+  requestAnimationFrame(() => {
+    document.querySelector('.VPSidebar')?.scrollTo({ top: 0 })
+  })
 }
 
 function closeReadingTools() {
@@ -1289,26 +1300,28 @@ watch(
       <div
         class="ct-sidebar-groups-toolbar"
         role="group"
-        aria-label="侧边栏分组控制"
+        :aria-label="isEnglishRoute ? 'Sidebar controls' : '侧边栏分组控制'"
       >
         <div class="ct-sidebar-groups-control">
           <button
             class="ct-sidebar-groups-button"
             type="button"
-            title="全部展开"
-            aria-label="全部展开"
+            :title="isEnglishRoute ? 'Expand all' : '展开全部'"
+            :aria-label="isEnglishRoute ? 'Expand all' : '展开全部'"
             @click="expandAllSidebarGroups"
           >
-            <UnfoldVertical :size="13" :stroke-width="2" aria-hidden="true" />
+            <ChevronsDown :size="14" :stroke-width="1.8" aria-hidden="true" />
+            <span>{{ isEnglishRoute ? 'Expand all' : '展开全部' }}</span>
           </button>
           <button
             class="ct-sidebar-groups-button"
             type="button"
-            title="全部折叠"
-            aria-label="全部折叠"
+            :title="isEnglishRoute ? 'Collapse all' : '全部收起'"
+            :aria-label="isEnglishRoute ? 'Collapse all' : '全部收起'"
             @click="collapseAllSidebarGroups"
           >
-            <FoldVertical :size="13" :stroke-width="2" aria-hidden="true" />
+            <ChevronsUp :size="14" :stroke-width="1.8" aria-hidden="true" />
+            <span>{{ isEnglishRoute ? 'Collapse all' : '全部收起' }}</span>
           </button>
         </div>
       </div>
@@ -1890,7 +1903,7 @@ watch(
   position: fixed;
   top: 0;
   left: calc(
-    var(--ct-sidebar-edge-right, var(--vp-sidebar-width, 212px)) - 14px
+    var(--ct-sidebar-edge-right, var(--vp-sidebar-width, 280px)) - 14px
   );
   width: 24px;
   height: 100vh;
@@ -2280,56 +2293,56 @@ watch(
   }
 }
 
-/* 侧边栏「展开全部 / 折叠全部」工具栏 */
+/* 侧边栏「展开全部 / 全部收起」工具栏 */
 .ct-sidebar-groups-toolbar {
-  display: flex;
-  justify-content: center;
-  padding: 5px 12px;
-  border-bottom: 1px solid var(--vp-c-divider);
-  background: linear-gradient(
-    to bottom,
-    var(--vp-c-bg-alt),
-    transparent
-  );
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 4px 0 5px;
+  border-bottom: 0;
+  background: var(--vp-c-bg);
 }
 
-/* 扁平的分段控件：一条矮栏，两个图标用竖线隔开 */
 .ct-sidebar-groups-control {
-  display: flex;
-  align-items: stretch;
-  padding: 2px;
-  background: var(--vp-c-bg-alt);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
 }
 
 .ct-sidebar-groups-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 19px;
-  padding: 0;
+  gap: 5px;
+  min-width: 0;
+  height: 28px;
+  padding: 0 6px;
   color: var(--vp-c-text-2);
   background: transparent;
-  border: none;
-  border-radius: 4px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 520;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     color 0.2s,
     background-color 0.2s;
 }
 
-.ct-sidebar-groups-button + .ct-sidebar-groups-button {
-  border-left: 1px solid var(--vp-c-divider);
-}
-
 .ct-sidebar-groups-button:hover {
-  color: var(--vp-c-brand-1);
-  background-color: var(--vp-c-brand-soft);
+  color: var(--vp-c-text-1);
+  background-color: var(--vp-c-bg-soft);
+  border-color: color-mix(in srgb, var(--vp-c-divider) 72%, transparent);
 }
 
 .ct-sidebar-groups-button:active {
   background-color: var(--vp-c-brand-soft);
+}
+
+.ct-sidebar-groups-button:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 1px;
 }
 </style>

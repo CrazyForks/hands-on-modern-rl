@@ -2597,6 +2597,223 @@ const enSidebar = {
   ]
 }
 
+const sidebarOverviewPattern =
+  /^(?:\d+|[A-Z](?:\.\d+)*)\.0 (?:本章导读|附录导读|概览|Chapter Overview|Appendix Overview|Overview)$/
+
+function mergeSidebarOverviews(sidebar) {
+  function visit(items) {
+    for (const item of items || []) {
+      if (!item.items?.length) continue
+
+      const [overview, ...remainingItems] = item.items
+      if (
+        !item.link &&
+        overview?.link &&
+        sidebarOverviewPattern.test(overview.text)
+      ) {
+        item.link = overview.link
+        if (remainingItems.length) {
+          item.items = remainingItems
+        } else {
+          delete item.items
+          delete item.collapsed
+        }
+      }
+
+      visit(item.items)
+    }
+  }
+
+  Object.values(sidebar).forEach(visit)
+}
+
+function findSidebarItem(items, textPrefix) {
+  for (const item of items || []) {
+    if (item.text?.startsWith(textPrefix)) return item
+    const nestedItem = findSidebarItem(item.items, textPrefix)
+    if (nestedItem) return nestedItem
+  }
+  return null
+}
+
+function groupSidebarLessons(sidebar, chapterPrefix, groups) {
+  const roots = Object.values(sidebar).flat()
+  const chapter = findSidebarItem(roots, chapterPrefix)
+  if (!chapter?.items?.length) return
+
+  const originalItems = chapter.items
+  const usedItems = new Set()
+  const groupedItems = groups.flatMap((group) => {
+    const items = group.prefixes
+      .map((prefix) =>
+        originalItems.find((item) => item.text?.startsWith(`${prefix} `))
+      )
+      .filter(Boolean)
+
+    items.forEach((item) => usedItems.add(item))
+    if (items.length < 2) return items
+
+    return [
+      {
+        text: group.text,
+        collapsed: true,
+        items
+      }
+    ]
+  })
+
+  chapter.items = [
+    ...groupedItems,
+    ...originalItems.filter((item) => !usedItems.has(item))
+  ]
+}
+
+function compactCourseSidebar(sidebar, groups) {
+  mergeSidebarOverviews(sidebar)
+  groups.forEach(({ chapter, sections }) =>
+    groupSidebarLessons(sidebar, chapter, sections)
+  )
+}
+
+compactCourseSidebar(zhSidebar, [
+  {
+    chapter: '13.',
+    sections: [
+      { text: '基础：模型、SFT 与奖励', prefixes: ['13.1', '13.2', '13.3'] },
+      { text: '训练：RLHF 工程与评测', prefixes: ['13.4', '13.5', '13.6'] }
+    ]
+  },
+  {
+    chapter: '16.',
+    sections: [
+      {
+        text: 'GRPO 与 RLVR',
+        prefixes: ['16.1', '16.2', '16.3', '16.4']
+      },
+      { text: '环境与验证器工程', prefixes: ['16.5', '16.6'] },
+      { text: '蒸馏与代码训练', prefixes: ['16.7', '16.8'] }
+    ]
+  },
+  {
+    chapter: '17.',
+    sections: [
+      { text: '推理模型训练', prefixes: ['17.1', '17.2'] },
+      {
+        text: '推理时扩展与对齐',
+        prefixes: ['17.3', '17.4', '17.5', '17.6']
+      }
+    ]
+  },
+  {
+    chapter: '18.',
+    sections: [
+      {
+        text: '过程奖励建模',
+        prefixes: ['18.1', '18.2', '18.3', '18.4']
+      },
+      { text: '推理时搜索', prefixes: ['18.5', '18.6'] }
+    ]
+  },
+  {
+    chapter: '20.',
+    sections: [
+      { text: '多轮训练基础', prefixes: ['20.1', '20.2', '20.3'] },
+      {
+        text: '工具与搜索智能体',
+        prefixes: ['20.4', '20.5', '20.6']
+      }
+    ]
+  },
+  {
+    chapter: '28.',
+    sections: [
+      { text: '失败模式与案例', prefixes: ['28.1', '28.2', '28.3'] },
+      { text: '防御与评估', prefixes: ['28.4', '28.5'] }
+    ]
+  },
+  {
+    chapter: 'B.',
+    sections: [
+      {
+        text: '训练算法',
+        prefixes: ['B.1', 'B.2', 'B.3', 'B.4', 'B.8']
+      },
+      { text: '模型计算基础', prefixes: ['B.5', 'B.6', 'B.7'] }
+    ]
+  }
+])
+
+compactCourseSidebar(enSidebar, [
+  {
+    chapter: '13.',
+    sections: [
+      {
+        text: 'Foundations: Model, SFT & Rewards',
+        prefixes: ['13.1', '13.2', '13.3']
+      },
+      {
+        text: 'Training: RLHF Engineering & Evaluation',
+        prefixes: ['13.4', '13.5', '13.6']
+      }
+    ]
+  },
+  {
+    chapter: '16.',
+    sections: [
+      { text: 'GRPO & RLVR', prefixes: ['16.1', '16.2', '16.3', '16.4'] },
+      { text: 'Environments & Verifiers', prefixes: ['16.5', '16.6'] },
+      { text: 'Distillation & Code Training', prefixes: ['16.7', '16.8'] }
+    ]
+  },
+  {
+    chapter: '17.',
+    sections: [
+      { text: 'Reasoning Model Training', prefixes: ['17.1', '17.2'] },
+      {
+        text: 'Inference Scaling & Alignment',
+        prefixes: ['17.3', '17.4', '17.5', '17.6']
+      }
+    ]
+  },
+  {
+    chapter: '18.',
+    sections: [
+      {
+        text: 'Process Reward Modeling',
+        prefixes: ['18.1', '18.2', '18.3', '18.4']
+      },
+      { text: 'Inference-Time Search', prefixes: ['18.5', '18.6'] }
+    ]
+  },
+  {
+    chapter: '20.',
+    sections: [
+      { text: 'Multi-Turn Training', prefixes: ['20.1', '20.2', '20.3'] },
+      {
+        text: 'Tool & Search Agents',
+        prefixes: ['20.4', '20.5', '20.6']
+      }
+    ]
+  },
+  {
+    chapter: '28.',
+    sections: [
+      { text: 'Failure Modes & Cases', prefixes: ['28.1', '28.2', '28.3'] },
+      { text: 'Defense & Evaluation', prefixes: ['28.4', '28.5'] }
+    ]
+  },
+  {
+    chapter: 'B.',
+    sections: [
+      {
+        text: 'Training Algorithms',
+        prefixes: ['B.1', 'B.2', 'B.3', 'B.4', 'B.8']
+      },
+      { text: 'Model Computation', prefixes: ['B.5', 'B.6', 'B.7'] }
+    ]
+  }
+])
+
 const logger = createLogger()
 const originalWarn = logger.warn
 logger.warn = (msg, options) => {
