@@ -1,4 +1,4 @@
-# 16.8 veRL 代码生成 RL 实验
+# 16.8 动手：veRL 代码生成 RL 实验
 
 本目录是《动手学现代强化学习》[16.8 节](../../../docs/chapter18_grpo/verl-code-sandbox.md)的配套代码：**用 veRL 在代码生成任务上跑通 PPO 训练**。
 

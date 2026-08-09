@@ -1040,7 +1040,7 @@ const zhSidebar = {
               link: '/chapter18_grpo/deepseek-dapo'
             },
             {
-              text: '16.3 RLVR 可验证奖励',
+              text: '16.3 动手：RLVR 可验证奖励',
               link: '/chapter18_grpo/rlvr'
             },
             {
@@ -1052,7 +1052,7 @@ const zhSidebar = {
               link: '/chapter18_grpo/rl-environments'
             },
             {
-              text: '16.6 金融 API 工具调用 GRPO 实验',
+              text: '16.6 动手：金融 API 工具调用 GRPO 实验',
               link: '/chapter18_grpo/financial-tool-calling-grpo'
             },
             {
@@ -1060,7 +1060,7 @@ const zhSidebar = {
               link: '/chapter18_grpo/on-policy-distillation'
             },
             {
-              text: '16.8 veRL 代码生成 RL 实验',
+              text: '16.8 动手：veRL 代码生成 RL 实验',
               link: '/chapter18_grpo/verl-code-sandbox'
             }
           ]
