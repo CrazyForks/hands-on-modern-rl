@@ -1306,22 +1306,22 @@ watch(
           <button
             class="ct-sidebar-groups-button"
             type="button"
-            :title="isEnglishRoute ? 'Expand all' : '展开全部'"
-            :aria-label="isEnglishRoute ? 'Expand all' : '展开全部'"
+            title="Expand all"
+            aria-label="Expand all"
             @click="expandAllSidebarGroups"
           >
             <ChevronsDown :size="14" :stroke-width="1.8" aria-hidden="true" />
-            <span>{{ isEnglishRoute ? 'Expand all' : '展开全部' }}</span>
+            <span>Expand all</span>
           </button>
           <button
             class="ct-sidebar-groups-button"
             type="button"
-            :title="isEnglishRoute ? 'Collapse all' : '全部收起'"
-            :aria-label="isEnglishRoute ? 'Collapse all' : '全部收起'"
+            title="Collapse all"
+            aria-label="Collapse all"
             @click="collapseAllSidebarGroups"
           >
             <ChevronsUp :size="14" :stroke-width="1.8" aria-hidden="true" />
-            <span>{{ isEnglishRoute ? 'Collapse all' : '全部收起' }}</span>
+            <span>Collapse all</span>
           </button>
         </div>
       </div>
@@ -1902,9 +1902,7 @@ watch(
   display: none;
   position: fixed;
   top: 0;
-  left: calc(
-    var(--ct-sidebar-edge-right, var(--vp-sidebar-width, 280px)) - 14px
-  );
+  left: var(--ct-sidebar-edge-right, var(--vp-sidebar-width, 280px));
   width: 24px;
   height: 100vh;
   z-index: 30;
@@ -1917,7 +1915,7 @@ watch(
 
 .ct-sidebar-resizer {
   position: absolute;
-  left: 12px;
+  left: 0;
   top: 0;
   width: 2px;
   height: 100%;
@@ -1938,7 +1936,7 @@ watch(
 .ct-sidebar-toggle-btn {
   position: absolute;
   top: 50%;
-  left: 10px;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: center;

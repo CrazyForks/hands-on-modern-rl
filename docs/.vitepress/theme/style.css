@@ -688,7 +688,8 @@ aside.VPSidebar:hover {
   }
 }
 
-/* Make sidebar footer stick to the bottom */
+/* Keep one scroll container for the whole sidebar. Nested scrolling on every
+   course group makes trackpad and wheel input stall at group boundaries. */
 .VPSidebar .curtain {
   display: none !important;
 }
@@ -696,12 +697,13 @@ aside.VPSidebar:hover {
 .VPSidebar > .nav {
   display: flex !important;
   flex-direction: column !important;
+  min-height: 100%;
 }
 
 .VPSidebar > .nav > .group {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
+  flex: 0 0 auto;
+  min-height: auto;
+  overflow: visible;
 }
 
 .ct-sidebar-footer {
@@ -741,7 +743,7 @@ aside.VPSidebar:hover {
 
 /* Keep the first course group visually separate from the sticky controls. */
 :where(html) .ct-sidebar-groups-toolbar + .group {
-  padding-top: 12px !important;
+  padding-top: 24px !important;
 }
 
 :where(html) .VPSidebar .group-title {
