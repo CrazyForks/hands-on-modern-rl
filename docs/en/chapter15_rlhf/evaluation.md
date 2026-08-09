@@ -2,8 +2,7 @@
 title: 8.6 Evaluation
 ---
 
-# 6.6 Evaluation
-
+# 13.6 Evaluation
 ## Reading Guide
 
 **Core points**

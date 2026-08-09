@@ -2,8 +2,7 @@
 title: 3.4 DP, MC, and TD
 ---
 
-# 3.4 DP, MC, and TD: Three Methods for Value Estimation
-
+# 4.1 DP, MC, and TD: Three Methods for Value Estimation
 ## Section Preview
 
 **Key Ideas**
@@ -562,7 +561,7 @@ The TD error is the difference between a value estimate and the one-step Bellman
 
 DP, MC, and TD are not three unrelated algorithms. They are three ways to solve the same problem under different information constraints.
 
-They share the same starting point: the Bellman expectation equation (Section 3.3):
+They share the same starting point: the Bellman expectation equation (Section 3.1):
 
 $$
 V^\pi(s) = \mathbb{E}_\pi\left[R_{t+1} + \gamma V^\pi(S_{t+1}) \mid S_t = s\right].
@@ -812,4 +811,4 @@ Next section: [Action-Value Function](./value-q)
 
 [^3]: Sutton, R. S. (1988). Learning to predict by the methods of temporal differences. _Machine Learning_, 3(1), 9-44.
 
-[^4]: Sutton, R. S., & Barto, A. G. (2018). _Reinforcement Learning: An Introduction_ (2nd ed.). MIT Press, Chapter 6, Section 6.1 and Chapter 7, Section 7.1. Section 6.1 explicitly compares the Monte Carlo target, TD target, and DP target; Section 7.1 explicitly calls the return used in a backup the target of the backup.
+[^4]: Sutton, R. S., & Barto, A. G. (2018). _Reinforcement Learning: An Introduction_ (2nd ed.). MIT Press, Chapter 6, Section 6.1 and Chapter 7, Section 15.3. Section 6.1 explicitly compares the Monte Carlo target, TD target, and DP target; Section 15.3 explicitly calls the return used in a backup the target of the backup.

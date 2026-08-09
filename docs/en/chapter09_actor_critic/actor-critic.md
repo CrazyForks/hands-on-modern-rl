@@ -2,8 +2,7 @@
 title: 6.3 Actor-Critic Architecture
 ---
 
-# 6.3 Actor-Critic Architecture
-
+# 7.2 Actor-Critic Architecture
 In the previous two sections we met the [advantage function](./advantage-function) $A(s,a)$ and the [training method for the Critic](./critic-training). Now let's assemble all the parts and see how the Actor and the Critic collaborate.
 
 ::: tip Prerequisites for This Section
@@ -345,14 +344,14 @@ for episode in range(500):
             _, next_value = model(torch.FloatTensor(next_state))
             next_value = 0 if done else next_value
 
-        # TD Error = advantage estimate (review: Section 6.1 A ~ delta)
+        # TD Error = advantage estimate (review: Section 7.1 A ~ delta)
         td_target = reward + gamma * next_value
         td_error = td_target - value
 
         # Actor loss: policy gradient x advantage
         actor_loss = -log_prob * td_error.detach()
 
-        # Critic loss: make V(s) close to TD target (review: Section 6.2 L = delta^2)
+        # Critic loss: make V(s) close to TD target (review: Section 13.4 L = delta^2)
         critic_loss = td_error.pow(2)
 
         # Total loss

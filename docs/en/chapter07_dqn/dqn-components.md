@@ -2,8 +2,7 @@
 title: 4.2 DQN Architecture
 ---
 
-# 4.2 DQN Architecture
-
+# 5.3 DQN Architecture
 ## Section Guide
 
 **Core ideas**

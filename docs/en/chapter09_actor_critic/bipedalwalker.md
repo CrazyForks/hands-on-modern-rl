@@ -2,8 +2,7 @@
 title: '6.5 Hands-On: BipedalWalker'
 ---
 
-# 6.5 Hands-on: BipedalWalker
-
+# 7.5 Hands-on: BipedalWalker
 > **Goal**: Train `BipedalWalker-v3` with A2C, observe how Actor-Critic handles high-dimensional continuous control — and understand why the next chapter needs PPO.
 
 > **Code**: [actor_critic_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/actor_critic_bipedalwalker.py) · [render_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/render_bipedalwalker.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/requirements.txt)
@@ -183,9 +182,9 @@ Evaluation comparison across the three phases (20-episode average):
 
 ## 6.6.5 A2C vs PPO: Same Task, Different Stability
 
-This section and Section 7.1 of Chapter 7 use the identical environment (BipedalWalker-v3), but train with A2C and PPO respectively. Comparing the two experiments:
+This section and Section 15.3 of Chapter 7 use the identical environment (BipedalWalker-v3), but train with A2C and PPO respectively. Comparing the two experiments:
 
-| Metric                 | A2C (this section) | PPO (Section 7.1) |
+| Metric                 | A2C (this section) | PPO (Section 15.3) |
 | ---------------------- | ------------------ | ----------------- |
 | Training steps         | 3M                 | 2M                |
 | 20-episode mean reward | 221.8              | 282.5             |

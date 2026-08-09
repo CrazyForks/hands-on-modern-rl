@@ -1,5 +1,4 @@
-# 6.7 Hands-on: Running PPO on GSM8K with veRL
-
+# 13.7 Hands-on: Running PPO on GSM8K with veRL
 In Section 8.5, we explained the four-model collaboration behind PPO-RLHF: the roles of the Actor, Reference, Reward Model, and Critic, and the mathematical relationship between the KL penalty, token-level rewards, and advantage estimation. In this section, we take a more practical route: we will use the industrial-grade framework [veRL](https://github.com/volcengine/verl) to run PPO training end-to-end on the GSM8K mathematical reasoning dataset.
 
 Handwritten pseudo-code helps you internalize the principles; veRL helps you run a real experiment. The relationship is similar to Chapter 7, where we run PPO with Stable Baselines3: the algorithm is the same, but the framework takes care of engineering details such as distributed scheduling, VRAM optimizations, and inference acceleration.

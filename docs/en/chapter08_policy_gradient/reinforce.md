@@ -2,8 +2,7 @@
 title: 5.2 The Policy Gradient Theorem and REINFORCE
 ---
 
-# 5.2 The Policy Gradient Theorem and REINFORCE
-
+# 6.2 The Policy Gradient Theorem and REINFORCE
 The previous section explained why we need policy-based methods: DQN's $\arg\max$ does not work in continuous action spaces, so learning the policy $\pi_\theta(a|s)$ directly is the more natural approach. This section answers two questions: what metric should we use to measure "how good" a policy is, and how do we optimize that metric?
 
 ## The Policy Objective
@@ -436,7 +435,7 @@ This difference leads to two key consequences: Q-Learning is off-policy (it can 
 
 </details>
 
-REINFORCE can work, but its high variance makes it nearly unusable in practice. Fortunately, the policy gradient theorem has a remarkable property: we can subtract a baseline that does not depend on the action from the gradient estimator, without changing the expected direction of the gradient, while significantly reducing variance. We will develop this in Section 5.4. In the next section, we will first run vanilla REINFORCE on CartPole: [Hands-on: CartPole](./cartpole).
+REINFORCE can work, but its high variance makes it nearly unusable in practice. Fortunately, the policy gradient theorem has a remarkable property: we can subtract a baseline that does not depend on the action from the gradient estimator, without changing the expected direction of the gradient, while significantly reducing variance. We will develop this in Section 6.3. In the next section, we will first run vanilla REINFORCE on CartPole: [Hands-on: CartPole](./cartpole).
 
 ---
 

@@ -2,8 +2,7 @@
 title: 5.1 Why We Need Policy Gradients
 ---
 
-# 5.1 Why We Need Policy Gradients
-
+# 6.1 Why We Need Policy Gradients
 ## Section Overview
 
 **Key takeaways**

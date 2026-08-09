@@ -2,11 +2,10 @@
 title: 7.3 Constraint Mechanisms for Policy Updates
 ---
 
-# 5.3 Constraint Mechanisms for Policy Updates
-
+# 8.1 Constraint Mechanisms for Policy Updates
 ## Section Overview
 
-Section 7.2 derived PPO's clipped surrogate objective:
+Section 15.4 derived PPO's clipped surrogate objective:
 
 $$L^{\text{CLIP}}(\theta) = \mathbb{E}_t \left[ \min \left( r_t(\theta) \cdot A_t, \; \text{clip}(r_t(\theta), 1-\varepsilon, 1+\varepsilon) \cdot A_t \right) \right]$$
 

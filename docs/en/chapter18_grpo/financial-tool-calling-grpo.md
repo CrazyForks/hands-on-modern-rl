@@ -1,5 +1,4 @@
-# 7.5 Hands-on: Training a Small Model with GRPO for Stable Financial API Calls
-
+# 16.6 Hands-on: Training a Small Model with GRPO for Stable Financial API Calls
 In the previous section, we used math problems to understand RLVR: as long as the answer can be verified by rules, we do not necessarily need to train a Reward Model. Now let us move the same idea into a more enterprise-like setting. A user asks a financial question in natural language, and a small model must choose the correct API, fill the correct arguments, and produce the right answer after the tool returns.
 
 Start with the intuition. In a math task, the action is "write the answer." In a financial assistant, the action is "call a tool." For example, if the user asks:

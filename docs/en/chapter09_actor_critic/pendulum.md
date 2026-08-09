@@ -2,8 +2,7 @@
 title: '6.4 Hands-on: Pendulum Swing-Up and Balance'
 ---
 
-# 6.4 Hands-on: Pendulum Swing-Up and Balance
-
+# 7.3 Hands-on: Pendulum Swing-Up and Balance
 > **Goal of this section**: Train `Pendulum-v1` with A2C, understand why continuous-action Actor-Critic outputs a Gaussian distribution, and see how the Critic helps the Actor learn stable control in continuous spaces.
 
 > **Code for this section**: [actor_critic_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/actor_critic_pendulum.py) · [render_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/render_pendulum.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/requirements.txt)

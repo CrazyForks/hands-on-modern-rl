@@ -2,8 +2,7 @@
 title: 8.4 Reward Models
 ---
 
-# 6.4 Reward Models
-
+# 13.3 Reward Models
 ## Reading Guide
 
 **Core points**

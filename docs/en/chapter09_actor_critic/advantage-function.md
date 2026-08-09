@@ -2,8 +2,7 @@
 title: 6.1 The Advantage Function
 ---
 
-# 6.1 The Advantage Function
-
+# 7.1 The Advantage Function
 At the end of Chapter 5, we found that subtracting a baseline $V(s)$ reduces the variance of policy gradients without changing the gradient direction. This section deepens that insight and introduces the advantage function -- the bridge connecting the Actor and the Critic.
 
 ::: tip Prerequisites

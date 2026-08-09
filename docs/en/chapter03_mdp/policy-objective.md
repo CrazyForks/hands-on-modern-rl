@@ -3,7 +3,7 @@ title: 3.6 From Value to Policy
 ---
 
 ::: warning TODO: English out of sync with Chinese restructure (2026-06-25)
-The Chinese side replaced this file with `policy-value.md` (now §3.2 策略、价值与回报 in the new outline). The "From Value to Policy" framing here is obsolete. Treat this file as archive-only translation reference; the live section should be re-translated from `docs/chapter03_mdp/policy-value.md`.
+The Chinese side replaced this file with `policy-value.md` (now §2.2 策略、价值与回报 in the new outline). The "From Value to Policy" framing here is obsolete. Treat this file as archive-only translation reference; the live section should be re-translated from `docs/chapter03_mdp/policy-value.md`.
 :::
 
 # 3.6 From Value to Policy

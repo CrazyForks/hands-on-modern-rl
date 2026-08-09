@@ -2,8 +2,7 @@
 outline: [2, 3]
 ---
 
-# 3.5 From Q to Q-Learning
-
+# 3.2 From Q to Q-Learning
 **Section Preview**
 
 **Core ideas**

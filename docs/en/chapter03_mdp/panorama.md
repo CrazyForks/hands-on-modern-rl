@@ -2,8 +2,7 @@
 title: '3.9 Chapter Summary: MDP, Value, and Policy'
 ---
 
-# 3.9 Chapter Summary: MDP, Value, and Policy
-
+# 2.4 Chapter Summary: MDP, Value, and Policy
 ## Overview
 
 This chapter develops the core language of reinforcement learning around sequential decision-making: how we model an environment, how we define return, how we evaluate states and actions via value functions, how Bellman equations provide the recursive structure, how we estimate values from data (DP/MC/TD), how tabular Q-Learning works, how we optimize parameterized policies, and why reward design matters.
@@ -422,7 +421,7 @@ This idea becomes the foundation for later techniques such as critics, DQN targe
 
 ### From State Values To Action Values
 
-$V^\pi(s)$ evaluates states, but it does not directly tell us how good each action is at state $s$. To capture long-term return at the action level, Section 3.5 introduces the action-value function:
+$V^\pi(s)$ evaluates states, but it does not directly tell us how good each action is at state $s$. To capture long-term return at the action level, Section 3.2 introduces the action-value function:
 
 $$
 Q^\pi(s,a)=\mathbb{E}_\pi[G_t\mid s_t=s,a_t=a]
@@ -432,7 +431,7 @@ This definition fixes the first action and evaluates the long-term return obtain
 
 ### From Action Values To Q-Learning
 
-Section 3.5 applies the TD idea to a table of action values. Each experience tuple $(s,a,r,s')$ yields a one-step TD target:
+Section 3.2 applies the TD idea to a table of action values. Each experience tuple $(s,a,r,s')$ yields a one-step TD target:
 
 $$
 r+\gamma\max_{a'}Q(s',a')
@@ -452,7 +451,7 @@ The policy gradient expression shows that the update direction has two component
 
 ### The Reward Function Defines The Objective
 
-Every value function, policy objective, and update rule ultimately depends on the accumulation of rewards. Rewards that are too sparse lead to weak learning signals; poorly designed rewards can cause the agent to optimize something misaligned with the task intention. The reward shaping and intrinsic reward ideas in Section 3.8 aim to strengthen learning signals while keeping the original task objective as unchanged as possible.
+Every value function, policy objective, and update rule ultimately depends on the accumulation of rewards. Rewards that are too sparse lead to weak learning signals; poorly designed rewards can cause the agent to optimize something misaligned with the task intention. The reward shaping and intrinsic reward ideas in Section 4.3 aim to strengthen learning signals while keeping the original task objective as unchanged as possible.
 
 ## Review Questions
 

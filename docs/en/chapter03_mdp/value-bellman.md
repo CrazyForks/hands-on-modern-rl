@@ -2,8 +2,7 @@
 title: 3.3 Value Functions and Bellman Equations
 ---
 
-# 3.3 V(s): Value Functions and Bellman Equations
-
+# 3.1 V(s): Value Functions and Bellman Equations
 ## Section Guide
 
 **Core content**
@@ -818,7 +817,7 @@ The 0 here does not mean these states are truly worth only 0 points. It means �
 
 To summarize: the value table solves a very concrete problem: **it gives the abstract value function a carrier that can be repeatedly updated**. When the number of states is finite and enumerable, the value table is the most direct representation. When the state space is huge or continuous, this table cannot fit everything, and later we need function approximation and neural networks to replace it.
 
-The same idea naturally extends to action values. A state-value table stores one number for each state; an action-value table stores one number for every “state-action pair,” namely $Q(s,a)$. The Q table in Section 3.5 is essentially the value table here extended from “one cell per state” to “one cell per action under each state.” Classic TD learning can be viewed as using experience to correct state predictions[^4]; Q-learning updates action values in a tabular setting with finite states, finite actions, and repeated sampling[^5].
+The same idea naturally extends to action values. A state-value table stores one number for each state; an action-value table stores one number for every “state-action pair,” namely $Q(s,a)$. The Q table in Section 3.2 is essentially the value table here extended from “one cell per state” to “one cell per action under each state.” Classic TD learning can be viewed as using experience to correct state predictions[^4]; Q-learning updates action values in a tabular setting with finite states, finite actions, and repeated sampling[^5].
 
 ### From Equation to Update Rule
 

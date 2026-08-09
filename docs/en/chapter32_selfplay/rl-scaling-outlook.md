@@ -2,8 +2,7 @@
 title: 12.6 RL Scaling and Future Outlook
 ---
 
-# 10.6 RL Scaling and Future Outlook: Where Is the Ceiling?
-
+# 29.2 RL Scaling and Future Outlook: Where Is the Ceiling?
 In the previous three sections, we traced the evolution of RL training from PPO to GRPO to DAPO/RLVR. On the strategy side, the Critic was removed; on the reward side, the RM was removed; training costs decreased step by step. But a more fundamental question remains unanswered: **Is there a ceiling to the benefits of RL training? Can we continue improving by investing more compute?**
 
 One of the most exciting discoveries of 2025 is that **the returns from RL training have not yet saturated**. Continuing to increase RL training scale still yields steady improvements in reasoning ability. This section discusses the future of RL from three dimensions: training paradigm choice (Online vs. Offline), three directions of RL Scaling, and Test-time Scaling with process reward models.

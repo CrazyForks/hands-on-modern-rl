@@ -2,8 +2,7 @@
 title: 9.1 DPO Theory, Math, and Method Selection
 ---
 
-# 7.1 DPO Theory, Math, and Method Selection
-
+# 15.3 DPO Theory, Math, and Method Selection
 You have already run DPO training code and watched metrics such as loss, accuracy, and reward margin move during training. Now let us slow down and return to the original problem DPO tries to solve: **if we already have human preference data, can we train the language model directly, without training a Reward Model and without running a full PPO pipeline?**
 
 A DPO training sample is a "choose one of two answers to the same question" preference item. Given the same prompt, the data contains two answers: one answer humans prefer, called chosen, and one answer humans do not prefer, called rejected.

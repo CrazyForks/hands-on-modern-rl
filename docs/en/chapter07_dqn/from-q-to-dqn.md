@@ -2,8 +2,7 @@
 title: 4.1 Why DQN Is Needed
 ---
 
-# 4.1 Why DQN Is Needed
-
+# 5.1 Why DQN Is Needed
 ## Section Guide
 
 **Core ideas**

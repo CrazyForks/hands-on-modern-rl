@@ -2,8 +2,7 @@
 title: 8.2 The RLHF Pipeline
 ---
 
-# 6.2 The RLHF Pipeline
-
+# 13.4 The RLHF Pipeline
 ## Reading Guide
 
 **Core points**

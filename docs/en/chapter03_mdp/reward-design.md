@@ -2,8 +2,7 @@
 title: 3.8 Reward Function Design
 ---
 
-# 3.8 Reward Functions: Where Does the Optimization Objective Come From?
-
+# 4.3 Reward Functions: Where Does the Optimization Objective Come From?
 In the previous sections, we discussed value estimation methods and how data is collected. But whether we are doing DP, MC, or TD, and whether we are on-policy or off-policy, the target of every update ultimately comes from the same upstream source: the reward function.
 
 The last section answered “where does the data come from.” In this section, we go one step further upstream and ask: **how does the reward determine the direction of optimization, and why is it so hard to write a good reward?**
@@ -50,7 +49,7 @@ Here $\gamma$ is the discount factor. The closer $\gamma$ is to 1, the more the 
 
 This also explains why reward design determines behavior. The algorithm does not see the true human intention; it sees only this scalar signal. In our minds, we want “keep the pole upright stably,” “get to the maze exit,” or “give the user a helpful answer.” What the algorithm actually optimizes is the expected sum of numbers. If the numbers are not aligned with the intention, then the stronger the optimizer, the faster the misalignment can be amplified.
 
-To understand reward, we also need to separate it from the value function from the previous section. In Section 3.3 we defined the state value function:
+To understand reward, we also need to separate it from the value function from the previous section. In Section 3.1 we defined the state value function:
 
 $$
 V^\pi(s)=\mathbb{E}_\pi[G_t\mid S_t=s].
@@ -58,7 +57,7 @@ $$
 
 Reward $R$ is the immediate signal provided by the environment after a one-step transition. Value $V^\pi$ is an estimate of how much long-term return can be obtained from a state under policy $\pi$. Reward is part of the task specification; value is a quantity computed by the learning algorithm from rewards and experience.
 
-Return to the three-cell corridor from Section 3.3:
+Return to the three-cell corridor from Section 3.1:
 
 $$
 S\xrightarrow{-1}M\xrightarrow{-1}G.

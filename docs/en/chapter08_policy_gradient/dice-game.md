@@ -2,8 +2,7 @@
 title: '5.7 Hands-on: A Two-Armed Bandit (Dice-Game Slot Machine)'
 ---
 
-# 5.1 Hands-on: A Two-Armed Bandit (Dice-Game Slot Machine)
-
+# 6.4 Hands-on: A Two-Armed Bandit (Dice-Game Slot Machine)
 Imagine you walk into a casino. In front of you is a single old slot machine with two levers: one red, one blue. The red lever wins with probability 30%, while the blue lever wins with probability 70%. Each round, you may pull exactly one lever. If you win, you get $1; if you lose, you get nothing.
 
 A rational human would play this how? Of course: pull the blue lever forever. A 70% win rate crushes 30%.

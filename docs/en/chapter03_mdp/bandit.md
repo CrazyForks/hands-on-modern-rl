@@ -2,8 +2,7 @@
 title: 3.1 Exploration and Exploitation
 ---
 
-# 3.1 Exploration and Exploitation
-
+# 2.1 Exploration and Exploitation
 ## What This Section Solves
 
 **Core content**
