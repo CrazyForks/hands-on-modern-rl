@@ -708,7 +708,7 @@ const zhSidebar = {
               link: '/chapter01_cartpole/metrics'
             },
             {
-              text: '1.3 PPO 训练可视化',
+              text: '1.3 动手：PPO 训练可视化',
               link: '/chapter01_cartpole/training'
             }
           ]
@@ -748,7 +748,7 @@ const zhSidebar = {
               link: '/chapter03_mdp/value-q'
             },
             {
-              text: '3.3 价值函数数值实验',
+              text: '3.3 动手：价值函数数值实验',
               link: '/chapter03_mdp/value-experiment'
             }
           ]
@@ -794,7 +794,7 @@ const zhSidebar = {
               link: '/chapter07_dqn/dqn-components'
             },
             {
-              text: '5.4 LunarLander / Atari 实验',
+              text: '5.4 动手：LunarLander / Atari 实验',
               link: '/chapter07_dqn/lunar-lander'
             }
           ]
@@ -834,7 +834,7 @@ const zhSidebar = {
               link: '/chapter09_actor_critic/actor-critic'
             },
             {
-              text: '7.3 实验',
+              text: '7.3 动手：Pendulum 实验',
               link: '/chapter09_actor_critic/pendulum'
             }
           ]
@@ -982,7 +982,7 @@ const zhSidebar = {
               link: '/chapter15_rlhf/evaluation'
             },
             {
-              text: '13.7 veRL PPO 训练 GSM8K',
+              text: '13.7 动手：veRL PPO 训练 GSM8K',
               link: '/chapter15_rlhf/verl-ppo-gsm8k'
             }
           ]
@@ -1268,11 +1268,11 @@ const zhSidebar = {
               link: '/chapter26_vlm/qwen3-vl-reflection'
             },
             {
-              text: '24.3 中国多模态前沿',
+              text: '24.3 动手：中国多模态前沿',
               link: '/chapter26_vlm/vlm-grpo-hands-on'
             },
             {
-              text: '24.4 GeoQA 几何推理实验',
+              text: '24.4 动手：GeoQA 几何推理实验',
               link: '/chapter26_vlm/easyr1-geoqa'
             }
           ]

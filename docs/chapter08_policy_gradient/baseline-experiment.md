@@ -1,4 +1,4 @@
-# 6.3 动手 与 Value Baseline 平衡小车挑战
+# 6.3 动手：Value Baseline 平衡小车挑战
 
 > **本节目标**：用 `CartPole-v1` 对比原始 REINFORCE 和带价值基线（Value Baseline, VB）的 REINFORCE，观察 $V(s)$ 如何让策略梯度训练更快、更稳。
 

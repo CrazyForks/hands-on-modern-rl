@@ -1,4 +1,4 @@
-# 7.4 动手 与 AlphaGo 复现
+# 7.4 动手：AlphaGo 复现
 
 学了策略梯度和 Actor-Critic 之后，我们已经有了两件武器：**策略网络**（决定下一步走哪——回顾：[策略 $\pi_\theta(a|s)$](../chapter08_policy_gradient/reinforce)）和**价值网络**（判断局面谁赢面大——回顾：[Critic $V(s)$](./critic-training)）。2016 年，DeepMind 的 AlphaGo 把这两件武器和蒙特卡洛树搜索（MCTS）组合在一起，击败了世界冠军李世石——这是 RL 历史上最出圈的时刻。
 

@@ -1,4 +1,4 @@
-# 7.5 动手 与 BipedalWalker 双足行走
+# 7.5 动手：BipedalWalker 双足行走
 
 > **本节目标**：用 A2C 训练 `BipedalWalker-v3`，观察 Actor-Critic 处理高维连续控制的能力与局限——并理解为什么下一章需要 PPO。
 

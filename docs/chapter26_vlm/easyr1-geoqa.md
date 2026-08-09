@@ -1,4 +1,4 @@
-# 24.4 GeoQA 几何推理实验
+# 24.4 动手：GeoQA 几何推理实验
 
 11.1 节我们手写了 VLM GRPO 训练循环——几十行代码，跑在合成数据上。这一节我们换一个姿势：用工业级框架 [EasyR1](https://github.com/hiyouga/EasyR1)，在真实数据集 GeoQA-8K 上训练 VLM 做几何推理。
 
