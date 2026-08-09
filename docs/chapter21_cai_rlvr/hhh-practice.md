@@ -101,7 +101,7 @@ $$
 R(x, y) = w_{\text{task}} r_{\text{RLVR}}(x, y) + w_{\text{safe}} r_{\text{CAI}}(x, y) + w_{\text{hon}} r_{\text{verifier}}(x, y) - \beta D_{KL}
 $$
 
-这种 **multi-objective RL** 是 Claude 3.5 / 4 的核心训练范式，也是 [第 19 章 PRM 引导搜索](../chapter20_prm_search/inference-time-search) 的奖励组合方式之一。
+这种 **multi-objective RL** 是 Claude 3.5 / 4 的核心训练范式，也是 [第 18 章 PRM 引导搜索](../chapter20_prm_search/inference-time-search) 的奖励组合方式之一。
 
 ### Claude 3.5 的几个工程经验
 
@@ -117,4 +117,4 @@ $$
 
 HHH（Helpful, Harmless, Honest）是 Anthropic 在 Claude 训练中实际使用的三原则。Helpful 要求模型尽力完成任务；Harmless 要求模型拒绝有害请求；Honest 要求模型不编造。这三者经常冲突——例如对一个敏感但合理的问题，过于 Harmless 会变成 evasiveness（回避），失去 Helpful 和 Honest。CAI 通过宪法让模型学会在冲突中找平衡。
 
-下一节 [21.3 RLAIF 工程化与宪法扩展](./rlaif-engineering) 讲解 Anthropic 2026 年发布的 80 页 Constitution——这是目前工业界最详尽的 AI 宪法工程实践。
+下一节 [19.2 RLAIF 工程化与宪法扩展](./rlaif-engineering) 讲解 Anthropic 2026 年发布的 80 页 Constitution——这是目前工业界最详尽的 AI 宪法工程实践。

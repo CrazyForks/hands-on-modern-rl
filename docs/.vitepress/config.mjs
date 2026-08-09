@@ -1210,7 +1210,7 @@ const zhSidebar = {
               link: '/chapter22_agentic/tool-use-and-trajectory'
             },
             {
-              text: '20.5 Search-Augmented RL',
+              text: '20.5 Search-Augmented RL 与 Web/Code Agent',
               link: '/chapter22_agentic/tool-use-agents'
             },
             {
@@ -1420,7 +1420,7 @@ const zhSidebar = {
               link: '/chapter32_selfplay/rl-scaling-outlook'
             },
             {
-              text: '29.3 In-Context RL 与未来十年',
+              text: '29.3 LLM 多智能体强化学习',
               link: '/chapter32_selfplay/llm-multi-agent-rl/'
             },
             {
@@ -1767,7 +1767,8 @@ const enSidebar = {
               link: '/en/chapter03_mdp/dp-mc-td'
             },
             {
-              text: '4.2 Algorithm Taxonomy: On/Off-Policy & Online/Offline (Translation pending)'
+              text: '4.2 Algorithm Taxonomy: On/Off-Policy & Online/Offline',
+              link: '/en/chapter03_mdp/algorithm-taxonomy'
             },
             {
               text: '4.3 Reward Function Design',
@@ -2174,7 +2175,7 @@ const enSidebar = {
               link: '/en/chapter22_agentic/tool-use-and-trajectory'
             },
             {
-              text: '20.5 Search-Augmented RL',
+              text: '20.5 Search-Augmented RL: Web and Code Agents',
               link: '/en/chapter22_agentic/tool-use-agents'
             },
             {
@@ -2345,7 +2346,7 @@ const enSidebar = {
               link: '/en/chapter32_selfplay/rl-scaling-outlook'
             },
             {
-              text: '29.3 In-Context RL & the Next Decade',
+              text: '29.3 LLM Multi-Agent Reinforcement Learning',
               link: '/en/chapter32_selfplay/llm-multi-agent-rl/'
             },
             {
@@ -2884,7 +2885,7 @@ export default defineConfig({
       }
     }
   },
-  ignoreDeadLinks: true,
+  ignoreDeadLinks: false,
   head: [
     ['link', { rel: 'icon', href: `${base}favicon.svg` }],
     ['meta', { name: 'theme-color', content: '#3f51b5' }],

@@ -1,8 +1,8 @@
 # 第 23 章 · Computer Use 与 GUI Agent
 
-> [第 20 章 Agentic RL](../chapter22_agentic/intro) 让 LLM 学会调用工具、阅读工具返回、在多轮交互中纠错——这是单 agent 的形态。但当任务从"写一段函数"升级到"在我电脑里订一张下周三去上海的机票"，agent 必须跨过的鸿沟是：**像人一样看屏幕、点鼠标、敲键盘**。本章解决两件事：(1) Computer Use 范式下，agent 如何把 GUI 像素流映射为原子动作并用 RL 优化（25.1–25.2）；(2) GUI Agent 的训练实践（[25.2](./training)）与安全防御（[25.3](./safety-swarm)）。
+> [第 20 章 Agentic RL](../chapter22_agentic/intro) 让 LLM 学会调用工具、阅读工具返回、在多轮交互中纠错——这是单 agent 的形态。但当任务从"写一段函数"升级到"在我电脑里订一张下周三去上海的机票"，agent 必须跨过的鸿沟是：**像人一样看屏幕、点鼠标、敲键盘**。本章解决两件事：(1) Computer Use 范式下，agent 如何把 GUI 像素流映射为原子动作并用 RL 优化（25.1–25.2）；(2) GUI Agent 的训练实践（[23.1](./training)）与安全防御（[23.2](./safety-swarm)）。
 
-## 25.1 Computer Use 范式
+## Computer Use 范式
 
 [第 20 章工具使用](../chapter22_agentic/tool-use-and-trajectory)中的工具是**结构化 API**——`def search(query): return results`，输入输出都是字符串。但真实世界里大量软件只有一种接口：**GUI**。浏览器、Excel、企业内部 OA、Photoshop、游戏——它们没有公开 API，只有屏幕和鼠标键盘事件。
 
@@ -153,4 +153,4 @@ class GUIEnv:
 
 Computer Use 把 GUI 像素流当作 RL 状态空间，把鼠标键盘事件当作动作空间，这让传统 RL 的所有难题（稀疏奖励、长时序、高维观察）同时放大。**Set-of-Mark** 与**视觉 Grounding** 是解决"定位"问题的两条主流路线：前者依赖外部检测器简化动作空间，后者用 VLM 端到端输出坐标。
 
-下一节 [25.2 GUI Agent 训练实践](./training) 走进工业实战——你会看到 UI-TARS-2、AutoGLM、MobileRL、ComputerRL 等系统如何把这套理论变成可复现的训练 pipeline。
+下一节 [23.1 GUI Agent 训练实践](./training) 走进工业实战——你会看到 UI-TARS-2、AutoGLM、MobileRL、ComputerRL 等系统如何把这套理论变成可复现的训练 pipeline。

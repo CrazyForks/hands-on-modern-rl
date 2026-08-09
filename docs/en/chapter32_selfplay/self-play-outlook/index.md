@@ -1,8 +1,8 @@
 ---
-title: 12.3 Self-Play
+title: 29.1 Self-Play
 ---
 
-# 10.3 Self-Play, Self-Evolution, and a Learning Roadmap
+# 29.1 Self-Play, Self-Evolution, and a Learning Roadmap
 
 AlphaGo learned Go from scratch through self-play — no human game records, no expert demonstrations, just a board and a loop of self-competition. This "from zero to superhuman" story is one of RL's most legendary chapters. In 2025–2026, the same idea is being transferred to large language models: **can models continuously evolve through self-play, eventually breaking through the ceiling of human data?**
 
@@ -171,15 +171,15 @@ In standard GRPO/DAPO training, each prompt is uniformly randomly sampled, but s
 
 $$\mathcal{P}^*(d) \propto \mathcal{P}_0(d) \cdot (1 - p(d))$$
 
-Prompts with low pass rates are sampled more. More advanced approaches have a Proposer model learn through RL to generate problems "just beyond the Solver's current ability" — the Proposer itself is also trained with RL. This connects directly to Chapter 9's GRPO: GRPO's within-group advantage automatically provides difficulty signals (prompts where the entire group answered correctly are too easy, where the entire group failed are too hard), which can be used to dynamically adjust the prompt distribution.
+Prompts with low pass rates are sampled more. More advanced approaches have a Proposer model learn through RL to generate problems "just beyond the Solver's current ability" — the Proposer itself is also trained with RL. This connects directly to Chapter 16's GRPO: GRPO's within-group advantage automatically provides difficulty signals (prompts where the entire group answered correctly are too easy, where the entire group failed are too hard), which can be used to dynamically adjust the prompt distribution.
 
 ### Closed Loop 3: Reward Signal Self-Evolution — From External RM to Self-Verification
 
 The highest form of self-evolution is **reward signals themselves evolving through RL**, corresponding to three stages:
 
-**Stage 1: External RM (RLHF, Chapter 8)**. Rewards come from a Reward Model trained on human preferences, with an upper limit constrained by RM quality.
+**Stage 1: External RM (RLHF, Chapter 13)**. Rewards come from a Reward Model trained on human preferences, with an upper limit constrained by RM quality.
 
-**Stage 2: Rule Verification (RLVR, Chapter 9)**. Rewards come from verifiable signals (answer correctness, code executability), eliminating the RM but limited to domains with standard answers.
+**Stage 2: Rule Verification (RLVR, Chapter 16)**. Rewards come from verifiable signals (answer correctness, code executability), eliminating the RM but limited to domains with standard answers.
 
 **Stage 3: Self-Verification and LLM-as-Judge**. The model evaluates its own generation quality — the Self-Rewarding LM discussed in this section. As generation capability improves, judging capability improves simultaneously, forming a positive flywheel. **STaR (Self-Taught Reasoner)** is a typical implementation of this closed loop: the model writes its own reasoning process, and if the final answer is correct (positive reward), the reasoning is treated as a positive example; if wrong (negative reward), the correct answer is provided for the model to reason backwards — the entire process is itself an RL loop.
 
@@ -199,7 +199,7 @@ Self-evolution systems sound wonderful, but they still face several fundamental 
 | --------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------- |
 | Self-loop degradation | Model's self-evaluation has biases, errors are continuously amplified | Introduce external verification signals (e.g., test cases) |
 | Diversity loss        | Self-play causes policy to collapse to narrow local optima            | Diversity rewards, population training                     |
-| Safety risks          | Autonomous exploration may discover harmful behavior patterns         | Constrained RL (as discussed in Section 12.2)              |
+| Safety risks          | Autonomous exploration may discover harmful behavior patterns         | Constrained RL                                             |
 | Evaluation bottleneck | "Is the model truly improving" becomes harder to assess               | Multi-dimensional evaluation, adversarial testing          |
 
 **Self-loop degradation** is the most concerning. If Generator and Judge both come from the same model, their biases may reinforce each other — the Generator produces answers in a certain style, the Judge gives high scores because it is "familiar with this style," and the Generator is encouraged to keep producing the same style. This is like an "AI echo chamber" — errors are not corrected but amplified.
@@ -212,21 +212,21 @@ The ideas of self-play and self-evolution thread through the core themes of the 
 
 | Concept from Previous Chapters           | Correspondence in Self-Play/Self-Evolution                                                       |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| AlphaGo self-play (Chapter 5)            | Direct predecessor of self-play — from Go to language                                            |
-| GRPO within-group comparison (Chapter 9) | Within-group comparison is "simplified self-play" — multiple answers from the same model compete |
-| Experience replay (Chapter 4)            | "Experience distillation" in self-evolution — from raw replay to summarized distillation         |
-| PPO (Chapter 7)                          | Policy optimization algorithm for self-play training                                             |
-| RLVR (Chapter 9)                         | Self-play rewards can use verifiable signals, no RM needed                                       |
-| Agentic RL (Chapter 9)                   | Self-play can train tool-use policies — model generates its own tool-call scenarios              |
-| Test-time search (Section 12.1)          | Reasoning strategies learned through self-play can be used at inference time                     |
+| AlphaGo self-play (Chapter 7)            | Direct predecessor of self-play — from Go to language                                            |
+| GRPO within-group comparison (Chapter 16) | Within-group comparison is "simplified self-play" — multiple answers from the same model compete |
+| Experience replay (Chapter 5)            | "Experience distillation" in self-evolution — from raw replay to summarized distillation         |
+| PPO (Chapter 8)                          | Policy optimization algorithm for self-play training                                             |
+| RLVR (Chapter 16)                         | Self-play rewards can use verifiable signals, no RM needed                                       |
+| Agentic RL (Chapter 20)                   | Self-play can train tool-use policies — model generates its own tool-call scenarios              |
+| Test-time search                         | Reasoning strategies learned through self-play can be used at inference time                     |
 
 Perhaps the deepest connection: **GRPO is a simplified version of self-play**. GRPO has the same model generate multiple answers, then compares them within the group — this is equivalent to multiple instances of the same model "competing." Self-play extends this competition to more complex scenarios: not just comparing final answers, but competing in multi-turn interactions, even playing different roles (Generator vs Judge, Debater A vs Debater B).
 
-From this perspective, the path from Chapter 9's GRPO to this chapter's self-play is a natural technical evolution: **from simple within-group competition to complex multi-role games, from fixed datasets to continuously evolving training loops**.
+From this perspective, the path from Chapter 16's GRPO to this chapter's self-play is a natural technical evolution: **from simple within-group competition to complex multi-role games, from fixed datasets to continuously evolving training loops**.
 
 ---
 
-Next we discuss [12.4 LLM Multi-Agent RL](../llm-multi-agent-rl) — from multi-agent cooperation to model-based RL, with a hands-on experiment using PettingZoo.
+Next we discuss [29.3 LLM Multi-Agent Reinforcement Learning](../llm-multi-agent-rl/) — from multi-agent cooperation to model-based RL, with a hands-on experiment using PettingZoo.
 
 ---
 

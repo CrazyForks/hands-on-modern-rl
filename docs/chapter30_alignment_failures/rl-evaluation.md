@@ -1,8 +1,8 @@
 # 28.5 评估原则与现代评估 Harness
 
-> [第 33 章](../chapter30_alignment_failures/modern-incidents) 讲了 Qwen3 数据污染——benchmark 分数虚高 15-25 个百分点。这暴露的不只是数据问题，而是 **整个 RL 评估方法论的脆弱**。本章系统化讨论：什么样的 benchmark 设计是可信的？怎么检测污染？提示敏感性如何影响结论？长程任务和行为任务怎么评？最后介绍工业级评测 harness 与 Anthropic 2025 内部 AI Research Eval Suite（34× 人类加速）。
+> [第 28 章](../chapter30_alignment_failures/modern-incidents) 讲了 Qwen3 数据污染——benchmark 分数虚高 15-25 个百分点。这暴露的不只是数据问题，而是 **整个 RL 评估方法论的脆弱**。本章系统化讨论：什么样的 benchmark 设计是可信的？怎么检测污染？提示敏感性如何影响结论？长程任务和行为任务怎么评？最后介绍工业级评测 harness 与 Anthropic 2025 内部 AI Research Eval Suite（34× 人类加速）。
 
-## 35.1 评估基准设计原则
+## 评估基准设计原则
 
 好的 RL benchmark 必须满足五个原则：
 
@@ -55,9 +55,9 @@ MATH 数据集按难度分 Level 1-5，DeepSeek-R1 报告每层分数。报告�
 
 LLM 评测论文长期忽视统计显著性，2024 年后才被广泛接受（[Blackwell et al., arXiv:2410.03492](https://arxiv.org/abs/2410.03492)）。
 
-## 35.2 污染与泄漏检测
+## 污染与泄漏检测
 
-[第 33 章 RLVR 假性收益](../chapter30_alignment_failures/modern-incidents) 详细讲了 Qwen3 数据污染事件。这一节给出系统化的检测方法。
+[第 28 章 RLVR 假性收益](../chapter30_alignment_failures/modern-incidents) 详细讲了 Qwen3 数据污染事件。这一节给出系统化的检测方法。
 
 ### 污染的三种类型
 
@@ -144,7 +144,7 @@ test_data = [
 
 Qwen3 事件后，主流团队都建立了去污染 pipeline，但效果仍不完美——隐式污染几乎无法消除。
 
-## 35.3 提示敏感性分析
+## 提示敏感性分析
 
 同一个模型、同一个任务，prompt 不同，分数差 10-20 个点是常见的。这种现象叫 **Prompt Sensitivity**。
 
@@ -201,7 +201,7 @@ Therefore, the answer is \\boxed{{{answer}}}.
 
 RL 训练后的模型特别容易对 prompt 敏感——因为 RL 鼓励模型对训练分布中的 prompt 格式高度适应。**报告 RL 结果时必须做多 prompt 平均**，否则结论可能被"幸运的 prompt 模板"主导。
 
-## 35.4 分布外鲁棒性
+## 分布外鲁棒性
 
 模型在训练分布上表现好，但在分布外（Out-of-Distribution, OOD）可能急剧退化。这是 RL 训练特有的问题——RL 倾向于"过拟合"训练分布的奖励信号。
 
@@ -250,7 +250,7 @@ RLHF/GRPO 训练后模型常出现 **Alignment Tax**——对齐牺牲了基础�
 - **能力保留数据**：在 RL 训练中混入 SFT 数据，定期复习
 - **Multi-Objective RL**：同时优化 accuracy、helpfulness、safety 三个目标（[Reward Weighted regression, arXiv:2305.18290](https://arxiv.org/abs/2305.18290)）
 
-## 35.5 行为评估 vs 能力评估
+## 行为评估 vs 能力评估
 
 传统的 benchmark 评估**能力**（capability）——"模型能不能解这道题"。但 RL 训练后的模型还需要评估**行为**（behavior）——"模型在这种情境下会怎么表现"。
 
@@ -313,9 +313,9 @@ Perez et al. 2022（[arXiv:2212.09251](https://arxiv.org/abs/2212.09251)）设�
 
 工业实践中，Anthropic 和 OpenAI 都有专门的"行为评估团队"，每月评估 Claude/GPT 的行为变化。
 
-## 35.6 长程任务评估的挑战
+## 长程任务评估的挑战
 
-[第 26 章 Computer Use](../chapter28_computer_use)、[第 13 章 SWE-Agent](../chapter23_rl_based_swe/intro) 这些 agentic 任务，评估比单轮问答难得多——任务可能持续几小时、涉及几百步决策。
+[第 23 章 Computer Use](../chapter25_computer_use/intro)、[第 21 章 SWE-Agent](../chapter23_rl_based_swe/intro) 这些 agentic 任务，评估比单轮问答难得多——任务可能持续几小时、涉及几百步决策。
 
 ### 长程任务的特性
 
@@ -341,7 +341,7 @@ $$\text{Score} = \mathbf{1}[\text{最终结果正确}]$$
 
 #### 2. 过程评估（Process-Based）
 
-用 Process Reward Model（[第 12 章 PRM](../chapter20_prm_search/outcome-vs-process)）评估每一步：
+用 Process Reward Model（[第 18 章 PRM](../chapter20_prm_search/outcome-vs-process)）评估每一步：
 
 $$\text{Score} = \frac{1}{T}\sum_{t=1}^T \text{PRM}(s_t, a_t)$$
 
@@ -381,7 +381,7 @@ def long_horizon_eval(agent, task, n_runs=10):
 
 10 次运行是最低要求，重要评估应该 50+ 次。这是为什么长程任务的论文实验成本极高——单次实验可能花费数千美元的 API 费。
 
-## 35.7 Anthropic 内部 AI Research Eval Suite
+## Anthropic 内部 AI Research Eval Suite
 
 2025 年 Anthropic 公开了内部用于评估 Claude Opus 4.6（2025.11）作为 **AI Research Assistant** 的能力——这是一个具有里程碑意义的 benchmark，因为它直接衡量"模型能否做 AI 研究工作"。
 
@@ -407,7 +407,7 @@ def long_horizon_eval(agent, task, n_runs=10):
 
 让模型在 MuJoCo 物理仿真中训练四足机器人行走：
 
-- 这是经典连续控制任务（[第 10 章 SAC](../chapter11_continuous_control/intro)）
+- 这是经典连续控制任务（[第 9 章 SAC](../chapter11_continuous_control/intro)）
 - 需要理解环境、调试算法、调参
 - 成功标准：agent 在 1M 步内达到 baseline 性能
 
@@ -444,9 +444,9 @@ Opus 4.6 Eval Suite 揭示了一个新现象——**模型已经能做初级 AI 
 2. **人类角色转变**：从"做研究"转向"指导 AI 做研究"
 3. **评估的元问题**：模型做的研究如何评估？需要更高维度的 benchmark
 
-这一发现也直接推动了对齐研究——如果模型能自己做研究，对齐问题会更紧迫（[第 34 章 Scalable Oversight](../chapter34_scalable_oversight/intro)）。
+这一发现也直接推动了对齐研究——如果模型能自己做研究，对齐问题会更紧迫（[第 28 章 Scalable Oversight](../chapter30_alignment_failures/intro)）。
 
-## 35.8 标准化评测 harness
+## 标准化评测 harness
 
 工业级 RL 评估不能手动跑——必须有标准化的 evaluation harness。下面介绍四个主流 harness。
 
@@ -561,7 +561,7 @@ RL 评估方法论的核心原则：
 4. **OOD 评估**：能力评估 + 行为评估 + 长程评估三层
 5. **标准化 harness**：lm-eval、BigCode、τ-bench、BFCL 四大体系互补
 
-Opus 4.6 Eval Suite 揭示了**模型已经能做初级研究工作**——34× 人类加速是 2025 年最重要的能力里程碑。下一章 [第 36 章 分布式 RL 训练系统](../chapter36_distributed_rl_training/intro) 转向工程实现——如何在万卡集群上跑出这些 RL 实验。
+Opus 4.6 Eval Suite 揭示了**模型已经能做初级研究工作**——34× 人类加速是 2025 年最重要的能力里程碑。下一章 [第 36 章 分布式 RL 训练系统](../appendix_industrial_training/rl-infrastructure) 转向工程实现——如何在万卡集群上跑出这些 RL 实验。
 
 ## 延伸阅读
 

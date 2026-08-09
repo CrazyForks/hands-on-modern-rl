@@ -1,5 +1,5 @@
 ---
-title: '11.5 Hands-On: Train GeoQA Geometry Reasoning with EasyR1'
+title: '24.4 Hands-On: Train GeoQA Geometry Reasoning with EasyR1'
 ---
 
 # 24.4 Hands-on: Train GeoQA Geometry Reasoning with EasyR1

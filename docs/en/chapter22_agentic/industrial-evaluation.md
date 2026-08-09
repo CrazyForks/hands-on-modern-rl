@@ -1,8 +1,8 @@
 ---
-title: 22.3 Benchmarks and Case Studies
+title: 'Supplement: Benchmarks and Case Studies'
 ---
 
-# 20.3 Benchmarks and Case Studies
+# Supplement: Benchmarks and Case Studies
 
 This section merges what used to be "industrial practice" and "benchmarks." The reason is simple: in real agent training, every operational problem eventually has to be closed by **evaluation**, **monitoring**, **badcase attribution**, and **regression testing**.
 

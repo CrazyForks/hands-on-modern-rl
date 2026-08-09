@@ -1,6 +1,6 @@
 # 9.3 Model-Based RL 与 Dyna、PETS、MBPO
 
-> [11.2](./td3-sac) 让连续控制的 model-free 算法达到了稳定可用——SAC、TD3 在 MuJoCo 上训练百万步能给出好策略。但百万步对真实机器人是不可承受的：机械臂的电机磨损、电池续航、安全约束让真实环境采样极其昂贵。**Model-Based RL** 的核心思想是：**学一个环境模型** $\hat{P}(s' \mid s, a), \hat{R}(s, a)$，让策略在模型上训练，把样本效率从百万步降到万步。
+> [9.2](./td3-sac) 让连续控制的 model-free 算法达到了稳定可用——SAC、TD3 在 MuJoCo 上训练百万步能给出好策略。但百万步对真实机器人是不可承受的：机械臂的电机磨损、电池续航、安全约束让真实环境采样极其昂贵。**Model-Based RL** 的核心思想是：**学一个环境模型** $\hat{P}(s' \mid s, a), \hat{R}(s, a)$，让策略在模型上训练，把样本效率从百万步降到万步。
 
 ## Model-Based 与 Model-Free 的根本区别
 
@@ -177,4 +177,4 @@ Model-Based RL 通过**学习环境模型** 提升样本效率：
 2. **PETS** 用概率集成表达模型不确定性，CEM 规划保持鲁棒
 3. **MBPO** 用短 horizon rollout 避免误差累积，达到 SAC 性能但采样少 100×
 
-下一节 [11.4 AlphaZero、MuZero 与 Dreamer V3](./search-world-models) 转向 model-based 的另一旗舰路线——显式搜索 + 神经网络估值，从 AlphaGo 到 Dreamer V3 的演进。
+下一节 [9.4 AlphaZero、MuZero 与 Dreamer V3](./search-world-models) 转向 model-based 的另一旗舰路线——显式搜索 + 神经网络估值，从 AlphaGo 到 Dreamer V3 的演进。

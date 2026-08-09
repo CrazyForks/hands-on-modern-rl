@@ -1,5 +1,5 @@
 ---
-title: 8. The RLHF Pipeline
+title: 13. The RLHF Pipeline
 ---
 
 # Chapter 13: The RLHF Pipeline
@@ -117,16 +117,16 @@ If you cannot trace which dataset, which checkpoint, and which evaluation produc
 
 | Section                                                               | Core question                                             | Deliverable                               |
 | --------------------------------------------------------------------- | --------------------------------------------------------- | ----------------------------------------- |
-| [8.1 From Base Model to Aligned Assistant](./base-model-to-assistant) | What does a base model miss?                              | base vs SFT vs RLHF comparison            |
-| [8.2 The RLHF Pipeline](./standard-rlhf-pipeline)                     | What are the inputs/outputs of SFT -> RM -> PPO?          | artifact checklist + flow diagram         |
-| [8.3 SFT Instruction Tuning](./imitation-learning-pipeline)           | How do we build SFT and preference data?                  | data pipeline and masking rules           |
-| [8.4 Reward Models](./reward-function-design)                         | How do we turn preferences into reward?                   | RM loss + metrics + failure modes         |
+| [13.1 From Base Model to Aligned Assistant](./base-model-to-assistant) | What does a base model miss?                              | base vs SFT vs RLHF comparison            |
+| [13.4 The RLHF Pipeline](./standard-rlhf-pipeline)                     | What are the inputs/outputs of SFT -> RM -> PPO?          | artifact checklist + flow diagram         |
+| [13.2 SFT Instruction Tuning](./imitation-learning-pipeline)           | How do we build SFT and preference data?                  | data pipeline and masking rules           |
+| [13.3 Reward Models](./reward-function-design)                         | How do we turn preferences into reward?                   | RM loss + metrics + failure modes         |
 | [8.5 PPO-RLHF](./ppo-rlhf-loop)                                       | How do Actor/Ref/RM/Critic work together?                 | the four-model loop + how to read metrics |
-| [8.6 Evaluation](./evaluation)                                        | How do we prove we improved without cheating the RM?      | evaluation gate and badcase loop          |
-| [8.7 Hands-On: veRL + GSM8K](./verl-ppo-gsm8k)                        | How does the pipeline look in an industrial framework?    | an end-to-end PPO experiment              |
-| [8.8 Extended Practice](./extended-practice)                          | What does reward hacking look like in a controlled setup? | a repeatable debugging workflow           |
+| [13.6 Evaluation](./evaluation)                                        | How do we prove we improved without cheating the RM?      | evaluation gate and badcase loop          |
+| [13.7 Hands-On: veRL + GSM8K](./verl-ppo-gsm8k)                        | How does the pipeline look in an industrial framework?    | an end-to-end PPO experiment              |
+| [13.5 Extended Practice](./extended-practice)                          | What does reward hacking look like in a controlled setup? | a repeatable debugging workflow           |
 
-## 8.6 Why Evaluation Is Mandatory
+## Why Evaluation Is Mandatory
 
 RLHF can easily create an illusion: training logs look good, but the model has actually gotten worse. Rising RM scores may mean the model has learned to game the RM. Longer answers may be misjudged as more helpful. Higher win rates on preference data may come with degraded math, code, or factual accuracy.
 

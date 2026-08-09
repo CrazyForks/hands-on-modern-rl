@@ -1,5 +1,5 @@
 ---
-title: '3.9 Chapter Summary: MDP, Value, and Policy'
+title: '2.4 Chapter Summary: MDP, Value, and Policy'
 ---
 
 # 2.4 Chapter Summary: MDP, Value, and Policy

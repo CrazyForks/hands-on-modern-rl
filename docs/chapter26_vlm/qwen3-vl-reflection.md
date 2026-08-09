@@ -187,7 +187,7 @@ Step-Audio-R1 的工业能力：
 
 ### 视觉生成 RL
 
-（参考 [11.6 节现代视频生成 RL](./video-generation-modern)）
+（参考 [27.2 节现代视频生成 RL](../chapter29_visual_generation/video-generation-modern)）
 
 ### 音频 RL
 
@@ -248,7 +248,7 @@ Step-Audio-R1 的工业能力：
 
 ### Embodied AI 的成熟
 
-VLA + world model + RL = 真正的通用机器人。这是 [第 12 章 embodied intelligence](../chapter28_vla/embodied-intelligence/) 的核心议题。
+VLA + world model + RL = 真正的通用机器人。这是 [第 26 章 embodied intelligence](../chapter28_vla/embodied-intelligence/) 的核心议题。
 
 ## 小结
 

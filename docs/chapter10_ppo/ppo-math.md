@@ -1,4 +1,4 @@
-# 8.2 PPO 数学推导
+# 补充阅读：PPO 数学推导
 
 上一节我们用 SB3 的 PPO 训练了月球着陆器，看到了 reward、entropy、clip fraction 这些曲线。接下来要回答一个更基础的问题：**PPO 到底是什么？为什么它最后会写成一个 loss？**
 

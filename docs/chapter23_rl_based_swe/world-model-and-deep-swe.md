@@ -93,7 +93,7 @@ World model 是个 LLM，会错。如果它预测错了"代码执行结果"，po
 
 CWM 是 model-based RL 在 SWE 领域的应用。经典 model-based RL（如 MuZero、Dreamer）已经在游戏、控制任务上证明了价值。CWM 把这个思想带到 LLM + SWE 领域。
 
-参考：[第 5 章 model-based RL](../chapter10_ppo/rl-long-horizon-planning) 和 [第 12 章 future trends / model-based RL](../chapter28_vla/embodied-intelligence/model-based-rl/)。
+参考：[第 8 章 model-based RL](../chapter10_ppo/rl-long-horizon-planning) 和 [第 12 章 future trends / model-based RL](../chapter28_vla/embodied-intelligence/model-based-rl/)。
 
 ## 12.3.2 DeepSWE 与 长 horizon agent 的 RL
 
@@ -129,7 +129,7 @@ def deep_swe_reward(trajectory, final_test_result):
 
 **技巧二：Value Model**
 
-DeepSWE 重新引入 value model（与 VAPO 思路一致）——[参考第 7 章 VAPO](../chapter18_grpo/grpo-family)。
+DeepSWE 重新引入 value model（与 VAPO 思路一致）——[参考第 16 章 VAPO](../chapter18_grpo/grpo-family)。
 
 Value model $V_\phi(s_t)$ 估计当前状态的"未来 reward 期望"。这让 RL 可以用 GAE 做 credit assignment：
 
@@ -187,7 +187,7 @@ DeepSWE 在开源模型中达到 50%——证明了长 horizon RL 训练的可�
 
 DeepSWE 的设计与 [字节 VAPO](../chapter18_grpo/grpo-family) 高度相似——都用 value model 替代 GRPO 的"无 critic"路线。这反映了字节 Seed 内部对 **"长 horizon 任务需要 critic"** 的共识。
 
-这也印证了 [第 7 章 GRPO 改进家族](../chapter18_grpo/grpo-family) 的结论——**critic-free 是工程妥协，不是算法必然**。在长 horizon 任务（长 CoT 推理、长 SWE trajectory）上，value model 重新证明了自己的价值。
+这也印证了 [第 16 章 GRPO 改进家族](../chapter18_grpo/grpo-family) 的结论——**critic-free 是工程妥协，不是算法必然**。在长 horizon 任务（长 CoT 推理、长 SWE trajectory）上，value model 重新证明了自己的价值。
 
 ## 12.3.3 Test-time Search 集成
 

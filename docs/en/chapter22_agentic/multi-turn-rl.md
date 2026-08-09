@@ -1,8 +1,8 @@
 ---
-title: 22.1 Multi-Turn RL and Credit Assignment
+title: 'Supplement: Multi-Turn RL and Credit Assignment'
 ---
 
-# 20.1 Multi-Turn RL and Credit Assignment
+# Supplement: Multi-Turn RL and Credit Assignment
 
 The Chapter 22 [intro](./intro) already established the overall framework of Agentic RL: the paradigm shift from single-turn to multi-turn, the four components of an agent, POMDP formalization, and the idea of breaking a trajectory-level reward back down into step-level advantages. This section dives into that decomposition—**how credit assignment is actually done**.
 

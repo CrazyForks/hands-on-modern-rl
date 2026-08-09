@@ -14,7 +14,7 @@ We also saw PPO in the previous chapter: an algorithm that improves a policy fro
 
 So in this chapter we switch the application from "game control" to "language alignment". At the level of generation, we will see how to convert human preferences about answers into a learning signal [^2]. At the sequence level, we will focus on a modern post-training paradigm called **Direct Preference Optimization (DPO)** [^3], and understand how it bypasses explicit reward modeling by **optimizing the language model directly from preference data**. From a systems perspective, DPO requires minimal architectural changes: we mainly change the loss function. In practical alignment work, we often freeze most parameters and use a small amount of high-quality preference data to efficiently adapt a pretrained model.
 
-## 2.1 The Basic Ingredients of Preference Tuning
+## 15.1 The Basic Ingredients of Preference Tuning
 
 A text-generation or dialogue model takes a prompt as input and produces a response. Beyond "just" next-token completion, **alignment** is a central training goal: the model should answer in ways that match human values, and in particular should be **helpful** and **honest**.
 
@@ -30,7 +30,7 @@ In ML terms, this is a **preference dataset (Preference Dataset)**.
 
 Each row (one interaction containing a prompt and two candidate responses) is a preference sample. We denote the "good" response we want the model to move toward as $y_w$ (winner), the "bad" response we want the model to move away from as $y_l$ (loser), and the input prompt as $x$. If the dataset has $N$ samples, the $i$-th sample is written as $(x^{(i)}, {y_w}^{(i)}, {y_l}^{(i)})$.
 
-## 2.2 Hands-On: Using DPO to Reduce Sycophancy
+## Hands-On: Using DPO to Reduce Sycophancy
 
 Given a preference dataset, our goal is to find parameters $\theta$ such that the model's behavior matches the preferences in the data. We will use a lightweight instruct model, `Qwen2.5-0.5B-Instruct` (about 0.5B parameters), as a concrete example.
 
@@ -49,7 +49,7 @@ That "not A, but B" structure is exactly what preference data buys you.
 
 ### Step 0: Prepare the Preference Dataset
 
-The core of preference alignment is the data. We have prepared a script that automatically generates mock data: [1-generate_data.py](../../code/chapter17_dpo/1-generate_data.py). It generates 100 preference pairs by default, each containing a user's incorrect or biased claim and two different response styles.
+The core of preference alignment is the data. We have prepared a script that automatically generates mock data: [1-generate_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/1-generate_data.py). It generates 100 preference pairs by default, each containing a user's incorrect or biased claim and two different response styles.
 
 Run it:
 
@@ -78,7 +78,7 @@ Note that **chosen is a response that corrects the user's misconception**, while
 
 ### Step 1: Inspect the Raw Behavior Before Training
 
-Run the companion script: [2-test_before.py](../../code/chapter17_dpo/2-test_before.py), and test the model's raw behavior with a **new question not in the training set**:
+Run the companion script: [2-test_before.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/2-test_before.py), and test the model's raw behavior with a **new question not in the training set**:
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -120,7 +120,7 @@ The model chose to **go along with the user's view**, agreeing with the biased c
 
 ### Step 2: Run DPO Training
 
-Next, run the training script: [3-train_dpo.py](../../code/chapter17_dpo/3-train_dpo.py), using DPO to teach the model not to blindly agree:
+Next, run the training script: [3-train_dpo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/3-train_dpo.py), using DPO to teach the model not to blindly agree:
 
 ```python
 import json
@@ -214,7 +214,7 @@ How to read the key signals:
 
 ### Step 3: Test the Aligned Model
 
-Now the model has been preference-tuned. Run the verification script: [4-test_after.py](../../code/chapter17_dpo/4-test_after.py), using the **same out-of-training-set question**:
+Now the model has been preference-tuned. Run the verification script: [4-test_after.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/4-test_after.py), using the **same out-of-training-set question**:
 
 ```python
 import os
@@ -261,7 +261,7 @@ Key observation: the model no longer blindly agrees with the user. Instead, it *
 
 ### Exploration Experiment: Custom Preference Directions
 
-Readers can open the companion script [1-generate_data.py](../../code/chapter17_dpo/1-generate_data.py) and modify the preference pairs. For example:
+Readers can open the companion script [1-generate_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/1-generate_data.py) and modify the preference pairs. For example:
 
 - Change chosen to a more direct, "sharp-tongued" correction.
 - Change rejected to a "correct but overly verbose" response.
@@ -269,7 +269,7 @@ Readers can open the companion script [1-generate_data.py](../../code/chapter17_
 
 After generating a new preference dataset and re-fine-tuning, you can observe the model's changes across different preference directions. This is precisely DPO's core capability -- **using a small number of preference pairs to steer the model's behavioral direction.**
 
-## 2.3 Observations and Questions
+## Observations and Questions
 
 After running the above code, you can input the same biased question to the model before and after fine-tuning. You will find that after fine-tuning, the model no longer defaults to blind agreement when faced with the user's incorrect views. Instead, it can **politely present a different opinion**.
 

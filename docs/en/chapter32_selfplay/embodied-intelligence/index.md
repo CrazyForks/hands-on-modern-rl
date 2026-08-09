@@ -1,8 +1,8 @@
 ---
-title: 12.1 Embodied Intelligence
+title: 'Legacy Page: Embodied Intelligence'
 ---
 
-# 10.1 Embodied Intelligence -- Bringing RL into the Physical World
+# Legacy Page: Embodied Intelligence
 
 In the previous eight chapters, our agents lived in the "digital world" -- CartPole's inverted pendulum, Atari's pixels, LLM's tokens. These settings share a common property: trial-and-error is nearly free, `env.reset()` completes in milliseconds, and the environment is fully controllable. But the ultimate goal of RL goes far beyond this -- we want agents that can enter the real world, control robots, drive cars, and complete complex tasks in factories and hospitals.
 
@@ -510,7 +510,7 @@ In short: **PPO sacrifices per-sample utilization for higher overall training th
 </details>
 
 ::: tip Continue Reading: Model-Based RL
-When embodied intelligence truly enters the physical world, the biggest bottleneck is often not the algorithm formulas but the cost of real-world interaction. The next section expands MBRL into a standalone topic: [Model-Based RL: From Model-Free to Model-Based](./model-based-rl/).
+When embodied intelligence truly enters the physical world, the biggest bottleneck is often not the algorithm formulas but the cost of real-world interaction. The next section expands MBRL into a standalone topic: [Model-Based RL: From Model-Free to Model-Based](./model-based-rl).
 :::
 
 ## Further Reading: Unitree Robotics Open-Source Ecosystem

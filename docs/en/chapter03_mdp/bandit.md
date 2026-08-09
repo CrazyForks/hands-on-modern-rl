@@ -1,5 +1,5 @@
 ---
-title: 3.1 Exploration and Exploitation
+title: 2.1 Exploration and Exploitation
 ---
 
 # 2.1 Exploration and Exploitation

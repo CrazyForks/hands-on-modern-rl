@@ -8,12 +8,12 @@ CartPole 只有"左推"和"右推"两个选项，DQN 给每个动作算一个 $Q
 
 既然"先打分再选"走不通，那就换一条路：**跳过 $Q$ 值，直接学策略 $\pi_\theta(a|s)$**。不问"每个动作值多少分"，而是直接学"在什么情况下该做什么"。
 
-这正是第 3 章[路线二：策略目标 $J(\theta)$](../chapter03_mdp/policy-objective)的核心思路——定义一个策略目标函数 $J(\theta)$，然后直接优化参数 $\theta$ 使 $J(\theta)$ 最大。本章将深入这条路线，从策略梯度定理到 REINFORCE 算法，再到降低方差的基线方法。
+这正是第 3 章[路线二：策略目标 $J(\theta)$](../chapter08_policy_gradient/policy-gradient)的核心思路——定义一个策略目标函数 $J(\theta)$，然后直接优化参数 $\theta$ 使 $J(\theta)$ 最大。本章将深入这条路线，从策略梯度定理到 REINFORCE 算法，再到降低方差的基线方法。
 
 ::: tip 前置知识回顾
 本章会频繁用到以下概念，如果记不清了，点进去复习一下再继续：
 
-- [策略 $\pi_\theta$ 与目标函数 $J(\theta)$](../chapter03_mdp/policy-objective)——参数化策略怎么表示？怎么定义"策略有多好"？
+- [策略 $\pi_\theta$ 与目标函数 $J(\theta)$](../chapter08_policy_gradient/policy-gradient)——参数化策略怎么表示？怎么定义"策略有多好"？
 - [MC 方法](../chapter03_mdp/dp-mc-td)——"跑完一整趟再回头看"，REINFORCE 的采样基础
 - [状态价值 $V(s)$](../chapter03_mdp/value-bellman)——"平均能拿多少分"，基线的来源
   :::

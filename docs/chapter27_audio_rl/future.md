@@ -1,6 +1,6 @@
 # 25.2 多模态音频 Agent 未来方向
 
-> [27.1](./reward-design) 讲了音频奖励设计。本节看音频 RL 的前沿——多模态音频 Agent（Step-Audio-Chat、Qwen2-Audio）、实时语音对话（GPT-4o Voice）、以及未来方向。
+> [25.1](./reward-design) 讲了音频奖励设计。本节看音频 RL 的前沿——多模态音频 Agent（Step-Audio-Chat、Qwen2-Audio）、实时语音对话（GPT-4o Voice）、以及未来方向。
 
 ## 简单语音对话 RL
 

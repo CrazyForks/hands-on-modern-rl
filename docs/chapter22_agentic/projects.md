@@ -4,7 +4,7 @@ search: false
 
 # 项目实践（已拆分为两个项目页）
 
-> 这一页保留为旧链接入口。核心内容已经迁移至 [22.4 rLLM DeepCoder 实验](./rllm-deepcoder-lab) 和 [22.5 Deep Research Agent](./deep-research-agent)。下面保留原文，方便从旧链接进入的读者对照。
+> 这一页保留为旧链接入口。核心内容已经迁移至 [20.8 rLLM DeepCoder 实验](./rllm-deepcoder-lab) 和 [第 22 章：Deep Research 与浏览器智能体](../chapter24_deep_research/intro)。下面保留原文，方便从旧链接进入的读者对照。
 
 # 多工具 Agentic RL——搜索文档、写代码、跑测试
 
@@ -1078,7 +1078,7 @@ Tongyi DeepResearch 的数据合成管线 [^tongyi_dr] 是其核心创新之一�
 
 ## 什么叫"好的" Deep Research？
 
-> 本节聚焦 Deep Research 场景特有的评估维度。更广泛的 Agentic 评测体系（包括工具调用、端到端任务、综合能力的 benchmark 全景和评测系统搭建）见 [22.3 节：工业实践、评测与 Badcase](./industrial-evaluation)。
+> 本节聚焦 Deep Research 场景特有的评估维度。更广泛的 Agentic 评测体系（包括工具调用、端到端任务、综合能力的 benchmark 全景和评测系统搭建）见 [工业实践、评测与 Badcase 补充页](./industrial-evaluation)。
 
 Deep Research Agent 的"好"远不止是最终答案的正确性。一个优秀的 Deep Research 结果需要同时满足四个层次：
 
@@ -1243,7 +1243,7 @@ def report_reward(report, task, verified_facts=None):
     )
 ```
 
-训练时建议采用**从短到长的课程学习**——先训 500 字短报告，逐步增加到 5000 字完整报告。这和 22.2 节 HardGen[^hardgen] 的难度自适应思路一致。
+训练时建议采用**从短到长的课程学习**——先训 500 字短报告，逐步增加到 5000 字完整报告。这和 [20.4 节](./tool-use-and-trajectory) HardGen[^hardgen] 的难度自适应思路一致。
 
 ### Deep Research 的两阶段 RL
 
@@ -1574,7 +1574,7 @@ for epoch in range(3):
 1. **真实搜索 API**：接入 Tavily 或 Serper API，替换模拟的搜索结果
 2. **更精细的 reward**：加入引用质量评分、步骤效率惩罚（参考[本节的奖励函数设计](#如何设计奖励函数从简单到前沿)）
 3. **异步并发**：用[Agentic 工程实战](./tool-use-agents)的异步并发架构加速 rollout
-4. **轨迹合成**：用[22.2 节](./tool-use-and-trajectory)的方法预合成训练数据
+4. **轨迹合成**：用[20.4 节](./tool-use-and-trajectory)的方法预合成训练数据
 5. **完整框架**：迁移到 DeepResearcher 或 rStar2-Agent 的框架进行大规模训练
 
 <details>
@@ -1585,7 +1585,7 @@ Deep Research Agent 的奖励设计是本书前面所有 RL 方法在这个特�
 - **RLVR（第 7 章）**：Deep Research 的许多 reward 是"可验证的"——引用 URL 是否可访问、代码是否通过测试、答案是否与标准答案匹配。这些都是客观可验证的，不需要 Reward Model。
 - **GRPO（第 7 章）**：DeepResearcher 等项目使用组采样 + 相对比较的方式来训练，这正是 GRPO 的思路。
 - **PPO（第 5 章）**：一些项目仍然使用 PPO 作为基础 RL 算法，特别是需要训练 Value Function 来做步级 credit assignment 时。
-- **PRM vs ORM（22.1 节）**：CaRR、Atom-Searcher、Web-Shepherd 等工作本质是在 Deep Research 场景下探讨 ORM（只看最终结果）和 PRM（每步评估）的取舍。研究发现：对于长程研究任务，PRM 提供的密集信号至关重要。
+- **PRM vs ORM（[20.3 节](./credit-assignment)）**：CaRR、Atom-Searcher、Web-Shepherd 等工作本质是在 Deep Research 场景下探讨 ORM（只看最终结果）和 PRM（每步评估）的取舍。研究发现：对于长程研究任务，PRM 提供的密集信号至关重要。
 
 Deep Research Agent 是一个把本书所有 RL 知识"串起来"的绝佳场景——从基础的 reward 设计到高级的 credit assignment，从数据合成到工程实现，全都用上了。
 

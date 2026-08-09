@@ -1,5 +1,5 @@
 ---
-title: 3.2 Markov Decision Processes
+title: 2.2 Markov Decision Processes
 ---
 
 # 2.2 MDP: Modeling Sequential Decision-Making

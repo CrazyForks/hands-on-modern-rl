@@ -1,12 +1,12 @@
 # 27.2 多奖励视频 RLHF 与物理感知生成
 
-[11.4 节视觉生成 RL](./visual-generation-rl) 讨论了 diffusion RL 的基础——DDPO、DPOK 等算法。那一节的视角是**算法层面**：怎么把 diffusion 训练建模为 MDP，怎么用策略梯度优化。
+[27.1 节视觉生成 RL](./intro) 讨论了 diffusion RL 的基础——DDPO、DPOK 等算法。那一节的视角是**算法层面**：怎么把 diffusion 训练建模为 MDP，怎么用策略梯度优化。
 
 这一节我们换视角——**工业层面**：2025-2026 年的视频生成模型（Seedance、LongCat-Video、Hailuo、Wan、Kling）是怎么用 RL 训练的？这些工作代表了视频生成 RL 的工业 SOTA。
 
 ## 11.6.1 从图像到视频 与 RL 的新挑战
 
-图像生成的 RL 已经成熟（[DDPO](./visual-generation-rl)、DPOK）。但视频生成带来新挑战：
+图像生成的 RL 已经成熟（[DDPO](./intro)、DPOK）。但视频生成带来新挑战：
 
 ### 长序列
 
@@ -48,7 +48,7 @@ RL 训练需要大量 rollout——每次 rollout 几分钟，让视频 RL 的�
 
 ### DanceGRPO 的核心思想
 
-回顾 [第 7 章 GRPO](../chapter18_grpo/grpo-practice-and-mechanism)：
+回顾 [第 16 章 GRPO](../chapter18_grpo/grpo-practice-and-mechanism)：
 
 - 对同一 prompt 生成 G 个 rollout
 - 计算每个 rollout 的 reward
@@ -350,7 +350,7 @@ MiniMax 内部的研究（如 [CISPO](../chapter18_grpo/grpo-family)）也对 Ha
 
 视频生成 RL 的核心挑战——长序列、时序一致性、计算成本——正在被工业实践逐步解决。未来 5-10 分钟视频、音视频联合、交互式生成是主要方向。
 
-这一章与 [11.4 视觉生成 RL](./visual-generation-rl) 形成完整体系：
+这一章与 [27.1 视觉生成 RL](./intro) 形成完整体系：
 
 - 11.4：算法基础（DDPO、DPOK）
 - 11.6：工业实践（DanceGRPO、Seedance、LongCat）

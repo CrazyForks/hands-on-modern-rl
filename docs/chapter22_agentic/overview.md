@@ -38,8 +38,8 @@ reward = 1                              reward = 0
 
 两条轨迹最终 reward 截然不同，但**问题出在哪一步**？轨迹 B 失败是因为 T1 的 query 太宽，还是 T2 没比价直接选第一条，还是 T3 没确认就下单？只看最终 reward 无法回答。
 
-- 形式化地把"轨迹 vs 单轮 completion"写清楚，见 [22.2 多轮 RL 形式化](./formulation)。
-- 把最终 reward 回拆到每一步，见 [22.3 轨迹信用分配](./credit-assignment)。
+- 形式化地把"轨迹 vs 单轮 completion"写清楚，见 [20.2 多轮 RL 形式化](./formulation)。
+- 把最终 reward 回拆到每一步，见 [20.3 轨迹信用分配](./credit-assignment)。
 
 ## 智能体的基本组件
 
@@ -85,7 +85,7 @@ query 写得差    →  搜索结果偏了  →  读到错误证据  →  后面
 query 写得好    →  找到关键来源  →  后续只需要验证和归纳
 ```
 
-一个早期小错误可能在后面被放大；一个早期好决策也可能因为后续步骤失误而没有转化成最终成功。**训练信号往往很晚才出现，但真正影响结果的决策可能发生在很早的位置**。这是信用分配问题的根源——详见 [22.3](./credit-assignment)。
+一个早期小错误可能在后面被放大；一个早期好决策也可能因为后续步骤失误而没有转化成最终成功。**训练信号往往很晚才出现，但真正影响结果的决策可能发生在很早的位置**。这是信用分配问题的根源——详见 [20.3](./credit-assignment)。
 
 ### 挑战二：环境随机性导致 reward variance 飙升
 
@@ -302,15 +302,15 @@ AReaL 的研究表明，异步训练可以在不损失效果的前提下将速�
 
 另一个关键差异是：框架最初为单轮 RL（推理任务）设计，还是一开始就考虑了多轮 Agent 交互。前者的 Agent 执行模块是后加的，能用但不是为此优化；后者的 Agent 执行是架构一等公民，在状态管理、异构轨迹长度、工具调用异步返回等方面有原生支持。OpenRLHF、AReaL、ROLL、SkyRL 属于后者。
 
-框架选型取决于具体场景。刚入门想快速跑通 demo，OpenRLHF 代码最简洁、文档最完善。企业级大规模训练（70B+），verl 的吞吐和生态优势明显。模型是 MoE 架构（如 GLM-4.5、Qwen3-30B-A3B、DeepSeek-R1），slime 的 Megatron + SGLang 原生架构对 MoE 的 fp8 rollout、DeepEP 通信等做了专门优化。极致吞吐，AReaL 的全异步模式能做到近 3 倍加速。更多工程细节——沙箱管理、环境构建、分布式部署——在 [22.4 工具调用 RL](./tool-use-and-trajectory) 展开。
+框架选型取决于具体场景。刚入门想快速跑通 demo，OpenRLHF 代码最简洁、文档最完善。企业级大规模训练（70B+），verl 的吞吐和生态优势明显。模型是 MoE 架构（如 GLM-4.5、Qwen3-30B-A3B、DeepSeek-R1），slime 的 Megatron + SGLang 原生架构对 MoE 的 fp8 rollout、DeepEP 通信等做了专门优化。极致吞吐，AReaL 的全异步模式能做到近 3 倍加速。更多工程细节——沙箱管理、环境构建、分布式部署——在 [20.4 工具调用 RL](./tool-use-and-trajectory) 展开。
 
 ## 本节总结
 
 Agentic RL 把训练对象从"一段回答"扩展到"一条完整交互轨迹"。这一扩展引出四个核心议题，本章后续小节逐一深入：
 
-- **形式化**——轨迹、状态、动作在多轮设定下如何精确定义？POMDP 视角如何区分模型生成的 action token 与环境返回的 observation token？→ [22.2 多轮 RL 形式化](./formulation)
-- **信用分配**——一条轨迹最终失败，reward 怎么回拆到每一步？ORM/PRM/SALT/GiGPO/HGPO/SPA-RL/AgentPRM/ARPO/IGPO/StepPO 等十多种方法各有何取舍？→ [22.3 轨迹信用分配](./credit-assignment)
-- **工具与轨迹工程**——训练数据从哪来、工具策略怎么学、沙箱怎么管？→ [22.4 工具调用 RL](./tool-use-and-trajectory)
-- **真实训练陷阱**——工业界在哪些坑里摔过？→ [22.6 Code Interpreter RL 工业实战](./industrial-practice)
+- **形式化**——轨迹、状态、动作在多轮设定下如何精确定义？POMDP 视角如何区分模型生成的 action token 与环境返回的 observation token？→ [20.2 多轮 RL 形式化](./formulation)
+- **信用分配**——一条轨迹最终失败，reward 怎么回拆到每一步？ORM/PRM/SALT/GiGPO/HGPO/SPA-RL/AgentPRM/ARPO/IGPO/StepPO 等十多种方法各有何取舍？→ [20.3 轨迹信用分配](./credit-assignment)
+- **工具与轨迹工程**——训练数据从哪来、工具策略怎么学、沙箱怎么管？→ [20.4 工具调用 RL](./tool-use-and-trajectory)
+- **真实训练陷阱**——工业界在哪些坑里摔过？→ [20.6 Code Interpreter RL 工业实战](./industrial-practice)
 
-接下来先看形式化：把"多轮交互"翻译成 RL 能处理的数学对象——[22.2 多轮 RL 形式化](./formulation)。
+接下来先看形式化：把"多轮交互"翻译成 RL 能处理的数学对象——[20.2 多轮 RL 形式化](./formulation)。

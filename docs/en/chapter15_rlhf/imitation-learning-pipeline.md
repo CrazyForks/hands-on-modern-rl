@@ -1,5 +1,5 @@
 ---
-title: 8.3 SFT Instruction Tuning
+title: 13.2 SFT Instruction Tuning
 ---
 
 # 13.2 SFT: Teaching Models to Follow Instructions

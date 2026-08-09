@@ -4,7 +4,7 @@
 
 为什么单独成章？三个原因：
 
-1. **SWE 是 RLVR 的天然战场**——单元测试是完美的"零噪声 verifier"，与 [第 9 章 PRM 的形式化路线](../chapter20_prm_search/formal-prm) 同源
+1. **SWE 是 RLVR 的天然战场**——单元测试是完美的"零噪声 verifier"，与 [第 18 章 PRM 的形式化路线](../chapter20_prm_search/formal-prm) 同源
 2. **2025 年这个领域出现了多个工业级突破**——Meta SWE-RL、字节 DeepSWE、清华 SSR、阿里 CWM，每个都把 SWE-bench 准确率推向新高度
 3. **SWE-RL 是 Agentic RL 的"算法实验室"**——它的很多发现（长 horizon credit assignment、self-play、world model）可以推广到其他领域
 
@@ -54,14 +54,14 @@
 
 这一章假定你已经读过：
 
-- [第 7 章 GRPO 改进家族](../chapter18_grpo/grpo-family)——基础 RL 算法
+- [第 16 章 GRPO 改进家族](../chapter18_grpo/grpo-family)——基础 RL 算法
 - [第 20 章 Agentic RL](../chapter22_agentic/intro)——agent 的多轮交互基础
 - [第 9 章 PRM](../chapter20_prm_search/intro)——形式化 verifier 思想
 
 本章后续会指向：
 
-- [第 12.4 节 agent 训练系统](../chapter22_agentic/build-agentic-training-system)——SWE-RL 的工程实现
-- [第 12 章奖励黑客](../chapter15_rlhf/evaluation)——SWE-RL 特有的 hacking
+- [第 20.10 节 agent 训练系统](../chapter22_agentic/build-agentic-training-system)——SWE-RL 的工程实现
+- [第 13 章奖励黑客](../chapter15_rlhf/evaluation)——SWE-RL 特有的 hacking
 
 ## 一个直觉性的开场
 

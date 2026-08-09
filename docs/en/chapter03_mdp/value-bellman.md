@@ -1,5 +1,5 @@
 ---
-title: 3.3 Value Functions and Bellman Equations
+title: 3.1 Value Functions and Bellman Equations
 ---
 
 # 3.1 V(s): Value Functions and Bellman Equations

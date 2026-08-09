@@ -1,5 +1,5 @@
 ---
-title: 11. VLM Reinforcement Learning
+title: 24. VLM Reinforcement Learning
 ---
 
 # Chapter 24: VLM Reinforcement Learning
@@ -54,11 +54,11 @@ This chapter is organized as: run something minimal -> see the new problems -> u
 
 | Section                                              | Question it answers                                                                       |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [11.1 Hands-On: GRPO for a VLM](./vlm-grpo-hands-on) | How do we train a VLM to "look then reason" under verifiable rewards?                     |
-| [11.2 Challenges](./vlm-challenges)                  | How do we assign reward across vision vs language? How do we reduce visual hallucination? |
+| [24.2 Hands-On: GRPO for a VLM](./vlm-grpo-hands-on) | How do we train a VLM to "look then reason" under verifiable rewards?                     |
+| [24.1 Challenges](./vlm-challenges)                  | How do we assign reward across vision vs language? How do we reduce visual hallucination? |
 | [11.3 Frameworks](./vlm-frameworks)                  | What systems bridge experiments to applications (tools, environments, self-play)?         |
-| [11.4 Visual Generation RL](./visual-generation-rl)  | How does RL apply to diffusion/video generation, and what does "policy" mean there?       |
-| [11.5 Hands-On: EasyR1 GeoQA](./easyr1-geoqa)        | How do we run an industrial-style VLM GRPO training loop on a real dataset?               |
+| [Visual Generation RL](./visual-generation-rl)          | How does RL apply to diffusion/video generation, and what does "policy" mean there?       |
+| [24.4 Hands-On: EasyR1 GeoQA](./easyr1-geoqa)        | How do we run an industrial-style VLM GRPO training loop on a real dataset?               |
 
 ## Learning Goals
 

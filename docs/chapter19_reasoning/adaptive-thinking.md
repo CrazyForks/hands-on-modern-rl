@@ -150,7 +150,7 @@ Anthropic 的应对是在训练时加入"思考质量"奖励——CoT 的内容�
 
 可以看到，**自适应思考是 Hybrid Thinking 的精细化版本**——从二选一到连续控制。这是推理模型的演化方向，但也意味着工程复杂度的提升。
 
-## 10.6 推理模型的对齐 与 未来展望
+## 推理模型的对齐 与 未来展望
 
 这一章我们看到了推理模型从 o1 到 Claude Opus 4.6 的演化。但推理模型的对齐问题才刚刚开始被研究：
 
@@ -172,7 +172,7 @@ test-time compute scaling 让模型越来越强，但也让对齐越来越难—
 
 ### 推理与 agentic 的融合
 
-Opus 4.6 的 AI Research Eval Suite 已经展示了这个趋势——推理模型不只是"思考"，还能"执行"（写代码、跑实验、分析结果）。这与 [第 10 章 Agentic RL](../chapter22_agentic/intro) 深度融合。未来推理模型将变成"能思考 + 能行动"的完整 agent。
+Opus 4.6 的 AI Research Eval Suite 已经展示了这个趋势——推理模型不只是"思考"，还能"执行"（写代码、跑实验、分析结果）。这与 [第 20 章 Agentic RL](../chapter22_agentic/intro) 深度融合。未来推理模型将变成"能思考 + 能行动"的完整 agent。
 
 ## 本章总结
 
@@ -194,6 +194,6 @@ Opus 4.6 的 AI Research Eval Suite 已经展示了这个趋势——推理模�
 
 **接下来的章节**：
 
-- [第 9 章 PRM 与推理时搜索](../chapter18_grpo/grpo-family)——怎么用过程奖励引导推理
-- [第 10 章 Agentic RL](../chapter22_agentic/intro)——推理模型如何与工具调用结合
-- [第 12 章奖励黑客与对齐失败](../chapter15_rlhf/evaluation)——推理模型特有的对齐挑战
+- [第 16 章 PRM 与推理时搜索](../chapter18_grpo/grpo-family)——怎么用过程奖励引导推理
+- [第 20 章 Agentic RL](../chapter22_agentic/intro)——推理模型如何与工具调用结合
+- [第 13 章奖励黑客与对齐失败](../chapter15_rlhf/evaluation)——推理模型特有的对齐挑战

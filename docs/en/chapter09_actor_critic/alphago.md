@@ -1,5 +1,5 @@
 ---
-title: '6.4 Hands-On: Reproducing AlphaGo'
+title: '7.4 Hands-On: Reproducing AlphaGo'
 ---
 
 # 7.4 Hands-on: Reproducing AlphaGo
@@ -24,7 +24,7 @@ AlphaGo consists of three core components:
 
 | Component               | Role                                                | Related Concept In This Chapter                                     |
 | ----------------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
-| Policy network          | Outputs probabilities over legal moves              | [Chapter 5 Policy Gradient](../chapter08_policy_gradient/reinforce) |
+| Policy network          | Outputs probabilities over legal moves              | [Chapter 6 Policy Gradient](../chapter08_policy_gradient/reinforce) |
 | Value network           | Evaluates the win rate of the current position      | [Section 6.2 Training the Critic](./critic-training)                |
 | Monte Carlo Tree Search | Looks ahead for several moves to find the best play | Newly introduced in this section                                    |
 

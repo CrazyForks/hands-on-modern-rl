@@ -10,7 +10,7 @@
 
 这就是我们本章的实验场——一个极简的赌博机。只有两个动作，没有"状态"（这是一个无状态环境），规则一句话就能说清楚。但就是这么简单的一个场景，能让策略网络从"什么都不知道"进化到"学会选最优动作"。更重要的是，它能让你亲眼看到策略梯度的核心——也是唯一的——学习信号：**"好结果强化对应动作的概率"**。
 
-这和第 3 章的猜硬币游戏有本质区别。猜硬币中我们手写了[确定性策略](../chapter03_mdp/mdp)（"永远猜正"），而这里我们要让 AI 自己学出一个[参数化策略](../chapter03_mdp/policy-objective) $\pi_\theta(a|s)$。
+这和第 3 章的猜硬币游戏有本质区别。猜硬币中我们手写了[确定性策略](../chapter03_mdp/mdp)（"永远猜正"），而这里我们要让 AI 自己学出一个[参数化策略](../chapter08_policy_gradient/policy-gradient) $\pi_\theta(a|s)$。
 
 ## 两臂赌博机环境
 
@@ -99,7 +99,7 @@ print(f"最终 P(B): {prob_history[-1]:.3f}")
 
 这段代码的核心就是 `loss = -log_prob * reward` 这一行。直觉上：如果这次选的动作带来了好结果（reward=1），`-log_prob * 1` 会产生一个梯度，让这个动作被选中的概率增加。如果结果不好（reward=0），梯度为零，概率不变。负号是因为 PyTorch 默认做梯度下降（最小化损失），而我们要做梯度上升（最大化奖励）。
 
-这个公式不是凭空设计的——它来自第 3 章预告过的[策略梯度公式](../chapter03_mdp/policy-objective) $\nabla_\theta J(\theta) \propto \mathbb{E}[\nabla_\theta \log \pi_\theta(a|s) \cdot G_t]$ 在单步赌博机上的特例。下一节将完整推导它。
+这个公式不是凭空设计的——它来自第 3 章预告过的[策略梯度公式](../chapter08_policy_gradient/policy-gradient) $\nabla_\theta J(\theta) \propto \mathbb{E}[\nabla_\theta \log \pi_\theta(a|s) \cdot G_t]$ 在单步赌博机上的特例。下一节将完整推导它。
 
 ## 训练现象
 

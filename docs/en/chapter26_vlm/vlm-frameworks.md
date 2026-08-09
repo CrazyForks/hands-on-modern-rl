@@ -1,8 +1,8 @@
 ---
-title: '11.3 VLM RL Frameworks and Frontiers'
+title: 'Supplement: VLM RL Frameworks and Frontiers'
 ---
 
-# 9.3 VLM RL Frameworks and Frontiers: The Bridge from Experiments to Applications
+# Supplement: VLM RL Frameworks and Frontiers
 
 In the previous two sections we ran VLM GRPO experiments and analyzed the unique challenges of VLM RL. Those discussions focused mainly on the "problem" level — how to do reward attribution, how to prevent visual hallucination, whether to update the visual encoder. This section looks at "solutions" — what frameworks are currently addressing these problems systematically, and where VLM RL may be headed.
 
@@ -201,7 +201,7 @@ VLM RL produces "models that can understand images." But in real scenarios, user
 
 ### Special Challenges in Multimodal Agent RL
 
-Combining this chapter's VLM RL with [Chapter 10's](../chapter22_agentic/intro) Agent RL introduces three additional challenges:
+Combining this chapter's VLM RL with [Chapter 20's](../chapter22_agentic/intro) Agent RL introduces three additional challenges:
 
 **1. Error misattribution.** When a multimodal Agent produces wrong results, the error may come from visual understanding ("misread" a value in the chart) or tool calling ("made a mistake" passing wrong parameters). These two types of errors require completely different fixes — the former needs more VLM RL training (this chapter's methods), the latter needs more [Agent RL training](../chapter22_agentic/tool-use-and-trajectory). In practice, **staged verification** is needed: first check if visual understanding is correct, then check if tool calls are reasonable.
 
@@ -231,7 +231,7 @@ def multimodal_agent_reward(trajectory, task):
 If you want to train multimodal Agents, the recommended path is:
 
 1. **Train visual understanding first**: Use this chapter's VLM GRPO to build basic visual ability.
-2. **Then train tool use**: Use [Chapter 10's tool-use RL](../chapter22_agentic/tool-use-and-trajectory) to establish basic tool-use patterns.
+2. **Then train tool use**: Use [Chapter 20's tool-use RL](../chapter22_agentic/tool-use-and-trajectory) to establish basic tool-use patterns.
 3. **Finally, joint training**: Do end-to-end RL on multimodal Agent tasks, with reward design following the composite reward function above.
 
 Key principle: **verify that visual understanding and tool use each meet baseline independently before attempting end-to-end joint training.** If the underlying components have problems, joint training will not rescue them.

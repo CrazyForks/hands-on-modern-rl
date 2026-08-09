@@ -203,7 +203,7 @@ The `external` mode is worth highlighting: it can use idle capacity or preemptib
 
 ### Algorithms, Models, and Operations
 
-**Algorithm support.** Relax includes four algorithms: GRPO (see [Sections 8.1-8.2](/chapter18_grpo/grpo-practice-and-mechanism)), GSPO, SAPO, and OPD (see [Section 8.5](/chapter18_grpo/on-policy-distillation)). Adding a new algorithm requires implementing a Service class and registering it in the `ALGOS` dictionary.
+**Algorithm support.** Relax includes four algorithms: GRPO (see [Sections 16.1–16.2](/chapter18_grpo/grpo-practice-and-mechanism)), GSPO, SAPO, and OPD (see [Section 16.7](/chapter18_grpo/on-policy-distillation)). Adding a new algorithm requires implementing a Service class and registering it in the `ALGOS` dictionary.
 
 **Model support.** The Qwen3 family (4B, 30B-A3B MoE), Qwen3-VL (vision-language), Qwen3-Omni (omni-modal), and Qwen3.5.
 

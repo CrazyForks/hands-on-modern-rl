@@ -89,7 +89,7 @@ In industrial practice, these methods are usually combined. A system may use SFT
 | [RLVR: verifiable rewards](../chapter18_grpo/rlvr)                         | Can verifiable rewards replace reward models? Why does 1-shot RLVR work?                                        | Understand verifier design and RLVR training                     |
 | [RL scaling outlook](../chapter32_selfplay/rl-scaling-outlook)             | When should we choose online vs offline RL? Where are the scaling limits?                                       | Build global judgment about RL training paradigms                |
 | [On-policy distillation](../chapter18_grpo/on-policy-distillation)         | Why can distillation be more effective than RL for small models? How can teacher log-probs act like rewards?    | Understand the RL nature of distillation                         |
-| [Industrial post-training practice](./industrial-post-training)            | How do major labs combine SFT, RLHF, DPO, RLVR, and Agentic RL in real systems?                                 | Connect papers to production post-training pipelines             |
+| [Industrial post-training practice](../chapter16_llm_rl_industrial/industrial-post-training) | How do major labs combine SFT, RLHF, DPO, RLVR, and Agentic RL in real systems?                                 | Connect papers to production post-training pipelines             |
 
 Ready? We begin with the mathematical structure of DPO:
 [DPO theory, mathematics, and method selection](./dpo-theory-and-family).

@@ -1,6 +1,6 @@
 # 14.3 优化器与训练稳定性
 
-[9.8 节工业实践](./industrial-post-training) 讨论了 2024-2025 年的主流工业方案——MiniMax、Qwen、Kimi、Seed、DeepSeek。这一节我们补充几个 2025-2026 年的最新工业实践：
+[14.2 节工业实践](./industrial-post-training) 讨论了 2024-2025 年的主流工业方案——MiniMax、Qwen、Kimi、Seed、DeepSeek。这一节我们补充几个 2025-2026 年的最新工业实践：
 
 - **GLM-4.5 / GLM-4.6**（智谱）：中国开源推理模型新秀
 - **Llama 4**（Meta）：开源旗舰的进化
@@ -426,6 +426,6 @@ $$
 
 接下来：
 
-- [第 8 章 Reasoning Models](../chapter19_reasoning/intro)——推理模型的详细讨论
+- [第 17 章 Reasoning Models](../chapter19_reasoning/intro)——推理模型的详细讨论
 - [第 9 章 PRM](../chapter20_prm_search/intro)——过程奖励的工业实践
-- [第 10 章 RL-based SWE](../chapter23_rl_based_swe/intro)——代码 agent 的训练
+- [第 21 章 RL-based SWE](../chapter23_rl_based_swe/intro)——代码 agent 的训练

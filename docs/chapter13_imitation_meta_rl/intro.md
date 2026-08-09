@@ -4,8 +4,8 @@
 
 ## 章节地图
 
-- [13.1 行为克隆与 DAgger](./bc-dagger)：监督学习的视角，以及 BC 的分布漂移问题与 DAgger 的解决方案
-- [13.2 逆向 RL 与 GAIL](./irl-gail)：从专家反推 reward，以及 GAIL 用 GAN 框架绕开显式 reward
-- [13.3 元 RL：MAML、RL²、PEARL、In-Context RL](./meta-rl)：学会快速适应新任务，以及 LLM 时代 Algorithm Distillation 揭示的"RL as in-context learning"
+- [11.1 行为克隆与 DAgger](./bc-dagger)：监督学习的视角，以及 BC 的分布漂移问题与 DAgger 的解决方案
+- [11.2 逆向 RL 与 GAIL](./irl-gail)：从专家反推 reward，以及 GAIL 用 GAN 框架绕开显式 reward
+- [11.3 元 RL：MAML、RL²、PEARL、In-Context RL](./meta-rl)：学会快速适应新任务，以及 LLM 时代 Algorithm Distillation 揭示的"RL as in-context learning"
 
-下一节 [13.1 行为克隆与 DAgger](./bc-dagger) 从最朴素的模仿学习开始。
+下一节 [11.1 行为克隆与 DAgger](./bc-dagger) 从最朴素的模仿学习开始。

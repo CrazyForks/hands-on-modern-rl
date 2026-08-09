@@ -2,7 +2,7 @@
 
 > [第 8 章 PPO](../chapter10_ppo/intro) 解决了连续动作空间的策略学习问题——用高斯策略输出连续动作 + clip 保证稳定更新。但 PPO 是 on-policy 的：每次策略更新后必须重新采样数据，**样本效率极低**。本章解决两个问题：(1) 如何 off-policy 地处理连续动作（DDPG/TD3/SAC）；(2) 如何用环境模型进一步提升样本效率（Model-Based RL + AlphaZero/Dreamer）。
 
-## 11.1 确定性策略梯度与 DDPG
+## 9.1 确定性策略梯度与 DDPG
 
 CartPole、Atari 这类问题动作是离散的（左/右、上下左右），用 Q-Learning 或 softmax 策略直接处理。但机器人控制、自动驾驶、机械臂操作——动作是**连续的**：关节角度 $\theta \in \mathbb{R}^n$、油门开度 $[0, 1]$、方向盘转角 $[-\pi, \pi]$。
 
@@ -94,4 +94,4 @@ DDPG 在 MuJoCo 物理环境（HalfCheetah、Hopper、Walker2d）上首次让深
 
 确定性策略梯度（DPG）定理把策略梯度从随机策略扩展到确定性策略，让连续动作空间也能 off-policy 训练。DDPG 把 DPG 与 DQN 的深度网络技巧结合，在 MuJoCo 上首次让深度 RL 打败经典方法。
 
-但 DDPG 有 Q 值过估计、超参敏感、训练不稳定三大缺陷。下一节 [11.2 TD3 与 SAC](./td3-sac) 给出两套互补的修补方案——TD3 用工程 trick 稳定 DDPG，SAC 用最大熵 RL 从根本上重构目标函数。
+但 DDPG 有 Q 值过估计、超参敏感、训练不稳定三大缺陷。下一节 [9.2 TD3 与 SAC](./td3-sac) 给出两套互补的修补方案——TD3 用工程 trick 稳定 DDPG，SAC 用最大熵 RL 从根本上重构目标函数。

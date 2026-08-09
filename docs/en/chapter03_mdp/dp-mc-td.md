@@ -1,5 +1,5 @@
 ---
-title: 3.4 DP, MC, and TD
+title: 4.1 DP, MC, and TD
 ---
 
 # 4.1 DP, MC, and TD: Three Methods for Value Estimation

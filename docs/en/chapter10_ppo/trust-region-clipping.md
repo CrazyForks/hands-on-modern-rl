@@ -1,5 +1,5 @@
 ---
-title: 7.3 Constraint Mechanisms for Policy Updates
+title: 8.1 Constraint Mechanisms for Policy Updates
 ---
 
 # 8.1 Constraint Mechanisms for Policy Updates

@@ -1,5 +1,5 @@
 ---
-title: 4.4 DQN Improvement Family
+title: 5.2 DQN Improvement Family
 ---
 
 # 5.2 DQN Improvement Family

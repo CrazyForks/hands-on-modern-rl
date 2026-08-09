@@ -1,5 +1,5 @@
 ---
-title: 9.1 DPO Theory, Math, and Method Selection
+title: 15.3 DPO Theory, Math, and Method Selection
 ---
 
 # 15.3 DPO Theory, Math, and Method Selection
@@ -480,7 +480,7 @@ In code, this is exactly the step where we compute the answer log probabilities 
 
 ### Step 3: Substitute into the Bradley-Terry Model
 
-Recall the Bradley-Terry preference model from [the previous RLHF chapter](../chapter15_rlhf/reward-function-design) and [Chapter 7 on GAE](../chapter10_ppo/gae-reward-model):
+Recall the Bradley-Terry preference model from [the previous RLHF chapter](../chapter15_rlhf/reward-function-design) and [Chapter 8 on GAE](../chapter10_ppo/gae-reward-model):
 
 $$P(y_w > y_l \mid x) = \sigma\left( r(x, y_w) - r(x, y_l) \right)$$
 
@@ -519,7 +519,7 @@ Substituting the preference probability above gives the full DPO loss:
 
 $$\mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(x, y_w, y_l)} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(y_w\mid x)}{\pi_{\text{ref}}(y_w\mid x)} - \beta \log \frac{\pi_\theta(y_l\mid x)}{\pi_{\text{ref}}(y_l\mid x)} \right) \right]$$
 
-This is the true form behind the `DPOTrainer` you used in [Chapter 2](../chapter17_dpo/intro):
+This is the true form behind the `DPOTrainer` you used in [Chapter 15](../chapter17_dpo/intro):
 
 <DpoCodeFocus focus="loss" />
 
@@ -657,7 +657,7 @@ print(f"Reward gap: {r_good - r_bad:.4f}")
 The meaning of implicit reward is this: **DPO does not lack a reward model; it hides the reward model inside the policy model**. You do not need to train and maintain a separate RM. The policy model itself can score its own answers. This is what "Direct" means in DPO: it learns the policy **directly** from preference data and **skips** the intermediate step of explicitly training an RM.
 
 <details>
-<summary>Question: What is the relationship between DPO's implicit reward $r(x,y) = \beta \log(\pi_\theta / \pi_{\text{ref}})$ and the KL penalty in [Chapter 7 PPO](../chapter10_ppo/trust-region-clipping)?</summary>
+<summary>Question: What is the relationship between DPO's implicit reward $r(x,y) = \beta \log(\pi_\theta / \pi_{\text{ref}})$ and the KL penalty in [Chapter 8 PPO](../chapter10_ppo/trust-region-clipping)?</summary>
 
 They are two sides of the same object. PPO's objective includes the term $-\beta \cdot D_{\text{KL}}(\pi_\theta \| \pi_{\text{ref}})$, which prevents the policy from moving too far away from the reference model. DPO's implicit reward $\beta \log(\pi_\theta / \pi_{\text{ref}})$ is exactly the logarithmic term inside the KL divergence. It is the "pointwise version" of the KL divergence.
 

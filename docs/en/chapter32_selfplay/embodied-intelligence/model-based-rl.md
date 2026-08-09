@@ -1,8 +1,8 @@
 ---
-title: 12.2 Model-Based RL
+title: 'Legacy Page: Model-Based RL'
 ---
 
-# 10.2 Model-Based RL: From Model-Free to Model-Based
+# Legacy Page: Model-Based RL
 
 <a id="article-start"></a>
 
@@ -263,7 +263,7 @@ $$
 
 Read this formula as a procedure. First randomly generate $M$ candidate action sequences. The $j$-th sequence is rolled forward for $H$ steps in the model, producing a sequence of predicted rewards $\hat r_{t+h}^{(j)}$. Sum these rewards, and choose the sequence with the highest total score. Finally, execute only $a_0^*$, observe the new real state, and plan again. This is the minimal version of model predictive control.
 
-The full script is in [minimal_mbrl_point_mass.py](../../../chapter28_vla/embodied-intelligence/model-based-rl/snippets/minimal_mbrl_point_mass.py), and can be run directly:
+The full script is in [minimal_mbrl_point_mass.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/docs/chapter28_vla/embodied-intelligence/model-based-rl/snippets/minimal_mbrl_point_mass.py), and can be run directly:
 
 ```bash
 python docs/chapter28_vla/embodied-intelligence/model-based-rl/snippets/minimal_mbrl_point_mass.py
@@ -683,7 +683,7 @@ The more likely path is hybridization: use model-free methods for stable optimiz
 | Policy gradients and actor-critic (Chapters 5-6)     | Dreamer trains actor and critic on imagined trajectories                                 |
 | Stable PPO training (Chapter 7)                      | Embodied RL often uses PPO first to obtain a strong simulation baseline                  |
 | Embodied intelligence (main article in this section) | MBRL addresses expensive real interaction and the need to predict the future             |
-| Offline RL (Section 12.5)                            | Offline data can be used to pretrain world models before planning or policy optimization |
+| [Offline RL](../offline-rl/)                               | Offline data can be used to pretrain world models before planning or policy optimization |
 
 ## Common Questions
 

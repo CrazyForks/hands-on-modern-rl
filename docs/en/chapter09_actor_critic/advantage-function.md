@@ -1,5 +1,5 @@
 ---
-title: 6.1 The Advantage Function
+title: 7.1 The Advantage Function
 ---
 
 # 7.1 The Advantage Function

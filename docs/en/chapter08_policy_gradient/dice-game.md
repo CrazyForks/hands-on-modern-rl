@@ -1,5 +1,5 @@
 ---
-title: '5.7 Hands-on: A Two-Armed Bandit (Dice-Game Slot Machine)'
+title: '6.4 Hands-on: A Two-Armed Bandit (Dice-Game Slot Machine)'
 ---
 
 # 6.4 Hands-on: A Two-Armed Bandit (Dice-Game Slot Machine)

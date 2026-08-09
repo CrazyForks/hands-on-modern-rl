@@ -1,5 +1,5 @@
 ---
-title: 5.4 Variance Reduction and Baselines
+title: 6.3 Variance Reduction and Baselines
 ---
 
 # 6.3 Variance Reduction and Baselines

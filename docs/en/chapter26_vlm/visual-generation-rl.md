@@ -1,8 +1,8 @@
 ---
-title: '11.4 RL Post-Training for Visual Generation Models'
+title: 'Supplement: RL Post-Training for Visual Generation Models'
 ---
 
-# 9.4 RL Post-Training for Visual Generation Models
+# Supplement: RL Post-Training for Visual Generation Models
 
 In the preceding chapters, we started from LLM text post-training: the model reads text, generates an answer, and RL's goal is to make it better aligned with human preferences, better at reasoning, and less prone to format and factual errors. In this chapter, we extended the input from pure text to images and text, discussing the **understanding** side of VLM: the model looks at an image and answers a question, with RL's goal being to make it see more accurately and answer more robustly.
 

@@ -6,11 +6,11 @@
 
 | 小节                                                                   | 主题                       | 文件                                          |
 | ---------------------------------------------------------------------- | -------------------------- | --------------------------------------------- |
-| [17.2 现代后训练流水线范式](../chapter17_dpo/industrial-post-training) | 国内外大厂后训练全景       | `chapter17_dpo/industrial-post-training.md`   |
-| [17.4 优化器与训练稳定性](../chapter17_dpo/modern-industrial-practice) | GLM-4.6、Llama 4、MuonClip | `chapter17_dpo/modern-industrial-practice.md` |
-| [17.6 动手 veRL 代码生成 RL](../chapter18_grpo/verl-code-sandbox)      | 代码题 verifier + PPO 实战 | `chapter18_grpo/verl-code-sandbox.md`         |
+| [14.2 现代后训练流水线范式](./industrial-post-training) | 国内外大厂后训练全景       | `chapter17_dpo/industrial-post-training.md`   |
+| [14.3 优化器与训练稳定性](./modern-industrial-practice) | GLM-4.6、Llama 4、MuonClip | `chapter17_dpo/modern-industrial-practice.md` |
+| [16.8 动手 veRL 代码生成 RL](../chapter18_grpo/verl-code-sandbox)      | 代码题 verifier + PPO 实战 | `chapter18_grpo/verl-code-sandbox.md`         |
 
-## 17.1 训练框架对比
+## 14.1 训练框架对比
 
 LLM RL 训练框架要同时编排多个模型（Actor、Critic、Reference、Reward Model、Rollout Engine），还要处理 on-policy 数据流、分布式训练、推理引擎权重同步等工程问题。这些需求超出了 HuggingFace `Trainer` 或 `Accelerate` 的设计边界，因此 2024 年起出现了专门面向 LLM RL 的训练框架。本节对比七个有代表性的开源框架，给出选型决策依据。
 
@@ -44,7 +44,7 @@ flowchart TB
 
 veRL 的工程亮点是把训练栈和推理栈解耦：Actor 用 FSDP/Megatron 训练，Rollout 用 vLLM 推理，二者通过权重同步接口 `sync_weights` 衔接。这种解耦让 vLLM 的 PagedAttention、Continuous Batching、Tensor Parallelism 等推理优化能直接接入 RL 训练，rollout 吞吐比朴素 HuggingFace 生成高 5-10 倍。
 
-veRL 是 Qwen3、DeepSeek-R1、Llama 4、Mistral 等开源训练脚本的事实选择。详细架构参考 [第 14 章 16.4 分布式同步、异步与 MoE 训练](./distributed-sync)。
+veRL 是 Qwen3、DeepSeek-R1、Llama 4、Mistral 等开源训练脚本的事实选择。详细架构参考 [第 14 章 14.4 分布式同步、异步与 MoE 训练](./distributed-sync)。
 
 #### OpenRLHF
 
@@ -123,9 +123,9 @@ $$\rho_t^{\text{stale}} = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{gen
 
 实战中一个反复出现的模式是：**先用 TRL/OpenRLHF 做算法验证，再用 veRL 做规模放大**。算法正确性验证不需要大规模集群，TRL 单卡 30 分钟能跑通 GRPO。验证通过后再切到 veRL 做大规模训练，避免在工程问题上浪费算法迭代时间。
 
-## 17.3 双轨奖励设计
+## 双轨奖励设计
 
-[17.2 节](../chapter17_dpo/industrial-post-training) 已经提到，现代后训练把奖励分成两类——**Verifiable Reward**（可验证奖励）和 **Pairwise Preference Reward**（成对偏好奖励）。本节深入讨论二者的数学结构、适用边界和工业级的混合策略。
+[14.2 节](./industrial-post-training) 已经提到，现代后训练把奖励分成两类——**Verifiable Reward**（可验证奖励）和 **Pairwise Preference Reward**（成对偏好奖励）。本节深入讨论二者的数学结构、适用边界和工业级的混合策略。
 
 ### 两条奖励路线的本质差异
 
@@ -237,7 +237,7 @@ $$\tilde{r}_{\text{domain}} = \frac{r - \mu_{\text{domain}}}{\sigma_{\text{domai
 
 另一种做法是 **GRPO 的组内归一化**——同一 prompt 的 $G$ 个 rollout 内部做 z-score。这天然消除了跨 prompt 的尺度差异，是 GRPO 相比 PPO 的一个隐含优势。
 
-## 17.5 训练成本估算
+## 训练成本估算
 
 工业 LLM 训练的成本核算是融资、招聘、算力采购的决策依据。本节给出从预训练到 RL 的完整成本模型，并用 DeepSeek、Qwen、Llama 公开数据校准估算公式。
 
@@ -339,7 +339,7 @@ $$C_{\text{inference}} = \text{requests} \cdot \text{avg\_tokens} \cdot \frac{2 
 3. **混合精度训练**：BF16 训练比 FP32 快 2 倍；FP8（H100 支持）再快 1.5-2 倍。但低精度训练对稳定性要求更高，需要 QK-clip 等技巧。
 4. **Checkpoint 复用**：pretraining → SFT → RL 各阶段保留 checkpoint，避免从零重训。DeepSeek 的多阶段训练流水线就是基于 checkpoint 复用设计的。
 
-## 17.7 中国对齐团队面试常见考点
+## 中国对齐团队面试常见考点
 
 本节梳理 2025-2026 年智谱、字节 Seed、Moonshot、阿里通义、DeepSeek、腾讯混元等中国对齐团队面试中反复出现的核心考点。这些考点不是"考题集锦"，而是反映工业团队真正关心的能力维度——**算法推导能力、工程系统理解、训练资源推算**。
 
@@ -389,7 +389,7 @@ PPO 要训练 Critic 估计 $A_t$，但在 LLM 场景下 Critic 是和 Actor 同
 
 $$A_i = \frac{r_i - \text{mean}(r_1, \ldots, r_G)}{\text{std}(r_1, \ldots, r_G)}$$
 
-其中 $r_i$ 是第 $i$ 个 rollout 的 reward，$G$ 是组大小。这样省掉了 Critic 网络，advantage 直接从组内 reward 统计得到。详细推导见 [9.4 节 GRPO 核心机制](../chapter18_grpo/grpo-practice-and-mechanism)。
+其中 $r_i$ 是第 $i$ 个 rollout 的 reward，$G$ 是组大小。这样省掉了 Critic 网络，advantage 直接从组内 reward 统计得到。详细推导见 [16.1 节 GRPO 核心机制](../chapter18_grpo/grpo-practice-and-mechanism)。
 
 #### 面试加分项
 
@@ -583,16 +583,16 @@ $$\text{成本} = 3300 \times 2 = \$6,600$$
 第 14 章把视角从算法层面提升到工业系统层面：
 
 1. **训练框架对比**（17.1）：veRL、OpenRLHF、TRL、NeMo-Aligner 同步阵营 vs AReaL、AgentRL、SLIME、ROLL、LlamaRL 异步阵营。同步框架适合短 rollout 的 RLHF/GRPO；异步框架适合长 rollout 的 Agentic RL。
-2. **现代后训练流水线**（[17.2](../chapter17_dpo/industrial-post-training)）：cold-start SFT → reasoning RL → agentic RL → general preference 回填，是 2025 年工业界的事实范式。
+2. **现代后训练流水线**（[14.2](./industrial-post-training)）：cold-start SFT → reasoning RL → agentic RL → general preference 回填，是 2025 年工业界的事实范式。
 3. **双轨奖励设计**（17.3）：Verifiable Reward（数学、代码、规则）与 Pairwise Preference Reward（开放对话、安全、风格）按任务类型混合，配合 z-score 归一化避免尺度冲突。
-4. **优化器与训练稳定性**（[17.4](../chapter17_dpo/modern-industrial-practice)）：MuonClip、QK-clip、低精度训练是万亿参数模型的关键稳定性工具。
+4. **优化器与训练稳定性**（[14.3](./modern-industrial-practice)）：MuonClip、QK-clip、低精度训练是万亿参数模型的关键稳定性工具。
 5. **训练成本估算**（17.5）：预训练占 80%-90% 总成本，RL 阶段虽然算力占比小但决定模型能否上线。MoE 显著降本——DeepSeek-V3 用 671B MoE 只花了 2.664M H800 小时。
-6. **动手 veRL 代码 RL**（[17.6](../chapter18_grpo/verl-code-sandbox)）：三层 verifier（格式 + 编译 + 测试）是代码 RLVR 的标准做法。
+6. **动手 veRL 代码 RL**（[16.8](../chapter18_grpo/verl-code-sandbox)）：三层 verifier（格式 + 编译 + 测试）是代码 RLVR 的标准做法。
 7. **中国对齐团队面试考点**（17.7）：PG → GRPO 推导链、DPO 家族、DeepSpeed vs Megatron、训练资源推算是高频考点，反映工业团队真正关心的能力维度。
 
 这一章的真正价值不在于记住每个框架的细节——而在于建立**系统性判断力**：看到一个新模型或新论文，能立刻判断它用了什么训练栈、什么奖励设计、成本量级、训练稳定性挑战。这种判断力是从"读论文"到"能动手做工业级 RL"的关键一步。
 
-下一章 [第 15 章 DPO 家族](../chapter17_dpo/dpo-theory-and-family) 深入推导 DPO 及其变体；[第 14 章 16.4 分布式训练](./distributed-sync) 从系统架构层面解析 veRL/AReaL/LlamaRL 的工程设计。
+下一章 [第 15 章 DPO 家族](../chapter17_dpo/dpo-theory-and-family) 深入推导 DPO 及其变体；[第 14 章 14.4 分布式训练](./distributed-sync) 从系统架构层面解析 veRL/AReaL/LlamaRL 的工程设计。
 
 ## 延伸阅读
 

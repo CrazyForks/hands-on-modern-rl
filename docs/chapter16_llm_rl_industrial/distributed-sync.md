@@ -2,7 +2,7 @@
 
 > [附录 B.1 RL 训练系统](../appendix_industrial_training/rl-infrastructure) 已经讲了基础——采样、异步、分布式并行。本章把视角提升到**框架级架构**和**前沿工业实践**：veRL 如何用 HybridFlow 统一编排多模型、AReaL/LlamaRL 如何用纯异步打破生成-训练壁垒、DeepSeek V3 的 DualPipe 如何在 MoE 上做流水线并行、万卡集群如何 profile 与调优。
 
-## 36.1 veRL 架构深度解析
+## veRL 架构深度解析
 
 veRL（Volcano Engine Reinforcement Learning）是字节跳动 2024 年开源的 RL 训练框架，论文 [HybridFlow, arXiv:2409.19256](https://arxiv.org/abs/2409.19256)。它已经成为事实上的主流 LLM RL 训练框架，被 Qwen、DeepSeek、Llama、Mistral 等团队的训练脚本采用。
 
@@ -140,9 +140,9 @@ veRL 是第一个把这些维度都做成可配置的框架。DeepSpeed-Chat、O
 | **推理后端** | vLLM/SGLang       | vLLM              | TRT-LLM          | HF generate    |
 | **典型规模** | 8-1024 GPU        | 8-256 GPU         | 8-512 GPU        | 1-8 GPU        |
 
-[第 7 章 GRPO 实践](../chapter09_grpo_rlvr/grpo-practice-and-mechanism) 用的就是 veRL。
+[第 16 章 GRPO 实践](../chapter18_grpo/grpo-practice-and-mechanism) 用的就是 veRL。
 
-## 36.2 OpenRLHF / NeMo-Aligner / TRL 对比
+## OpenRLHF / NeMo-Aligner / TRL 对比
 
 ### OpenRLHF
 
@@ -218,7 +218,7 @@ trainer.train(dataset)
 - 研究、中等规模：OpenRLHF 或 veRL
 - 大规模生产：veRL 或 NeMo-Aligner（看硬件栈）
 
-## 36.3 Rollout 引擎与 vLLM 集成
+## Rollout 引擎与 vLLM 集成
 
 RL 训练 99% 的时间在 rollout（[附录 B.1](../appendix_industrial_training/async-training)）。Rollout 引擎是性能瓶颈的核心。vLLM 是事实标准。
 
@@ -320,7 +320,7 @@ class VLLMRolloutWorker:
 - **SGLang**：agentic rollout、多轮、结构化输出
 - **TRT-LLM**：NVIDIA 硬件极致优化
 
-## 36.4 GPU 内存优化：ZeRO、FSDP、Gradient Checkpointing
+## GPU 内存优化：ZeRO、FSDP、Gradient Checkpointing
 
 LLM 训练显存是核心瓶颈。一个 70B 模型 bf16 全参训练需要 ~1.5 TB 显存——单卡 80GB H100 根本放不下。
 
@@ -413,9 +413,9 @@ class CheckpointedBlock(nn.Module):
 | ZeRO-3 + Gradient Checkpointing        | 30 GB        | 1×       |
 | ZeRO-3 + Gradient Checkpointing + LoRA | 8 GB         | 1.2×     |
 
-LoRA（[第 6 章](../chapter08_rlhf/industrial-post-training)）只训少量参数，显存需求大幅降低。工业级 70B RL 训练通常用 LoRA + FSDP。
+LoRA（[第 14 章](./industrial-post-training)）只训少量参数，显存需求大幅降低。工业级 70B RL 训练通常用 LoRA + FSDP。
 
-## 36.5 异步 RL 训练
+## 异步 RL 训练
 
 同步训练的瓶颈在 [附录 B.1](../appendix_industrial_training/async-training) 详述——GPU 99% 空闲等 rollout。异步训练把生成和训练解耦，让两边同时跑。下面介绍三个 2025 年的旗舰框架。
 
@@ -510,7 +510,7 @@ controller.route_function_calls(task_workers)
 | **AReaL**   | Ant Group 和清华 | 全异步 rollout + staleness-aware PPO | 2.77×      | 大规模 LLM RL  |
 | **AgentRL** | THUDM/智谱       | 多轮多任务 + 统一环境接口            | 论文未标注 | Agent 训练     |
 
-## 36.6 MoE + RL 训练
+## MoE + RL 训练
 
 DeepSeek V3、Qwen3、GLM-4.5 都是 MoE 架构。MoE 给 RL 训练带来新挑战。
 
@@ -570,7 +570,7 @@ GPU 3: expert 9,10,11   ──┘
 
 #### 3. Token 级 IS 方差大
 
-[GRPO 家族](../chapter09_grpo_rlvr/grpo-family) 提到——MoE 下不同 token 路由到不同 expert，token 级 importance sampling 比率波动剧烈，梯度方差大。
+[GRPO 家族](../chapter18_grpo/grpo-family) 提到——MoE 下不同 token 路由到不同 expert，token 级 importance sampling 比率波动剧烈，梯度方差大。
 
 **解决**：**GSPO（Group Sequence Policy Optimization）**——把 IS 比率从 token 级改成序列级：
 
@@ -611,7 +611,7 @@ GLM-4.5 用 **slime** 框架训练（[THUDM/slime](https://github.com/THUDM/slim
 - SGLang 推理后端
 - 原生 MoE 优化（DeepEP 通信、fp8 rollout）
 
-## 36.7 DualPipe 与 Best-Fit Packing
+## DualPipe 与 Best-Fit Packing
 
 ### DualPipe
 
@@ -684,7 +684,7 @@ def best_fit_pack(items, bin_capacity):
 
 DeepSeek V3 用 Best-Fit Packing 让 GPU 利用率从 70% 提升到 95%。
 
-## 36.8 性能 Profiling 与瓶颈分析
+## 性能 Profiling 与瓶颈分析
 
 RL 训练的性能优化必须基于 profiling——不能凭感觉。
 
@@ -763,7 +763,7 @@ H100 bf16 峰值 ~1000 TFLOPS。典型 LLM RL 训练 MFU：
 
 MFU < 30% 说明有显著优化空间——通常是通信或 rollout 瓶颈。
 
-## 36.9 万卡集群实践
+## 万卡集群实践
 
 把上面所有技术组合起来——这就是 2025 年万卡集群上的 RL 训练实践。
 
@@ -868,7 +868,7 @@ def monitor_expert_balance(model):
 6. **MoE + RL** 需要 GSPO、Expert Balancing、DualPipe、Best-Fit Packing 协同优化
 7. **万卡集群** 是工程极限——故障常态、通信瓶颈、监控告警、数据 pipeline
 
-[第 15 章 LLM RL 工业实战](../chapter09_alignment/industrial-post-training) 会从产品视角再讲一遍这些技术如何落地——这一章是工程视角。
+[第 14 章 LLM RL 工业实战](./industrial-post-training) 会从产品视角再讲一遍这些技术如何落地——这一章是工程视角。
 
 ## 延伸阅读
 

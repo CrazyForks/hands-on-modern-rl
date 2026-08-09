@@ -70,7 +70,7 @@ SWE-bench Verified（高质量子集，500 题）的 SOTA 表现：
 
 ## 12.1.2 为什么 SWE 是 RLVR 的理想战场
 
-回顾 [第 7 章 RLVR](../chapter18_grpo/rlvr)——RLVR 的核心思想是**用规则验证替代 RM**。RLVR 需要三个条件：
+回顾 [第 16 章 RLVR](../chapter18_grpo/rlvr)——RLVR 的核心思想是**用规则验证替代 RM**。RLVR 需要三个条件：
 
 1. **任务有明确答案**：对就是对，错就是错
 2. **验证可以自动化**：不需要人工判断
@@ -160,7 +160,7 @@ SWE-RL 训练需要大量 (Issue, patch, tests) 三元组。来源有三个：
 3. 跑测试看是否通过
 4. 通过的（issue, patch, test）三元组作为训练数据
 
-这是 [12.5 节 SSR](./self-play-ssr) 的核心思想——**模型自己生成训练数据**。
+这是 [21.3 节 SSR](./self-play-ssr-and-summary) 的核心思想——**模型自己生成训练数据**。
 
 ## 12.1.5 SWE-RL 的奖励函数
 

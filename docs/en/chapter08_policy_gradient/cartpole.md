@@ -1,5 +1,5 @@
 ---
-title: '5.3 Hands-On: Policy Gradient CartPole'
+title: '6.5 Hands-On: Policy Gradient CartPole'
 ---
 
 # 6.5 Hands-on: Policy Gradient CartPole

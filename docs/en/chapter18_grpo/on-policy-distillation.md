@@ -1,5 +1,5 @@
 ---
-title: 9.5 On-Policy Distillation
+title: 16.7 On-Policy Distillation
 ---
 
 # 16.7 On-Policy Distillation: Turning the Teacher into Dense Reward

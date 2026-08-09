@@ -1,5 +1,5 @@
 ---
-title: '5.3 Hands-on: Value Baseline on CartPole'
+title: '6.6 Hands-on: Value Baseline on CartPole'
 ---
 
 # 6.6 Hands-on: Value Baseline for the CartPole Challenge

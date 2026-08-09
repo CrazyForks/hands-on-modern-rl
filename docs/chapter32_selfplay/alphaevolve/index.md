@@ -1,6 +1,6 @@
 # 29.4 进化式 LLM 搜索与科学发现
 
-[前面几节](../) 我们讨论了 RL 的传统前沿——embodied intelligence、self-play、multi-agent。这一节我们看一个全新的方向：**LLM 驱动的科学发现**。
+[本章前面几节](../intro)讨论了 RL 的传统前沿——self-play、multi-agent 与 scaling。这一节转向一个新的方向：**LLM 驱动的科学发现**。
 
 这个方向的特点是：
 
@@ -43,7 +43,7 @@
 └─────────────────────────────────────────────────────────────┘
 ```
 
-这个流程与 [经典遗传算法（GA）](../chapter03_mdp/dp-mc-td) 几乎完全一样——区别只是变异操作从"随机改动"变成"LLM 智能生成"。
+这个流程与 [经典遗传算法（GA）](../../chapter03_mdp/dp-mc-td) 几乎完全一样——区别只是变异操作从"随机改动"变成"LLM 智能生成"。
 
 ### AlphaEvolve 的关键创新
 
@@ -300,7 +300,7 @@ M-GRPO 解决多智能体 RL 训练的三个难点：
 
 **挑战 3：安全风险**
 
-如果模型可以无限改进自己，可能突破人类控制——这是 [AI safety](../chapter30_alignment_failures/intro) 的核心担忧。
+如果模型可以无限改进自己，可能突破人类控制——这是 [AI safety](../../chapter30_alignment_failures/intro) 的核心担忧。
 
 ### RSI 的部分实现
 
@@ -356,7 +356,7 @@ AlphaEvolve 之所以能发现新算法，是因为**算法的效果可以自动
 
 递归自我改进是 AGI 的潜在路径之一——如果模型能持续改进自己，可能在某个时间点超越人类能力。
 
-但这伴随**严重的安全风险**——这也是 [Alignment 研究](../chapter30_alignment_failures/scaling-and-defenses) 的核心议题。
+但这伴随**严重的安全风险**——这也是 [Alignment 研究](../../chapter30_alignment_failures/scaling-and-defenses) 的核心议题。
 
 ## 小结
 

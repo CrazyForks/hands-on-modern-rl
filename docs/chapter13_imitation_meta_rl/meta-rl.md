@@ -1,6 +1,6 @@
 # 11.3 元 RL 与 MAML、RL²、PEARL、In-Context RL
 
-> [13.2](./irl-gail) 讲了从专家反推 reward。本节处理另一种特殊场景：**环境本身在不断变化**。元 RL（Meta-RL）让 agent 学会"快速适应新任务"的能力——在多个相关任务上预训练后，面对新任务时只需几次交互就能掌握。
+> [11.2](./irl-gail) 讲了从专家反推 reward。本节处理另一种特殊场景：**环境本身在不断变化**。元 RL（Meta-RL）让 agent 学会"快速适应新任务"的能力——在多个相关任务上预训练后，面对新任务时只需几次交互就能掌握。
 
 ## MAML、RL²、PEARL
 
@@ -195,7 +195,7 @@ graph LR
 2. **RM 阶段 = 反向 RL 的近似**：从偏好数据反推"奖励函数"——这是 LLM 版本的 MaxEnt IRL 思想（虽然具体用 Bradley-Terry 模型而非最大熵）
 3. **PPO 阶段 = 前向 RL**：用学到的奖励函数做 on-policy 优化，解决 SFT 的分布偏移
 
-[第 7 章 DPO](../chapter17_dpo/dpo-theory-and-family)可以看作 GAIL 的简化版本：DPO 的隐式奖励 $\log \pi_\theta(y_w \mid x) - \log \pi_\theta(y_l \mid x) - \log \pi_{\text{ref}}(y_w \mid x) + \log \pi_{\text{ref}}(y_l \mid x)$ 正是把"专家 vs 非专家"的判别学习内化进策略本身。
+[第 15 章 DPO](../chapter17_dpo/dpo-theory-and-family)可以看作 GAIL 的简化版本：DPO 的隐式奖励 $\log \pi_\theta(y_w \mid x) - \log \pi_\theta(y_l \mid x) - \log \pi_{\text{ref}}(y_w \mid x) + \log \pi_{\text{ref}}(y_l \mid x)$ 正是把"专家 vs 非专家"的判别学习内化进策略本身。
 
 ### 元 RL 视角下的 LLM 适应
 
@@ -230,7 +230,7 @@ LLM 的 few-shot in-context learning 可以看作"**RL² 的零样本版本**"�
 5. **In-Context RL / Algorithm Distillation** 把整个 RL 算法蒸馏进 transformer 的 in-context 能力，连接到 LLM 的 few-shot 学习
 6. **LLM 后训练**可重写为 BC（SFT）+ 反向 RL（RM）+ 前向 RL（PPO），DPO 是 GAIL 的对偶形式
 
-下一章 [第 13 章 探索、MARL 与分层 RL](../chapter14_exploration_marl_hierarchical/intro)转向另外三个进阶主题：当奖励稀疏时如何探索、当多个智能体互动时如何训练、当 horizon 极长时如何分层规划。
+下一章 [第 12 章 探索、MARL 与分层 RL](../chapter14_exploration_marl_hierarchical/intro)转向另外三个进阶主题：当奖励稀疏时如何探索、当多个智能体互动时如何训练、当 horizon 极长时如何分层规划。
 
 ## 延伸阅读
 

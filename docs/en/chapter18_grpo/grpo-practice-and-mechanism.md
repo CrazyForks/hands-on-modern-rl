@@ -1,5 +1,5 @@
 ---
-title: 9.2 GRPO Training and Core Mechanisms
+title: 16.1 GRPO Training and Core Mechanisms
 ---
 
 # 16.1 GRPO Training and Core Mechanisms
@@ -411,7 +411,7 @@ Before answering "why it can replace it", first clarify "why we want to replace 
 
 **3. It complicates engineering.** Four models have separate optimizers, learning rates, and gradient clipping configurations, making hyperparameter tuning much harder.
 
-Recall the [baseline analysis in Chapter 5](../chapter08_policy_gradient/pg-improvements) and the [advantage function in Chapter 6](../chapter09_actor_critic/advantage-function): the core role of the Critic is **to provide a baseline that reduces variance**. If we can obtain a baseline without training a separate network, the Critic can retire.
+Recall the [baseline analysis in Chapter 6](../chapter08_policy_gradient/pg-improvements) and the [advantage function in Chapter 7](../chapter09_actor_critic/advantage-function): the core role of the Critic is **to provide a baseline that reduces variance**. If we can obtain a baseline without training a separate network, the Critic can retire.
 
 ### The Core Idea of GRPO
 

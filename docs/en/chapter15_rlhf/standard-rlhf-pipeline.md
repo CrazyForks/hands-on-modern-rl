@@ -1,5 +1,5 @@
 ---
-title: 8.2 The RLHF Pipeline
+title: 13.4 The RLHF Pipeline
 ---
 
 # 13.4 The RLHF Pipeline

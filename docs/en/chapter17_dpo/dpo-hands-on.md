@@ -1,5 +1,5 @@
 # 15.4 Hands-on: A DPO Alignment Experiment
-In [Chapter 2](../chapter17_dpo/intro), you already used DPO to teach a model to politely push back when a user is mistaken. That earlier run was mainly about "getting the pipeline to work". We did not look closely at what happens during training itself.
+In [Chapter 15](../chapter17_dpo/intro), you already used DPO to teach a model to politely push back when a user is mistaken. That earlier run was mainly about "getting the pipeline to work". We did not look closely at what happens during training itself.
 
 In this section we will use a slightly more demanding setup: aligning a model that tends to respond with sarcasm, and then watching every movement in the training metrics.
 

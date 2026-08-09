@@ -1,8 +1,8 @@
 ---
-title: 6.6 Actor-Critic at the Frontier
+title: 'Supplement: Actor-Critic at the Frontier'
 ---
 
-# 6.6 Actor-Critic at the Frontier: Large-Scale Applications
+# Supplement: Actor-Critic at the Frontier
 
 The experiments we ran earlier all lived in teaching environments such as CartPole and LunarLander: tens of state dimensions, a handful of action dimensions, and training finishes in minutes on a CPU. But the real value of the Actor-Critic (AC) architecture is this:
 

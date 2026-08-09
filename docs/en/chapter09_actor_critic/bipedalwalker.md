@@ -1,5 +1,5 @@
 ---
-title: '6.5 Hands-On: BipedalWalker'
+title: '7.5 Hands-On: BipedalWalker'
 ---
 
 # 7.5 Hands-on: BipedalWalker
@@ -240,4 +240,4 @@ This chapter started from REINFORCE's high-variance problem and introduced the A
 
 But the BipedalWalker experiment also exposed the core weakness of vanilla Actor-Critic: **training instability**. Without constraints on the magnitude of policy updates, A2C's reward curve oscillates violently on complex tasks, and both final performance and consistency fall short of PPO.
 
-The next chapter addresses this problem with PPO: [Chapter 7: PPO](../chapter10_ppo/intro).
+The next chapter addresses this problem with PPO: [Chapter 8: PPO](../chapter10_ppo/intro).

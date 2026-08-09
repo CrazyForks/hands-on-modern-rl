@@ -1,5 +1,5 @@
 ---
-title: 12.6 RL Scaling and Future Outlook
+title: 29.2 RL Scaling and Future Outlook
 ---
 
 # 29.2 RL Scaling and Future Outlook: Where Is the Ceiling?

@@ -1,6 +1,6 @@
 # 19.2 RLAIF 工程化宪法扩展
 
-> [21.1](./hhh-practice) 讲了 HHH 三原则在 Claude 训练中的落地。本节关注 RLAIF 的工程化扩展——Anthropic 2026 年发布 80 页 Constitution，这是目前工业界最详尽的 AI 宪法实践。我们看看宪法是怎么"工程化"的。
+> [19.1](./hhh-practice) 讲了 HHH 三原则在 Claude 训练中的落地。本节关注 RLAIF 的工程化扩展——Anthropic 2026 年发布 80 页 Constitution，这是目前工业界最详尽的 AI 宪法实践。我们看看宪法是怎么"工程化"的。
 
 ## Anthropic 2026 80 页 Constitution
 
@@ -47,7 +47,7 @@ $$
 其中 $\mathcal{L}_{\text{context-consistency}}$ 衡量模型在不同情境下的回答是否与 Constitution 框架一致。
 
 ::: details 为什么 Socialization 比 Rule-Listing 更鲁棒
-规则列表的根本问题：**规则无法穷尽**。80 条原则覆盖不了真实部署中遇到的千变万化情境。Socialization 让模型学的是"价值判断的能力"，而不是"规则匹配"。Anthropic 报告：Claude 4 在 OOD（训练时未见过）的安全情境上，鲁棒性比规则列表版本高 40%+。这与 [第 26 章 Computer Use](../chapter25_computer_use/intro) 中"模型需要在新环境泛化"的需求直接对应。
+规则列表的根本问题：**规则无法穷尽**。80 条原则覆盖不了真实部署中遇到的千变万化情境。Socialization 让模型学的是"价值判断的能力"，而不是"规则匹配"。Anthropic 报告：Claude 4 在 OOD（训练时未见过）的安全情境上，鲁棒性比规则列表版本高 40%+。这与 [第 23 章 Computer Use](../chapter25_computer_use/intro) 中"模型需要在新环境泛化"的需求直接对应。
 :::
 
 ### 可审计性（Auditability）
@@ -77,7 +77,7 @@ Entropy 项鼓励 attribution 不要坍缩到单一原则（多原则兼容时�
 | OOD 鲁棒性 | 弱                      | 强（socialization 泛化）      |
 | 审计能力   | 黑盒                    | 每个决策可追溯到原则          |
 
-这条路线和 [第 34 章 Scalable Oversight](../chapter34_scalable_oversight/intro) 的"AI supervision"研究、[第 36 章 Distributed RL Training](../chapter36_distributed_rl_training/intro) 的大规模对齐训练形成了完整的工业级对齐体系。
+这条路线和 [第 28 章 Scalable Oversight](../chapter30_alignment_failures/intro) 的"AI supervision"研究、[第 36 章 Distributed RL Training](../appendix_industrial_training/rl-infrastructure) 的大规模对齐训练形成了完整的工业级对齐体系。
 
 ## 本章总结
 
@@ -89,7 +89,7 @@ Constitutional AI 与 RLAIF 是 LLM 对齐从"依赖人类标注"走向"可扩�
 4. **HHH 三原则** 是 Constitution 的底层价值框架，三者在多目标 RL 中以加权 reward 形式联合优化。
 5. **Claude 4 系列 Constitution**（2026）完成了从"规则列表"到"层级化价值树 + 情境化 socialization + 可审计 attribution"的方法论跃迁，为 OOD 鲁棒性和可解释性提供了新范式。
 
-下一章 [第 21 章 RL Environments 与 Verifiers](../chapter23_rl_environments/intro) 我们转向 RLAIF/RLVR 的另一半——**验证器（verifier）怎么设计**。一个数学题的答案对不对、一段代码能不能跑通、一次 API 调用是否合规，都需要可执行的环境来给出奖励信号。这是把 RLAIF 的"软偏好"转换为"硬规则"的工程基石。
+下一章 [第 16 章 RL Environments 与 Verifiers](../chapter18_grpo/rl-environments) 我们转向 RLAIF/RLVR 的另一半——**验证器（verifier）怎么设计**。一个数学题的答案对不对、一段代码能不能跑通、一次 API 调用是否合规，都需要可执行的环境来给出奖励信号。这是把 RLAIF 的"软偏好"转换为"硬规则"的工程基石。
 
 ## 延伸阅读
 

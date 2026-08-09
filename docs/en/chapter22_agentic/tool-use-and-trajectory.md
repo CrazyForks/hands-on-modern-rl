@@ -1,5 +1,5 @@
 ---
-title: 22.2 Tool Use, Trajectory Synthesis, and Agentic Engineering
+title: 20.4 Tool Use, Trajectory Synthesis, and Agentic Engineering
 ---
 
 # 20.4 Tool Use, Trajectory Synthesis, and Agentic Engineering

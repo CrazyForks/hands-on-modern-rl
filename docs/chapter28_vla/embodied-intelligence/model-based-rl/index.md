@@ -1,4 +1,4 @@
-# 10.2 Model-Based RL 与 从 Model-Free 到 Model-Based
+# 补充阅读：Model-Based RL——从 Model-Free 到 Model-Based
 
 <a id="article-start"></a>
 
@@ -259,7 +259,7 @@ $$
 
 这个公式可以按流程读。先随机生成 $M$ 条候选动作序列；第 $j$ 条序列在模型里滚动 $H$ 步，得到一串预测奖励 $\hat r_{t+h}^{(j)}$；把这些奖励加起来，选总分最高的那条序列。最后只执行 $a_0^*$，拿到真实新状态后重新规划。这就是最小版的 Model Predictive Control。
 
-完整脚本在 [minimal_mbrl_point_mass.py](./snippets/minimal_mbrl_point_mass.py)，可以直接运行：
+完整脚本在 [minimal_mbrl_point_mass.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/docs/chapter28_vla/embodied-intelligence/model-based-rl/snippets/minimal_mbrl_point_mass.py)，可以直接运行：
 
 ```bash
 python docs/chapter28_vla/embodied-intelligence/model-based-rl/snippets/minimal_mbrl_point_mass.py

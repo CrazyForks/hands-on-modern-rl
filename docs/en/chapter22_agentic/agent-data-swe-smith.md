@@ -1,8 +1,8 @@
 ---
-title: '22.4 Agent Data Synthesis: SWE-smith'
+title: 'Supplement: Agent Data Synthesis with SWE-smith'
 ---
 
-# 20.4 Agent Data Synthesis: SWE-smith as an Example
+# Supplement: Agent Data Synthesis with SWE-smith
 
 The previous sections discussed the theoretical frame of Agentic RL, tool-use policies, and evaluation. We now face a more practical question: **where does the training data come from?**
 

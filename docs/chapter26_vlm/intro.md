@@ -50,11 +50,11 @@
 
 | 小节                                                    | 你会回答的问题                                        |
 | ------------------------------------------------------- | ----------------------------------------------------- |
-| [11.1 动手：GRPO 训练 VLM](./vlm-grpo-hands-on)         | 怎么用 GRPO 让 VLM 学会“看图再推理”？训练指标怎么看？ |
-| [11.2 视觉奖励与幻觉](./vlm-challenges)                 | 视觉 token 的奖励怎么分配？视觉幻觉怎么应对？         |
+| [24.3 动手：GRPO 训练 VLM](./vlm-grpo-hands-on)         | 怎么用 GRPO 让 VLM 学会“看图再推理”？训练指标怎么看？ |
+| [24.1 视觉奖励与幻觉](./vlm-challenges)                 | 视觉 token 的奖励怎么分配？视觉幻觉怎么应对？         |
 | [11.3 VLM RL 框架与前沿](./vlm-frameworks)              | VisPlay、VISTA-Gym、多模态 Agent 等框架怎么工作？     |
-| [11.4 视觉生成模型的 RL 后训练](./visual-generation-rl) | Diffusion/视频生成怎么用 RL 优化？Reward 怎么设计？   |
-| [11.5 动手：用 EasyR1 训练 GeoQA](./easyr1-geoqa)       | 工业框架 + 真实数据集，跑一次完整的 VLM GRPO 训练     |
+| [27.1 视觉生成模型的 RL 后训练](../chapter29_visual_generation/intro) | Diffusion/视频生成怎么用 RL 优化？Reward 怎么设计？   |
+| [24.4 动手：用 EasyR1 训练 GeoQA](./easyr1-geoqa)       | 工业框架 + 真实数据集，跑一次完整的 VLM GRPO 训练     |
 
 ## 学习目标
 
@@ -64,4 +64,4 @@
 
 第三，VLM RL 正在成为多模态 Agent 和具身智能之间的桥梁。它既连接语言模型的推理能力，也连接图像、视频、屏幕、机器人视角这些真实世界输入。理解这一章，再去看后面的自博弈、自进化和具身智能，就会更容易看清它们之间的技术脉络。
 
-准备好后，我们先从一个最小但完整的实验开始：[11.1 动手：用 GRPO 训练 VLM 回答视觉问题](./vlm-grpo-hands-on)。
+准备好后，我们先从一个最小但完整的实验开始：[24.3 动手：用 GRPO 训练 VLM 回答视觉问题](./vlm-grpo-hands-on)。

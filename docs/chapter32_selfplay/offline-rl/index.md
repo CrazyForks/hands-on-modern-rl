@@ -1,4 +1,4 @@
-# 29.5 离线强化学习 与 从历史数据到可靠策略
+# 补充阅读：离线强化学习——从历史数据到可靠策略
 
 <a id="article-start"></a>
 
@@ -106,7 +106,7 @@ Q 网络要回答的是“任意状态动作对有多好”。但离线数据只
 
 ## 复现 OOD 动作问题 {#minimal-offline-practice}
 
-先做一个小到能跑懂的实验。完整脚本在 [minimal_offline_rl_contextual_bandit.py](./snippets/minimal_offline_rl_contextual_bandit.py)。
+先做一个小到能跑懂的实验。完整脚本在 [minimal_offline_rl_contextual_bandit.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/docs/chapter32_selfplay/offline-rl/snippets/minimal_offline_rl_contextual_bandit.py)。
 
 这个环境不是完整 MDP，而是一个上下文 bandit。它足够小，但能复现离线 RL 最核心的坑：**数据只覆盖窄动作区，普通 Q 最大化会跑到数据没覆盖的极端动作。**
 
@@ -548,7 +548,7 @@ Offline RL 提供的是一种从历史数据中学习决策策略的框架，但
 | DPO 的 reference model（第 7 章） | reference model 扮演了和 BCQ/TD3+BC 中行为约束相同的角色          |
 | GRPO 的组内 advantage（第 7 章）  | IQL 的 advantage-weighted BC 与 GRPO 的 advantage 计算异曲同工    |
 | RLVR 的规则验证（第 7 章）        | 离线 RL 的 reward 信号只能来自已有数据，不能在线验证              |
-| 自博弈的对手池（12.3 节）         | 离线 RL 的数据集 = 历史策略产生的轨迹，和对手池中的旧策略数据同源 |
+| [自博弈的对手池（29.1 节）](../self-play-outlook/)         | 离线 RL 的数据集 = 历史策略产生的轨迹，和对手池中的旧策略数据同源 |
 
 最深刻的联系可能是：**DPO 就是 LLM 版本的离线 RL**。DPO 用固定偏好数据集优化语言模型策略，不需要在线采样。它的 reference model 扮演了和 BCQ/TD3+BC 中行为约束相同的角色——防止策略跑出训练分布。而 IQL 的 advantage-weighted behavior cloning 则和第 7 章的 GRPO 异曲同工：都是在已有数据中"挑出比平均更好的动作"来优化策略，只是 GRPO 的数据来自当前策略的在线采样，IQL 的数据来自固定的历史轨迹。
 

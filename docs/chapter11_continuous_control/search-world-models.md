@@ -1,6 +1,6 @@
 # 9.4 AlphaZero、MuZero 与 Dreamer V3
 
-> [11.3](./model-based) 讲了 model-based RL 的"数据增强"路线——Dyna/PETS/MBPO 用模型生成数据加速 model-free 训练。本节讲 model-based 的另一条旗舰路线：**显式搜索 + 神经网络估值**。从 AlphaGo（2016）到 AlphaZero（2017）到 MuZero（2019）再到 Dreamer V3（2023），这条线代表了 model-based RL 的理论天花板，也直接启发了 LLM 时代的 Process Reward Model 搜索。
+> [9.3](./model-based) 讲了 model-based RL 的"数据增强"路线——Dyna/PETS/MBPO 用模型生成数据加速 model-free 训练。本节讲 model-based 的另一条旗舰路线：**显式搜索 + 神经网络估值**。从 AlphaGo（2016）到 AlphaZero（2017）到 MuZero（2019）再到 Dreamer V3（2023），这条线代表了 model-based RL 的理论天花板，也直接启发了 LLM 时代的 Process Reward Model 搜索。
 
 ## AlphaZero 与 搜索 + 学习的极致
 

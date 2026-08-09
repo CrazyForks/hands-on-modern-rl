@@ -54,7 +54,7 @@ $$G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \ldots + \gamma^{T-t} r_T$$
 
 ### GAE（Generalized Advantage Estimation）
 
-[第 5 章 PPO 的 GAE](../chapter10_ppo/gae-reward-model) 通过引入 $\lambda$ 参数，在 bias 和 variance 之间做权衡。GAE 是 PPO 的标准做法，但它的根本局限是——**它需要 value function**，而 GRPO 故意省略了 value function。
+[第 8 章 PPO 的 GAE](../chapter10_ppo/gae-reward-model) 通过引入 $\lambda$ 参数，在 bias 和 variance 之间做权衡。GAE 是 PPO 的标准做法，但它的根本局限是——**它需要 value function**，而 GRPO 故意省略了 value function。
 
 ### Token-level loss
 
@@ -177,7 +177,7 @@ PRM 的工业实现有两条主要路线，对应不同的训练方法：
 
 模型：LLM + Lean4 verifier。
 
-这三条路线是接下来三节的主题：[11.2 判别式 PRM](./discriminative-prm)、[11.3 生成式 PRM](./generative-prm)、[11.4 形式化 PRM](./formal-prm)。
+这三条路线是接下来三节的主题：[18.2 判别式 PRM](./discriminative-prm)、[18.3 生成式 PRM](./generative-prm)、[18.4 形式化 PRM](./formal-prm)。
 
 ## 小结
 

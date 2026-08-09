@@ -297,7 +297,7 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 - 训练时轻度搜索（加速收敛）
 - 推理时根据任务难度决定是否搜索
 
-这与 [第 8 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 的思想一致——把算力花在哪里，是一个工程权衡。
+这与 [第 17 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 的思想一致——把算力花在哪里，是一个工程权衡。
 
 ## 小结
 

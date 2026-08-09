@@ -1,6 +1,6 @@
 # 12.2 多智能体 RL 与 CTDE、MADDPG、MAPPO
 
-> [14.1](./intro) 讲了单 agent 的 hard-exploration 问题。本节转向多 agent 场景——当环境里有多个智能体同时学习，每个智能体看到的环境都在变（因为其他智能体在变），这就打破了 MDP 的平稳性假设。**CTDE**（Centralized Training Decentralized Execution）范式是工业级多智能体 RL 的标准答案。
+> [12.1](./intro) 讲了单 agent 的 hard-exploration 问题。本节转向多 agent 场景——当环境里有多个智能体同时学习，每个智能体看到的环境都在变（因为其他智能体在变），这就打破了 MDP 的平稳性假设。**CTDE**（Centralized Training Decentralized Execution）范式是工业级多智能体 RL 的标准答案。
 
 ## 多智能体 RL 与 CTDE 框架
 
@@ -126,4 +126,4 @@ VDN 假设 $Q_{\text{tot}} = \sum_i Q_i(o_i, a_i)$，QMIX 推广为 $Q_{\text{to
 
 多智能体 RL 的核心挑战是非平稳性——每个 agent 看到的环境都在变。CTDE（Centralized Training Decentralized Execution）范式用集中式 critic 解决训练时的非平稳性，分布式 actor 保证部署时每个 agent 独立决策。MADDPG 把 DDPG 扩展到多 agent，MAPPO 把 PPO 扩展到多 agent——后者是 StarCraft 多智能体微操的 SOTA。
 
-下一节 [14.3 分层 RL 与生成式世界模型引子](./hierarchical) 处理第三种被回避的情形——**任务 horizon 极长**，需要分层 RL 把长程决策分解为 option 序列。
+下一节 [12.3 分层 RL 与生成式世界模型引子](./hierarchical) 处理第三种被回避的情形——**任务 horizon 极长**，需要分层 RL 把长程决策分解为 option 序列。

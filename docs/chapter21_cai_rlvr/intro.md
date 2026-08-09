@@ -2,7 +2,7 @@
 
 > [第 13 章 RLHF](../chapter15_rlhf/intro) 把"人类标注偏好 → 奖励模型 → PPO"这条流水线讲通了；[第 15 章 DPO/GRPO](../chapter17_dpo/intro) 进一步把它精简成不需要 RM、不需要 Critic 的形式。但所有这些方法都默认一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，这个前提就崩了——人类既标不动（成本和速度），也标不准（在数学、代码、长上下文上判断力不够）。本章回答一个问题：**当人类标注成为对齐瓶颈时，训练信号从哪来？** Anthropic 2022 年的答案是 _Constitutional AI: Harmlessness from AI Feedback_——让 AI 自己当裁判、自己改作文、自己生成偏好对。
 
-## 21.1 Constitutional AI 框架
+## Constitutional AI 框架
 
 RLHF 的痛点不是"训练算法不够好"，而是"标注数据不够用"。Anthropic 在 2022 年训练 Claude 初代时发现两个具体问题：
 
@@ -81,7 +81,7 @@ def sl_cai_generate(base_model, redteam_prompts, constitution):
 
 伪代码看起来朴素，但效果惊人。Anthropic 报告：CAI 训出的 Claude 在无害性上**超过**纯 RLHF 的版本，同时**有用性几乎不掉**——这恰好打破了 RLHF 里 "HH 互相拉扯"的诅咒。
 
-## 21.2 RLAIF 与 用 AI 反馈替代人类标注
+## RLAIF 与 用 AI 反馈替代人类标注
 
 RLAIF（Reinforcement Learning from AI Feedback）和 RLHF 共用 PPO 框架，差别只在偏好对的来源。下面把这条流水线逐步写清楚，并和 RLHF 做精确对比。
 
@@ -145,7 +145,7 @@ RLAIF 的质量受限于 judge 模型本身。在 Claude 2 阶段，让 Claude 2
 
 成本差两个数量级，这是为什么 2024 年后几乎所有大模型对齐都转向 **RLAIF + 一小撮人类 high-quality 偏好** 的混合模式。
 
-## 21.3 自我修正与自我奖励
+## 自我修正与自我奖励
 
 CAI 的两个核心机制——**Self-Critique** 和 **Self-Revision**——本质上是把"思考"显式写进文本。这一节把它们的数学结构拆开看，并延伸到 Meta 2024 年的 Self-Rewarding Language Models。
 
@@ -226,4 +226,4 @@ Meta 用 Llama 2-70B 做了三轮 self-rewarding（M1 → M2 → M3），结果�
 
 Constitutional AI（CAI）的核心是用 AI 反馈替代人类标注——让模型自己评判、自己改写、自己生成偏好对。RLAIF 把 CAI 生成的偏好对喂给标准 RLHF pipeline。Self-Correction 和 Self-Rewarding 进一步把"AI 评判 AI" 推到极致。
 
-下一节 [21.2 HHH 原则与 Claude 实践](./hhh-practice) 讲解 Anthropic 实际在 Claude 训练中如何落地 HHH（Helpful, Harmless, Honest）三原则。
+下一节 [19.1 HHH 原则与 Claude 实践](./hhh-practice) 讲解 Anthropic 实际在 Claude 训练中如何落地 HHH（Helpful, Harmless, Honest）三原则。

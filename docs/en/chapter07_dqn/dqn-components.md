@@ -1,5 +1,5 @@
 ---
-title: 4.2 DQN Architecture
+title: 5.3 DQN Architecture
 ---
 
 # 5.3 DQN Architecture

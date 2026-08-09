@@ -1,5 +1,5 @@
 ---
-title: 5.1 Why We Need Policy Gradients
+title: 6.1 Why We Need Policy Gradients
 ---
 
 # 6.1 Why We Need Policy Gradients

@@ -5,7 +5,7 @@ outline:
   level: [2, 3]
 ---
 
-# 5.5 PPO Game Project Practice Guide
+# Supplement: PPO Game Project Practice Guide
 
 After learning PPO's math and implementation, the next step is to put it into real game environments. The goal of this section is not to list every game that can be trained with PPO. It is to help you build a practical path from "it runs" to "I understand its boundary."
 

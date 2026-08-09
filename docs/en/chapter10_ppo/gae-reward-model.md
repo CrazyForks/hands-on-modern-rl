@@ -1,5 +1,5 @@
 ---
-title: 7.4 Advantage Estimation and Reward Modeling
+title: 8.3 Advantage Estimation and Reward Modeling
 ---
 
 # 8.3 Advantage Estimation and Reward Modeling
@@ -36,7 +36,7 @@ The next three sections all consume this table: first TD and MC each compute adv
 
 ## Advantage Estimation: TD vs MC
 
-Recall the definition (review: [Section 6.1](../chapter09_actor_critic/advantage-function)):
+Recall the definition (review: [Section 7.1](../chapter09_actor_critic/advantage-function)):
 
 $$A(s_t, a_t) = Q(s_t, a_t) - V(s_t)$$
 
@@ -211,7 +211,7 @@ Classic RL environments (CartPole, LunarLander) hand us the reward directly thro
 LLM alignment has two tracks:
 
 - **Subjective alignment** (politeness, safety, helpfulness): no objective ground truth, requires a reward model trained from human preferences
-- **Objective reasoning** (math, code): verifiable by rules, can use rule-based rewards directly (covered in [Chapter 9: RLVR](../chapter18_grpo/rlvr))
+- **Objective reasoning** (math, code): verifiable by rules, can use rule-based rewards directly (covered in [Chapter 16: RLVR](../chapter18_grpo/rlvr))
 
 This chapter focuses on subjective alignment — the classic PPO-for-LLM use case.
 
@@ -338,4 +338,4 @@ This is why RM training must carefully control capacity and regularization — b
 
 </details>
 
-**The RM is the heaviest burden in PPO-for-LLM alignment — heavy to label, heavy to host, and risky to trust. Can we skip it?** The next chapter gives DPO's answer: [Chapter 9: DPO — Bypassing the Reward Model](../chapter17_dpo/intro).
+**The RM is the heaviest burden in PPO-for-LLM alignment — heavy to label, heavy to host, and risky to trust. Can we skip it?** The next chapter gives DPO's answer: [Chapter 15: DPO — Bypassing the Reward Model](../chapter17_dpo/intro).

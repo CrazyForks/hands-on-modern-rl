@@ -1,5 +1,5 @@
 ---
-title: '6.4 Hands-on: Pendulum Swing-Up and Balance'
+title: '7.3 Hands-on: Pendulum Swing-Up and Balance'
 ---
 
 # 7.3 Hands-on: Pendulum Swing-Up and Balance

@@ -1,5 +1,5 @@
 ---
-title: '11.1 Hands-On: Train a VLM with GRPO'
+title: '24.2 Hands-On: Train a VLM with GRPO'
 ---
 
 # 24.2 Hands-on: Train a VLM to Answer Visual Questions with GRPO

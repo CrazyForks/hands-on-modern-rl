@@ -13,7 +13,7 @@
 - **Reward 设计思路**：把模型生成的代码当独立程序，跑 stdin/stdout 测试算通过率（详见下文 Reward 函数设计）。
 - **评测方法与数据**：使用 EvalScope 在 GSM8K、HumanEval、LiveCodeBench 上的评测流程，以及 RL 训练前后的对比数据。
 
-火山引擎原始教程使用 VKE 集群 + SandboxFusion 云沙箱做大规模分布式训练。本节把这些方案适配到**本地 GPU 环境**：用子进程隔离代替云沙箱，用单卡/多卡脚本代替集群部署，保留相同的算法逻辑和参数配置。完整的工业级代码 Agent 实验放在 [10.5 用 rLLM 训练 DeepCoder Agent](../chapter22_agentic/rllm-deepcoder-lab)，那里更关注 AgentFlow 和 sandbox cookbook；本节更关注如何把代码 verifier 接进 veRL 训练框架。
+火山引擎原始教程使用 VKE 集群 + SandboxFusion 云沙箱做大规模分布式训练。本节把这些方案适配到**本地 GPU 环境**：用子进程隔离代替云沙箱，用单卡/多卡脚本代替集群部署，保留相同的算法逻辑和参数配置。完整的工业级代码 Agent 实验放在 [20.8 用 rLLM 训练 DeepCoder Agent](../chapter22_agentic/rllm-deepcoder-lab)，那里更关注 AgentFlow 和 sandbox cookbook；本节更关注如何把代码 verifier 接进 veRL 训练框架。
 
 ```mermaid
 flowchart LR
@@ -115,7 +115,7 @@ pip install flash-attn --no-build-isolation
 
 数据集已分好 split：train 48 万条（其中 `ability=="code"` 2.5 万条），validation 2048 条（其中 code 1024 条）。
 
-处理数据的脚本见 [code/chapter18_grpo/verl_code_rlvr/prepare_data.py](../../code/chapter18_grpo/verl_code_rlvr/prepare_data.py)，一键生成 veRL 需要的 parquet：
+处理数据的脚本见 [code/chapter18_grpo/verl_code_rlvr/prepare_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter18_grpo/verl_code_rlvr/prepare_data.py)，一键生成 veRL 需要的 parquet：
 
 ```bash
 conda activate test
@@ -261,7 +261,7 @@ def compute_score(data_source, solution_str, ground_truth, extra_info=None):
 
 ### 完整代码
 
-完整文件见 [code/chapter18_grpo/verl_code_rlvr/code_reward.py](../../code/chapter18_grpo/verl_code_rlvr/code_reward.py)。可以直接自检（不依赖训练环境）：
+完整文件见 [code/chapter18_grpo/verl_code_rlvr/code_reward.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter18_grpo/verl_code_rlvr/code_reward.py)。可以直接自检（不依赖训练环境）：
 
 ```bash
 python code/chapter18_grpo/verl_code_rlvr/code_reward.py
@@ -281,7 +281,7 @@ python code/chapter18_grpo/verl_code_rlvr/code_reward.py
 
 训练代码模型时，prompt 要尽量约束输出格式。早期不要让模型自由写长解释，否则 verifier 需要花很多精力抽取代码。
 
-Eurus-2-RL-Data 的 code 样本是"读 stdin、写 stdout"的竞赛题，**没有** `entry_point`/`problem_statement` 这种字段拆分。`prepare_data.py` 重建 prompt 时用 **chat 消息格式**（见 [prepare_data.py](../../code/chapter18_grpo/verl_code_rlvr/prepare_data.py) 里的 `CODE_GEN_SYSTEM` / `CODE_GEN_USER_TEMPLATE`）：
+Eurus-2-RL-Data 的 code 样本是"读 stdin、写 stdout"的竞赛题，**没有** `entry_point`/`problem_statement` 这种字段拆分。`prepare_data.py` 重建 prompt 时用 **chat 消息格式**（见 [prepare_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter18_grpo/verl_code_rlvr/prepare_data.py) 里的 `CODE_GEN_SYSTEM` / `CODE_GEN_USER_TEMPLATE`）：
 
 ````json
 [
@@ -298,7 +298,7 @@ Eurus-2-RL-Data 的 code 样本是"读 stdin、写 stdout"的竞赛题，**没�
 
 基于 8.7 节的 veRL PPO 脚本结构，适配代码生成任务。整体框架不变，关键差异有三处：数据集换成 Eurus-2-RL-Data（只取 code 样本）、reward 函数换成代码验证、`max_response_length` 从 256 增大到 512（代码回答通常比数学推理更长）。
 
-脚本的设计思路和 8.7 节完全一致：所有参数通过环境变量设置默认值，需要调整时不用改脚本，直接在命令行覆盖就行。完整脚本见 [code/chapter18_grpo/verl_code_rlvr/run_qwen_coder_ppo_single_gpu.sh](../../code/chapter18_grpo/verl_code_rlvr/run_qwen_coder_ppo_single_gpu.sh)。
+脚本的设计思路和 8.7 节完全一致：所有参数通过环境变量设置默认值，需要调整时不用改脚本，直接在命令行覆盖就行。完整脚本见 [code/chapter18_grpo/verl_code_rlvr/run_qwen_coder_ppo_single_gpu.sh](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter18_grpo/verl_code_rlvr/run_qwen_coder_ppo_single_gpu.sh)。
 
 和 8.7 节 GSM8K 脚本相比，本节新增的关键配置是 **Reward 接线**——不配 `custom_reward_function` 的话 reward 根本不会生效（这是文档早期版本漏掉的）：
 
@@ -492,7 +492,7 @@ evalscope eval \
 
 ## 和 10.5 DeepCoder 实验的关系
 
-本节和 [10.5](../chapter22_agentic/rllm-deepcoder-lab) 讲的是同一个大方向：用 sandbox reward 训练代码模型。区别在于关注点不同：
+本节和 [20.8](../chapter22_agentic/rllm-deepcoder-lab) 讲的是同一个大方向：用 sandbox reward 训练代码模型。区别在于关注点不同：
 
 | 小节     | 框架 | 重点                                      |
 | -------- | ---- | ----------------------------------------- |

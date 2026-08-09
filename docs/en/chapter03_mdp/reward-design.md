@@ -1,5 +1,5 @@
 ---
-title: 3.8 Reward Function Design
+title: 4.3 Reward Function Design
 ---
 
 # 4.3 Reward Functions: Where Does the Optimization Objective Come From?

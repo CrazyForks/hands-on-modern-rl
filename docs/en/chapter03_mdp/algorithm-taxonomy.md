@@ -1,8 +1,8 @@
 ---
-title: '3.7 Data Sources: On-Policy, Off-Policy, Online, and Offline'
+title: '4.2 Data Sources: On-Policy, Off-Policy, Online, and Offline'
 ---
 
-# 3.7 Data Sources: On-Policy, Off-Policy, Online, and Offline
+# 4.2 Data Sources: On-Policy, Off-Policy, Online, and Offline
 
 > **One-sentence summary**: this section introduces two pairs of concepts that are often confused: **on-policy vs. off-policy** (does the data come from the current policy?), and **online vs. offline** (can we still collect new data during training?). Think of them as two independent axes that jointly define what an RL algorithm's data looks like.
 

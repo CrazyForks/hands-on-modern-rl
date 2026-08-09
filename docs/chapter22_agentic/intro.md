@@ -75,13 +75,13 @@ $$
 
 | 小节                                                       | 核心问题                                                                          |
 | ---------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| [22.1 Agentic RL 总览](./overview)                         | 单轮到多轮的范式转移、智能体四组件、最简 Agent Loop、工业框架全景                 |
-| [22.2 多轮 RL 形式化](./formulation)                       | 多轮 MDP 怎么写？联合状态、结构化动作、POMDP、step-level 轨迹、action mask        |
-| [22.3 轨迹信用分配](./credit-assignment)                   | 多轮交互失败了，该怪谁？ORM vs PRM、turn-level discounting、group-based advantage |
-| [22.4 工具调用 RL](./tool-use-and-trajectory)              | 训练数据从哪来？轨迹合成、工具调用策略、沙箱与异步 rollout                        |
-| [22.5 Search-Augmented RL](./tool-use-agents)              | 搜索增强 Agent 怎么训？DeepSeek-Researcher、Kimi-Researcher 的训练范式            |
-| [22.6 Code Interpreter RL 工业实战](./industrial-practice) | 代码 Agent 的真实训练陷阱：不稳定、长度失控、reward hacking 的工程对策            |
-| [22.7 多智能体协作与 Agent Swarm](./multi-agent-swarm)     | 多个 Agent 怎么协作？角色分工、通信协议、群体优势分配                             |
+| [20.1 Agentic RL 总览](./overview)                         | 单轮到多轮的范式转移、智能体四组件、最简 Agent Loop、工业框架全景                 |
+| [20.2 多轮 RL 形式化](./formulation)                       | 多轮 MDP 怎么写？联合状态、结构化动作、POMDP、step-level 轨迹、action mask        |
+| [20.3 轨迹信用分配](./credit-assignment)                   | 多轮交互失败了，该怪谁？ORM vs PRM、turn-level discounting、group-based advantage |
+| [20.4 工具调用 RL](./tool-use-and-trajectory)              | 训练数据从哪来？轨迹合成、工具调用策略、沙箱与异步 rollout                        |
+| [20.5 Search-Augmented RL](./tool-use-agents)              | 搜索增强 Agent 怎么训？DeepSeek-Researcher、Kimi-Researcher 的训练范式            |
+| [20.6 Code Interpreter RL 工业实战](./industrial-practice) | 代码 Agent 的真实训练陷阱：不稳定、长度失控、reward hacking 的工程对策            |
+| [20.7 多智能体协作与 Agent Swarm](./multi-agent-swarm)     | 多个 Agent 怎么协作？角色分工、通信协议、群体优势分配                             |
 
 ## 学习目标
 
@@ -97,4 +97,4 @@ $$
 - [PPO 与奖励模型](../chapter10_ppo/intro)——策略优化的基础框架
 - [MDP 五元组](../chapter03_mdp/mdp)——形式化多轮交互的出发点
 
-准备好后，先从 Agentic RL 的整体图景开始——[22.1 Agentic RL 总览](./overview)。
+准备好后，先从 Agentic RL 的整体图景开始——[20.1 Agentic RL 总览](./overview)。

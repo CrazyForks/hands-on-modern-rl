@@ -1,5 +1,5 @@
 ---
-title: '4.3 Hands-On: LunarLander'
+title: '5.4 Hands-On: LunarLander'
 ---
 
 # 5.4 Hands-on: LunarLander

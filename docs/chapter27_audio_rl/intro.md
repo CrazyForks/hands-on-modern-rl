@@ -2,7 +2,7 @@
 
 > [第 24 章 VLM RL](../chapter26_vlm/intro) 把推理 RL 从文本扩展到了视觉——Qwen3-VL 学会"看一眼图、反思一下、再回答"。但视觉只是模态的一半：人类最自然的交互媒介是**语音**。本章解决音频领域的两个核心难题：(1) 当模型先转录再推理时，为什么"想得越多越差"（inverted scaling）？(2) 用可验证奖励训练得到的音频模型为什么变成了"机械答题机"？答案分别来自 **Step-Audio-R1 的 MGRD（模态接地推理蒸馏）** 和 **Step-Audio-R1.5 的 RLHF 范式迁移**。
 
-## 27.1 音频语言模型概览
+## 音频语言模型概览
 
 文本语言模型处理的是离散 token 序列。但音频是 24 kHz 的连续波形——每秒 24000 个浮点采样。要让 Transformer 处理音频，必须先把它"token 化"。这就是**神经音频编解码器（Neural Audio Codec）**的任务。
 
@@ -46,7 +46,7 @@ $$e^{(0)} = \text{Encoder}(x), \quad c_k = \arg\min_c \|e^{(k-1)} - \text{CB}_k[
 
 GPT-4o Realtime、Gemini Live、Moshi 用 **chunked autoregressive** + **streaming vocoder** 解决。本章后半部分会看到，Step-Audio-R1 Realtime 用"边听边想 + 边想边说"的**双脑架构**实现亚秒级延迟。
 
-## 27.2 Step-Audio 系列 与 中国独特方向
+## Step-Audio 系列 与 中国独特方向
 
 StepFun（阶跃星辰）是国内音频 LLM 的代表厂商。Step-Audio 系列从 Step-Audio 2（基础对话模型）演进到 **Step-Audio-R1**（推理模型，2025.11）和 **Step-Audio-R1.5**（RLHF 对齐，2026.04），完整覆盖了"音频理解 + 推理 + 生成"的全链路。
 
@@ -56,7 +56,7 @@ StepFun（阶跃星辰）是国内音频 LLM 的代表厂商。Step-Audio 系列
 
 #### Inverted scaling 反常现象
 
-文本和视觉推理模型普遍遵循 test-time compute scaling law——给模型更多推理 token，性能可预测地提升（见 [第 11 章推理模型](../chapter19_reasoning/intro)）。但音频域出现反常：
+文本和视觉推理模型普遍遵循 test-time compute scaling law——给模型更多推理 token，性能可预测地提升（见 [第 17 章推理模型](../chapter19_reasoning/intro)）。但音频域出现反常：
 
 ```mermaid
 graph LR
@@ -203,4 +203,4 @@ graph TB
 
 Step-Audio-R1 是 StepWise 2026 年初发布的音频 reasoning 模型，核心创新是 **MGRD（模态接地推理蒸馏）**——把文本推理链蒸馏到音频模态，解决"想得越多越差"的 inverted scaling 问题。Step-Audio-R1.5 进一步把训练范式从 RLVR 转向 RLHF，让音频模型不再只是"机械答题机"，而是真正可对话的语音助手。
 
-下一节 [27.2 RLVR → RLHF 演进与音频奖励设计](./reward-design) 详细分析音频奖励设计的特殊性——为什么文本 RM 不能直接用于音频。
+下一节 [25.1 RLVR → RLHF 演进与音频奖励设计](./reward-design) 详细分析音频奖励设计的特殊性——为什么文本 RM 不能直接用于音频。

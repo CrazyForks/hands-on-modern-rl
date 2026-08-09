@@ -35,7 +35,7 @@ Self-play 的灵感来自 AlphaGo Zero——**模型与自己下棋，从对弈�
 
 ### 与 SWE-smith 的区别
 
-[12.1 节 SWE-smith](./swe-bench-and-rlvr) 是**离线合成数据**——一次性生成 50K 数据，然后训练。
+[21.1 节 SWE-smith](./swe-bench-and-rlvr) 是**离线合成数据**——一次性生成 50K 数据，然后训练。
 
 SSR 是**在线合成数据**——模型在训练过程中持续生成数据，数据质量随着模型能力提升而提升。
 
@@ -312,5 +312,5 @@ Reviewer Agent: 检查代码质量
 **接下来的章节**：
 
 - [第 11 章 PRM 与搜索](../chapter20_prm_search/intro)——SWE-RL 中的 step-level reward
-- [第 12 章奖励黑客](../chapter15_rlhf/evaluation)——SWE 任务的 hacking（如"删除测试让 reward 变高"）
-- [第 12.8 节 Agentic RL 训练系统](../chapter22_agentic/build-agentic-training-system)——SWE-RL 的工程实现
+- [第 13 章奖励黑客](../chapter15_rlhf/evaluation)——SWE 任务的 hacking（如"删除测试让 reward 变高"）
+- [第 20.10 节 Agentic RL 训练系统](../chapter22_agentic/build-agentic-training-system)——SWE-RL 的工程实现

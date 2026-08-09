@@ -1,5 +1,5 @@
 ---
-title: 8.1 From Base Model to Aligned Assistant
+title: 13.1 From Base Model to Aligned Assistant
 ---
 
 # 13.1 From Base Model to Aligned Assistant

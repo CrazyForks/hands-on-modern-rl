@@ -1,8 +1,8 @@
 ---
-title: 12.4 LLM Multi-Agent Reinforcement Learning
+title: 29.3 LLM Multi-Agent Reinforcement Learning
 ---
 
-# 10.4 LLM Multi-Agent Reinforcement Learning
+# 29.3 LLM Multi-Agent Reinforcement Learning
 
 Before discussing LLM-driven multi-agent systems, let us quickly review the core framework of traditional multi-agent RL (MARL). The biggest challenge in MARL is **non-stationarity**: when you learn a new policy, your teammates are also learning -- the "environment" you face is constantly changing. The current mainstream paradigm is **CTDE (Centralized Training with Decentralized Execution)**: during training, a "God's-eye view" global Critic sees all agents' observations and actions; during execution, each agent can only make decisions based on its local observations.
 
@@ -88,9 +88,9 @@ This architecture is consistent with the CTDE approach mentioned above, but has 
 
 $$R_i = \alpha \cdot R^{\text{outcome}} + (1-\alpha) \cdot R_i^{\text{process}}$$
 
-where $R^{\text{outcome}}$ is the shared task outcome reward (did the tests pass? was the issue fixed?), and $R_i^{\text{process}}$ is the process reward for role $i$ (code quality score, review accuracy, etc.). $\alpha$ is typically 0.5-0.7, placing more weight on measurable outcomes. This directly corresponds to the ORM vs. PRM credit assignment discussed in Chapter 9 -- only extended from single-agent multi-turn interaction to multi-agent collaboration.
+where $R^{\text{outcome}}$ is the shared task outcome reward (did the tests pass? was the issue fixed?), and $R_i^{\text{process}}$ is the process reward for role $i$ (code quality score, review accuracy, etc.). $\alpha$ is typically 0.5-0.7, placing more weight on measurable outcomes. This directly corresponds to the ORM vs. PRM credit assignment discussed in Chapter 20 -- only extended from single-agent multi-turn interaction to multi-agent collaboration.
 
-Another representative work, **MetaGPT**, encodes Standardized Operating Procedures (SOPs) into system prompts. From an RL perspective, SOPs act as a **strong prior constraint** -- restricting the policy space, greatly reducing search difficulty and improving training stability, similar to the KL constraint from the reference model in PPO (Chapter 7).
+Another representative work, **MetaGPT**, encodes Standardized Operating Procedures (SOPs) into system prompts. From an RL perspective, SOPs act as a **strong prior constraint** -- restricting the policy space, greatly reducing search difficulty and improving training stability, similar to the KL constraint from the reference model in PPO (Chapter 8).
 
 ![MetaGPT Pipeline](../../../chapter32_selfplay/llm-multi-agent-rl/images/metagpt.png)
 
@@ -100,9 +100,9 @@ Another representative work, **MetaGPT**, encodes Standardized Operating Procedu
 
 ### Architecture 2: Debate and Competition
 
-Section 12.3 introduced debate-style self-play training; here we re-examine it from the **multi-agent RL** perspective. In a debate architecture, two LLM Agents give different answers to the same question, challenge each other through multiple rounds of debate, and a Judge ultimately determines the winner.
+[Section 29.1](../self-play-outlook/) introduced debate-style self-play training; here we re-examine it from the **multi-agent RL** perspective. In a debate architecture, two LLM Agents give different answers to the same question, challenge each other through multiple rounds of debate, and a Judge ultimately determines the winner.
 
-The difference from Section 12.3 is: self-play typically uses **multiple instances of the same model**, while debate from a multi-agent perspective can use **models with different training strategies**. This introduces the idea of population training -- maintaining multiple models with different strategies, randomly pairing them for debate, preventing all models from converging to the same strategy.
+The difference from [Section 29.1](../self-play-outlook/) is: self-play typically uses **multiple instances of the same model**, while debate from a multi-agent perspective can use **models with different training strategies**. This introduces the idea of population training -- maintaining multiple models with different strategies, randomly pairing them for debate, preventing all models from converging to the same strategy.
 
 ```mermaid
 flowchart TD
@@ -129,8 +129,8 @@ The first two architectures have clear task objectives and win/loss conditions, 
 From an RL perspective, this brings several unique challenges:
 
 - **Multi-objective reward design**: Not a single "score," but a combination of multiple objectives -- behavioral coherence, social plausibility, goal achievement, etc., similar to Multi-Objective RL: $$R_t = \sum_{m=1}^{M} w_m \cdot r_m(s_t, a_t)$$ The weights $w_m$ of each objective determine the direction of emergent behavior.
-- **Exploration is exploration of social strategies**: Agents explore the social behavior space ("who to interact with," "what to talk about") rather than physical action space. This is similar to Chapter 4's epsilon-greedy exploration in DQN, but exploring a high-dimensional social strategy space.
-- **Evaluation problem**: With no ground truth, how do we judge whether one social strategy is "better"? Currently, evaluation relies primarily on **human assessment + LLM-as-Judge**, but this introduces the "self-loop degradation" risk discussed in Section 12.3.
+- **Exploration is exploration of social strategies**: Agents explore the social behavior space ("who to interact with," "what to talk about") rather than physical action space. This is similar to Chapter 5's epsilon-greedy exploration in DQN, but exploring a high-dimensional social strategy space.
+- **Evaluation problem**: With no ground truth, how do we judge whether one social strategy is "better"? Currently, evaluation relies primarily on **human assessment + LLM-as-Judge**, but this introduces the "self-loop degradation" risk discussed in [Section 29.1](../self-play-outlook/).
 
 The core RL value of open-ended environments is: they test whether agents can **emerge meaningful collaborative behaviors through interaction without explicit reward shaping** -- this is an important testbed on the path to general intelligence.
 
@@ -147,7 +147,7 @@ Traditional MARL already has non-stationarity problems -- when you learn a new p
 
 ### Challenge 2: Cross-Role Credit Assignment
 
-Chapter 9 discussed credit assignment in multi-turn interaction (Section 20.3) -- if a 7-turn interaction fails, who is to blame? Multi-agent extends this dimension further: **multiple independent decision-makers are simultaneously acting; whose contribution is greatest?**
+Chapter 20 discusses credit assignment in multi-turn interaction (Section 20.3) -- if a 7-turn interaction fails, who is to blame? Multi-agent extends this dimension further: **multiple independent decision-makers are simultaneously acting; whose contribution is greatest?**
 
 In a software project, the Coder writes code, the Reviewer spots a potential bug and suggests a fix, and the Coder revises and passes the tests. How should the final "passed tests" reward be distributed?
 
@@ -167,7 +167,7 @@ where $R_i^{\text{process}}$ is the process reward for role $i$, and $R^{\text{o
 
 In human-AI collaboration scenarios, agents need to remember past experience collaborating with the same person -- what style of topics did the streamer prefer last time? What types of suggestions did the user respond coldly to? These memories need to accumulate across episodes, influencing future strategy choices.
 
-This is fundamentally different from DQN's experience replay (Chapter 4): DQN's experience replay **reuses** old data as-is, while human-AI collaboration memory needs **distillation** -- abstracting "what this person likes" as a preference model from past interactions, then using it in new episodes.
+This is fundamentally different from DQN's experience replay (Chapter 5): DQN's experience replay **reuses** old data as-is, while human-AI collaboration memory needs **distillation** -- abstracting "what this person likes" as a preference model from past interactions, then using it in new episodes.
 
 ```mermaid
 flowchart LR
@@ -198,7 +198,7 @@ MAPoRL [^maporl] models the collaboration of multiple LLM Agents as a joint poli
 
 ### M-GRPO: The Multi-Agent Extension of GRPO
 
-Recall GRPO from Chapter 9: the same model generates multiple responses and compares within a group. M-GRPO [^mgrpo] extends this idea to multi-agent scenarios -- multiple groups of outputs from multiple roles are compared together. For example, for the same programming task, generate 3 "Coder-Reviewer-Tester" teams and compare which team has a higher task completion rate.
+Recall GRPO from Chapter 16: the same model generates multiple responses and compares within a group. M-GRPO [^mgrpo] extends this idea to multi-agent scenarios -- multiple groups of outputs from multiple roles are compared together. For example, for the same programming task, generate 3 "Coder-Reviewer-Tester" teams and compare which team has a higher task completion rate.
 
 $$\text{Advantage}_i = \frac{R_i - \text{mean}(R_{1..G})}{\text{std}(R_{1..G})}$$
 
@@ -206,7 +206,7 @@ where $R_i$ is the total reward for team $i$. This preserves GRPO's core advanta
 
 ### SAGE: Closed-Loop Self-Evolution Multi-Agent Framework
 
-SAGE [^sage] implements a **closed-loop self-evolution** multi-agent system: multiple Agents collaborate to complete tasks -> evaluate collaboration effectiveness -> identify weak links -> targeted training of weak roles' policies -> re-collaborate. This cycle is similar to Section 12.3's self-evolution system but extended to multi-agent scenarios.
+SAGE [^sage] implements a **closed-loop self-evolution** multi-agent system: multiple Agents collaborate to complete tasks -> evaluate collaboration effectiveness -> identify weak links -> targeted training of weak roles' policies -> re-collaborate. This cycle is similar to [Section 29.1](../self-play-outlook/)'s self-evolution system but extended to multi-agent scenarios.
 
 ### MARTI: Multi-Agent Debate Framework
 
@@ -217,15 +217,15 @@ MARTI [^marti] improves reasoning quality through multi-agent debate. The core i
 | Previous Chapter                                   | Correspondence in LLM Multi-Agent RL                            |
 | -------------------------------------------------- | --------------------------------------------------------------- |
 | CTDE global Critic                                 | Theoretical foundation for cross-role credit assignment         |
-| Self-play Generator-Judge (Section 12.3)           | Direct predecessor of debate/competition architecture           |
-| Multi-turn credit assignment ORM/PRM (Section 24.2) | Methodological foundation for cross-role credit assignment      |
-| GRPO within-group comparison (Chapter 9)           | M-GRPO extends within-group comparison to multi-agent           |
-| DQN experience replay (Chapter 4)                  | Memory mechanisms: from raw reuse to preference distillation    |
-| PPO (Chapter 7)                                    | Foundation algorithm for multi-agent policy optimization        |
-| Training stability (Chapter 7)                     | Amplified non-stationarity requires stronger stability controls |
-| Bespoke Labs KL=0.001 (Section 9.5)                | KL constraints are equally critical in multi-agent scenarios    |
+| [Self-play Generator-Judge (Section 29.1)](../self-play-outlook/)           | Direct predecessor of debate/competition architecture           |
+| Multi-turn credit assignment ORM/PRM (Section 20.3) | Methodological foundation for cross-role credit assignment      |
+| GRPO within-group comparison (Chapter 16)           | M-GRPO extends within-group comparison to multi-agent           |
+| DQN experience replay (Chapter 5)                  | Memory mechanisms: from raw reuse to preference distillation    |
+| PPO (Chapter 8)                                    | Foundation algorithm for multi-agent policy optimization        |
+| Training stability (Chapter 8)                     | Amplified non-stationarity requires stronger stability controls |
+| Bespoke Labs KL=0.001 (Section 20.6)                | KL constraints are equally critical in multi-agent scenarios    |
 
-The deepest connection may be: **LLM multi-agent RL is the "highest-difficulty comprehensive application" of all core concepts in this book**. It requires simultaneously handling multi-turn credit assignment (Section 24.2), policy gradient optimization (Chapters 5-6), training stability (Chapter 7), reward design (Section 24.4) -- only extended from single-agent to multi-agent, where each problem's difficulty increases by an order of magnitude.
+The deepest connection may be: **LLM multi-agent RL is the "highest-difficulty comprehensive application" of all core concepts in this book**. It requires simultaneously handling multi-turn credit assignment (Section 20.3), policy gradient optimization (Chapters 6-8), training stability (Chapter 8), reward design (Section 20.6) -- only extended from single-agent to multi-agent, where each problem's difficulty increases by an order of magnitude.
 
 ## Training Recipes: From Theory to Practice
 
@@ -412,7 +412,7 @@ Key design principles:
 
 **Environment sandbox isolation.** Each team (a group of roles) needs an independent environment sandbox to prevent cross-team environment interference. Code execution environments are especially important -- code written by one Coder must not affect other teams' execution environments.
 
-**Communication protocol standardization.** The message format passed between roles needs to be unified -- even if roles' internal models differ, message formats should be consistent. A common approach is to define message formats with JSON Schema, similar to the tool-calling format in Section 9.3.
+**Communication protocol standardization.** The message format passed between roles needs to be unified -- even if roles' internal models differ, message formats should be consistent. A common approach is to define message formats with JSON Schema, similar to the tool-calling format in Section 20.4.
 
 ## Model-Based RL: From Blind Trial-and-Error to Mental Simulation
 
@@ -441,7 +441,7 @@ More specifically:
 - **Actions** = choosing reasoning paths (verification, backtracking, exploring new directions)
 - **Reward** = correctness of the final answer
 
-This is why Chapter 9's GRPO and DeepSeek-R1 can elicit reasoning capability through RL -- the large model itself is a powerful world model, and RL teaches it how to better utilize this world model to plan reasoning paths.
+This is why Chapter 16's GRPO and DeepSeek-R1 can elicit reasoning capability through RL -- the large model itself is a powerful world model, and RL teaches it how to better utilize this world model to plan reasoning paths.
 
 ### Multi-Agent + MBRL: "Mental Simulation" in Collaboration
 
@@ -598,7 +598,7 @@ Here all agents share the same policy network (parameter sharing), which is stan
 
 ### From Multi-Agent to Agentic RL
 
-Multi-agent in PettingZoo means "multiple RL agents in the same environment." Agentic RL discussed in Chapter 9 is "one agent interacting with external tools and environments." The intersection is precisely **multi-agent LLM collaboration** -- multiple LLM Agents playing different roles, learning to collaborate on complex tasks through RL.
+Multi-agent in PettingZoo means "multiple RL agents in the same environment." Agentic RL discussed in Chapter 20 is "one agent interacting with external tools and environments." The intersection is precisely **multi-agent LLM collaboration** -- multiple LLM Agents playing different roles, learning to collaborate on complex tasks through RL.
 
 ## References
 

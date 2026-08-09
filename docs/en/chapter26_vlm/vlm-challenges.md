@@ -1,5 +1,5 @@
 ---
-title: '11.2 Special Challenges in VLM RL'
+title: '24.1 Special Challenges in VLM RL'
 ---
 
 # 24.1 Special Challenges in VLM RL: When Vision Meets Reinforcement Learning

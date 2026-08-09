@@ -4,7 +4,7 @@
 
 ## 策略目标函数
 
-第 3 章引入过[策略目标函数](../chapter03_mdp/policy-objective) $J(\theta)$——衡量"这个策略整体上有多好"。答案很自然：在所有可能的起点上，策略 $\pi_\theta$ 期望能累积的[折扣总奖励](../chapter03_mdp/mdp)。
+第 3 章引入过[策略目标函数](../chapter08_policy_gradient/policy-gradient) $J(\theta)$——衡量"这个策略整体上有多好"。答案很自然：在所有可能的起点上，策略 $\pi_\theta$ 期望能累积的[折扣总奖励](../chapter03_mdp/mdp)。
 
 $$J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \sum_{t=0}^{\infty} \gamma^t r_t \right]$$
 

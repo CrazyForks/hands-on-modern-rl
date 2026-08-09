@@ -1,5 +1,5 @@
 ---
-title: '22.5 Hands-On: rLLM DeepCoder'
+title: '20.8 Hands-On: rLLM DeepCoder'
 ---
 
 # 20.8 Hands-on: Training a DeepCoder Agent with rLLM
@@ -854,7 +854,7 @@ Also an rLLM cookbook, FinQA (financial analysis agent) uses a completely differ
 | Cost                | Zero                          | ~$0.01-0.05 per evaluation                            |
 | Use case            | Code, math (verifiable tasks) | Finance, research (tasks needing subjective judgment) |
 
-Code tasks need only the simplest RLVR; tasks requiring semantic understanding need more complex reward design (see Section 22.1's discussion of ORM vs PRM).
+Code tasks need only the simplest RLVR; tasks requiring semantic understanding need more complex reward design (see [Section 20.3](./multi-turn-rl) for the ORM-versus-PRM discussion).
 :::
 
 ## What to Explore from DeepCoder

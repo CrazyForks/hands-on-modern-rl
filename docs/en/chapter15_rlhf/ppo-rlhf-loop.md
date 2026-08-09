@@ -1,8 +1,8 @@
 ---
-title: 8.5 PPO-RLHF
+title: 'Supplement: PPO-RLHF'
 ---
 
-# 6.5 PPO-RLHF
+# Supplement: PPO-RLHF
 
 ## Reading Guide
 

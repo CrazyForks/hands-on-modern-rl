@@ -33,7 +33,7 @@
 
 ## TD 与 MC
 
-优势函数的定义是（回顾：[第 6.1 节](../chapter09_actor_critic/advantage-function)）：
+优势函数的定义是（回顾：[第 7.1 节](../chapter09_actor_critic/advantage-function)）：
 
 $$A(s_t, a_t) = Q(s_t, a_t) - V(s_t)$$
 
@@ -284,7 +284,7 @@ print("目标回报:", returns)
 LLM 对齐有两条强化路径：
 
 - **主观对齐**（礼貌、安全、有帮助）：没有客观对错标准，必须通过人类偏好训练 RM
-- **客观推理**（数学、代码）：有明确规则校验，可以直接用规则奖励（[第 7 章 RLVR](../chapter18_grpo/rlvr) 会详细讲）
+- **客观推理**（数学、代码）：有明确规则校验，可以直接用规则奖励（[第 16 章 RLVR](../chapter18_grpo/rlvr) 会详细讲）
 
 本章聚焦主观对齐场景——这也是 PPO 在 LLM 对齐中最经典的应用。
 
@@ -432,4 +432,4 @@ $\lambda=1$ 时 $\hat{A}_t = G_t - V(s_t)$。$V(s_t)$ 是噪声，但 $G_t$ 是�
 
 </details>
 
-**RM 是 PPO 在 LLM 对齐中最沉重的负担——训练它需要大量标注，维护它需要大量显存，信任它需要冒 reward hacking 的风险。能不能跳过这一步？** 下一章我们就会看到，DPO 给出了一个漂亮的答案——[第 7 章：DPO——绕过奖励模型的魔法](../chapter17_dpo/intro)。
+**RM 是 PPO 在 LLM 对齐中最沉重的负担——训练它需要大量标注，维护它需要大量显存，信任它需要冒 reward hacking 的风险。能不能跳过这一步？** 下一章我们就会看到，DPO 给出了一个漂亮的答案——[第 15 章：DPO——绕过奖励模型的魔法](../chapter17_dpo/intro)。

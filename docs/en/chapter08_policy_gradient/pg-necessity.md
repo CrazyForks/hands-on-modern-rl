@@ -1,8 +1,8 @@
 ---
-title: 5.1 Why Policy Gradients
+title: 'Supplement: Why Policy Gradients'
 ---
 
-# 5.1 Why Policy Gradients
+# Supplement: Why Policy Gradients
 
 ## Reading Guide
 

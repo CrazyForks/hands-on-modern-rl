@@ -1,5 +1,5 @@
 ---
-title: 8.8 Extended Practice
+title: 13.5 Extended Practice
 ---
 
 # 13.5 Extended Practice: Reward Hacking and the Data Flywheel

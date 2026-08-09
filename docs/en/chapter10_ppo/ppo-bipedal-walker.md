@@ -1,5 +1,5 @@
 ---
-title: '7.1 Hands-On: BipedalWalker Continuous Control'
+title: '8.5 Hands-On: BipedalWalker Continuous Control'
 ---
 
 # 8.5 Hands-on: BipedalWalker Continuous Control

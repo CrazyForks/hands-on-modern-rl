@@ -8,7 +8,7 @@
 
 ## 11.6.1 深度 vs 广度 与 推理算力的两种花法
 
-[第 8 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 我们讨论过两种推理算力的花法：
+[第 17 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 我们讨论过两种推理算力的花法：
 
 - **串行深度（Sequential Depth）**：模型生成一条很长的 CoT
 - **并行广度（Parallel Breadth）**：模型生成多条独立的 CoT，用某种方式聚合
@@ -147,7 +147,7 @@ $$\text{GenRM}(q, o) = P(\text{"good"} | q, o, \text{prompt})$$
 
 GenRM 是一个更宽泛的概念——它可以做 ORM（输出整条回答的评价）或 PRM（输出每步推理的评价）。
 
-[11.3 节的 ThinkPRM](./generative-prm) 是 GenRM 做 PRM 的代表。其他 GenRM 工作：
+[18.3 节的 ThinkPRM](./generative-prm) 是 GenRM 做 PRM 的代表。其他 GenRM 工作：
 
 - **Generative Verifiers**（[Zhang et al.](https://arxiv.org/abs/2408.15240)）：用 Chain-of-Thought 评价
 - **LLM-as-Judge**（[Zheng et al.](https://arxiv.org/abs/2306.05685)）：用 GPT-4 评价其他模型的输出
@@ -221,6 +221,6 @@ ORM-only → PRM-only → PRM + ORM + 形式化 + LLM-as-Judge 混合——趋�
 
 **接下来的章节**：
 
-- [第 10 章 Agentic RL](../chapter22_agentic/intro)——多步 trajectory 中的 PRM
-- [第 12 章奖励黑客](../chapter15_rlhf/evaluation)——PRM 的 reward hacking 问题
-- [第 13 章工业实战](../chapter17_dpo/industrial-post-training)——PRM 在工业训练中的使用
+- [第 20 章 Agentic RL](../chapter22_agentic/intro)——多步 trajectory 中的 PRM
+- [第 13 章奖励黑客](../chapter15_rlhf/evaluation)——PRM 的 reward hacking 问题
+- [第 14 章工业实战](../chapter16_llm_rl_industrial/industrial-post-training)——PRM 在工业训练中的使用

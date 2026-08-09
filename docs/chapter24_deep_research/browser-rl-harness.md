@@ -1,6 +1,6 @@
 # 22.1 浏览器 RL 动作空间与 harness 工程
 
-> [24.1](./intro) 介绍了 Deep Research 的任务定义和主流模型。但当你真正动手训练一个 Deep Research Agent 时，会立刻撞上两个工程问题：(1) **动作空间怎么设计**——浏览器有成百上千种操作，哪些该暴露给 agent？(2) **harness 怎么搭**——agent 生成的动作要落到真实浏览器上，需要一套完整的执行、监控、奖励计算环境。本节解决这两件事，给出可复现的工程模板。
+> [本章导读](./intro)介绍了 Deep Research 的任务定义和主流模型。但当你真正动手训练一个 Deep Research Agent 时，会立刻撞上两个工程问题：(1) **动作空间怎么设计**——浏览器有成百上千种操作，哪些该暴露给 agent？(2) **harness 怎么搭**——agent 生成的动作要落到真实浏览器上，需要一套完整的执行、监控、奖励计算环境。本节解决这两件事，给出可复现的工程模板。
 
 ## 浏览器作为 RL 环境
 
@@ -287,11 +287,11 @@ async def parallel_rollout(
 实测在 8×H100 GPU + 64-core CPU server 上，单次 GRPO step 处理 1024 prompts 约需 8-12 分钟。训练一个 7B Deep Research 模型到收敛通常需要 5000-10000 step，即 4-7 天。
 
 ::: tip 与 [第 16 章 GRPO](../chapter18_grpo/grpo-practice-and-mechanism) 的衔接
-Deep Research 的 RL 训练流水线和 [第 16 章](../chapter18_grpo/grpo-practice-and-mechanism) 讲的 GRPO 没有本质区别——都是 group-normalized advantage + PPO-Clip。差异只在环境（浏览器 vs 文本 sandbox）和奖励（任务完成 vs 答案正确）。如果你已经跑通过 [18.8 金融 API 工具调用 GRPO](../chapter18_grpo/financial-tool-calling-grpo)，迁移到 Deep Research 只需要换 `Environment Wrapper` 和 `Reward Verifier` 两个模块。
+Deep Research 的 RL 训练流水线和 [第 16 章](../chapter18_grpo/grpo-practice-and-mechanism) 讲的 GRPO 没有本质区别——都是 group-normalized advantage + PPO-Clip。差异只在环境（浏览器 vs 文本 sandbox）和奖励（任务完成 vs 答案正确）。如果你已经跑通过 [16.6 金融 API 工具调用 GRPO](../chapter18_grpo/financial-tool-calling-grpo)，迁移到 Deep Research 只需要换 `Environment Wrapper` 和 `Reward Verifier` 两个模块。
 :::
 
 ## 本节总结
 
 Deep Research 的 harness 工程核心是**五个模块**：环境封装、动作解析、奖励计算、进度跟踪、并行 rollout。其中**环境封装**和**奖励计算**是最难复现的——前者需要真实浏览器工程经验，后者需要任务特定的 verifier 设计。
 
-下一节 [24.3 评测基准与开源项目](./deep-research-eval) 介绍如何衡量 Deep Research Agent 的好坏——你会发现，评测本身比训练更难。
+下一节 [22.2 评测基准与开源项目](./deep-research-eval) 介绍如何衡量 Deep Research Agent 的好坏——你会发现，评测本身比训练更难。

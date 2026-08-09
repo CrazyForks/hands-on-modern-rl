@@ -1,5 +1,5 @@
 ---
-title: 5.2 The Policy Gradient Theorem and REINFORCE
+title: 6.2 The Policy Gradient Theorem and REINFORCE
 ---
 
 # 6.2 The Policy Gradient Theorem and REINFORCE

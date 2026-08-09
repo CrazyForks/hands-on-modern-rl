@@ -1,8 +1,8 @@
 # 16.5 RL Environments 与 Verifier 工程
 
-> [第 20 章 CAI 与 RLVR](../chapter21_cai_rlvr/intro) 解决了"如何在没有人工标注的情况下训练推理模型"——RLVR 用规则验证器替代奖励模型，CAI 用 AI 反馈替代人类标注。但当任务从"数学题答对/答错"扩展到"写代码、调工具、订机票、修 Bug"时，**奖励信号本身成了瓶颈**。本章解决一个工程问题：如何把真实世界任务封装成可训练的 RL 环境，以及如何设计能抵抗作弊的 Verifier。这是 2025 年下半年 RL 训练流水线最受关注的工程方向。
+> [第 19 章 CAI 与 RLVR](../chapter21_cai_rlvr/intro) 解决了"如何在没有人工标注的情况下训练推理模型"——RLVR 用规则验证器替代奖励模型，CAI 用 AI 反馈替代人类标注。但当任务从"数学题答对/答错"扩展到"写代码、调工具、订机票、修 Bug"时，**奖励信号本身成了瓶颈**。本章解决一个工程问题：如何把真实世界任务封装成可训练的 RL 环境，以及如何设计能抵抗作弊的 Verifier。这是 2025 年下半年 RL 训练流水线最受关注的工程方向。
 
-## 23.1 RL Environments 作为新瓶颈
+## RL Environments 作为新瓶颈
 
 Karpathy 在 2025 年初明确指出："**RLVR 是 LLM 训练流水线的新主要阶段**"。模型可以推理、可以写代码、可以调工具——但当我们要训练它们在真实任务上 long-horizon 地工作（修一个 GitHub issue、订一张机票、完成一次数据清洗）时，瓶颈不再是 GPU 也不是算法，而是**环境本身**。
 
@@ -12,7 +12,7 @@ Karpathy 在 2025 年初明确指出："**RLVR 是 LLM 训练流水线的新主�
 - **Mechanize 开出 $500K 年薪**招募 RL 环境工程师，高于当时多数模型训练岗位
 - **OpenAI、Google、Meta、字节、阿里** 同时成立 RL Environments 团队，工程文档中频繁出现 "Eval is the new bottleneck"、"Environments are the new data"
 
-为什么环境成了瓶颈？回到 PPO/GRPO 的目标函数（[第 7 章 GRPO](../chapter18_grpo/grpo-family)）：
+为什么环境成了瓶颈？回到 PPO/GRPO 的目标函数（[第 16 章 GRPO](../chapter18_grpo/grpo-family)）：
 
 $$\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_t A(s_t, a_t) \cdot \nabla_\theta \log \pi_\theta(a_t \mid s_{<t}, a_{<t})\right]$$
 
@@ -34,7 +34,7 @@ $$\text{吞吐量} = \frac{N_{\text{parallel\_sandboxes}}}{T_{\text{rollout}}}$$
 
 要么增加并行沙箱数（昂贵但简单），要么缩短单条 rollout 时间（难但有上限），要么让 rollout 与训练解耦（异步 RL，见 23.6）。整个 23 章都在围绕这两个数字做工程。
 
-## 23.2 Evals 与 RL Environments 的等价性
+## Evals 与 RL Environments 的等价性
 
 Pash 2025 提出一个被业界广泛接受的命题：
 
@@ -87,7 +87,7 @@ for step in range(n_steps):
 工业实践：**先写 eval，再让它变成 RL 环境**。如果 eval 的 verifier 太慢、太主观、易作弊，那它根本不能用作 RL 环境。反之，一个能稳定训练的 RL 环境，几乎一定也是一个可靠的 eval。先评估你的 verifier——它就是你的环境质量上限。
 :::
 
-## 23.3 Verifier 设计原则
+## Verifier 设计原则
 
 Verifier $\mathcal{V}$ 是 RL 环境的灵魂。一个坏的 verifier 会让策略学到"奖励最大化但任务失败"的行为（reward hacking）。Verifier 设计有四条原则：
 
@@ -173,7 +173,7 @@ flowchart TB
     D --> D2[✗ 工程复杂]
 ```
 
-## 23.4 Sandbox 工程
+## Sandbox 工程
 
 Agent 任务的环境核心是**沙箱**——一个隔离的执行环境，policy 在其中读写文件、执行代码、调用工具。沙箱工程要解决三个问题：
 
@@ -304,7 +304,7 @@ results = ray.get(futures)
 实战经验：单条 rollout < 30 秒用新建；> 5 分钟长程任务用池复用。
 :::
 
-## 23.5 长程任务 Harness
+## 长程任务 Harness
 
 [Anthropic 2025.11 Effective Harnesses](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) 总结了"如何让 agent 在 100+ 步长程任务中稳定工作"。核心结论：**harness（任务脚手架）的质量决定 agent 表现的上限**。
 
@@ -411,7 +411,7 @@ flowchart LR
     V -->|pick best| B[Final Answer]
 ```
 
-## 23.6 同步 vs 异步 RL 训练
+## 同步 vs 异步 RL 训练
 
 RL 训练主循环有两种模式：**同步（synchronous）** 和 **异步（asynchronous）**。区别在于 rollout 与 gradient step 的时序关系。
 
@@ -494,7 +494,7 @@ AReaL 论文报告，在 agentic 任务上对 Llama-3-8B 训练：
 
 更深入的工程细节见[附录 B.1：RL 训练系统](../appendix_industrial_training/rl-infrastructure)。
 
-## 23.7 评测基准
+## 评测基准
 
 RL 环境质量最终要在公认基准上验证。2025 年主流的 agent RL 基准按任务类型分类：
 
@@ -549,7 +549,7 @@ flowchart TB
 没有一个基准覆盖所有能力。工业训练通常用 **3-5 个基准的组合**：代码（SWE-bench）+ 工具（τ-bench）+ Web（WebArena）+ 长程（Vending-Bench）。这能在不同维度独立验证策略能力，避免单一基准过拟合。
 :::
 
-## 23.8 训练-评估循环工程化
+## 训练-评估循环工程化
 
 把以上各部分串起来，完整的 RL 训练-评估循环工程化涉及四个子问题。
 
@@ -644,7 +644,7 @@ def select_checkpoint(eval_history):
 
 ### 与模型对齐失败的关系
 
-RL 环境质量差会导致一系列 alignment failures——策略学到 verifier 漏洞、过拟合 eval set、对噪声敏感。这些问题在 [第 33 章 Alignment Failures](../chapter30_alignment_failures/intro) 有详细分析，本章从工程角度预防：**先把环境做好，再谈策略对齐**。
+RL 环境质量差会导致一系列 alignment failures——策略学到 verifier 漏洞、过拟合 eval set、对噪声敏感。这些问题在 [第 28 章 Alignment Failures](../chapter30_alignment_failures/intro) 有详细分析，本章从工程角度预防：**先把环境做好，再谈策略对齐**。
 
 ## 本章总结
 

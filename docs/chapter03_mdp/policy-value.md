@@ -140,4 +140,4 @@ $$V^\pi(s) = \sum_a \pi(a \mid s) \sum_{s'} P(s' \mid s, a) \left[R(s, a, s') + 
 2. **回报 $G_t$**：从 $t$ 起的折扣累积奖励 $\sum \gamma^k r$
 3. **价值函数**：$V^\pi(s)$ 状态价值，$Q^\pi(s, a)$ 动作价值；优势 $A = Q - V$ 衡量相对好坏
 
-下一节 [3.3 折扣、轨迹与 POMDP](./panorama) 讨论轨迹的形式化、POMDP（部分可观察 MDP）的扩展。
+下一节 [2.4 折扣、轨迹与 POMDP](./panorama) 讨论轨迹的形式化、POMDP（部分可观察 MDP）的扩展。

@@ -1,5 +1,5 @@
 ---
-title: 22. Agentic RL
+title: 20. Agentic RL
 ---
 
 # Chapter 20: Agentic RL
@@ -184,7 +184,7 @@ Agentic rollouts are far more complex than single-turn ones:
 These engineering issues—asynchronous training, sandbox management, heterogeneous trajectory batching, long-tail latency elimination—are what Agentic RL frameworks in 2025–2026 aim to solve. The next section expands on this.
 
 ::: tip Beyond Credit Assignment: A Training Pitfall
-In addition to step-level signals, Agentic RL faces **reward hacking**—the model exploits loopholes in the reward function instead of actually solving the problem. For example, if a code agent's reward only checks "do tests pass," the model may learn to generate a mock function that always returns `True`. Engineering countermeasures are covered in [Industrial Practice](./industrial-evaluation).
+In addition to step-level signals, Agentic RL faces **reward hacking**—the model exploits loopholes in the reward function instead of actually solving the problem. For example, if a code agent's reward only checks "do tests pass," the model may learn to generate a mock function that always returns `True`. Engineering countermeasures are covered in [Industrial Practice](../chapter22_agentic/industrial-evaluation).
 :::
 
 ## A Minimal Agent Loop
@@ -353,7 +353,7 @@ This chapter uses the following concepts frequently; review them first:
 | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | [Multi-Turn RL and Credit Assignment](./multi-turn-rl)                                   | After 7 turns the task failed—whom do we blame? ORM vs PRM; planning ability; hands-on labs                     |
 | [Tool Calling, Trajectory Synthesis, and Agentic Engineering](./tool-use-and-trajectory) | Where does training data come from? When should the model use tools? Sandbox, async rollout, reward design      |
-| [Industrial Practice, Evaluation, and Bad Cases](./industrial-evaluation)                | How does real training go unstable? How to localize problems via benchmarks, eval pipelines, and bad-case loops |
+| [Industrial Practice, Evaluation, and Bad Cases](../chapter22_agentic/industrial-evaluation)                | How does real training go unstable? How to localize problems via benchmarks, eval pipelines, and bad-case loops |
 | [Agent Data Fabrication—SWE-smith](./agent-data-swe-smith)                               | Auto-generate 50k+ code agent training data: inject bugs, run tests, filter useful samples                      |
 | [Hands-on Lab: Training a DeepCoder Agent with rLLM](./rllm-deepcoder-lab)               | rLLM in practice: AgentFlow + sandbox verification + GRPO RL training                                           |
 | [Project 2: Deep Research Agent](./projects)                                             | Long-horizon search, citation verification, report generation, and Deep Research RL schemes                     |

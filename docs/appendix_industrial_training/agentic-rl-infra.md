@@ -193,7 +193,7 @@ curl -X POST http://controller:8000/scale \
 
 ### 算法、模型和运维
 
-**算法支持。** Relax 内置了四种算法：GRPO（见 [8.1-8.2 节](/chapter18_grpo/grpo-practice-and-mechanism)）、GSPO、SAPO 和 OPD（见 [8.5 节](/chapter18_grpo/on-policy-distillation)）。添加新算法只需实现一个 Service 类并注册到 `ALGOS` 字典。
+**算法支持。** Relax 内置了四种算法：GRPO（见 [16.1–16.2 节](/chapter18_grpo/grpo-practice-and-mechanism)）、GSPO、SAPO 和 OPD（见 [16.7 节](/chapter18_grpo/on-policy-distillation)）。添加新算法只需实现一个 Service 类并注册到 `ALGOS` 字典。
 
 **模型支持。** Qwen3 全系列（4B、30B-A3B MoE）、Qwen3-VL（视觉语言）、Qwen3-Omni（全模态）和 Qwen3.5。
 

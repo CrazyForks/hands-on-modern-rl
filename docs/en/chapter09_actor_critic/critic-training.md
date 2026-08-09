@@ -1,8 +1,8 @@
 ---
-title: 6.2 Training the Critic
+title: 'Supplement: Training the Critic'
 ---
 
-# 6.2 Training the Critic
+# Supplement: Training the Critic
 
 In the previous section, we defined the advantage function $A(s,a) \approx \delta = r + \gamma V(s') - V(s)$ and introduced the Critic network as an estimator of $V(s)$. This section expands on the three classic value-estimation methods from Chapter 3 -- [DP, MC, and TD](../chapter03_mdp/dp-mc-td) -- and shows how each one trains the Critic in practice.
 
@@ -362,7 +362,7 @@ The TD target ($-2$) is much smaller in magnitude than the MC target ($-7$), but
 
 Both methods eventually converge to the same $V^\pi$, but their update paths differ: MC makes large single updates ($-3.5$) with high variance; TD makes small updates ($-1$) but more frequently, with lower variance.
 
-In practice, Actor-Critic methods almost always use TD to train the Critic. In more advanced implementations (e.g., [GAE in Chapter 7](../chapter10_ppo/gae-reward-model)), MC and TD are combined -- a parameter $\lambda$ interpolates between them to achieve an optimal bias-variance tradeoff.
+In practice, Actor-Critic methods almost always use TD to train the Critic. In more advanced implementations (e.g., [GAE in Chapter 8](../chapter10_ppo/gae-reward-model)), MC and TD are combined -- a parameter $\lambda$ interpolates between them to achieve an optimal bias-variance tradeoff.
 
 ## The Full Critic-Training Workflow
 

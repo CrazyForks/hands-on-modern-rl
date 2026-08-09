@@ -1,6 +1,6 @@
 # 12.3 分层 RL 与生成式世界模型引子
 
-> [14.2](./marl) 处理了多 agent 场景。本节处理第三种被刻意回避的情形——**任务 horizon 极长**（如机器人完成整个房屋清洁，需要 1000+ 步动作）。单层策略在这种长程任务上几乎学不到信号。**分层 RL** 把长程决策分解为 option 序列：高层策略选子目标，低层策略执行子目标。
+> [12.2](./marl) 处理了多 agent 场景。本节处理第三种被刻意回避的情形——**任务 horizon 极长**（如机器人完成整个房屋清洁，需要 1000+ 步动作）。单层策略在这种长程任务上几乎学不到信号。**分层 RL** 把长程决策分解为 option 序列：高层策略选子目标，低层策略执行子目标。
 
 ## 分层 RL 与 Options、FeUdal Networks 与 HIRO
 
@@ -78,7 +78,7 @@ for step in range(total_steps):
 | HIRO    | 状态位移     | 状态匹配    | off-policy        | 目标转移设计  |
 
 ::: warning 分层 RL 的实际困境
-分层 RL 听起来优雅，但工业落地少。原因：(1) 层次结构本身是强归纳偏置，错配会反向伤害性能；(2) 高层与底层耦合训练易陷入"互相欺骗"局部解——Manager 给无意义方向，Worker 学着忽略它；(3) LLM 时代的"分层"已经从神经网络架构转移到 prompt 层（plan-then-act、ReAct），更易调试。但思想仍深刻影响 agentic RL（[第 23 章](../chapter22_agentic/tool-use-and-trajectory)）和 [第 38 章 多智能体](../chapter32_selfplay/llm-multi-agent-rl/)。
+分层 RL 听起来优雅，但工业落地少。原因：(1) 层次结构本身是强归纳偏置，错配会反向伤害性能；(2) 高层与底层耦合训练易陷入"互相欺骗"局部解——Manager 给无意义方向，Worker 学着忽略它；(3) LLM 时代的"分层"已经从神经网络架构转移到 prompt 层（plan-then-act、ReAct），更易调试。但思想仍深刻影响 agentic RL（[第 20 章](../chapter22_agentic/tool-use-and-trajectory)）和 [第 29 章 多智能体](../chapter32_selfplay/llm-multi-agent-rl/)。
 :::
 
 ## 生成式世界模型作为 RL 环境
@@ -106,10 +106,10 @@ $$z_t = \text{LatentAction}(x_t, x_{t+1}),\quad x_{t+1} = \text{Decoder}(x_t, z_
 把世界模型当作可生成环境后，本章三主题重新组合：
 
 1. **探索**：内在奖励可以作用在生成环境的隐藏空间上，而不是像素空间——ICM 的"前向预测误差"本质就是世界模型的训练 loss
-2. **多智能体**：Genie 类模型可生成包含 NPC 的环境，多智能体可在生成环境中做 self-play（[第 38 章 self-play](../chapter32_selfplay/self-play-outlook/)）
+2. **多智能体**：Genie 类模型可生成包含 NPC 的环境，多智能体可在生成环境中做 self-play（[第 29 章 self-play](../chapter32_selfplay/self-play-outlook/)）
 3. **分层**：高层策略可以直接输出"潜在子目标"，由世界模型解码出环境状态变化，相当于 option 的隐式学习
 
-工业影响：DeepMind 的 SIMA（Scalable Instructable Multi-World Agent）已经在 Genie 生成的多游戏环境中训练通用 agent；Tongyi DeepResearch 等 LLM agent 也开始用 LLM 自生成的"code world model"作为训练环境（[第 37 章 LLM 驱动的科学发现](../chapter32_selfplay/llm-driven-discovery)）。世界模型从"训练辅助工具"升级为"训练环境本身"，是 2024-2026 年 RL 最深刻的变化之一。
+工业影响：DeepMind 的 SIMA（Scalable Instructable Multi-World Agent）已经在 Genie 生成的多游戏环境中训练通用 agent；Tongyi DeepResearch 等 LLM agent 也开始用 LLM 自生成的"code world model"作为训练环境（[第 29 章 LLM 驱动的科学发现](../chapter32_selfplay/alphaevolve/)）。世界模型从"训练辅助工具"升级为"训练环境本身"，是 2024-2026 年 RL 最深刻的变化之一。
 
 ## 本章总结
 
@@ -119,7 +119,7 @@ $$z_t = \text{LatentAction}(x_t, x_{t+1}),\quad x_{t+1} = \text{Decoder}(x_t, z_
 2. **多智能体非平稳 → CTDE**：MADDPG 给每个智能体配集中 critic，MAPPO 共享 critic + on-policy clip，是 SMAC、Hanabi 的事实标准
 3. **长 horizon → 分层**：Options 框架、FeUdal Networks 的端到端 manager-worker、HIRO 的 off-policy 目标转移，让高层只关心子目标序列
 
-这三条路线在 LLM 时代再次汇合：agentic RL 的工具调用本质是 option、多 agent 协作本质是 CTDE、LLM 内嵌的世界知识本质是 Genie 式生成环境。下一章 [第 14 章 RLHF 训练流水线](../chapter15_rlhf/intro) 进入大模型对齐主线，那里的"环境"是 LLM 自身，但本章的探索、多智能体、分层思想将贯穿后续所有 LLM RL 章节。
+这三条路线在 LLM 时代再次汇合：agentic RL 的工具调用本质是 option、多 agent 协作本质是 CTDE、LLM 内嵌的世界知识本质是 Genie 式生成环境。下一章 [第 13 章 RLHF 训练流水线](../chapter15_rlhf/intro) 进入大模型对齐主线，那里的"环境"是 LLM 自身，但本章的探索、多智能体、分层思想将贯穿后续所有 LLM RL 章节。
 
 ## 延伸阅读
 

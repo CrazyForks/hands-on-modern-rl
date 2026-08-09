@@ -1,6 +1,6 @@
 # 10.2 Decision Transformer、Trajectory Transformer 与 Diffuser
 
-> [12.1](./intro) 讲了离线 RL 在 Bellman 框架内的三大保守路线——BCQ/CQL/IQL。本节走另一条路：**彻底抛弃 Bellman**，把 RL 重新表述为**条件序列生成**。Decision Transformer 用 GPT 直接建模轨迹，Trajectory Transformer 用 beam search，Diffuser 用扩散模型——三者共同指向 "RL as sequence modeling" 的范式革命。
+> [10.1](./intro) 讲了离线 RL 在 Bellman 框架内的三大保守路线——BCQ/CQL/IQL。本节走另一条路：**彻底抛弃 Bellman**，把 RL 重新表述为**条件序列生成**。Decision Transformer 用 GPT 直接建模轨迹，Trajectory Transformer 用 beam search，Diffuser 用扩散模型——三者共同指向 "RL as sequence modeling" 的范式革命。
 
 ## Decision Transformer 与 RL 作为序列建模
 
@@ -172,4 +172,4 @@ $$\tilde{\epsilon}_\theta = (1 + w) \cdot \epsilon_\theta(\tau_t, t, c) - w \cdo
 
 Decision Transformer 把 RL 写成条件序列生成——给定 return-to-go，自回归生成动作。这一范式革命让 RL 训练栈和 LLM 训练栈合二为一。Trajectory Transformer 进一步用 beam search 引入 planning，Diffuser 用扩散模型生成完整轨迹。
 
-下一节 [12.3 离线 RL 实验与 LLM 视角](./experiments) 把视角拉回 LLM 时代——你会发现 DPO 本质上就是离线 RL 的特例。
+下一节 [10.3 离线 RL 实验与 LLM 视角](./experiments) 把视角拉回 LLM 时代——你会发现 DPO 本质上就是离线 RL 的特例。

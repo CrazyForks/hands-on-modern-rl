@@ -13,4 +13,4 @@ title: Hands-on Modern RL
 
 This is the English edition of the course. Content is being translated progressively.
 
-[Get Started](/docs/en/preface/intro.md) | [Chinese edition](/zh/)
+[Get Started](/en/preface/intro) | [Chinese edition](/preface/intro)

@@ -1,4 +1,4 @@
-# 7.2 Critic 训练
+# 补充阅读：Critic 训练
 
 上一节定义了优势函数 $A(s,a) \approx \delta = r + \gamma V(s') - V(s)$，并引出了 Critic 网络作为 $V(s)$ 的估计器。本节展开第 3 章速览过的 [DP、MC、TD](../chapter03_mdp/dp-mc-td) 三种方法在 Critic 训练中的具体实现。
 
@@ -358,7 +358,7 @@ TD 目标 $(-2)$ 远小于 MC 目标 $(-7)$，但 TD 不需要等整局结束。
 
 两种方法最终收敛到同一个 $V^\pi$，但更新路径不同：MC 单次更新幅度大（$-3.5$），方差高；TD 单次更新幅度小（$-1$），但更频繁，方差低。
 
-实际中，Actor-Critic 几乎都用 TD 方法来训练 Critic。在更高级的实现中（如[第 5 章的 GAE](../chapter10_ppo/gae-reward-model)），MC 和 TD 会被组合使用——通过参数 $\lambda$ 在两者之间插值，获得偏差和方差的最佳平衡。
+实际中，Actor-Critic 几乎都用 TD 方法来训练 Critic。在更高级的实现中（如[第 8 章的 GAE](../chapter10_ppo/gae-reward-model)），MC 和 TD 会被组合使用——通过参数 $\lambda$ 在两者之间插值，获得偏差和方差的最佳平衡。
 
 ## Critic 训练的完整流程
 

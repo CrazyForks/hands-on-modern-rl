@@ -1,5 +1,5 @@
 ---
-title: 9.3 The R1-Zero Paradigm
+title: 16.2 The R1-Zero Paradigm
 ---
 
 # 16.2 DeepSeek-R1 and DAPO: A New Paradigm for Pure RL Training
@@ -93,7 +93,7 @@ GRPO proved that RL can work without a Critic, but it still has engineering pain
 
 **Dynamic sampling** solves the "graduation problem." Late in training, many prompts have near-zero within-group variance because the model already solves them reliably. These prompts provide no gradient signal—everyone in the group is correct. DAPO filters them out and keeps only prompts that still produce useful gradients. On the AIME 2024 math competition, DAPO reached a score of 50 using **half the training steps** of DeepSeek-R1.
 
-**Token-level loss** addresses another blind spot. Standard GRPO normalizes the entire sequence: a correct answer is fully reinforced, a wrong answer is fully suppressed. But in a wrong answer, the first 80% of reasoning steps may be correct—only the final calculation fails. Token-level loss lets GRPO distinguish which tokens contributed to the error and which did not. This connects directly to the [credit assignment problem in Chapter 7](../chapter10_ppo/gae-reward-model): in long sequences, we need per-token contributions to the final outcome.
+**Token-level loss** addresses another blind spot. Standard GRPO normalizes the entire sequence: a correct answer is fully reinforced, a wrong answer is fully suppressed. But in a wrong answer, the first 80% of reasoning steps may be correct—only the final calculation fails. Token-level loss lets GRPO distinguish which tokens contributed to the error and which did not. This connects directly to the [credit assignment problem in Chapter 8](../chapter10_ppo/gae-reward-model): in long sequences, we need per-token contributions to the final outcome.
 
 **Overlong Reward Shaping** tackles response length runaway. The model may learn that "more tokens = more likely to contain correct reasoning," producing verbose 2000+ token answers. The original GRPO approach truncates beyond a maximum length and assigns a penalty. But truncation is a hard boundary: a 499-token answer is fine, a 501-token answer is penalized. This discontinuity destabilizes the gradient signal. DAPO replaces the hard cutoff with a smooth penalty function, letting the model learn length control naturally.
 

@@ -67,7 +67,7 @@ $$\nabla_\theta J(\theta) \approx \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot G
 
 Intuitively, $\nabla_\theta \log \pi_\theta(a_t|s_t)$ is the "knob" that changes the action probability, and $G_t$ tells you which direction is good: if the return is positive, increase the probability; if negative, decrease it.
 
-The log has two practical benefits: it turns probability products into sums (more numerically stable), and since $\nabla \log \pi = \nabla \pi / \pi$, low-probability actions naturally receive larger gradients, which helps exploration. The full derivation is in [Chapter 5](../chapter08_policy_gradient/reinforce).
+The log has two practical benefits: it turns probability products into sums (more numerically stable), and since $\nabla \log \pi = \nabla \pi / \pi$, low-probability actions naturally receive larger gradients, which helps exploration. The full derivation is in [Chapter 6](../chapter08_policy_gradient/reinforce).
 
 The corresponding loss is $\mathcal{L} = -\log \pi_\theta(a_t|s_t) \cdot G_t$. Note the minus sign: we perform gradient descent, so we minimize this loss to maximize expected return. This is the core of the REINFORCE algorithm.
 

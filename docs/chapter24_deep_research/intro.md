@@ -259,7 +259,7 @@ Tongyi DeepResearch 的数据合成管线 [^tongyi_dr] 是其核心创新之一�
 
 ## 什么叫"好的" Deep Research？
 
-> 本节聚焦 Deep Research 场景特有的评估维度。更广泛的 Agentic 评测体系（包括工具调用、端到端任务、综合能力的 benchmark 全景和评测系统搭建）见 [10.3 节：工业实践、评测与 Badcase](./industrial-evaluation)。
+> 本节聚焦 Deep Research 场景特有的评估维度。更广泛的 Agentic 评测体系（包括工具调用、端到端任务、综合能力的 benchmark 全景和评测系统搭建）见 [10.3 节：工业实践、评测与 Badcase](../chapter22_agentic/industrial-evaluation)。
 
 Deep Research Agent 的"好"远不止是最终答案的正确性。一个优秀的 Deep Research 结果需要同时满足四个层次：
 
@@ -744,7 +744,7 @@ flowchart TD
 
 搜索返回的 token（`<information>` 部分）在计算 RL loss 时被 **mask 掉**——只有模型自己生成的 token 参与梯度更新。原因很直观：搜索结果的质量不由模型控制，不应因搜索引擎返回了低质量结果而惩罚模型。
 
-这与 [10.1 节](./intro) 讨论的 Agent Loop 设计原则一致：**环境反馈不改变策略，只有策略自身的决策才改变策略**。
+这与本章前文讨论的 Agent Loop 设计原则一致：**环境反馈不改变策略，只有策略自身的决策才改变策略**。
 
 #### 奖励函数
 
@@ -891,7 +891,7 @@ def rollout(model, question, retriever, max_turns=10):
 # - <answer>...</answer> 之间的 token -> mask=1（模型输出）
 ```
 
-这与 [10.1 节](./intro) 讨论的 Agent Loop 一致：环境返回的观测不应影响策略梯度。
+这与本章前文讨论的 Agent Loop 一致：环境返回的观测不应影响策略梯度。
 
 #### GRPO 策略梯度
 

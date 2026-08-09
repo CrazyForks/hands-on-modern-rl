@@ -2,9 +2,9 @@
 
 > [第 9 章](../chapter11_continuous_control/intro) 解决了连续动作与样本效率问题——DDPG/TD3/SAC 通过 replay buffer 复用历史数据，model-based RL 通过环境模型减少真实交互。但所有这些算法仍然允许智能体**继续与环境交互**：replay buffer 里的数据是旧策略采的，新策略采到的新数据会持续加入。本章处理一个更严苛的设定——**当智能体完全不能交互，只能从一个固定的历史数据集学习时，如何训出可靠策略？** 这就是 **Offline RL（离线强化学习）**，也称作 batch RL。它是 LLM 后训练、推荐系统、医疗决策、工业机器人等真实场景的核心范式，并且通过 **Decision Transformer** 这一分支，与现代序列建模（GPT）建立了直接联系。
 
-## 12.1 离线 RL 的核心挑战 与 分布偏移
+## 10.1 离线 RL 的核心挑战 与 分布偏移
 
-[第 5 章 DQN](../chapter07_dqn/intro) 和 [第 10 章 SAC](../chapter11_continuous_control/intro) 都依赖同一个机制：Bellman 备份。无论 on-policy 还是 off-policy，价值函数的更新都写成：
+[第 5 章 DQN](../chapter07_dqn/intro) 和 [第 9 章 SAC](../chapter11_continuous_control/intro) 都依赖同一个机制：Bellman 备份。无论 on-policy 还是 off-policy，价值函数的更新都写成：
 
 $$y = r + \gamma \cdot \mathbb{E}_{s' \sim P(\cdot \mid s, a)}\left[V(s')\right]$$
 
@@ -42,7 +42,7 @@ $$\max_\theta \; \mathbb{E}_{s \sim \mathcal{D}}\left[Q^\pi(s, \pi_\theta(s))\ri
 
 接下来三节按"如何实现这个约束"分三条路线展开。
 
-## 12.2 悲观主义路线 与 CQL / IQL / BCQ
+## 悲观主义路线 与 CQL / IQL / BCQ
 
 最直接的思路：**让 Q 函数对 OOD 动作悲观**。如果 $Q(s, a)$ 在没见过的 $a$ 上给低值，$\max_a Q(s, a)$ 自然不会选到幻想动作。三大经典算法——BCQ、CQL、IQL——从不同角度实现这一原则。
 
@@ -125,7 +125,7 @@ $\exp(\beta A)$ 给数据中表现好的动作更大权重，让 $\pi_\theta$ �
 
 **实战建议**：从 IQL 开始（最稳定、最少调参）；若 baseline 偏低再换 CQL（更激进）；BCQ 已较少作为新 baseline。
 
-## 12.3 AWAC 与 TD3+BC 与 保守约束 + 行为克隆正则化
+## AWAC 与 TD3+BC 与 保守约束 + 行为克隆正则化
 
 另一条路线更工程化——**保留 on-policy / off-policy actor-critic 主循环，在策略损失里直接加行为克隆（BC）正则**。这类方法的优势是与 [第 9 章](../chapter11_continuous_control/intro) 的 PPO/SAC 框架兼容，工程改造量极小。
 
@@ -176,4 +176,4 @@ IQL 通过把 Bellman target 改成 $V(s')$（不再 max），从根源上消除
 
 本节梳理了离线 RL 的核心挑战（分布偏移与外推误差）与三大保守路线：BCQ 约束动作空间、CQL 惩罚 OOD Q 值、IQL 完全规避 max 算子。这些算法都在 Bellman 框架内做文章。
 
-下一节 [12.2 Decision Transformer、Trajectory Transformer 与 Diffuser](./sequence-modeling) 走另一条路——彻底抛弃 Bellman，把 RL 写成条件序列生成。
+下一节 [10.2 Decision Transformer、Trajectory Transformer 与 Diffuser](./sequence-modeling) 走另一条路——彻底抛弃 Bellman，把 RL 写成条件序列生成。

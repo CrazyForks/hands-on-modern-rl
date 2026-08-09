@@ -1,5 +1,5 @@
 ---
-title: 8.4 Reward Models
+title: 13.3 Reward Models
 ---
 
 # 13.3 Reward Models

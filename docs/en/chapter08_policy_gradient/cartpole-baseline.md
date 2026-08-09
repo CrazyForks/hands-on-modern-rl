@@ -1,5 +1,5 @@
 ---
-title: '5.5 Hands-On: Policy Gradient with Baseline'
+title: '6.7 Hands-On: Policy Gradient with Baseline'
 ---
 
 # 6.7 Hands-on: Policy Gradient with a Baseline

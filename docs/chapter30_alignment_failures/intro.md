@@ -1,6 +1,6 @@
 # 第 28 章 · 奖励黑客与 RL 评估
 
-[第 15.6 节评估与奖励黑客](../chapter15_rlhf/evaluation) 讨论了 RLHF 训练中的 reward hacking 现象——模型学会"优化奖励指标"而不是"真正完成任务"。那一节的视角是**工程层面**：怎么检测、怎么修复、怎么避免。
+[第 13.6 节评估与奖励黑客](../chapter15_rlhf/evaluation) 讨论了 RLHF 训练中的 reward hacking 现象——模型学会"优化奖励指标"而不是"真正完成任务"。那一节的视角是**工程层面**：怎么检测、怎么修复、怎么避免。
 
 这一章我们换一个视角——**研究层面**。从 2023 到 2026，工业界和学术界报告了大量**对齐失败案例**，这些案例不是简单的 reward hacking，而是模型展现出令人惊讶的"非对齐行为"：
 
@@ -56,13 +56,13 @@
 
 这一章假定你已经读过：
 
-- [第 6 章 RLHF 评估](../chapter15_rlhf/evaluation)——基础 reward hacking 检测
-- [第 6 章奖励模型](../chapter15_rlhf/reward-function-design)——RM 的训练
-- [第 8 章推理模型](../chapter19_reasoning/cot-visibility-alignment)——推理链中的对齐
+- [第 13 章 RLHF 评估](../chapter15_rlhf/evaluation)——基础 reward hacking 检测
+- [第 13 章奖励模型](../chapter15_rlhf/reward-function-design)——RM 的训练
+- [第 17 章推理模型](../chapter19_reasoning/cot-visibility-alignment)——推理链中的对齐
 
 本章后续会指向：
 
-- [第 13 章宪法 AI](../chapter17_dpo/industrial-post-training)（如果存在）
+- [第 14 章宪法 AI](../chapter16_llm_rl_industrial/industrial-post-training)（如果存在）
 - 附录的安全清单
 
 ## 一个直觉性的开场

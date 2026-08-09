@@ -1,5 +1,5 @@
 ---
-title: '9.4 RLVR: Verifiable Rewards'
+title: '16.3 RLVR: Verifiable Rewards'
 ---
 
 # 16.3 RLVR: Reinforcement Learning with Verifiable Rewards
@@ -366,4 +366,4 @@ RLVR is not a universal solution. It has several important limitations:
 
 ---
 
-GRPO removes the Critic from the policy side, and RLVR removes the RM from the reward side. Together, they compress the complexity of RL training to an extreme degree. But the RL story does not end here. The next exciting directions are RL Scaling and test-time scaling. In [Chapter 12](../chapter32_selfplay/rl-scaling-outlook), we will look at these frontier directions: RL Scaling and the future outlook.
+GRPO removes the Critic from the policy side, and RLVR removes the RM from the reward side. Together, they compress the complexity of RL training to an extreme degree. But the RL story does not end here. The next exciting directions are RL Scaling and test-time scaling. In [Chapter 29](../chapter32_selfplay/rl-scaling-outlook), we will look at these frontier directions: RL Scaling and the future outlook.

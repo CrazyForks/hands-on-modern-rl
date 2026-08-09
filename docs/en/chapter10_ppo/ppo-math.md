@@ -1,8 +1,8 @@
 ---
-title: 7.2 PPO Mathematical Derivation
+title: 'Supplement: PPO Mathematical Derivation'
 ---
 
-# 5.2 PPO Mathematical Derivation
+# Supplement: PPO Mathematical Derivation
 
 In the previous section, we trained LunarLander with SB3's PPO and looked at curves such as reward, entropy, and clip fraction. Now we should answer a more basic question:
 
@@ -580,7 +580,7 @@ Each term does a different job:
 
 **policy loss drives Actor improvement, value loss ensures the Critic provides accurate advantage signals, and entropy bonus preserves exploration.**
 
-They collaborate through the shared Actor-Critic network. In [ppo_from_scratch.py](../../../code/chapter07_ppo/ppo_from_scratch.py), the Actor and Critic share the same backbone network (`shared_net`), so one backpropagation updates both.
+They collaborate through the shared Actor-Critic network. In [ppo_from_scratch.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_ppo/ppo_from_scratch.py), the Actor and Critic share the same backbone network (`shared_net`), so one backpropagation updates both.
 
 ### Hyperparameter Summary
 

@@ -1,5 +1,5 @@
 ---
-title: '22.5 Hands-On: Financial QA Agent'
+title: '20.9 Hands-On: Financial QA Agent'
 ---
 
 # 20.9 Hands-on: Training a Financial Analysis Agent with rLLM

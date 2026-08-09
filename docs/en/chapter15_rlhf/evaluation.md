@@ -1,5 +1,5 @@
 ---
-title: 8.6 Evaluation
+title: 13.6 Evaluation
 ---
 
 # 13.6 Evaluation
@@ -368,7 +368,7 @@ def reward_hacking_signals(rows):
 
 This check cannot replace manual evaluation, but it can alert you during training: the model may be learning to "score high" rather than learning to "answer better."
 
-The best practice exercise is to run a controlled experiment: deliberately write a bad reward function where "longer answers always score higher," observe how reward, length, and diversity curves degrade together, then fix it with multi-dimensional rewards and KL constraints. That experiment does not fit cleanly into this evaluation section; the full version is in [8.8 Extended Practice](./extended-practice).
+The best practice exercise is to run a controlled experiment: deliberately write a bad reward function where "longer answers always score higher," observe how reward, length, and diversity curves degrade together, then fix it with multi-dimensional rewards and KL constraints. That experiment does not fit cleanly into this evaluation section; the full version is in [13.5 Extended Practice](./extended-practice).
 
 ### Reward hacking diagnosis flow
 
@@ -559,7 +559,7 @@ RLHF evaluation must simultaneously answer three questions:
 
 If you only look at the reward curve, it is easy to mistake reward hacking for model improvement. Evaluation loop + reward hacking controlled experiment + data flywheel together form RLHF's quality guardrails.
 
-With this, the classic RLHF main thread is complete: the base model is not an assistant, SFT gives it a behavioral starting point, the RM gives it a preference direction, PPO lets it practice according to reward, and evaluation and the data flywheel prevent it from learning the wrong things. For a controlled debugging exercise, continue to [8.8 Extended Practice](./extended-practice). The next chapter starts from this classic RLHF pipeline and explains why modern methods simplify the RM, Critic, or human preference itself -- [Post-Training Alignment](../chapter17_dpo/intro).
+With this, the classic RLHF main thread is complete: the base model is not an assistant, SFT gives it a behavioral starting point, the RM gives it a preference direction, PPO lets it practice according to reward, and evaluation and the data flywheel prevent it from learning the wrong things. For a controlled debugging exercise, continue to [13.5 Extended Practice](./extended-practice). The next chapter starts from this classic RLHF pipeline and explains why modern methods simplify the RM, Critic, or human preference itself -- [Post-Training Alignment](../chapter17_dpo/intro).
 
 ## Exercises
 
