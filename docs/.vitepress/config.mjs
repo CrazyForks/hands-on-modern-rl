@@ -671,7 +671,7 @@ const zhSidebar = {
   '/': [
     {
       text: '序章 · 导论',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '强化学习导论',
@@ -689,11 +689,11 @@ const zhSidebar = {
     },
     {
       text: 'Part I · 基础与经典强化学习',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '1. CartPole 入门',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '1.1 CartPole 控制原理',
@@ -711,7 +711,7 @@ const zhSidebar = {
         },
         {
           text: '2. 强化学习问题与基本定义',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '2.1 探索与利用',
@@ -733,7 +733,7 @@ const zhSidebar = {
         },
         {
           text: '3. 价值函数与贝尔曼方程',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '3.1 状态价值、动作价值与贝尔曼期望方程',
@@ -751,7 +751,7 @@ const zhSidebar = {
         },
         {
           text: '4. 经典强化学习方法',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '4.1 动态规划、蒙特卡洛与时序差分',
@@ -771,11 +771,11 @@ const zhSidebar = {
     },
     {
       text: 'Part II · 深度强化学习',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '5. 深度 Q 网络',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '5.1 从 Q-Learning 到 DQN',
@@ -801,7 +801,7 @@ const zhSidebar = {
         },
         {
           text: '6. 策略梯度方法',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '6.1 策略梯度定理',
@@ -835,7 +835,7 @@ const zhSidebar = {
         },
         {
           text: '7. Actor-Critic 方法',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '7.1 优势函数',
@@ -861,7 +861,7 @@ const zhSidebar = {
         },
         {
           text: '8. TRPO 与 PPO 信任域优化',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '8.1 TRPO 与信任域约束',
@@ -887,7 +887,7 @@ const zhSidebar = {
         },
         {
           text: '9. 连续控制与基于模型的强化学习',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '9.1 DDPG 与确定性策略梯度',
@@ -911,11 +911,11 @@ const zhSidebar = {
     },
     {
       text: 'Part III · 高级 RL 方法',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '10. 离线强化学习',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '10.1 离线 RL 的挑战与经典方法',
@@ -933,7 +933,7 @@ const zhSidebar = {
         },
         {
           text: '11. 模仿学习、逆向 RL 与元 RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '11.1 行为克隆与 DAgger',
@@ -951,7 +951,7 @@ const zhSidebar = {
         },
         {
           text: '12. 探索、多智能体与分层 RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '12.1 内在动机探索：ICM、RND、NGU 与 Agent57',
@@ -971,11 +971,11 @@ const zhSidebar = {
     },
     {
       text: 'Part IV · 大语言模型对齐与后训练',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '13. RLHF 训练流水线',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '13.1 从基座模型到指令对齐',
@@ -1009,7 +1009,7 @@ const zhSidebar = {
         },
         {
           text: '14. 大模型 RL 工业实践',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '14.1 训练框架与双轨奖励',
@@ -1031,7 +1031,7 @@ const zhSidebar = {
         },
         {
           text: '15. 偏好对齐与 DPO 家族',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '15.1 DPO 数学推导',
@@ -1053,7 +1053,7 @@ const zhSidebar = {
         },
         {
           text: '16. GRPO、RLVR 与 Verifier 工程',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '16.1 GRPO 核心机制',
@@ -1091,7 +1091,7 @@ const zhSidebar = {
         },
         {
           text: '17. 推理模型与 Test-Time Scaling',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '17.1 推理模型的兴起',
@@ -1121,7 +1121,7 @@ const zhSidebar = {
         },
         {
           text: '18. 过程奖励模型与推理时搜索',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '18.1 Outcome vs Process 奖励',
@@ -1151,7 +1151,7 @@ const zhSidebar = {
         },
         {
           text: '19. Constitutional AI 与 RLAIF',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '19.1 HHH 原则与 Claude 实践',
@@ -1167,11 +1167,11 @@ const zhSidebar = {
     },
     {
       text: 'Part V · Agentic 强化学习',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '20. 工具调用、多轮交互与多智能体 RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '20.1 Agentic RL 总览',
@@ -1217,7 +1217,7 @@ const zhSidebar = {
         },
         {
           text: '21. 代码智能体强化学习',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '21.1 SWE-RL 基础实验',
@@ -1235,7 +1235,7 @@ const zhSidebar = {
         },
         {
           text: '22. Deep Research 与浏览器智能体',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '22.1 浏览器 RL Harness 工程',
@@ -1249,7 +1249,7 @@ const zhSidebar = {
         },
         {
           text: '23. Computer Use 与 GUI Agent',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '23.1 GUI Agent 训练',
@@ -1265,11 +1265,11 @@ const zhSidebar = {
     },
     {
       text: 'Part VI · 多模态强化学习',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '24. 视觉语言模型 RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '24.1 视觉奖励设计',
@@ -1291,7 +1291,7 @@ const zhSidebar = {
         },
         {
           text: '25. 音频与语音 RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '25.1 从 RLVR 到 RLHF 的音频奖励设计',
@@ -1305,7 +1305,7 @@ const zhSidebar = {
         },
         {
           text: '26. 具身智能与 VLA 模型',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '26.1 VLA 模型基础',
@@ -1315,7 +1315,7 @@ const zhSidebar = {
         },
         {
           text: '27. 视觉生成 RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '27.1 视觉生成与 DanceGRPO',
@@ -1331,11 +1331,11 @@ const zhSidebar = {
     },
     {
       text: 'Part VII · 安全、评估与研究前沿',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '28. 奖励黑客与 RL 评估',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '28.1 经典对齐失败模式',
@@ -1361,7 +1361,7 @@ const zhSidebar = {
         },
         {
           text: '29. 自博弈、规模化与研究前沿',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '29.1 自博弈基础与 LLM 自博弈',
@@ -1388,7 +1388,7 @@ const zhSidebar = {
       items: [
         {
           text: 'A. 训练调试与工程实践',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: 'A.1 训练调试指南',
@@ -1410,7 +1410,7 @@ const zhSidebar = {
         },
         {
           text: 'B. 核心算法实现',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: 'B.1 SFT 与 KL 散度',
@@ -1448,7 +1448,7 @@ const zhSidebar = {
         },
         {
           text: 'C. 学习资源与参考资料',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: 'C.1 学习资源与项目路线',
@@ -1470,11 +1470,11 @@ const zhSidebar = {
         },
         {
           text: 'D. 数学基础',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: 'D.1 线性代数',
-              collapsed: true,
+              collapsed: false,
               items: [
                 {
                   text: '基础对象',
@@ -1500,7 +1500,7 @@ const zhSidebar = {
             },
             {
               text: 'D.2 概率、期望与随机估计',
-              collapsed: true,
+              collapsed: false,
               items: [
                 {
                   text: '概率基础',
@@ -1530,7 +1530,7 @@ const zhSidebar = {
             },
             {
               text: 'D.3 微积分与优化',
-              collapsed: true,
+              collapsed: false,
               items: [
                 {
                   text: '导数与梯度',
@@ -1560,7 +1560,7 @@ const zhSidebar = {
             },
             {
               text: 'D.4 信息论与分布距离',
-              collapsed: true,
+              collapsed: false,
               items: [
                 {
                   text: '熵与探索',
@@ -1599,7 +1599,7 @@ const enSidebar = {
   '/en/': [
     {
       text: 'Preface · Introduction',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: 'Introduction to RL',
@@ -1617,11 +1617,11 @@ const enSidebar = {
     },
     {
       text: 'Part I · Fundamentals & Classical RL',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '1. CartPole',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '1.1 CartPole Control Principles',
@@ -1638,7 +1638,7 @@ const enSidebar = {
         },
         {
           text: '2. RL Problems and Basic Definitions',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '2.1 Exploration and Exploitation',
@@ -1659,7 +1659,7 @@ const enSidebar = {
         },
         {
           text: '3. Value Functions & Bellman Equations',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '3.1 State Value, Action Value and Bellman Expectation',
@@ -1676,7 +1676,7 @@ const enSidebar = {
         },
         {
           text: '4. Classical RL Methods',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '4.1 Dynamic Programming, Monte Carlo and Temporal Difference',
@@ -1696,11 +1696,11 @@ const enSidebar = {
     },
     {
       text: 'Part II · Deep Reinforcement Learning',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '5. Deep Q-Networks',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '5.1 From Q-Learning to DQN',
@@ -1726,7 +1726,7 @@ const enSidebar = {
         },
         {
           text: '6. Policy Gradient Methods',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '6.1 Policy Gradient Theorem',
@@ -1760,7 +1760,7 @@ const enSidebar = {
         },
         {
           text: '7. Actor-Critic Methods',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '7.1 Advantage Function',
@@ -1786,7 +1786,7 @@ const enSidebar = {
         },
         {
           text: '8. TRPO and PPO Trust-Region Optimization',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '8.1 TRPO and Trust-Region Constraints',
@@ -1812,7 +1812,7 @@ const enSidebar = {
         },
         {
           text: '9. Continuous Control and Model-Based RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '9.1 DDPG and Deterministic Policy Gradients'
@@ -1832,11 +1832,11 @@ const enSidebar = {
     },
     {
       text: 'Part III · Advanced RL Methods',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '10. Offline Reinforcement Learning',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '10.1 Offline RL Challenges and Classical Methods'
@@ -1851,7 +1851,7 @@ const enSidebar = {
         },
         {
           text: '11. Imitation Learning, Inverse RL and Meta-RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '11.1 Behavioral Cloning and DAgger'
@@ -1866,7 +1866,7 @@ const enSidebar = {
         },
         {
           text: '12. Exploration, Multi-Agent RL and Hierarchical RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '12.1 Intrinsic Motivation: ICM, RND, NGU and Agent57'
@@ -1883,11 +1883,11 @@ const enSidebar = {
     },
     {
       text: 'Part IV · LLM Alignment & Post-Training',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '13. RLHF Pipeline',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '13.1 Base Model to Instruction Alignment',
@@ -1921,7 +1921,7 @@ const enSidebar = {
         },
         {
           text: '14. Industrial LLM RL Engineering',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '14.1 Training Frameworks and Dual-Track Rewards'
@@ -1940,7 +1940,7 @@ const enSidebar = {
         },
         {
           text: '15. Preference Alignment and the DPO Family',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '15.1 DPO Derivation',
@@ -1962,7 +1962,7 @@ const enSidebar = {
         },
         {
           text: '16. GRPO, RLVR and Verifier Engineering',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '16.1 GRPO Core Mechanism',
@@ -1997,7 +1997,7 @@ const enSidebar = {
         },
         {
           text: '17. Reasoning Models and Test-Time Scaling',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '17.1 Emergence of Reasoning Models'
@@ -2021,7 +2021,7 @@ const enSidebar = {
         },
         {
           text: '18. Process Reward Models and Inference-Time Search',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '18.1 Outcome and Process Rewards'
@@ -2045,7 +2045,7 @@ const enSidebar = {
         },
         {
           text: '19. Constitutional AI and RLAIF',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '19.1 HHH Principles and Claude Practice'
@@ -2059,11 +2059,11 @@ const enSidebar = {
     },
     {
       text: 'Part V · Agentic Reinforcement Learning',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '20. Tool Use, Multi-Turn & Multi-Agent RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '20.1 Agentic RL Overview',
@@ -2106,7 +2106,7 @@ const enSidebar = {
         },
         {
           text: '21. RL for Code Agents',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '21.1 SWE-RL Basics'
@@ -2121,7 +2121,7 @@ const enSidebar = {
         },
         {
           text: '22. Deep Research and Browser Agents',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '22.1 Browser RL Harness Engineering'
@@ -2133,7 +2133,7 @@ const enSidebar = {
         },
         {
           text: '23. Computer Use and GUI Agents',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '23.1 GUI Agent Training'
@@ -2147,11 +2147,11 @@ const enSidebar = {
     },
     {
       text: 'Part VI · Multimodal Reinforcement Learning',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '24. Vision-Language Model RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '24.1 Visual Reward Design',
@@ -2172,7 +2172,7 @@ const enSidebar = {
         },
         {
           text: '25. Audio and Speech RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '25.1 Audio Reward Design from RLVR to RLHF'
@@ -2184,7 +2184,7 @@ const enSidebar = {
         },
         {
           text: '26. Embodied Intelligence and VLA Models',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '26.1 VLA Model Foundations'
@@ -2193,7 +2193,7 @@ const enSidebar = {
         },
         {
           text: '27. Visual Generation RL',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '27.1 Visual Generation and DanceGRPO'
@@ -2207,11 +2207,11 @@ const enSidebar = {
     },
     {
       text: 'Part VII · Safety, Evaluation & Research Frontiers',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: '28. Reward Hacking and RL Evaluation',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '28.1 Classical Alignment Failure Modes'
@@ -2232,7 +2232,7 @@ const enSidebar = {
         },
         {
           text: '29. Self-Play, Scaling and Research Frontiers',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: '29.1 Self-Play Basics & LLM Self-Play',
@@ -2255,11 +2255,11 @@ const enSidebar = {
     },
     {
       text: 'Appendices',
-      collapsed: true,
+      collapsed: false,
       items: [
         {
           text: 'A. Training Debugging and Engineering Practice',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: 'A.1 Training Debugging Guide',
@@ -2281,7 +2281,7 @@ const enSidebar = {
         },
         {
           text: 'B. Core Algorithm Implementations',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: 'B.1 SFT and KL Divergence',
@@ -2319,7 +2319,7 @@ const enSidebar = {
         },
         {
           text: 'C. Learning Resources and Reference Materials',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: 'C.1 Learning Resources and Project Roadmap',
@@ -2340,11 +2340,11 @@ const enSidebar = {
         },
         {
           text: 'D. Math Foundations',
-          collapsed: true,
+          collapsed: false,
           items: [
             {
               text: 'D.1 Linear Algebra',
-              collapsed: true,
+              collapsed: false,
               items: [
                 {
                   text: 'Basic Objects',
@@ -2370,7 +2370,7 @@ const enSidebar = {
             },
             {
               text: 'D.2 Probability and Estimation',
-              collapsed: true,
+              collapsed: false,
               items: [
                 {
                   text: 'Probability Basics',
@@ -2400,7 +2400,7 @@ const enSidebar = {
             },
             {
               text: 'D.3 Calculus and Optimization',
-              collapsed: true,
+              collapsed: false,
               items: [
                 {
                   text: 'Derivatives and Gradients',
@@ -2430,7 +2430,7 @@ const enSidebar = {
             },
             {
               text: 'D.4 Information Theory',
-              collapsed: true,
+              collapsed: false,
               items: [
                 {
                   text: 'Entropy and Exploration',
@@ -2494,7 +2494,7 @@ function groupSidebarLessons(sidebar, chapterPrefix, groups) {
     return [
       {
         text: group.text,
-        collapsed: true,
+        collapsed: false,
         items
       }
     ]
