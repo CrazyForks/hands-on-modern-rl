@@ -242,7 +242,7 @@ This is exactly what `sequence_logprob` does: it takes the log probability of ea
 
 <DpoCodeFocus focus="logprob" />
 
-## 15.3.1 Deriving DPO in Three Steps
+## Deriving DPO in Three Steps
 
 ### The Engineering Pain Points of RLHF
 
@@ -604,7 +604,7 @@ This point is very direct in the training step: after `loss.backward()`, only th
 
 <DpoCodeFocus focus="train" />
 
-## 15.3.2 Implicit Reward
+## Implicit Reward
 
 From the derivation in Step 2, we obtained a very important relationship:
 
@@ -665,7 +665,7 @@ PPO explicitly computes KL divergence during training and penalizes drift. DPO u
 
 </details>
 
-## 15.3.3 DPO's Limitations and Family Evolution
+## DPO's Limitations and Family Evolution
 
 DPO is elegant, but it is not universal:
 
@@ -688,7 +688,7 @@ The core tension behind these limitations can be summarized with an analogy: DPO
 
 DPO clearly wins over PPO in engineering complexity, but PPO has a higher theoretical ceiling. This trade-off gave rise to a class of DPO-style offline preference optimization methods. They all answer the same question: **which component can be safely removed?**
 
-## 15.3.4 The DPO-Style Offline Preference Optimization Family
+## The DPO-Style Offline Preference Optimization Family
 
 After deriving the DPO loss and seeing DPO's limitations, we can look at a group of methods that continue along the DPO path of simplification: KTO, SimPO, and IPO.
 
@@ -735,7 +735,7 @@ IPO replaces log-sigmoid with mean squared error and therefore has a natural "ta
 | **Core strength**   | Classic, stable, best ecosystem                  | Flexible data format, low collection cost   | Saves memory (one fewer full model)   | More stable with small data            |
 | **Best fit**        | General first choice                             | User feedback, review annotations           | Single-card training for large models | Fewer than 1,000 data examples         |
 
-## 15.3.5 Method Selection Guide
+## Method Selection Guide
 
 Putting all methods together, here is a practical decision table:
 

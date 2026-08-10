@@ -331,4 +331,4 @@ SWE-bench 是 SWE-RL 的核心 benchmark，定义了 (issue, patch, tests) 的�
 
 SWE-RL 与传统 code generation 有本质区别——长上下文、多文件、有测试反馈、多步决策。这让它与 Agentic RL 高度一致，是 RL 在工业上最有价值的应用之一。
 
-下一节我们看 Meta SWE-RL——开源 SWE-RL 的代表作。
+接下来先通过[补充阅读：Meta SWE-RL](./meta-swe-rl)观察 GRPO 与简单奖励如何落到真实仓库，再进入 [21.2 Code World Model 与 DeepSWE](./world-model-and-deep-swe)，处理长轨迹训练不稳定的问题。

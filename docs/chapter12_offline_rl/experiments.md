@@ -8,7 +8,7 @@
 
 ### DPO 作为隐式 Q-Learning
 
-[第 15 章 DPO](../chapter17_dpo/principles) 推导的 DPO 目标：
+[第 15 章 DPO](../chapter17_dpo/intro) 推导的 DPO 目标：
 
 $$\mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(x, y_w, y_l)}\left[\log \sigma\left(\beta \log \frac{\pi_\theta(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \beta \log \frac{\pi_\theta(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\right)\right]$$
 

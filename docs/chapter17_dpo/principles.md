@@ -8,7 +8,7 @@ $$\text{Pre-training} \;\xrightarrow{\text{Base Model}}\; \underbrace{\text{SFT}
 
 下面依次介绍每个阶段的目标与产出，最后定位 DPO 在其中的位置。
 
-### 2.1.1 阶段一 与 预训练（Pre-training）
+### 15.1.1 阶段一：预训练
 
 预训练阶段将海量文本序列作为输入，模型通过"预测下一个词"（Next-Token Prediction）学习世界知识和语言规律。这是代价最高的一步，赋予了模型基础能力。
 
@@ -24,7 +24,7 @@ $$\text{Pre-training} \;\xrightarrow{\text{Base Model}}\; \underbrace{\text{SFT}
 
 基座模型的核心能力是"续写"——给它一段文字，它会按照训练语料中的统计规律继续往下生成。但它不会"回答问题"，更不知道什么叫"得体"。正如第一章中 CartPole 的策略网络在随机初始化时只知道均匀采样动作一样，基座模型只知道按照训练分布生成 token，并不理解"对话"这一交互形式。
 
-### 2.1.2 阶段二 与 监督微调（Supervised Fine-Tuning, SFT）
+### 15.1.2 阶段二：监督微调（Supervised Fine-Tuning, SFT）
 
 监督微调阶段将高质量的问答对作为输入，让模型学会以对话格式回应人类。
 
@@ -51,7 +51,7 @@ $$\text{Pre-training} \;\xrightarrow{\text{Base Model}}\; \underbrace{\text{SFT}
 
 SFT 的训练信号只有一个方向——"模仿"，模型缺少关于"什么是差的"的对比信息，因此无法建立起对回答质量的判断力。这正是第三阶段需要引入偏好对比数据的动机。
 
-### 2.1.3 阶段三 与 强化学习与对齐（RL / Alignment）
+### 15.1.3 阶段三：强化学习与对齐（RL / Alignment）
 
 对齐阶段就是 DPO 所处的位置。该阶段将偏好数据（好坏对比）作为输入，让模型学会区分高质量的回答和低质量的回答。
 
@@ -140,13 +140,13 @@ $$\mathcal{L}_{DPO} = -\ln \sigma \left( \beta \ln \frac{\pi_\theta(y_w | x)}{\p
 
 </details>
 
-### 2.1.4 DPO 的优化目标
+### 15.1.4 DPO 的优化目标
 
 在第 1 章中，我们拆解了 SB3 的 `model.learn()`，揭示了其背后的三步循环：收集经验 → 计算优势 → 更新参数。这一节来看 `DPOTrainer.train()` 做了什么——也就是说，DPO 的损失函数是如何从偏好数据中计算出来的。
 
 要理解 DPO 的创新，需要先看它简化了什么。
 
-#### 2.1.4.1 从 RLHF 到 DPO 与 跳过奖励模型
+#### 15.1.4.1 从 RLHF 到 DPO：跳过奖励模型
 
 在传统的 RLHF（基于人类反馈的强化学习）流水线中（Christiano et al., 2017; Ouyang et al., 2022），对齐模型需要以下两步：
 
@@ -180,7 +180,7 @@ trainer = DPOTrainer(
 
 代码中只传入了一个模型，没有奖励模型。`DPOTrainer` 会在内部自动创建一份 `model` 的冻结副本作为参考模型 $\pi_{ref}$，并在每一步训练中对比 $\pi_\theta$ 和 $\pi_{ref}$ 的输出概率。$\beta$ 系数已在 `DPOConfig` 中设置为 0.1——后面推导损失函数时会反复提到它。
 
-#### 2.1.4.2 损失函数推导
+#### 15.1.4.2 损失函数推导
 
 DPO 的最终损失函数如下：
 

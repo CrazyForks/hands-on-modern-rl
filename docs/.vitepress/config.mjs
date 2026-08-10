@@ -1432,6 +1432,10 @@ const zhSidebar = {
               link: '/appendix_code_cheatsheet/grpo-rlvr'
             },
             {
+              text: 'B.5 DAPO',
+              link: '/appendix_code_cheatsheet/dapo'
+            },
+            {
               text: 'B.6 Softmax 与交叉熵',
               link: '/appendix_code_cheatsheet/softmax-ce'
             },
@@ -1442,10 +1446,6 @@ const zhSidebar = {
             {
               text: 'B.8 注意力机制',
               link: '/appendix_code_cheatsheet/attention-mha'
-            },
-            {
-              text: 'B.5 DAPO',
-              link: '/appendix_code_cheatsheet/dapo'
             }
           ]
         },
@@ -2303,6 +2303,10 @@ const enSidebar = {
               link: '/en/appendix_code_cheatsheet/grpo-rlvr'
             },
             {
+              text: 'B.5 DAPO',
+              link: '/en/appendix_code_cheatsheet/dapo'
+            },
+            {
               text: 'B.6 Softmax and Cross-Entropy',
               link: '/en/appendix_code_cheatsheet/softmax-ce'
             },
@@ -2313,10 +2317,6 @@ const enSidebar = {
             {
               text: 'B.8 Attention Mechanism',
               link: '/en/appendix_code_cheatsheet/attention-mha'
-            },
-            {
-              text: 'B.5 DAPO',
-              link: '/en/appendix_code_cheatsheet/dapo'
             }
           ]
         },

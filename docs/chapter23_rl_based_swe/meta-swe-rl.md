@@ -8,7 +8,7 @@
 
 这一节我们详细看 Meta SWE-RL 的数据、算法、工程细节。
 
-## 12.2.1 数据规模与构成
+## 21.1.1 数据规模与构成
 
 Meta SWE-RL 的训练数据来源：
 
@@ -44,7 +44,7 @@ Meta 报告了几个数据清洗的关键步骤：
 
 这些过滤让最终数据质量显著提升。Meta 报告，过滤前的数据训练效果差，过滤后效果大幅改善——**数据质量 > 数据数量**。
 
-## 12.2.2 算法 与 GRPO + 简单 reward
+## 21.1.2 算法：GRPO + 简单奖励
 
 Meta SWE-RL 的算法选择极其简单——**GRPO + 测试 binary reward**。
 
@@ -87,7 +87,7 @@ Meta 报告了几个 reward shaping 的尝试，结果都**比简单 binary 差*
 
 这印证了 R1-Zero 的发现：**简单 reward + 大规模 RL 是最好的组合**。
 
-## 12.2.3 工程细节 与 Context 管理
+## 21.1.3 工程细节：上下文管理
 
 SWE-RL 的 context 管理是个工程难点。一个完整的 SWE 任务可能涉及：
 
@@ -166,7 +166,7 @@ RAG 是工业上最常用的方法——简单、高效、与现有模型兼容�
 
 Meta SWE-RL 用的是**方法一 + 方法三的混合**——基础 context 用 RAG，工具调用让模型进一步探索。
 
-## 12.2.4 训练稳定性技巧
+## 21.1.4 训练稳定性技巧
 
 SWE-RL 训练稳定性比数学 RL 难——因为：
 
@@ -214,7 +214,7 @@ $\pi_{\text{ref}}$ 是 RL 前的模型（SFT 后的版本），$\beta$ 是约束
 
 这与 DeepSeek V3.2 "数学任务 zero KL" 形成对比——**SWE 需要保留代码风格，所以需要 KL**；数学是纯逻辑，不需要 KL。
 
-## 12.2.5 SWE-bench Verified 41.0%
+## 21.1.5 SWE-bench Verified 41.0%
 
 Meta SWE-RL 在 SWE-bench Verified 上的最终成绩：
 
@@ -230,7 +230,7 @@ Meta SWE-RL 在 SWE-bench Verified 上的最终成绩：
 
 Meta SWE-RL 是开源模型的 SOTA——证明了**用开源数据 + GRPO + 简单 reward，可以达到接近闭源的水平**。
 
-## 12.2.6 Meta SWE-RL 的局限
+## 21.1.6 Meta SWE-RL 的局限
 
 但 Meta SWE-RL 也有几个局限：
 
@@ -259,4 +259,4 @@ Meta SWE-RL 是开源 SWE-RL 的代表作。它的核心贡献是：
 - **工程**：context 管理、训练稳定性技巧
 - **结果**：SWE-bench Verified 41.0%（开源 SOTA）
 
-Meta SWE-RL 证明了 RLVR 在 SWE 领域的可行性。但它的局限（只支持 Python、长 horizon 不稳定、依赖测试）指向了下一节的话题——**怎么用 world model 让模型"模拟"代码执行，避免每次都跑真实测试**。
+Meta SWE-RL 证明了 RLVR 在 SWE 领域的可行性。但它的局限（只支持 Python、长 horizon 不稳定、依赖测试）也引出了 [21.2 Code World Model 与 DeepSWE](./world-model-and-deep-swe)：怎样用 world model 让模型模拟代码执行，减少对真实测试的依赖。

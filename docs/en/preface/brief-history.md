@@ -163,6 +163,47 @@ $$
 
 This lightweight design avoids training a separate critic network and uses the relative ranking within a group to drive learning, making large-scale reasoning RL more practical on clusters.
 
+## 5. Industrial Expansion: GRPO Families, Reasoning Models, and Agents (2025-2026)
+
+If 2024 made RLHF and GRPO widely understood, 2025-2026 moved them into industrial-scale systems. Three changes happened together: the GRPO family evolved quickly, reasoning models became a distinct product category, and Agentic RL entered production workflows.
+
+### 5.1 Four Directions in the GRPO Family
+
+Within a year of the R1 paper, open-source teams and industrial labs introduced several influential GRPO variants. Each one addresses a concrete training failure:
+
+- **DAPO** from ByteDance and Tsinghua University ([arXiv:2503.14476](https://arxiv.org/abs/2503.14476)) targets length growth and inefficient sampling in R1-Zero. It combines asymmetric clipping, dynamic sampling, token-level loss, and overlong-sample filtering. On AIME 2024, it surpassed R1-Zero with about half as many training steps.
+- **Dr.GRPO** ([arXiv:2503.20783](https://arxiv.org/abs/2503.20783)) shows that standard-deviation normalization and length normalization can bias optimization, encourage reward hacking, and inflate response length. Removing them produces a more stable update.
+- **GSPO** from the Qwen3 team ([arXiv:2507.18071](https://arxiv.org/abs/2507.18071)) moves importance sampling from the token level to the sequence level. It was designed for stable RL training of mixture-of-experts models and became a foundation of the Qwen3 training stack.
+- **CISPO** from MiniMax ([arXiv:2506.13585](https://arxiv.org/abs/2506.13585)) clips importance weights instead of clipping token updates. This preserves gradient contributions from all tokens and, together with lightning attention, improves training throughput.
+- **VAPO** from ByteDance Seed ([arXiv:2504.05118](https://arxiv.org/abs/2504.05118)) takes the opposite direction and restores a value model. Its results show that a critic can still be useful for long-chain-of-thought tasks.
+
+By early 2026, choosing a GRPO variant had become an engineering decision based on model architecture, response length, verifier behavior, and available compute.
+
+### 5.2 Reasoning Models and Formal RL
+
+OpenAI's o1, o3, and o4 series established **test-time compute scaling** as a new scaling dimension. Anthropic's 2025 study [Competitive Programming with Large Reasoning Models](https://arxiv.org/abs/2502.06807) reported that complex test-time strategies on IOI and Codeforces emerged from end-to-end RL rather than from a hand-written search procedure.
+
+Formal reasoning developed in parallel. DeepMind's **AlphaProof** and **AlphaGeometry 2** combined formal languages with AlphaZero-style search and reached silver-medal performance at the International Mathematical Olympiad. **DeepSeek-Prover-V2** ([arXiv:2504.21801](https://arxiv.org/abs/2504.21801)) continued this direction. Lean4 acts as a deterministic verifier, turning proof correctness into a precise reward signal and creating a new setting for process-reward and verifier research.
+
+### 5.3 Agentic RL Enters Production
+
+Another major shift was the move from single-turn answers to long-horizon tasks:
+
+- Meta's **SWE-RL** ([arXiv:2502.18449](https://arxiv.org/abs/2502.18449)) trained Llama-3-70B from GitHub pull requests and reached 41 percent on SWE-bench Verified.
+- Anthropic's **Claude Computer Use** and OpenAI's **Operator** let models act directly in browsers and desktop interfaces.
+- ByteDance's **UI-TARS-2** ([arXiv:2509.02544](https://arxiv.org/abs/2509.02544)) and Zhipu AI's **AutoGLM** extended RL to multi-turn GUI agents and asynchronous rollout systems.
+- Training infrastructure expanded from model generation alone to environment execution, sandboxing, trajectory storage, tool scheduling, and long-horizon credit assignment.
+
+The optimization target therefore changed. A model was no longer rewarded only for one final response; it had to learn when to search, call a tool, inspect an observation, recover from an error, and stop.
+
+### 5.4 The Rise of Chinese AI Labs
+
+Chinese labs played a distinct role in this industrial expansion. DeepSeek published unusually detailed compute and training information for V3 and R1-Zero. Qwen3 adopted GSPO as a central RL method. Kimi K2 introduced the MuonClip optimizer for training stability ([arXiv:2507.20534](https://arxiv.org/abs/2507.20534)). ByteDance contributed DAPO, VAPO, UI-TARS, DanceGRPO, and Seedance across reasoning, agents, and visual generation. Zhipu AI's GLM-4.5 and later models made difficulty-based RL curricula a mainstream training strategy ([arXiv:2508.06471](https://arxiv.org/abs/2508.06471)). StepFun's Step3-VL introduced PaCoRe-style parallel coordinated reasoning as another route for test-time scaling.
+
+At the same time, safety and training boundaries became active research topics. Anthropic's [Natural Emergent Misalignment from Reward Hacking](https://arxiv.org/abs/2511.18397) studied misaligned behavior that can emerge naturally during RL. Microsoft's Reinforcement Pre-Training ([arXiv:2506.08007](https://arxiv.org/abs/2506.08007)) moved RL into pre-training, while DeepMind's AlphaEvolve combined language models, evolutionary search, and automatic evaluators for algorithm discovery.
+
+RL traveled from nineteenth-century puzzle-box experiments to industrial clusters running reasoning models and agents. Its operational core remains the same: an agent acts in an environment, receives feedback, and improves behavior toward higher cumulative return.
+
 ## Takeaway
 
 From Thorndike's puzzle box, to Bellman's equations; from DQN on Atari, to today's fast-iterating post-training pipelines with DPO and GRPO: the history of RL is the story of agents that **learn from environments, evolve from feedback, and scale from small systems to giant models**.
