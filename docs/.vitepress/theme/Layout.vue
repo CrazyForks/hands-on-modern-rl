@@ -23,7 +23,7 @@ import TextType from './components/TextType.vue'
 import mediumZoom from 'medium-zoom'
 import { initGithubStars } from './githubStars.js'
 
-const { frontmatter, site, theme, isDark } = useData()
+const { frontmatter, site, theme, isDark, page } = useData()
 const route = useRoute()
 const router = useRouter()
 
@@ -47,6 +47,10 @@ const DEFAULT_DOC_WIDTH = 980
 const DEFAULT_SIDEBAR_WIDTH = 280
 const MIN_SIDEBAR_WIDTH = 264
 const MAX_SIDEBAR_WIDTH = 520
+const ROUTE_LOADING_DELAY_MS = 120
+const ROUTE_LOADING_TIMEOUT_MS = 5000
+const ROUTE_RECOVERY_MAX_ATTEMPTS = 5
+const ROUTE_RECOVERY_BASE_DELAY_MS = 400
 
 const fontSize = ref(DEFAULT_FONT_SIZE)
 const lineHeight = ref(DEFAULT_LINE_HEIGHT)
@@ -196,6 +200,9 @@ let sidebarObserver = null
 let navigationSyncTimer = null
 let routeLoadingTimer = null
 let routeLoadingFallbackTimer = null
+let routeRecoveryTimer = null
+let routeRecoveryPath = ''
+let routeRecoveryAttempts = 0
 let zoom = null
 let mermaidViewerDragState = null
 
@@ -402,6 +409,14 @@ function showRouteLoading() {
   window.clearTimeout(routeLoadingTimer)
   window.clearTimeout(routeLoadingFallbackTimer)
   routeLoading.value = false
+
+  routeLoadingTimer = window.setTimeout(() => {
+    routeLoading.value = true
+  }, ROUTE_LOADING_DELAY_MS)
+
+  routeLoadingFallbackTimer = window.setTimeout(() => {
+    routeLoading.value = false
+  }, ROUTE_LOADING_TIMEOUT_MS)
 }
 
 function updateSupportQrRatio(event) {
@@ -419,7 +434,60 @@ function openSupportQrViewer(event) {
 function hideRouteLoading() {
   window.clearTimeout(routeLoadingTimer)
   window.clearTimeout(routeLoadingFallbackTimer)
+  routeLoadingTimer = null
+  routeLoadingFallbackTimer = null
   routeLoading.value = false
+}
+
+function normalizeNavigationPath(path) {
+  if (!path) return '/'
+  const withoutHash = path.split(/[?#]/, 1)[0]
+  const withoutHtml = withoutHash.replace(/\.html$/, '')
+  return withoutHtml === '/' ? '/' : withoutHtml.replace(/\/$/, '')
+}
+
+function isPrimaryNavigationRoute(path) {
+  const normalizedPath = normalizeNavigationPath(path)
+  return (theme.value.nav || []).some(
+    (item) => normalizeNavigationPath(item.link) === normalizedPath
+  )
+}
+
+function clearRouteRecovery() {
+  window.clearTimeout(routeRecoveryTimer)
+  routeRecoveryTimer = null
+  routeRecoveryPath = ''
+  routeRecoveryAttempts = 0
+}
+
+function scheduleRouteRecovery() {
+  const path = normalizeNavigationPath(mobileRoutePath.value)
+
+  if (!page.value.isNotFound || !isPrimaryNavigationRoute(path)) {
+    clearRouteRecovery()
+    return
+  }
+
+  if (routeRecoveryPath !== path) {
+    window.clearTimeout(routeRecoveryTimer)
+    routeRecoveryTimer = null
+    routeRecoveryPath = path
+    routeRecoveryAttempts = 0
+  }
+
+  if (
+    routeRecoveryTimer ||
+    routeRecoveryAttempts >= ROUTE_RECOVERY_MAX_ATTEMPTS
+  ) {
+    return
+  }
+
+  const delay = ROUTE_RECOVERY_BASE_DELAY_MS * 2 ** routeRecoveryAttempts
+  routeRecoveryTimer = window.setTimeout(async () => {
+    routeRecoveryTimer = null
+    routeRecoveryAttempts += 1
+    await router.go(window.location.href)
+  }, delay)
 }
 
 function clampMermaidViewerScale(value) {
@@ -952,9 +1020,12 @@ onMounted(() => {
     showRouteLoading()
   }
 
-  router.onAfterRouteChanged = () => {
+  router.onAfterRouteChange = () => {
     hideRouteLoading()
+    scheduleRouteRecovery()
   }
+
+  scheduleRouteRecovery()
 })
 
 onBeforeUnmount(() => {
@@ -963,8 +1034,9 @@ onBeforeUnmount(() => {
   cleanupMermaidViewer()
   closeMermaidViewer()
   hideRouteLoading()
+  clearRouteRecovery()
   router.onBeforeRouteChange = undefined
-  router.onAfterRouteChanged = undefined
+  router.onAfterRouteChange = undefined
   window.removeEventListener('resize', handleViewportResize)
   window.removeEventListener('keydown', handleWindowKeydown)
 })
@@ -1875,21 +1947,25 @@ watch(
 
 .ct-route-loading {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  left: 0;
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
+  height: 3px;
+  overflow: hidden;
+  pointer-events: none;
+  background: transparent;
 }
 
 .ct-route-loading-spinner {
-  width: 42px;
-  height: 42px;
-  border: 4px solid rgba(63, 81, 181, 0.16);
-  border-top-color: var(--vp-c-brand-1);
-  border-radius: 50%;
-  animation: ct-route-loading-spin 0.76s linear infinite;
+  display: block;
+  width: 36%;
+  min-width: 120px;
+  height: 100%;
+  border-radius: 0 999px 999px 0;
+  background: var(--vp-c-brand-1);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--vp-c-brand-1) 55%, transparent);
+  animation: ct-route-loading-progress 0.8s ease-in-out infinite;
 }
 
 .ct-route-loading-fade-enter-active,
@@ -1902,18 +1978,17 @@ watch(
   opacity: 0;
 }
 
-.dark .ct-route-loading {
-  background: #1b1b1f;
-}
-
 .dark .ct-route-loading-spinner {
-  border-color: rgba(154, 168, 255, 0.22);
-  border-top-color: #9aa8ff;
+  background: #9aa8ff;
 }
 
-@keyframes ct-route-loading-spin {
+@keyframes ct-route-loading-progress {
+  from {
+    transform: translateX(-110%);
+  }
+
   to {
-    transform: rotate(360deg);
+    transform: translateX(290%);
   }
 }
 
