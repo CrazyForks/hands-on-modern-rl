@@ -74,7 +74,42 @@ VISTA-Gym 可以和 GRPO 自然结合。对同一个图片+问题，模型生成
 
 这三个框架不是互相替代的，而是解决不同层面的问题。VLM GRPO 是"基础训练"——用固定的数据集和规则奖励打好基础。VisPlay 是"持续进化"——通过自我博弈来突破静态数据的限制。VISTA-Gym 是"可靠性增强"——通过工具调用来验证推理过程。在实际应用中，这三者可以串联使用：先用 GRPO 打基础，再用 VisPlay 做持续优化，最后用 VISTA-Gym 做可靠性验证。
 
-## 11.3.4 VLM RL 的前沿方向
+## 11.3.4 VeRL-Omni：多模态生成 RL 的训练框架
+
+VisPlay、VISTA-Gym 和 VLM GRPO 实验重点在**算法思路**——提问者与推理者协同、工具增强推理、组内相对优势。要把这些想法（或更广泛的视觉生成 RL 想法）跑成可复现、可扩展的工业级实验，还需要一套面向多模态**生成**模型的训练基础设施。本节介绍 [VeRL-Omni](https://github.com/verl-project/verl-omni)——基于 [veRL](https://github.com/verl-project/verl) 构建、专注于扩散模型与全模态模型的 RL 后训练框架。
+
+### 框架定位与适用范围
+
+VeRL-Omni 面向三类生成模型的 RL 后训练：
+
+1. **扩散生成模型**（图像、视频、音频）——如 Qwen-Image、Wan2.2
+2. **统一多模态理解+生成模型**——如 BAGEL、HunyuanImage-3.0
+3. **全模态模型**（文本、图像、音频、视频联合处理）——如 Qwen3-Omni
+
+它和本章其他内容的关系可以这样理解：
+
+| | VLM GRPO（11.1 手写实验） | EasyR1（11.4 GeoQA 实验） | VisPlay / VISTA-Gym | VeRL-Omni |
+| --- | --- | --- | --- | --- |
+| **层级** | 教学/demo | VLM **理解** RL 工业框架 | 研究型算法/环境 | 多模态**生成** RL 工业框架 |
+| **优化对象** | 文本回答 token | 文本回答 token | 双模型博弈 / 工具轨迹 | 扩散去噪轨迹 / 生成 latent |
+| **典型奖励** | 规则（正确性+格式） | 规则 + GeoQA 验证 | 博弈信号 / 工具效率 | 偏好模型、OCR、GenRM 等 |
+| **何时选用** | 理解 GRPO 原理 | 在真实 VLM 数据集上跑理解 RL | 探索前沿研究方向 | 做图像/视频/全模态生成 RL |
+
+### 何时该用 VeRL-Omni
+
+建议在以下场景考虑 VeRL-Omni：
+
+- **已完成本章 VLM GRPO 或 EasyR1 实验**，理解了 RL 后训练的基本流程（采样 → 打分 → 策略更新），准备进入**视觉生成** RL（FlowGRPO、DanceGRPO 等）。
+- **需要训练扩散或全模态生成模型**，而非仅优化 VLM 的文本回答质量。
+- **需要工程级吞吐与稳定性**：VeRL-Omni 集成 [vLLM-Omni](https://github.com/vllm-project/vllm-omni) 做快速 rollout、支持异步多奖励计算、FSDP2 分布式训练等；在参考 Qwen-Image FlowGRPO 设置上，端到端吞吐约为 diffusers 版 [flow_grpo](https://github.com/yifan123/flow_grpo) 的 **~25%** 提升。
+
+VeRL-Omni **不是** VisPlay 或 VISTA-Gym 的直接替代品——后两者解决的是 VLM **理解**侧的研究问题；VeRL-Omni 提供的是把生成侧 RL 算法（FlowGRPO、Diffusion DPO、GSPO 等）落地为可复现实验的**训练栈**。如果你仍在 GeoQA 这类 VLM 理解任务上迭代，应优先使用 EasyR1 或 veRL 原版。
+
+### 与后续内容的衔接
+
+下一节我们将从"视觉理解"转向"视觉生成"——讨论 Diffusion 如何把去噪过程写成 MDP、如何用 DDPO 做策略梯度更新。VeRL-Omni 正是把这些生成侧算法（FlowGRPO、DanceGRPO、DiffusionNFT 等）工程化落地的框架；学完算法原理后，可以直接在 [VeRL-Omni 文档](https://verl-omni.readthedocs.io/en/latest/index.html) 中找到对应的 Quickstart 和 recipe。
+
+## 11.3.5 VLM RL 的前沿方向
 
 VLM RL 是一个快速发展的领域，以下几个方向值得关注：
 
@@ -155,7 +190,7 @@ def robot_vlm_rl_train(vlm, simulator, num_episodes=10000):
                   f"评估奖励: {eval_reward:.1f}")
 ```
 
-## 11.3.5 从文本 RL 到多模态 RL 与 回顾与展望
+## 11.3.6 从文本 RL 到多模态 RL 与 回顾与展望
 
 回顾前面章节的完整学习路径，我们看到 RL 从最简单的表格方法一路发展到了多模态的复杂场景：
 
@@ -181,7 +216,7 @@ def robot_vlm_rl_train(vlm, simulator, num_episodes=10000):
 
 VLM RL 是当前最活跃的研究方向之一。从 GPT-4V 到 Gemini，从 LLaVA 到 Qwen-VL，每一个多模态大模型的发布都伴随着 RL 训练方法的改进。这个领域还有太多未解决的问题——视觉幻觉、奖励归因、安全性与效率的权衡、从仿真到现实的迁移……每一个问题的解决都可能催生新的应用场景。
 
-## 11.3.6 从 VLM RL 到多模态 Agent
+## 11.3.7 从 VLM RL 到多模态 Agent
 
 VLM RL 训练出的是"能看懂图的模型"。但真实场景中，用户需要的往往是"能看懂图、还能动手操作"的智能体——比如截图理解 + 自动操作（GUI Agent）、图表分析 + 数据查询（Data Agent）。这就是从 VLM RL 到多模态 Agent 的跨越：**视觉理解 + 工具调用**。
 
@@ -231,9 +266,10 @@ def multimodal_agent_reward(trajectory, task):
 
 关键原则：**先单独验证视觉理解和工具调用各自达标，再做端到端联合训练**。如果基础组件有问题，联合训练也救不回来。
 
-下一节我们把视角从"视觉理解"转到"视觉生成"——看看 Diffusion 和视频生成模型如何通过 RL 后训练提升文本对齐、视觉质量和指令遵循能力。
+下一节我们把视角从"视觉理解"转到"视觉生成"——看看 Diffusion 和视频生成模型如何通过 RL 后训练提升文本对齐、视觉质量和指令遵循能力。实践中可直接参考 11.3.4 介绍的 VeRL-Omni 框架。
 
 ## 参考资料
 
 - [VisPlay Project Page](https://bruno686.github.io/VisPlay/) —— 展示了 Image-Conditioned Questioner 与 Multimodal Reasoner 协同训练的整体框架。
 - [VISTA-Gym / VISTA-R1 Blog](https://www.eigenai.com/blog/vista-gym-vista-r1) —— 展示了工具增强视觉问答环境、VISTA-R1 主结果和消融分析。
+- [VeRL-Omni](https://github.com/verl-project/verl-omni) —— 面向扩散模型与全模态模型的 RL 后训练框架，含 [文档](https://verl-omni.readthedocs.io/en/latest/index.html) 与 FlowGRPO / DanceGRPO 等 recipe。
