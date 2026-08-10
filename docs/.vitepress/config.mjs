@@ -1476,96 +1476,120 @@ const zhSidebar = {
           collapsed: false,
           items: [
             {
-              text: 'D.1.1 向量与矩阵',
-              link: '/appendix_math/linear-algebra-basics'
+              text: 'D.1 线性代数',
+              collapsed: false,
+              items: [
+                {
+                  text: 'D.1.1 向量与矩阵',
+                  link: '/appendix_math/linear-algebra-basics'
+                },
+                {
+                  text: 'D.1.2 贝尔曼方程的矩阵形式',
+                  link: '/appendix_math/linear-algebra-bellman'
+                },
+                {
+                  text: 'D.1.3 点积、范数与函数近似',
+                  link: '/appendix_math/linear-algebra-function-approx'
+                },
+                {
+                  text: 'D.1.4 收敛性、特征值与信任域',
+                  link: '/appendix_math/linear-algebra-advanced'
+                },
+                {
+                  text: 'D.1.5 线性代数公式速查与练习',
+                  link: '/appendix_math/linear-algebra-formulas-exercises'
+                }
+              ]
             },
             {
-              text: 'D.1.2 贝尔曼方程的矩阵形式',
-              link: '/appendix_math/linear-algebra-bellman'
+              text: 'D.2 概率、期望与随机估计',
+              collapsed: false,
+              items: [
+                {
+                  text: 'D.2.1 概率、条件概率与期望',
+                  link: '/appendix_math/probability-basics'
+                },
+                {
+                  text: 'D.2.2 从随机轨迹到状态价值',
+                  link: '/appendix_math/probability-value'
+                },
+                {
+                  text: 'D.2.3 蒙特卡洛、增量平均与重要性采样',
+                  link: '/appendix_math/probability-sampling'
+                },
+                {
+                  text: 'D.2.4 轨迹概率、Baseline 与 GAE',
+                  link: '/appendix_math/probability-trajectory-td'
+                },
+                {
+                  text: 'D.2.5 贝尔曼期望方程与动作价值',
+                  link: '/appendix_math/probability-bellman-advanced'
+                },
+                {
+                  text: 'D.2.6 概率统计公式速查与练习',
+                  link: '/appendix_math/probability-formulas-exercises'
+                }
+              ]
             },
             {
-              text: 'D.1.3 点积、范数与函数近似',
-              link: '/appendix_math/linear-algebra-function-approx'
+              text: 'D.3 微积分与优化',
+              collapsed: false,
+              items: [
+                {
+                  text: 'D.3.1 导数、梯度与链式法则',
+                  link: '/appendix_math/calculus-basics'
+                },
+                {
+                  text: 'D.3.2 策略梯度与优势函数',
+                  link: '/appendix_math/calculus-policy-gradient'
+                },
+                {
+                  text: 'D.3.3 PPO 裁剪、Adam 与更新稳定性',
+                  link: '/appendix_math/calculus-ppo'
+                },
+                {
+                  text: 'D.3.4 策略梯度、Taylor 与 GRPO 推导',
+                  link: '/appendix_math/calculus-derivations'
+                },
+                {
+                  text: 'D.3.5 PG、DQN、GAE、PPO、GRPO 完整公式',
+                  link: '/appendix_math/calculus-advanced-formulas'
+                },
+                {
+                  text: 'D.3.6 微积分与优化公式速查与练习',
+                  link: '/appendix_math/calculus-formulas-exercises'
+                }
+              ]
             },
             {
-              text: 'D.1.4 收敛性、特征值与信任域',
-              link: '/appendix_math/linear-algebra-advanced'
-            },
-            {
-              text: 'D.1.5 线性代数公式速查与练习',
-              link: '/appendix_math/linear-algebra-formulas-exercises'
-            },
-            {
-              text: 'D.2.1 概率、条件概率与期望',
-              link: '/appendix_math/probability-basics'
-            },
-            {
-              text: 'D.2.2 从随机轨迹到状态价值',
-              link: '/appendix_math/probability-value'
-            },
-            {
-              text: 'D.2.3 蒙特卡洛、增量平均与重要性采样',
-              link: '/appendix_math/probability-sampling'
-            },
-            {
-              text: 'D.2.4 轨迹概率、Baseline 与 GAE',
-              link: '/appendix_math/probability-trajectory-td'
-            },
-            {
-              text: 'D.2.5 贝尔曼期望方程与动作价值',
-              link: '/appendix_math/probability-bellman-advanced'
-            },
-            {
-              text: 'D.2.6 概率统计公式速查与练习',
-              link: '/appendix_math/probability-formulas-exercises'
-            },
-            {
-              text: 'D.3.1 导数、梯度与链式法则',
-              link: '/appendix_math/calculus-basics'
-            },
-            {
-              text: 'D.3.2 策略梯度与优势函数',
-              link: '/appendix_math/calculus-policy-gradient'
-            },
-            {
-              text: 'D.3.3 PPO 裁剪、Adam 与更新稳定性',
-              link: '/appendix_math/calculus-ppo'
-            },
-            {
-              text: 'D.3.4 策略梯度、Taylor 与 GRPO 推导',
-              link: '/appendix_math/calculus-derivations'
-            },
-            {
-              text: 'D.3.5 PG、DQN、GAE、PPO、GRPO 完整公式',
-              link: '/appendix_math/calculus-advanced-formulas'
-            },
-            {
-              text: 'D.3.6 微积分与优化公式速查与练习',
-              link: '/appendix_math/calculus-formulas-exercises'
-            },
-            {
-              text: 'D.4.1 自信息、熵与探索',
-              link: '/appendix_math/information-basics'
-            },
-            {
-              text: 'D.4.2 交叉熵与 KL 散度',
-              link: '/appendix_math/information-cross-entropy-kl'
-            },
-            {
-              text: 'D.4.3 PPO、RLHF 与 DPO 中的信息论',
-              link: '/appendix_math/information-rlhf-dpo'
-            },
-            {
-              text: 'D.4.4 互信息与表征学习',
-              link: '/appendix_math/information-mutual-info'
-            },
-            {
-              text: 'D.4.5 KL、RLHF、DPO 与互信息完整公式',
-              link: '/appendix_math/information-advanced-formulas'
-            },
-            {
-              text: 'D.4.6 信息论公式速查与练习',
-              link: '/appendix_math/information-formulas-exercises'
+              text: 'D.4 信息论与分布距离',
+              collapsed: false,
+              items: [
+                {
+                  text: 'D.4.1 自信息、熵与探索',
+                  link: '/appendix_math/information-basics'
+                },
+                {
+                  text: 'D.4.2 交叉熵与 KL 散度',
+                  link: '/appendix_math/information-cross-entropy-kl'
+                },
+                {
+                  text: 'D.4.3 PPO、RLHF 与 DPO 中的信息论',
+                  link: '/appendix_math/information-rlhf-dpo'
+                },
+                {
+                  text: 'D.4.4 互信息与表征学习',
+                  link: '/appendix_math/information-mutual-info'
+                },
+                {
+                  text: 'D.4.5 KL、RLHF、DPO 与互信息完整公式',
+                  link: '/appendix_math/information-advanced-formulas'
+                },
+                {
+                  text: 'D.4.6 信息论公式速查与练习',
+                  link: '/appendix_math/information-formulas-exercises'
+                }
+              ]
             }
           ]
         }
@@ -2322,96 +2346,120 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: 'D.1.1 Vectors and Matrices',
-              link: '/en/appendix_math/linear-algebra-basics'
+              text: 'D.1 Linear Algebra',
+              collapsed: false,
+              items: [
+                {
+                  text: 'D.1.1 Vectors and Matrices',
+                  link: '/en/appendix_math/linear-algebra-basics'
+                },
+                {
+                  text: 'D.1.2 Matrix Form of the Bellman Equation',
+                  link: '/en/appendix_math/linear-algebra-bellman'
+                },
+                {
+                  text: 'D.1.3 Dot Products, Norms, and Function Approximation',
+                  link: '/en/appendix_math/linear-algebra-function-approx'
+                },
+                {
+                  text: 'D.1.4 Convergence, Eigenvalues, and Trust Regions',
+                  link: '/en/appendix_math/linear-algebra-advanced'
+                },
+                {
+                  text: 'D.1.5 Formula Review and Exercises',
+                  link: '/en/appendix_math/linear-algebra-formulas-exercises'
+                }
+              ]
             },
             {
-              text: 'D.1.2 Matrix Form of the Bellman Equation',
-              link: '/en/appendix_math/linear-algebra-bellman'
+              text: 'D.2 Probability, Expectation, and Random Estimation',
+              collapsed: false,
+              items: [
+                {
+                  text: 'D.2.1 Probability, Conditional Probability, and Expectation',
+                  link: '/en/appendix_math/probability-basics'
+                },
+                {
+                  text: 'D.2.2 From Random Trajectories to State Values',
+                  link: '/en/appendix_math/probability-value'
+                },
+                {
+                  text: 'D.2.3 Monte Carlo, Incremental Averages, and Importance Sampling',
+                  link: '/en/appendix_math/probability-sampling'
+                },
+                {
+                  text: 'D.2.4 Trajectory Probability, Baselines, and GAE',
+                  link: '/en/appendix_math/probability-trajectory-td'
+                },
+                {
+                  text: 'D.2.5 Bellman Expectation Equation and Action Values',
+                  link: '/en/appendix_math/probability-bellman-advanced'
+                },
+                {
+                  text: 'D.2.6 Probability and Statistics Formula Reference and Exercises',
+                  link: '/en/appendix_math/probability-formulas-exercises'
+                }
+              ]
             },
             {
-              text: 'D.1.3 Dot Products, Norms, and Function Approximation',
-              link: '/en/appendix_math/linear-algebra-function-approx'
+              text: 'D.3 Calculus and Optimization',
+              collapsed: false,
+              items: [
+                {
+                  text: 'D.3.1 Derivatives, Gradients, and the Chain Rule',
+                  link: '/en/appendix_math/calculus-basics'
+                },
+                {
+                  text: 'D.3.2 Policy Gradients and Advantage Functions',
+                  link: '/en/appendix_math/calculus-policy-gradient'
+                },
+                {
+                  text: 'D.3.3 PPO Clipping, Adam, and Update Stability',
+                  link: '/en/appendix_math/calculus-ppo'
+                },
+                {
+                  text: 'D.3.4 Policy Gradient, Taylor, and GRPO Derivations',
+                  link: '/en/appendix_math/calculus-derivations'
+                },
+                {
+                  text: 'D.3.5 Complete Formulas for PG, DQN, GAE, PPO, and GRPO',
+                  link: '/en/appendix_math/calculus-advanced-formulas'
+                },
+                {
+                  text: 'D.3.6 Calculus and Optimization Formula Reference and Exercises',
+                  link: '/en/appendix_math/calculus-formulas-exercises'
+                }
+              ]
             },
             {
-              text: 'D.1.4 Convergence, Eigenvalues, and Trust Regions',
-              link: '/en/appendix_math/linear-algebra-advanced'
-            },
-            {
-              text: 'D.1.5 Formula Review and Exercises',
-              link: '/en/appendix_math/linear-algebra-formulas-exercises'
-            },
-            {
-              text: 'D.2.1 Probability, Conditional Probability, and Expectation',
-              link: '/en/appendix_math/probability-basics'
-            },
-            {
-              text: 'D.2.2 From Random Trajectories to State Values',
-              link: '/en/appendix_math/probability-value'
-            },
-            {
-              text: 'D.2.3 Monte Carlo, Incremental Averages, and Importance Sampling',
-              link: '/en/appendix_math/probability-sampling'
-            },
-            {
-              text: 'D.2.4 Trajectory Probability, Baselines, and GAE',
-              link: '/en/appendix_math/probability-trajectory-td'
-            },
-            {
-              text: 'D.2.5 Bellman Expectation Equation and Action Values',
-              link: '/en/appendix_math/probability-bellman-advanced'
-            },
-            {
-              text: 'D.2.6 Probability and Statistics Formula Reference and Exercises',
-              link: '/en/appendix_math/probability-formulas-exercises'
-            },
-            {
-              text: 'D.3.1 Derivatives, Gradients, and the Chain Rule',
-              link: '/en/appendix_math/calculus-basics'
-            },
-            {
-              text: 'D.3.2 Policy Gradients and Advantage Functions',
-              link: '/en/appendix_math/calculus-policy-gradient'
-            },
-            {
-              text: 'D.3.3 PPO Clipping, Adam, and Update Stability',
-              link: '/en/appendix_math/calculus-ppo'
-            },
-            {
-              text: 'D.3.4 Policy Gradient, Taylor, and GRPO Derivations',
-              link: '/en/appendix_math/calculus-derivations'
-            },
-            {
-              text: 'D.3.5 Complete Formulas for PG, DQN, GAE, PPO, and GRPO',
-              link: '/en/appendix_math/calculus-advanced-formulas'
-            },
-            {
-              text: 'D.3.6 Calculus and Optimization Formula Reference and Exercises',
-              link: '/en/appendix_math/calculus-formulas-exercises'
-            },
-            {
-              text: 'D.4.1 Self-Information, Entropy, and Exploration',
-              link: '/en/appendix_math/information-basics'
-            },
-            {
-              text: 'D.4.2 Cross-Entropy and KL Divergence',
-              link: '/en/appendix_math/information-cross-entropy-kl'
-            },
-            {
-              text: 'D.4.3 Information Theory in PPO, RLHF, and DPO',
-              link: '/en/appendix_math/information-rlhf-dpo'
-            },
-            {
-              text: 'D.4.4 Mutual Information and Representation Learning',
-              link: '/en/appendix_math/information-mutual-info'
-            },
-            {
-              text: 'D.4.5 Complete Formulas for KL, RLHF, DPO, and Mutual Information',
-              link: '/en/appendix_math/information-advanced-formulas'
-            },
-            {
-              text: 'D.4.6 Information Theory Formula Reference and Exercises',
-              link: '/en/appendix_math/information-formulas-exercises'
+              text: 'D.4 Information Theory and Distribution Distance',
+              collapsed: false,
+              items: [
+                {
+                  text: 'D.4.1 Self-Information, Entropy, and Exploration',
+                  link: '/en/appendix_math/information-basics'
+                },
+                {
+                  text: 'D.4.2 Cross-Entropy and KL Divergence',
+                  link: '/en/appendix_math/information-cross-entropy-kl'
+                },
+                {
+                  text: 'D.4.3 Information Theory in PPO, RLHF, and DPO',
+                  link: '/en/appendix_math/information-rlhf-dpo'
+                },
+                {
+                  text: 'D.4.4 Mutual Information and Representation Learning',
+                  link: '/en/appendix_math/information-mutual-info'
+                },
+                {
+                  text: 'D.4.5 Complete Formulas for KL, RLHF, DPO, and Mutual Information',
+                  link: '/en/appendix_math/information-advanced-formulas'
+                },
+                {
+                  text: 'D.4.6 Information Theory Formula Reference and Exercises',
+                  link: '/en/appendix_math/information-formulas-exercises'
+                }
+              ]
             }
           ]
         }
