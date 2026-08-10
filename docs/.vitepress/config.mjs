@@ -2598,36 +2598,6 @@ const enSidebar = {
   ]
 }
 
-const sidebarOverviewPattern =
-  /^(?:\d+|[A-Z](?:\.\d+)*)\.0 (?:本章导读|附录导读|概览|Chapter Overview|Appendix Overview|Overview)$/
-
-function mergeSidebarOverviews(sidebar) {
-  function visit(items) {
-    for (const item of items || []) {
-      if (!item.items?.length) continue
-
-      const [overview, ...remainingItems] = item.items
-      if (
-        !item.link &&
-        overview?.link &&
-        sidebarOverviewPattern.test(overview.text)
-      ) {
-        item.link = overview.link
-        if (remainingItems.length) {
-          item.items = remainingItems
-        } else {
-          delete item.items
-          delete item.collapsed
-        }
-      }
-
-      visit(item.items)
-    }
-  }
-
-  Object.values(sidebar).forEach(visit)
-}
-
 function findSidebarItem(items, textPrefix) {
   for (const item of items || []) {
     if (item.text?.startsWith(textPrefix)) return item
@@ -2670,7 +2640,6 @@ function groupSidebarLessons(sidebar, chapterPrefix, groups) {
 }
 
 function compactCourseSidebar(sidebar, groups) {
-  mergeSidebarOverviews(sidebar)
   groups.forEach(({ chapter, sections }) =>
     groupSidebarLessons(sidebar, chapter, sections)
   )

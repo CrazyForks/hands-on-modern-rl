@@ -57,6 +57,7 @@ const supportQrWide = ref(true)
 const sidebarCollapsed = ref(false)
 const sidebarWidth = ref(DEFAULT_SIDEBAR_WIDTH)
 const sidebarResizing = ref(false)
+const allSidebarGroupsExpanded = ref(false)
 const routeLoading = ref(false)
 
 const mermaidViewerOpen = ref(false)
@@ -82,6 +83,9 @@ const mobileRoutePath = computed(() => {
 const isEnglishRoute = computed(
   () =>
     mobileRoutePath.value === '/en' || mobileRoutePath.value.startsWith('/en/')
+)
+const sidebarGroupsToggleLabel = computed(() =>
+  allSidebarGroupsExpanded.value ? 'Collapse all' : 'Expand all'
 )
 const currentLanguage = computed(() =>
   isEnglishRoute.value ? 'English' : '简体中文'
@@ -334,6 +338,18 @@ function toggleSidebar() {
   sidebarCollapsed.value = !sidebarCollapsed.value
 }
 
+function getSidebarGroups() {
+  if (typeof document === 'undefined') return []
+  return Array.from(document.querySelectorAll('.VPSidebarItem.collapsible'))
+}
+
+function syncSidebarGroupsExpanded() {
+  const groups = getSidebarGroups()
+  allSidebarGroupsExpanded.value =
+    groups.length > 0 &&
+    groups.every((groupEl) => !groupEl.classList.contains('collapsed'))
+}
+
 /**
  * 展开或折叠侧边栏里的全部可折叠分组。
  * VitePress 每个分组用 .VPSidebarItem.collapsible 渲染，collapsed 状态
@@ -341,9 +357,7 @@ function toggleSidebar() {
  * 所以一次遍历就能处理所有层级。
  */
 function setAllSidebarGroups(expand) {
-  const groups = Array.from(
-    document.querySelectorAll('.VPSidebarItem.collapsible')
-  )
+  const groups = getSidebarGroups()
 
   // 展开时先处理父级，收起时先处理子级，避免隐藏节点的点击冒泡
   // 反复切换父级，导致“全部收起”最终又回到展开状态。
@@ -356,19 +370,20 @@ function setAllSidebarGroups(expand) {
       toggleEl && toggleEl.click()
     }
   })
+
+  syncSidebarGroupsExpanded()
 }
 
-function expandAllSidebarGroups() {
-  setAllSidebarGroups(true)
-}
-
-function collapseAllSidebarGroups() {
-  setAllSidebarGroups(false)
+function toggleAllSidebarGroups() {
+  const shouldExpand = !allSidebarGroupsExpanded.value
+  setAllSidebarGroups(shouldExpand)
 
   // 长目录收起后高度会骤减。归位到顶部，避免首个分组被吸顶工具栏遮住。
-  requestAnimationFrame(() => {
-    getSidebarScrollContainer()?.scrollTo({ top: 0 })
-  })
+  if (!shouldExpand) {
+    requestAnimationFrame(() => {
+      getSidebarScrollContainer()?.scrollTo({ top: 0 })
+    })
+  }
 }
 
 function closeReadingTools() {
@@ -871,6 +886,8 @@ function initNavigationSync() {
             scrollSidebarToActiveItem(target)
           }
         }
+
+        syncSidebarGroupsExpanded()
       })
 
       sidebarObserver.observe(sidebarContainer, {
@@ -883,6 +900,8 @@ function initNavigationSync() {
       if (currentSidebarActive) {
         scrollSidebarToActiveItem(currentSidebarActive)
       }
+
+      syncSidebarGroupsExpanded()
     }
 
     updateSidebarEdgePosition()
@@ -921,6 +940,7 @@ onMounted(() => {
   window.addEventListener('resize', handleViewportResize)
   window.addEventListener('keydown', handleWindowKeydown)
   initNavigationSync()
+  window.requestAnimationFrame(syncSidebarGroupsExpanded)
   updateSidebarEdgePosition()
   initMediumZoom()
   initMermaidViewer()
@@ -1313,34 +1333,39 @@ watch(
           role="group"
           :aria-label="isEnglishRoute ? 'Sidebar controls' : '侧边栏分组控制'"
         >
-          <div class="ct-sidebar-groups-control">
-            <button
-              class="ct-sidebar-groups-button"
-              type="button"
-              title="Expand all"
-              aria-label="Expand all"
-              @click="expandAllSidebarGroups"
-            >
-              <ChevronsDown :size="14" :stroke-width="1.8" aria-hidden="true" />
-              <span>Expand all</span>
-            </button>
-            <button
-              class="ct-sidebar-groups-button"
-              type="button"
-              title="Collapse all"
-              aria-label="Collapse all"
-              @click="collapseAllSidebarGroups"
-            >
-              <ChevronsUp :size="14" :stroke-width="1.8" aria-hidden="true" />
-              <span>Collapse all</span>
-            </button>
+          <div class="ct-sidebar-toolbar-row">
+            <div class="ct-sidebar-groups-control">
+              <button
+                class="ct-sidebar-groups-button"
+                :class="{ 'is-collapse-action': allSidebarGroupsExpanded }"
+                type="button"
+                :title="sidebarGroupsToggleLabel"
+                :aria-label="sidebarGroupsToggleLabel"
+                :aria-expanded="allSidebarGroupsExpanded"
+                @click="toggleAllSidebarGroups"
+              >
+                <ChevronsUp
+                  v-if="allSidebarGroupsExpanded"
+                  :size="12"
+                  :stroke-width="1.8"
+                  aria-hidden="true"
+                />
+                <ChevronsDown
+                  v-else
+                  :size="12"
+                  :stroke-width="1.8"
+                  aria-hidden="true"
+                />
+                <span>{{ sidebarGroupsToggleLabel }}</span>
+              </button>
+            </div>
+            <SidebarFooter
+              class="ct-sidebar-toolbar-actions"
+              @open-settings="readingToolsOpen = true"
+            />
           </div>
         </div>
       </Teleport>
-    </template>
-
-    <template v-if="showDocChrome" #sidebar-nav-after>
-      <SidebarFooter @open-settings="readingToolsOpen = true" />
     </template>
 
     <template v-if="isHomePage && homeTypingText" #home-hero-info-after>
@@ -2321,7 +2346,7 @@ watch(
   }
 }
 
-/* 侧边栏「展开全部 / 全部收起」工具栏 */
+/* 侧边栏常驻工具栏 */
 .ct-sidebar-groups-toolbar {
   position: relative;
   z-index: 2;
@@ -2360,45 +2385,94 @@ watch(
 }
 
 .ct-sidebar-groups-control {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ct-sidebar-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px 4px;
 }
 
 .ct-sidebar-groups-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
   gap: 5px;
-  min-width: 0;
+  min-width: 94px;
   height: 28px;
-  padding: 0 6px;
+  padding: 0 4px;
   color: var(--vp-c-text-2);
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  border: 0;
+  border-radius: 7px;
   font-family: inherit;
   font-size: 12px;
-  font-weight: 520;
+  font-weight: 540;
+  letter-spacing: 0.005em;
   white-space: nowrap;
   cursor: pointer;
   transition:
     color 0.2s,
-    background-color 0.2s;
+    background-color 0.2s,
+    transform 0.2s;
+}
+
+.ct-sidebar-groups-button svg {
+  color: var(--vp-c-brand-1);
+  opacity: 0.58;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 
 .ct-sidebar-groups-button:hover {
   color: var(--vp-c-text-1);
-  background-color: var(--vp-c-bg-soft);
-  border-color: color-mix(in srgb, var(--vp-c-divider) 72%, transparent);
+  background-color: color-mix(in srgb, var(--vp-c-bg-soft) 76%, transparent);
+}
+
+.ct-sidebar-groups-button:hover svg {
+  opacity: 0.92;
+  transform: translateY(1px);
+}
+
+.ct-sidebar-groups-button.is-collapse-action:hover svg {
+  transform: translateY(-1px);
 }
 
 .ct-sidebar-groups-button:active {
   background-color: var(--vp-c-brand-soft);
+  transform: scale(0.98);
 }
 
 .ct-sidebar-groups-button:focus-visible {
-  outline: 2px solid var(--vp-c-brand-1);
+  outline: 2px solid color-mix(in srgb, var(--vp-c-brand-1) 68%, transparent);
   outline-offset: 1px;
+}
+
+@media (max-width: 959px) {
+  .ct-sidebar-groups-toolbar {
+    padding-top: 3px;
+    padding-bottom: 4px;
+  }
+
+  .ct-sidebar-groups-button {
+    min-width: 100px;
+    height: 30px;
+    padding-right: 6px;
+    padding-left: 6px;
+    font-size: 12.5px;
+  }
+
+  .ct-sidebar-toolbar-actions .ct-sidebar-footer-btn,
+  .ct-sidebar-toolbar-actions .ct-sidebar-footer-link {
+    width: 30px;
+    height: 30px;
+  }
 }
 </style>

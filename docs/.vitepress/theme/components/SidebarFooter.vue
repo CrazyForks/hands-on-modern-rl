@@ -3,9 +3,20 @@ import { useData } from 'vitepress'
 import { computed } from 'vue'
 import { Github, MessageCircle, Moon, Settings, Sun } from 'lucide-vue-next'
 
-const { isDark, theme } = useData()
+const { isDark, lang, theme } = useData()
 
 const emit = defineEmits(['open-settings'])
+
+const isEnglish = computed(() => lang.value.startsWith('en'))
+const appearanceLabel = computed(() => {
+  if (isEnglish.value) {
+    return isDark.value ? 'Switch to light mode' : 'Switch to dark mode'
+  }
+  return isDark.value ? '切换到浅色' : '切换到深色'
+})
+const settingsLabel = computed(() =>
+  isEnglish.value ? 'Reading and appearance settings' : '阅读与外观设置'
+)
 
 function toggleAppearance() {
   isDark.value = !isDark.value
@@ -27,18 +38,22 @@ const discordUrl = 'https://discord.gg/XU7DQmpqk'
       <div class="ct-sidebar-footer-actions">
         <button
           class="ct-sidebar-footer-btn"
-          :title="isDark ? '切换到浅色' : '切换到深色'"
+          type="button"
+          :title="appearanceLabel"
+          :aria-label="appearanceLabel"
           @click="toggleAppearance"
         >
-          <Sun v-if="isDark" :size="16" :stroke-width="2" />
-          <Moon v-else :size="16" :stroke-width="2" />
+          <Sun v-if="isDark" :size="16" :stroke-width="2" aria-hidden="true" />
+          <Moon v-else :size="16" :stroke-width="2" aria-hidden="true" />
         </button>
         <button
           class="ct-sidebar-footer-btn"
-          title="阅读与外观设置"
+          type="button"
+          :title="settingsLabel"
+          :aria-label="settingsLabel"
           @click="emit('open-settings')"
         >
-          <Settings :size="16" :stroke-width="2" />
+          <Settings :size="16" :stroke-width="2" aria-hidden="true" />
         </button>
       </div>
       <a
@@ -47,8 +62,9 @@ const discordUrl = 'https://discord.gg/XU7DQmpqk'
         target="_blank"
         rel="noopener noreferrer"
         title="Discord"
+        aria-label="Discord"
       >
-        <MessageCircle :size="16" :stroke-width="2" />
+        <MessageCircle :size="16" :stroke-width="2" aria-hidden="true" />
       </a>
       <a
         class="ct-sidebar-footer-link"
@@ -56,8 +72,9 @@ const discordUrl = 'https://discord.gg/XU7DQmpqk'
         target="_blank"
         rel="noopener noreferrer"
         title="GitHub"
+        aria-label="GitHub"
       >
-        <Github :size="16" :stroke-width="2" />
+        <Github :size="16" :stroke-width="2" aria-hidden="true" />
       </a>
     </div>
   </div>
