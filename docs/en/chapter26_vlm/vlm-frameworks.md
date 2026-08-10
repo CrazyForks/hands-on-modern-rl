@@ -78,7 +78,42 @@ Putting VisPlay, VISTA-Gym, and the VLM GRPO experiment from the previous sectio
 
 These three frameworks are not substitutes for each other; they solve problems at different levels. VLM GRPO is "basic training" — build foundations with a fixed dataset and rule rewards. VisPlay is "continuous evolution" — break through static data limits through self-play. VISTA-Gym is "reliability enhancement" — verify reasoning through tool calls. In practice, they can be used sequentially: first GRPO for foundations, then VisPlay for ongoing optimization, and finally VISTA-Gym for reliability verification.
 
-## 11.3.4 Frontiers of VLM RL
+## 11.3.4 VeRL-Omni: Training Framework for Multimodal Generative RL
+
+VisPlay, VISTA-Gym, and the VLM GRPO experiments focus on **algorithmic ideas** — questioner-reasoner co-evolution, tool-augmented reasoning, and within-group relative advantage. To turn these ideas (or broader visual-generation RL ideas) into reproducible, scalable experiments, you also need training infrastructure aimed at multimodal **generation** models. This section introduces [VeRL-Omni](https://github.com/verl-project/verl-omni) — an RL post-training framework built on [veRL](https://github.com/verl-project/verl), focused on diffusion and omni-modality models.
+
+### Scope and Positioning
+
+VeRL-Omni targets RL post-training for three families of generative models:
+
+1. **Diffusion generative models** (image, video, audio) — e.g., Qwen-Image, Wan2.2
+2. **Unified multimodal understanding + generation models** — e.g., BAGEL, HunyuanImage-3.0
+3. **Omni-modality models** that jointly handle text, image, audio, and video — e.g., Qwen3-Omni
+
+Its relationship to other material in this chapter:
+
+| | VLM GRPO (Sec 11.1 hands-on) | EasyR1 (Sec 11.4 GeoQA) | VisPlay / VISTA-Gym | VeRL-Omni |
+| --- | --- | --- | --- | --- |
+| **Level** | Teaching / demo | VLM **understanding** RL framework | Research algorithms / environments | Multimodal **generation** RL framework |
+| **Optimized object** | Text answer tokens | Text answer tokens | Dual-model game / tool trajectories | Diffusion denoising trajectories / generation latents |
+| **Typical rewards** | Rules (correctness + format) | Rules + GeoQA verification | Game signals / tool efficiency | Preference models, OCR, GenRM, etc. |
+| **When to choose** | Learn GRPO fundamentals | Run understanding RL on real VLM datasets | Explore frontier research | Image / video / omni-modality generation RL |
+
+### When Learners Should Use VeRL-Omni
+
+Consider VeRL-Omni when:
+
+- **You have completed this chapter's VLM GRPO or EasyR1 experiments** and understand the basic RL post-training loop (sample → score → policy update), and are ready to move into **visual generation** RL (FlowGRPO, DanceGRPO, etc.).
+- **You need to train diffusion or omni-modality generative models**, not just optimize a VLM's text answers.
+- **You need production-grade throughput and stability**: VeRL-Omni integrates [vLLM-Omni](https://github.com/vllm-project/vllm-omni) for fast rollout, supports asynchronous multi-reward computation, FSDP2 distributed training, and more. On the reference Qwen-Image FlowGRPO setup, end-to-end throughput is roughly **~25% higher** than the diffusers-based [flow_grpo](https://github.com/yifan123/flow_grpo) implementation.
+
+VeRL-Omni is **not** a direct substitute for VisPlay or VISTA-Gym — those address research problems on the VLM **understanding** side. VeRL-Omni provides the **training stack** for turning generation-side RL algorithms (FlowGRPO, Diffusion DPO, GSPO, etc.) into reproducible experiments. If you are still iterating on VLM understanding tasks like GeoQA, prefer EasyR1 or upstream veRL.
+
+### Connecting to What Follows
+
+The next section shifts from "visual understanding" to "visual generation" — discussing how Diffusion formulates denoising as an MDP and how DDPO applies policy gradients. VeRL-Omni is the framework that engineers these generation-side algorithms (FlowGRPO, DanceGRPO, DiffusionNFT, etc.) into runnable recipes. After learning the algorithmic foundations, see the [VeRL-Omni documentation](https://verl-omni.readthedocs.io/en/latest/index.html) for Quickstart guides and recipes.
+
+## 11.3.5 Frontiers of VLM RL
 
 VLM RL is a rapidly evolving field. Several directions are worth watching:
 
@@ -160,7 +195,7 @@ def robot_vlm_rl_train(vlm, simulator, num_episodes=10000):
                   f"Eval reward: {eval_reward:.1f}")
 ```
 
-## 11.3.5 From Text RL to Multimodal RL: Review and Outlook
+## 11.3.6 From Text RL to Multimodal RL: Review and Outlook
 
 Reviewing the full learning path across chapters, we see RL develop from the simplest tabular methods to complex multimodal scenarios:
 
@@ -186,7 +221,7 @@ The reward function also needs corresponding adjustment — video understanding 
 
 VLM RL is one of the most active research directions today. From GPT-4V to Gemini, from LLaVA to Qwen-VL, every multimodal large model release comes with improvements in RL training methods. This field still has too many unsolved problems — visual hallucination, reward attribution, safety-efficiency tradeoffs, sim-to-real transfer — solving each one may spawn new application scenarios.
 
-## 11.3.6 From VLM RL to Multimodal Agents
+## 11.3.7 From VLM RL to Multimodal Agents
 
 VLM RL produces "models that can understand images." But in real scenarios, users often need "agents that can both understand images and take action" — such as screenshot understanding + automated operation (GUI Agent), chart analysis + data querying (Data Agent). This is the leap from VLM RL to multimodal Agents: **visual understanding + tool calling**.
 
@@ -236,9 +271,10 @@ If you want to train multimodal Agents, the recommended path is:
 
 Key principle: **verify that visual understanding and tool use each meet baseline independently before attempting end-to-end joint training.** If the underlying components have problems, joint training will not rescue them.
 
-The next section shifts perspective from "visual understanding" to "visual generation" — looking at how Diffusion and video generation models can improve text alignment, visual quality, and instruction following through RL post-training.
+The next section shifts perspective from "visual understanding" to "visual generation" — looking at how Diffusion and video generation models can improve text alignment, visual quality, and instruction following through RL post-training. For hands-on practice, see VeRL-Omni introduced in Sec 11.3.4.
 
 ## References
 
 - [VisPlay Project Page](https://bruno686.github.io/VisPlay/) — demonstrates the joint training framework for the Image-Conditioned Questioner and Multimodal Reasoner.
 - [VISTA-Gym / VISTA-R1 Blog](https://www.eigenai.com/blog/vista-gym-vista-r1) — showcases the tool-augmented visual QA environment, VISTA-R1 main results, and ablation analysis.
+- [VeRL-Omni](https://github.com/verl-project/verl-omni) — RL post-training framework for diffusion and omni-modality models, with [documentation](https://verl-omni.readthedocs.io/en/latest/index.html) and recipes for FlowGRPO, DanceGRPO, and more.
