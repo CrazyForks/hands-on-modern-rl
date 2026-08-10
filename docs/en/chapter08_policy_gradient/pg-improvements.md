@@ -81,9 +81,9 @@ The advantage function $A^\pi(s,a)$ is one of the most important ideas in policy
 
 We will use the advantage function repeatedly in later chapters:
 
-- **Chapter 6 Actor-Critic**: use a critic network to estimate $V(s)$ directly, enabling per-step updates (no need to wait for the episode to end)
-- **Chapter 7 PPO**: use GAE (Generalized Advantage Estimation) to trade off bias and variance
-- **Chapter 9 RLHF**: the signal produced by a reward model is, in essence, also a kind of advantage estimate
+- **Chapter 7 Actor-Critic**: use a critic network to estimate $V(s)$ directly, enabling per-step updates (no need to wait for the episode to end)
+- **Chapter 8 PPO**: use GAE (Generalized Advantage Estimation) to trade off bias and variance
+- **Chapter 13 RLHF**: the signal produced by a reward model is, in essence, also a kind of advantage estimate
 
 ## Implementation: Adding a Value Network
 

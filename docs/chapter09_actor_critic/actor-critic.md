@@ -154,7 +154,7 @@ Actor-Critic 数据流
 | Actor（演员）    | 选择动作 | 状态 $s$ | 动作概率 $\pi(a\|s)$ | 最大化累积奖励   |
 | Critic（评论家） | 评估局面 | 状态 $s$ | 价值估计 $V(s)$      | 准确预测未来回报 |
 
-如果你仔细看 Critic 的更新规则，$V(s) \leftarrow V(s) + \alpha \cdot \delta$——这不就是第 3 章的 [TD Learning](../chapter03_mdp/dp-mc-td) 吗？**Critic 本质上就是第 3 章[价值函数 $V(s)$](../chapter03_mdp/value-bellman)的神经网络实现**，它独立地学习"每个状态值多少分"。Actor 则是[策略 $\pi(a|s)$](../chapter08_policy_gradient/policy-gradient) 的神经网络实现，它根据 Critic 提供的评估来调整自己的行为。
+如果你仔细看 Critic 的更新规则，$V(s) \leftarrow V(s) + \alpha \cdot \delta$——这不就是第 4 章的 [TD Learning](../chapter03_mdp/dp-mc-td) 吗？**Critic 本质上就是第 3 章[价值函数 $V(s)$](../chapter03_mdp/value-bellman)的神经网络实现**，它独立地学习"每个状态值多少分"。Actor 则是[策略 $\pi(a|s)$](../chapter08_policy_gradient/policy-gradient) 的神经网络实现，它根据 Critic 提供的评估来调整自己的行为。
 
 两个函数逼近器协同工作——Critic 帮 Actor 判断"这个动作比平均好多少"，Actor 根据判断调整策略，然后新的策略又产生新的数据让 Critic 学得更好。这就是 Actor-Critic 名字的由来。
 
@@ -341,14 +341,14 @@ for episode in range(500):
             _, next_value = model(torch.FloatTensor(next_state))
             next_value = 0 if done else next_value
 
-        # TD Error = 优势估计（回顾：第 6.1 节 A ≈ δ）
+        # TD Error = 优势估计（回顾：第 7.1 节 A ≈ δ）
         td_target = reward + gamma * next_value
         td_error = td_target - value
 
         # Actor 损失：策略梯度 × 优势
         actor_loss = -log_prob * td_error.detach()
 
-        # Critic 损失：让 V(s) 接近 TD Target（回顾：第 6.2 节 L = δ²）
+        # Critic 损失：让 V(s) 接近 TD Target（回顾：第 7.2 节 L = δ²）
         critic_loss = td_error.pow(2)
 
         # 总损失

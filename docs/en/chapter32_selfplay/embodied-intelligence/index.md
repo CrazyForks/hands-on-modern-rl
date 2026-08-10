@@ -368,7 +368,7 @@ In practice, the two are often combined: domain randomization as a base policy c
 
 ### Diffusion Policy
 
-In Chapter 7 we learned PPO's deterministic policy output -- given a state, the network outputs an action vector. But many manipulation tasks have multimodal action distributions: for the same goal, there may be multiple valid grasping approaches.
+In Chapter 8 we learned PPO's deterministic policy output -- given a state, the network outputs an action vector. But many manipulation tasks have multimodal action distributions: for the same goal, there may be multiple valid grasping approaches.
 
 [Diffusion Policy](https://diffusion-policy.cs.columbia.edu/) models action generation as a **denoising diffusion process** -- starting from random noise, progressively denoising to generate the final action. This is the same idea as image diffusion models, except the generated object changes from "images" to "action sequences." Diffusion policy naturally supports multimodal action distributions and performs excellently on dexterous manipulation tasks.
 
@@ -384,7 +384,7 @@ VLA (Vision-Language-Action) is the newest and most exciting direction in embodi
 
 Typical workflow: the robot receives the instruction "pick up the red cup on the table" -> the VLA model receives camera imagery + language instruction -> directly outputs the robot's joint control commands.
 
-Google's [RT-2](https://robotics-transformer2.github.io/) (Robotic Transformer 2) is a representative VLA work: it uses a pretrained vision-language model to transform robot control tasks into a "visual question answering" problem -- inputting images and language instructions, outputting action tokens. This follows the same philosophy as Chapter 11's VLM RL -- except the output changes from "text answers" to "physical actions."
+Google's [RT-2](https://robotics-transformer2.github.io/) (Robotic Transformer 2) is a representative VLA work: it uses a pretrained vision-language model to transform robot control tasks into a "visual question answering" problem -- inputting images and language instructions, outputting action tokens. This follows the same philosophy as Chapter 24's VLM RL -- except the output changes from "text answers" to "physical actions."
 
 ```mermaid
 flowchart LR

@@ -23,10 +23,10 @@ This appendix covers the algorithms that are most frequently asked to be handwri
 | [B.2 PPO Policy Loss and GAE](./ppo-gae)      | clipped surrogate, value loss, reverse-time GAE recursion      | 5/5       |
 | [B.3 DPO and Variants](./dpo-family)          | DPO loss, IPO, KTO, SimPO                                      | 5/5       |
 | [B.4 GRPO and Reward Models](./grpo-rlvr)     | group-wise normalization in GRPO, Bradley-Terry reward model   | 4/5       |
-| [B.5 Softmax and Cross-Entropy](./softmax-ce) | numerically stable softmax, log-sum-exp, CE loss               | 4/5       |
-| [B.6 Top-k / Top-p Sampling](./top-k-top-p)   | temperature, top-k, top-p (nucleus) decoding                   | 4/5       |
-| [B.7 Attention / MHA / GQA](./attention-mha)  | scaled dot-product attention, multi-head attention, MQA, GQA   | 5/5       |
-| [B.8 DAPO](./dapo)                            | decoupled clipping, dynamic sampling, overlong penalty shaping | 3/5       |
+| [B.5 DAPO](./dapo)                            | decoupled clipping, dynamic sampling, overlong penalty shaping | 3/5       |
+| [B.6 Softmax and Cross-Entropy](./softmax-ce) | numerically stable softmax, log-sum-exp, CE loss               | 4/5       |
+| [B.7 Top-k / Top-p Sampling](./top-k-top-p)   | temperature, top-k, top-p (nucleus) decoding                   | 4/5       |
+| [B.8 Attention / MHA / GQA](./attention-mha)  | scaled dot-product attention, multi-head attention, MQA, GQA   | 5/5       |
 
 ## How To Use This Appendix
 

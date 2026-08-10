@@ -11,7 +11,7 @@ Earlier in the chapter, we used CartPole and LunarLander to understand RL where 
 
 `Pendulum-v1` changes the problem. The agent is not choosing among buttons. It must apply a **continuous torque** to a rod. That torque could be -2, or 0.17, or 1.843. The action is no longer a few discrete bins; it is the entire real interval $[-2, 2]$. This is the new problem that Actor-Critic was designed to solve: **when there are infinitely many action candidates, how should a policy express "this is what I want to do"?**
 
-## 6.4.1 Task Intuition: Not Picking a Button, but Controlling Torque
+## 7.3.1 Task Intuition: Not Picking a Button, but Controlling Torque
 
 The Pendulum setup is simple. A rod hangs from a pivot. At each step the agent applies a torque, and the goal is to swing the rod up to the upright position and keep it there.
 
@@ -39,7 +39,7 @@ Here $\theta$ is the angle away from upright, $\dot\theta$ is the angular veloci
 
 Because of this formulation, the cumulative return on Pendulum is typically negative. A random policy often scores around -1200 to -900. A well-trained policy can push toward -500, -300, or even closer to 0. When reading these curves, don't ask "why isn't the reward positive?"; instead, watch whether it climbs from deeply negative values toward 0.
 
-## 6.4.2 Why DQN Does Not Fit This Task
+## 7.3.2 Why DQN Does Not Fit This Task
 
 Let's start from what we already know: DQN. DQN learns $Q(s,a)$ and acts by
 
@@ -61,7 +61,7 @@ This lets DQN barely run, but it creates two problems. First, control precision 
 
 The real issue, then, is not "can DQN get a few more output heads?" It is this: **continuous control requires a policy that can directly generate continuous actions.**
 
-## 6.4.3 Continuous Actor: Output a Gaussian Distribution
+## 7.3.3 Continuous Actor: Output a Gaussian Distribution
 
 A discrete policy outputs a probability for each action:
 
@@ -109,7 +109,7 @@ Second, `log_std` is a learnable parameter. Instead of learning $\sigma$ directl
 
 Third, `value_head` is the Critic, outputting $V(s)$. The shared feature trunk feeds both the Actor head and the Critic head. This is exactly the Actor-Critic architecture described throughout the chapter: the Actor decides how to act, the Critic judges roughly how good the current situation is.
 
-## 6.4.4 How the Critic Provides a Learning Signal for the Actor
+## 7.3.4 How the Critic Provides a Learning Signal for the Actor
 
 An Actor alone is not enough. We need to know whether a given action was "better or worse than expected." The Critic provides this reference.
 
@@ -142,7 +142,7 @@ The `actor_loss` has a negative sign because the optimizer performs gradient des
 
 The `critic_loss` pushes the Critic's estimate toward the TD target. The final `entropy` term encourages the policy to retain some exploration and prevents the standard deviation from collapsing too early.
 
-## 6.4.5 Running the Training
+## 7.3.5 Running the Training
 
 Install dependencies:
 
@@ -188,9 +188,9 @@ python code/chapter06_actor_critic/render_pendulum.py \
   --output output/pendulum_actor_critic.gif
 ```
 
-## 6.4.6 Experimental Results: First Learn to Swing Up, Then Learn to Stabilize
+## 7.3.6 Experimental Results: First Learn to Swing Up, Then Learn to Stabilize
 
-Here are the results from a 300k-step training run. Since A2C is still an on-policy Actor-Critic — each batch of data is used once and discarded — the per-episode variance is higher than what you will see with PPO in Chapter 7. Focus on the moving-average trend, not any single episode's spike or dip.
+Here are the results from a 300k-step training run. Since A2C is still an on-policy Actor-Critic — each batch of data is used once and discarded — the per-episode variance is higher than what you will see with PPO in Chapter 8. Focus on the moving-average trend, not any single episode's spike or dip.
 
 ![A2C Pendulum-v1 replay: the policy can swing the rod near the top, but stability is still limited](../../chapter09_actor_critic/images/pendulum_actor_critic.gif)
 
@@ -214,7 +214,7 @@ The curve reveals three phases:
 
 Pendulum learning is not like CartPole, where perfect scores appear quickly. Here the action requires both direction and magnitude. Too little torque, and the rod never swings up. Too much torque, and it overshoots the top. This is exactly the difficulty of continuous control: the policy is not choosing "left or right" — it is choosing a precise force magnitude at every step.
 
-## 6.4.7 Policy Entropy: How Exploration Gradually Narrows
+## 7.3.7 Policy Entropy: How Exploration Gradually Narrows
 
 One advantage of a Gaussian policy is that we can directly observe exploration intensity. A larger standard deviation $\sigma$ means more dispersed action sampling; higher policy entropy means a more random action distribution.
 
@@ -230,7 +230,7 @@ But entropy should not drop too fast. If the action distribution becomes too nar
 
 In this section's configuration, `ent_coef=0.0`. This does not mean entropy is unimportant; it means Pendulum's Gaussian policy already has inherent sampling noise. For more difficult continuous-control tasks, adding an explicit entropy bonus is usually more reliable.
 
-## 6.4.8 Loss Curves: What the Actor and Critic Are Each Doing
+## 7.3.8 Loss Curves: What the Actor and Critic Are Each Doing
 
 The reward curve tells us whether performance is improving; the loss curves help us understand whether training is stable.
 
@@ -250,7 +250,7 @@ If the Critic loss stays large over an extended period, it means the value estim
 
 This is why RL cannot be monitored by loss alone, unlike an ordinary classification task. A more reliable evaluation order is: first check whether episode reward is rising, then check whether the Critic loss diverges over the long run, and finally check whether entropy and standard deviation collapse prematurely.
 
-## 6.4.9 Common Failures and Hyperparameter Tuning
+## 7.3.9 Common Failures and Hyperparameter Tuning
 
 If Pendulum fails to learn, go through these checks in order.
 
@@ -272,7 +272,7 @@ Common hyperparameter reference:
 | `num_envs`      | `8`                    | too few collects samples slowly; too many adds overhead             |
 | `VecNormalize`  | enabled                | without it the Critic has a harder time fitting raw returns         |
 
-## 6.4.10 Section Summary
+## 7.3.10 Section Summary
 
 Pendulum takes us from discrete actions to continuous actions. The real change is not that the environment is more complex; it is that the policy representation changes: the Actor no longer outputs Softmax probabilities over a few actions. Instead, it outputs the mean and standard deviation of a Gaussian distribution, and a continuous torque is sampled from that distribution.
 

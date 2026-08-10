@@ -44,7 +44,7 @@ In the previous section we prepared SFT data and preference data. Now we need to
 
 The reward function is the "objective function" of the entire RL system — it defines "what is good." The policy network does not care what you have in mind; it simply moves in the direction the reward function points. If the reward function says "more words is better," the model will produce long-winded responses. If the reward function says "including 'I'd be happy to help' is good," the model will append that pleasantry to every sentence. Designing a reward function is like giving instructions to an extremely obedient assistant with zero common sense — it will do exactly what you say, including every unintended side effect.
 
-## 8.4.1 A Spectrum of Rewards
+## 13.3.1 A Spectrum of Rewards
 
 Reward functions are not a binary choice. They form a continuous spectrum from "pure rules" to "pure models":
 
@@ -71,7 +71,7 @@ $$R_{total} = R_{RM} + \alpha \cdot R_{format} + \beta \cdot R_{length} + \gamma
 
 where $\alpha, \beta, \gamma$ are hyperparameters that require tuning. $R_{format}$ checks format compliance, $R_{length}$ penalizes overly long or short answers, and $R_{correctness}$ verifies answers for questions with objective ground truth (math, code, etc.).
 
-## 8.4.2 Bradley-Terry Model
+## 13.3.2 Bradley-Terry Model
 
 The core task of a reward model is to learn a scoring function from human preference pairs. Given prompt $x$ and two responses $y_w$ (chosen) and $y_l$ (rejected), the human annotator judged $y_w$ as better than $y_l$. The RM needs to learn a function $r_\theta(x, y)$ such that $r_\theta(x, y_w) > r_\theta(x, y_l)$.
 
@@ -179,7 +179,7 @@ Preference modeling exploits exactly this strength:
 
 In practice, a common annotation approach is to sample 4–9 responses per prompt, have annotators rank them, then split the rankings into multiple chosen/rejected pairs.
 
-## 8.4.3 Reward Granularity
+## 13.3.3 Reward Granularity
 
 The RM assigns a single score to a response. How should that score be allocated? One score for the entire response, a separate score per token, or scores segmented by reasoning step? This is the question of reward granularity.
 
@@ -244,7 +244,7 @@ Sequence-level RM has a fundamental difficulty: it only assigns a score after th
 
 This is one reason the Critic and advantage estimation in PPO-RLHF exist: they cannot perfectly solve credit assignment, but they can smooth the "is the whole response good or bad" signal back down to token-level updates. Later approaches like GRPO, RLVR, and process rewards are all essentially tackling this problem from different angles.
 
-## 8.4.4 Rule Rewards vs Model Rewards
+## 13.3.4 Rule Rewards vs Model Rewards
 
 Whether to choose rule rewards or model rewards depends on your task type and constraints.
 
@@ -257,11 +257,11 @@ Whether to choose rule rewards or model rewards depends on your task type and co
 | **Use cases**              | Math / code / format checks with objective standards | Dialogue / creative writing / safety alignment for subjective preferences |
 | **Typical role**           | "Floor" in a mixed reward                            | "Main body" in a mixed reward                                             |
 
-In the next chapter's RLVR (Reinforcement Learning with Verifiable Rewards) setting, rule rewards take center stage. Whether a math answer is correct can be verified by code; whether code runs can be checked by execution. But in open-domain dialogue, creative writing, and safety alignment, there are no objective standards, and model rewards are indispensable.
+In Chapter 16's RLVR (Reinforcement Learning with Verifiable Rewards) setting, rule rewards take center stage. Whether a math answer is correct can be verified by code; whether code runs can be checked by execution. But in open-domain dialogue, creative writing, and safety alignment, there are no objective standards, and model rewards are indispensable.
 
 A practical rule of thumb: **use rule rewards wherever you can, and supplement with model rewards where rules cannot reach.** The benefit is that rule rewards provide a "safety net" — even if the RM is hacked, rule rewards still ensure basic formatting and correctness.
 
-## 8.4.5 Engineering Details of RM Training
+## 13.3.5 Engineering Details of RM Training
 
 Training a reliable RM involves more than just the Bradley-Terry loss. There are many engineering details to get right.
 
@@ -391,7 +391,7 @@ def rm_eval_metrics(r_chosen, r_rejected, chosen_lengths, rejected_lengths):
 
 If `length_reward_corr` is high, go back and check the preference data: are the chosen responses generally longer than the rejected ones? If so, the RM may have learned "longer is better" rather than "more helpful is better."
 
-## 8.4.6 Reward Hacking
+## 13.3.6 Reward Hacking
 
 The biggest risk in reward function design is not low RM accuracy, but systematic blind spots in the RM. During the PPO phase, the Actor is not a random user — it will actively search for output distributions that make the RM assign high scores. If the RM favors certain surface patterns, the Actor will push those patterns to the extreme.
 
@@ -420,7 +420,7 @@ for name, response in stress_cases:
 
 If "long rambling" scores higher than "correct but brief," do not run PPO yet. PPO will only amplify this problem.
 
-## 8.4.7 Engineering Checklist for Reward Function Design
+## 13.3.7 Engineering Checklist for Reward Function Design
 
 This section's content condensed into a practical checklist, for you to reference item by item when designing your own reward function:
 

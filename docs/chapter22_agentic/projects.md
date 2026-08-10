@@ -1285,7 +1285,7 @@ Rubrics（评分标准）是把"什么是好的搜索结果"转化为可测量�
 
 **数据收集。** 对同一个搜索 query，让模型（或不同模型）生成多条搜索结果。然后让标注员（或用 LLM-as-Judge）按照 Rubrics 对每条结果打分，并构建偏好对——"结果 A 比结果 B 好"。
 
-**RM 训练。** 用 Bradley-Terry 模型（第 6 章的奖励模型）训练一个 Reward Model。输入是 (query, search_result) 对，输出是一个标量分数。这个 RM 将作为后续 RL 训练的 reward 来源。
+**RM 训练。** 用 Bradley-Terry 模型（第 13 章的奖励模型）训练一个 Reward Model。输入是 (query, search_result) 对，输出是一个标量分数。这个 RM 将作为后续 RL 训练的 reward 来源。
 
 但这里有一个关键选择：**是训练一个综合评分的单一 RM，还是为每个 Rubrics 维度训练独立的 RM？**
 
@@ -1582,9 +1582,9 @@ for epoch in range(3):
 
 Deep Research Agent 的奖励设计是本书前面所有 RL 方法在这个特定场景的综合应用：
 
-- **RLVR（第 7 章）**：Deep Research 的许多 reward 是"可验证的"——引用 URL 是否可访问、代码是否通过测试、答案是否与标准答案匹配。这些都是客观可验证的，不需要 Reward Model。
-- **GRPO（第 7 章）**：DeepResearcher 等项目使用组采样 + 相对比较的方式来训练，这正是 GRPO 的思路。
-- **PPO（第 5 章）**：一些项目仍然使用 PPO 作为基础 RL 算法，特别是需要训练 Value Function 来做步级 credit assignment 时。
+- **RLVR（第 16 章）**：Deep Research 的许多 reward 是"可验证的"——引用 URL 是否可访问、代码是否通过测试、答案是否与标准答案匹配。这些都是客观可验证的，不需要 Reward Model。
+- **GRPO（第 16 章）**：DeepResearcher 等项目使用组采样 + 相对比较的方式来训练，这正是 GRPO 的思路。
+- **PPO（第 8 章）**：一些项目仍然使用 PPO 作为基础 RL 算法，特别是需要训练 Value Function 来做步级 credit assignment 时。
 - **PRM vs ORM（[20.3 节](./credit-assignment)）**：CaRR、Atom-Searcher、Web-Shepherd 等工作本质是在 Deep Research 场景下探讨 ORM（只看最终结果）和 PRM（每步评估）的取舍。研究发现：对于长程研究任务，PRM 提供的密集信号至关重要。
 
 Deep Research Agent 是一个把本书所有 RL 知识"串起来"的绝佳场景——从基础的 reward 设计到高级的 credit assignment，从数据合成到工程实现，全都用上了。
@@ -1645,4 +1645,4 @@ Deep Research Agent 是一个把本书所有 RL 知识"串起来"的绝佳场景
 
 [^memento]: Zhou H, et al. "Memento: Fine-tuning LLM Agents without Fine-tuning LLMs." [arXiv:2508.16153](https://arxiv.org/abs/2508.16153), 2025. **为什么不归入上述任何一类**：Memento 提供了一条完全不同的技术路线——**不修改模型参数**，而是通过外部情景记忆机制让 Agent 在推理时检索相似案例来指导行为。它在 GAIA 验证集上排名第一（87.88% Pass@3），有力地证明了：有时候"更好的检索"比"更好的训练"更有效。这个工作提示我们，RL 并非提升 Agent 能力的唯一路径，外部记忆与推理时策略同样是值得关注的方向。
 
-到这里，第 7 章的全部内容就结束了。下一章，让我们把目光投向更远的前沿——[未来趋势](../chapter32_selfplay/self-play-outlook/)，看看 RL 领域正在发生哪些激动人心的变化。
+到这里，本页保留的旧版项目内容结束。如需继续了解规模化与研究前沿，可进入[第 29 章自博弈、规模化与研究前沿](../chapter32_selfplay/self-play-outlook/)。

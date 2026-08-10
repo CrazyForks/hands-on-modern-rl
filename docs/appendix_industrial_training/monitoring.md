@@ -4,7 +4,7 @@ search: false
 
 # 训练监控与故障排查（已并入 B.3）
 
-> 这一页保留为旧链接入口。核心内容已经合并到 [B.3 RL 后训练与 Agentic RL Benchmark](./evaluation-badcase) 的“训练监控与故障排查”部分。下面保留原文，方便从旧链接进入的读者对照。
+> 这一页保留为旧链接入口。核心内容已经合并到[附录 A.4 评测基准](./evaluation-badcase)的“训练监控与故障排查”部分。下面保留原文，方便从旧链接进入的读者对照。
 
 > RL 训练不像监督学习那样稳定。reward 可能突然暴跌，策略可能坍缩，KL 散度可能飙升——而且这些变化往往在几步训练之内就会发生。
 >
@@ -63,4 +63,4 @@ wandb.log({
 3. **Entropy 降到接近 0**——策略已经坍缩，继续训练没有意义
 4. **评测 benchmark 分数连续 2 次下降**——模型在退化
 
-最佳实践：每 100-500 步跑一次评测 benchmark，设置自动回滚——一旦评测分数低于历史最佳，自动回退到上一个 checkpoint。详见 [B.3 RL 后训练与 Agentic RL Benchmark](./evaluation-badcase) 中的自动化闭环。
+最佳实践：每 100-500 步跑一次评测 benchmark，设置自动回滚——一旦评测分数低于历史最佳，自动回退到上一个 checkpoint。详见 [A.4 RL 后训练与 Agentic RL Benchmark](./evaluation-badcase) 中的自动化闭环。

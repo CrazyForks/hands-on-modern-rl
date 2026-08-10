@@ -561,7 +561,7 @@ RL 评估方法论的核心原则：
 4. **OOD 评估**：能力评估 + 行为评估 + 长程评估三层
 5. **标准化 harness**：lm-eval、BigCode、τ-bench、BFCL 四大体系互补
 
-Opus 4.6 Eval Suite 揭示了**模型已经能做初级研究工作**——34× 人类加速是 2025 年最重要的能力里程碑。下一章 [第 36 章 分布式 RL 训练系统](../appendix_industrial_training/rl-infrastructure) 转向工程实现——如何在万卡集群上跑出这些 RL 实验。
+Opus 4.6 Eval Suite 揭示了**模型已经能做初级研究工作**——34× 人类加速是 2025 年最重要的能力里程碑。接下来可进入[附录 A.2 训练系统底座](../appendix_industrial_training/rl-infrastructure)，了解如何在大规模集群上运行这些 RL 实验。
 
 ## 延伸阅读
 

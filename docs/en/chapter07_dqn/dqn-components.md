@@ -303,7 +303,7 @@ Implementation choices explained:
 - **hidden_dim=128**: total parameters approximately $4 \times 128 + 128 \times 128 + 128 \times 2 \approx 17000$. 64 is a bit small; 256 is a bit large; 128 strikes a balance between precision and efficiency, and transfers well to LunarLander. Atari pixel inputs require CNN instead of MLP.
 - **ReLU activation**: fast to compute (just check positive/negative), gradient is constant 1 in the positive region (no vanishing gradient), output is unbounded (does not constrain Q-value range). Sigmoid/Tanh suffer from vanishing gradients and output range limitations.
 - **No activation on output layer**: Q-values can be any real number. ReLU would truncate negative values; Sigmoid/Tanh would limit the output range.
-- **Output all action Q-values at once**: selecting an action requires only one forward pass plus `argmax`, rather than running the network separately for each action. The limitation is that this only handles discrete actions; continuous actions require Actor-Critic (Chapter 6).
+- **Output all action Q-values at once**: selecting an action requires only one forward pass plus `argmax`, rather than running the network separately for each action. The limitation is that this only handles discrete actions; continuous actions require Actor-Critic (Chapter 7).
 
 ### Define the Replay Buffer
 

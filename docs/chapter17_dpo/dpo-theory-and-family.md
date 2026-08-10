@@ -298,7 +298,7 @@ $$
 
 ### 代入 Bradley-Terry 模型
 
-回顾[上一章 RLHF](../chapter15_rlhf/reward-function-design) 和[第 8 章 GAE](../chapter10_ppo/gae-reward-model) 中的 Bradley-Terry 偏好模型：
+回顾[第 13 章 RLHF](../chapter15_rlhf/reward-function-design) 和[第 8 章 GAE](../chapter10_ppo/gae-reward-model) 中的 Bradley-Terry 偏好模型：
 
 $$
 P(y_w > y_l \mid x) = \sigma\left(r(x, y_w) - r(x, y_l)\right)

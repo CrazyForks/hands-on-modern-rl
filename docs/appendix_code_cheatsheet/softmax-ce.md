@@ -1,4 +1,4 @@
-# B.5 Softmax 与 Cross-Entropy
+# B.6 Softmax 与 Cross-Entropy
 
 面试热身题。写 DPO / PPO 之前，面试官可能先让你手写一个数值稳定的 softmax 和交叉熵。
 

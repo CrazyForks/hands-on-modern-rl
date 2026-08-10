@@ -4,7 +4,7 @@ title: 'Supplement: Training the Critic'
 
 # Supplement: Training the Critic
 
-In the previous section, we defined the advantage function $A(s,a) \approx \delta = r + \gamma V(s') - V(s)$ and introduced the Critic network as an estimator of $V(s)$. This section expands on the three classic value-estimation methods from Chapter 3 -- [DP, MC, and TD](../chapter03_mdp/dp-mc-td) -- and shows how each one trains the Critic in practice.
+In the previous section, we defined the advantage function $A(s,a) \approx \delta = r + \gamma V(s') - V(s)$ and introduced the Critic network as an estimator of $V(s)$. This section expands on the three classic value-estimation methods from Chapter 4 -- [DP, MC, and TD](../chapter03_mdp/dp-mc-td) -- and shows how each one trains the Critic in practice.
 
 ::: tip Prerequisites
 
@@ -13,7 +13,7 @@ In the previous section, we defined the advantage function $A(s,a) \approx \delt
 - [TD Error $\delta$](../chapter03_mdp/dp-mc-td) -- the core signal of TD methods
   :::
 
-We continue with the three-cell corridor from Chapter 3, using a fixed policy $\pi$: at both $S$ and $M$, move right with probability 0.8 and left with probability 0.2. The transitions and rewards are:
+We continue with the three-cell corridor from Chapter 4, using a fixed policy $\pi$: at both $S$ and $M$, move right with probability 0.8 and left with probability 0.2. The transitions and rewards are:
 
 | Current state | Action | Policy prob | Next state | Reward |
 | ------------- | ------ | ----------- | ---------- | ------ |

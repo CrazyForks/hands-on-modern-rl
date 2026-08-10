@@ -61,11 +61,12 @@ const SIDEBAR_NAV_GROUP_PREFIXES = {
   '/chapter30_alignment_failures/classical-failures': 'Part VII ·',
   '/appendix_industrial_training/training-debugging': '附录',
   '/en/preface/intro': 'Preface ·',
-  '/en/chapter01_cartpole/principles': 'Part I ·',
-  '/en/chapter07_dqn/from-q-to-dqn': 'Part II ·',
-  '/en/chapter15_rlhf/base-model-to-assistant': 'Part IV ·',
-  '/en/chapter22_agentic/intro': 'Part V ·',
-  '/en/chapter32_selfplay/self-play-outlook': 'Part VII ·',
+  '/en/chapter01_cartpole/principles': 'Fundamentals & Classical RL',
+  '/en/chapter07_dqn/from-q-to-dqn': 'Deep Reinforcement Learning',
+  '/en/chapter15_rlhf/base-model-to-assistant': 'LLM Alignment & Post-Training',
+  '/en/chapter22_agentic/intro': 'Agentic Reinforcement Learning',
+  '/en/chapter32_selfplay/self-play-outlook':
+    'Safety, Evaluation & Research Frontiers',
   '/en/appendix_industrial_training/intro': 'Appendices'
 }
 
@@ -2600,15 +2601,6 @@ watch(
     min-height: 48px;
     padding-top: 10px;
     padding-bottom: 10px;
-  }
-}
-
-@media (min-width: 1440px) {
-  .ct-sidebar-groups-toolbar {
-    margin-left: max(
-      32px,
-      calc((100vw - (var(--vp-layout-max-width) - 64px)) / 2)
-    );
   }
 }
 

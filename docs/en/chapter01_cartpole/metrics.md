@@ -700,17 +700,17 @@ graph TD
     ROOT["RL = Maximize Cumulative Reward"] --> VB["Value-Based<br/>First learn how much each action is worth"]
     ROOT --> PB["Policy-Based<br/>Directly learn what action to take"]
 
-    VB --> DQN["DQN (Chapter 4)"]
-    PB --> PG["REINFORCE (Chapter 5)"]
+    VB --> DQN["DQN (Chapter 5)"]
+    PB --> PG["REINFORCE (Chapter 6)"]
 
-    DQN --> AC["Actor-Critic (Chapter 6)"]
+    DQN --> AC["Actor-Critic (Chapter 7)"]
     PG --> AC
 
-    AC --> PPO["PPO (Chapter 7)<br/><-- You just used this"]
+    AC --> PPO["PPO (Chapter 8)<br/><-- You just used this"]
 
     PPO --> LLM["LLM Alignment"]
-    LLM --> DPOG["DPO (Chapter 2)<br/><-- What Chapter 2 uses"]
-    LLM --> GRPOG["GRPO (Chapter 9)"]
+    LLM --> DPOG["DPO (Chapter 15)"]
+    LLM --> GRPOG["GRPO (Chapter 16)"]
 
     style ROOT fill:#f8f9fa,stroke:#24292f,color:#24292f
     style VB fill:#e3f2fd,stroke:#1976d2,color:#000
@@ -722,10 +722,10 @@ graph TD
 ```
 
 - **Value-Based** (blue): first learn "the value of each action" (Q-value),
-  then choose the action with the highest value. The representative algorithm is DQN in Chapter 4.
+  then choose the action with the highest value. The representative algorithm is DQN in Chapter 5.
 - **Policy-Based** (orange): skip value estimation
   and directly learn the policy of "what action to take given a state."
-  The representative algorithm is REINFORCE in Chapter 5.
+  The representative algorithm is REINFORCE in Chapter 6.
 - The two routes converge in the **Actor-Critic** architecture --
   Actor learns the policy, Critic learns the value function.
   This is the foundational architecture of PPO.
@@ -737,7 +737,7 @@ graph TD
 This diagram will reappear at the beginning of each subsequent chapter.
 For now, just remember one key point:
 **The PPO we used in this chapter is the product of the two routes converging.
-The DPO we will introduce in Chapter 2 is a simplified version of PPO for the LLM era.**
+The DPO introduced in Chapter 15 is a simplified version of PPO for the LLM era.**
 
 In the next chapter, we will see that reinforcement learning is not limited to making a cart balance a pole --
 it can also make large language models learn to align with human preferences.

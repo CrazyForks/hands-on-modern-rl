@@ -166,7 +166,7 @@ It is very difficult. Pre-training determines the upper bound of the model's kno
 
 ## 2.1.4 DPO's Optimization Objective
 
-In the previous chapter, we disassembled SB3's `model.learn()`, revealing the three-step loop behind it: collect experience, compute advantages, update parameters. In this section, we look at what `DPOTrainer.train()` does -- that is, how DPO's loss function is computed from preference data.
+In Chapter 1, we disassembled SB3's `model.learn()`, revealing the three-step loop behind it: collect experience, compute advantages, update parameters. In this section, we look at what `DPOTrainer.train()` does -- that is, how DPO's loss function is computed from preference data.
 
 To understand DPO's innovation, we first need to see what it simplifies.
 
@@ -181,7 +181,7 @@ This means that during training, two large models must be loaded into GPU memory
 
 **DPO (Direct Preference Optimization)** [^4] asks a key question: can we skip training a reward model and directly optimize the language model with preference data?
 
-To understand why this is possible, recall the implicit constraint during PPO training: the policy must not drift too far from the original model, measured by KL divergence. Without this constraint, the model might output gibberish to get high reward scores -- the reward would be high, but completely incomprehensible to humans. This is the same concern underlying the PPO clipping mechanism discussed in Section 1.1.6.4: limit the magnitude of each update to ensure training stability.
+To understand why this is possible, recall the implicit constraint during PPO training: the policy must not drift too far from the original model, measured by KL divergence. Without this constraint, the model might output gibberish to get high reward scores -- the reward would be high, but completely incomprehensible to humans. This is the same concern underlying the PPO clipping mechanism discussed in Section 8.2: limit the magnitude of each update to ensure training stability.
 
 Rafailov et al. (2023) found that solving for the optimal policy under this KL constraint yields a concise relationship:
 

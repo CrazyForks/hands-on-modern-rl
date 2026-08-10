@@ -715,15 +715,6 @@ aside.VPSidebar {
   }
 }
 
-@media (min-width: 1440px) {
-  .VPSidebar > .nav {
-    padding-left: max(
-      32px,
-      calc((100vw - (var(--vp-layout-max-width) - 64px)) / 2)
-    );
-  }
-}
-
 .VPSidebar > .nav > .group {
   flex: 0 0 auto;
   min-height: auto;

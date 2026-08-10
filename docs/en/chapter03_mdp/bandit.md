@@ -30,7 +30,7 @@ $$
 
 **Role of This Chapter's Formulas**
 
-Chapter 3 establishes a unified formulation of reinforcement learning through a set of foundational formulas. The MDP tuple is used to characterize the sequential decision-making environment the agent operates in; the discounted cumulative return $G_t$ defines the long-term optimization objective; the state value function and action value function evaluate the long-term return of states and actions; the policy objective $J(\theta)$ formulates the optimization problem for parameterized policies. Subsequent topics — DQN, policy gradient, Actor-Critic, and PPO — all build on these basic objects.
+This part establishes a unified formulation of reinforcement learning through a set of foundational formulas. The MDP tuple is used to characterize the sequential decision-making environment the agent operates in; the discounted cumulative return $G_t$ defines the long-term optimization objective; the state value function and action value function evaluate the long-term return of states and actions; the policy objective $J(\theta)$ formulates the optimization problem for parameterized policies. Subsequent topics — DQN, policy gradient, Actor-Critic, and PPO — all build on these basic objects.
 
 Chapter 1 trained a CartPole agent end to end. That run already contained the full reinforcement-learning loop, but action selection, state transitions, delayed return, and policy updates all appeared at once. Before formalizing the complete process, this section isolates the smallest decision problem: choosing among actions with unknown rewards.
 

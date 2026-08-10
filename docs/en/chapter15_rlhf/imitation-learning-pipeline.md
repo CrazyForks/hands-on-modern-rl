@@ -41,7 +41,7 @@ This chapter starts from a public pretrained base model. It can already continue
 
 Once you understand BC and IRL, the RLHF three-stage pipeline is no longer three isolated steps — it is a complete engineering system with a clear theoretical thread. SFT is BC, RM training is a simplified version of IRL, and the final RL stage uses the learned reward function to optimize the policy. The whole line connects: first learn the basics by following a teacher (BC -> SFT), then infer the scoring standard from the teacher's preferences (IRL -> RM), and finally practice and improve on your own using that standard (RL -> PPO).
 
-## 8.3.1 Behavior Cloning
+## 13.2.1 Behavior Cloning
 
 Imagine learning to cook. The fastest way is not trial-and-error (RL) — it is to follow a chef step by step: when the chef chops onions, you chop onions; when the chef turns up the heat, you turn up the heat. You do not need to know "why garlic goes in before tomatoes" — you just imitate. That is the core idea behind behavior cloning.
 
@@ -88,7 +88,7 @@ def train_bc(policy, expert_states, expert_actions, epochs=100):
             print(f"Epoch {epoch+1}/{epochs} | Loss: {loss.item():.4f}")
 ```
 
-This code is fundamentally no different from the classification network you wrote in Chapter 4 — BC is just plain supervised learning. But this is precisely why SFT is so effective: a large model has already learned trillions of tokens of "human writing style" from the internet, and SFT simply uses a few thousand carefully annotated instruction-response pairs to steer this general writing ability into the specific format of "answering questions on demand."
+This code is fundamentally no different from the classification network you wrote in Chapter 5 — BC is just plain supervised learning. But this is precisely why SFT is so effective: a large model has already learned trillions of tokens of "human writing style" from the internet, and SFT simply uses a few thousand carefully annotated instruction-response pairs to steer this general writing ability into the specific format of "answering questions on demand."
 
 ### BC's Fatal Flaw: Distribution Shift
 
@@ -107,7 +107,7 @@ In the LLM setting, distribution shift is equally real. An SFT model performs we
 
 In the classical imitation learning literature, one direct fix is DAgger: let the policy roll out under its own distribution, add "states the model visited on its own" to the dataset for iterative labeling, and thereby suppress distribution shift. [^dagger]
 
-## 8.3.2 Inverse Reinforcement Learning
+## 13.2.2 Inverse Reinforcement Learning
 
 BC directly imitates the expert's actions. But sometimes we want to know not just "what the expert did," but "why the expert did it." It is like watching a chess player make a brilliant move — you do not merely want to memorize the move (BC), you want to understand the evaluation standard in their mind: what kind of position do they consider good?
 
@@ -143,7 +143,7 @@ Mapping BC and IRL theory into RLHF practice, you find that each stage was not i
 
 The key insight of this logic chain is: BC solves "how to start" but leaves the risk of distribution shift; IRL finds "what the goal is" but does not directly optimize the policy; RL uses the goal found by IRL to optimize the policy while compensating for BC's accumulated errors through trial-and-error. All three are indispensable.
 
-## 8.3.3 SFT Data Construction
+## 13.2.3 SFT Data Construction
 
 In industrial post-training work, **over 70% of time is spent on data, not algorithms**. This is not an exaggeration — a training script, once written, can be reused repeatedly, but data needs constant iteration, cleaning, and supplementation. Let us start with how SFT data is constructed.
 
@@ -312,7 +312,7 @@ At minimum, track these metrics during training:
 
 A common beginner mistake is watching only SFT loss. SFT loss decreasing only means the model resembles the training data more — it does not mean the training data itself is good enough. Especially when the data contains many templated responses, the loss will look great, but the model becomes an assistant that is "correctly formatted but anemic in content."
 
-## 8.3.4 Preference Data Generation
+## 13.2.4 Preference Data Generation
 
 Preference data is the core fuel for DPO and the second stage of RLHF (RM training). Each data point is a triplet $(x, y_w, y_l)$: given the same prompt $x$, the model generates two responses, and a human (or AI) annotator labels $y_w$ (chosen) as better than $y_l$ (rejected).
 
@@ -377,7 +377,7 @@ def construct_preference_pairs(prompt, responses, judge_outputs):
 
 **Online collection** gathers implicit preference signals from actual user interactions — likes/dislikes, edit-and-resend behavior, copying response content, and other behaviors all contain preference information. This approach has extremely low cost and massive scale, but the signal is also very noisy.
 
-## 8.3.5 Data Cleaning
+## 13.2.5 Data Cleaning
 
 No matter what method generates the data, cleaning is an essential step. A typical cleaning pipeline includes:
 
@@ -407,7 +407,7 @@ Another easily overlooked issue is **format bias**. If the seed data responses a
 
 </details>
 
-## 8.3.6 RLHF Three-Stage Overview
+## 13.2.6 RLHF Three-Stage Overview
 
 With SFT data and preference data in hand, we can run the full RLHF three-stage pipeline:
 
@@ -440,7 +440,7 @@ flowchart LR
 
 **Stage 2 (RM)** takes preference ranking pairs $(x, y_w, y_l)$ as input and outputs a model that can score responses. This is exactly a simplified implementation of the IRL idea — instead of inferring rewards from policy iteration, it directly learns a scoring function from preference data.
 
-**Stage 3 (RL)** takes the SFT model and RM as input and outputs the optimized final model. PPO uses the RM's scores as reward signals to optimize the policy (recall Chapter 7). The goal of this step is to compensate for the distribution shift from the SFT stage, enabling the model to give high-quality responses across a wider range of scenarios.
+**Stage 3 (RL)** takes the SFT model and RM as input and outputs the optimized final model. PPO uses the RM's scores as reward signals to optimize the policy (recall Chapter 8). The goal of this step is to compensate for the distribution shift from the SFT stage, enabling the model to give high-quality responses across a wider range of scenarios.
 
 The three stages are not mechanically chained — the output quality of each stage directly affects the starting point of the next. If SFT data quality is poor, the model cannot even learn basic formatting, and the RM has nothing to evaluate; if preference data quality is poor, the RM learns a wrong scoring standard, and RL steers the model in the wrong direction. This is why data engineering is the true core of RLHF.
 

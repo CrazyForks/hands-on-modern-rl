@@ -10,7 +10,7 @@ A rational human would play this how? Of course: pull the blue lever forever. A 
 But what about an AI agent? It does not know which lever is better. It must discover the fact through trial and error.
 
 ::: tip How This Relates To Chapter 3
-In Chapter 3's [multi-armed bandit experiment](../chapter03_mdp/bandit), we discussed regret: "how many points did we lose because we did not pick the optimal arm?" There the emphasis was **analysis**: given a strategy, how fast does regret grow? Here the emphasis is **learning**: let the AI discover the best arm by interacting with the environment.
+In Chapter 2's [multi-armed bandit experiment](../chapter03_mdp/bandit), we discussed regret: "how many points did we lose because we did not pick the optimal arm?" There the emphasis was **analysis**: given a strategy, how fast does regret grow? Here the emphasis is **learning**: let the AI discover the best arm by interacting with the environment.
 
 The bridge between the two is the same mathematical object: the [expected reward](../chapter03_mdp/bandit) $\mathbb{E}[R_a]$.
 :::
@@ -19,7 +19,7 @@ This is the experimental playground for this section: an extremely minimal bandi
 
 **good outcomes reinforce the probability of the action that produced them.**
 
-This is fundamentally different from the coin-guessing game in Chapter 3. In that game we wrote down a [deterministic policy](../chapter03_mdp/mdp) ("always guess heads") by hand. Here, we want the AI to learn a [parameterized policy](../chapter03_mdp/policy-objective) $\pi_\theta(a|s)$ by itself.
+This is fundamentally different from the coin-guessing game in Chapter 2. In that game we wrote down a [deterministic policy](../chapter03_mdp/mdp) ("always guess heads") by hand. Here, we want the AI to learn a [parameterized policy](../chapter03_mdp/policy-objective) $\pi_\theta(a|s)$ by itself.
 
 ## Two-Armed Bandit Environment
 
@@ -110,7 +110,7 @@ The heart of this code is the single line `loss = -log_prob * reward`. Intuitive
 
 If the sampled action leads to a good outcome (`reward = 1`), then `-log_prob * 1` produces a gradient that pushes up the probability of that action. If the outcome is bad (`reward = 0`), the gradient is zero, and the probability stays unchanged. The minus sign is there because PyTorch performs gradient descent (minimizing a loss), while we conceptually want gradient ascent (maximizing expected return).
 
-This formula is not arbitrary. It is the single-step special case of the policy gradient estimator previewed in Chapter 3's [policy objective](../chapter03_mdp/policy-objective):
+This formula is not arbitrary. It is the single-step special case of the policy gradient estimator previewed in Chapter 2's [policy objective](../chapter03_mdp/policy-objective):
 $\nabla_\theta J(\theta) \propto \mathbb{E}[\nabla_\theta \log \pi_\theta(a|s) \cdot G_t]$.
 In the next section we will derive it carefully.
 
@@ -164,7 +164,7 @@ The oscillations also reveal the central tension in reinforcement learning: expl
 
 This is close to how humans learn. When you first learn to cook, you try many recipes (exploration). Once you discover a dish you really like, you make it repeatedly (exploitation). But if you lock in too early, you might miss something even better.
 
-> In Chapter 7's [PPO](../chapter10_ppo/intro), an entropy bonus is a mechanism that forces the policy to keep exploring. It adds a term to the loss that prevents the policy from becoming "too certain" too early.
+> In Chapter 8's [PPO](../chapter10_ppo/intro), an entropy bonus is a mechanism that forces the policy to keep exploring. It adds a term to the loss that prevents the policy from becoming "too certain" too early.
 
 <details>
 <summary>Thinking: If B only wins with probability 55% (instead of 70%), can the policy still learn?</summary>

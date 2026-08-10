@@ -148,7 +148,7 @@ print("  Base model can be directly aligned with RLMT, overturning traditional t
 
 ### RLMT's Connection to Previous Chapters
 
-RLMT stands at the intersection of Chapter 9 RLVR and Chapter 7 RLHF:
+RLMT stands at the intersection of Chapter 16 RLVR and Chapter 13 RLHF:
 
 | Concept Source                       | Role in RLMT                                         |
 | ------------------------------------ | ---------------------------------------------------- |
@@ -210,7 +210,7 @@ The key prerequisite is sufficiently diverse prompt data. If the training data t
 
 ### Agentic RL Scaling Laws
 
-The three dimensions above focus on standard RL scaling. When RL enters Agentic scenarios (discussed in detail in Chapter 9), scaling takes new forms. The ZeroTIR method enables models to spontaneously learn to generate and execute code to assist reasoning **without supervised examples**, and discovers a predictable relationship: there is a **power-law relationship** between training steps, code execution frequency, and final accuracy. This means you can predict final performance early in training — if code execution frequency is still rising after 100 training steps, the model is still learning; if the frequency stabilizes, learning is approaching saturation. This finding gives practitioners a **free training progress indicator**: just monitor code execution frequency to determine "whether to continue training." ZeroTIR was accepted at NeurIPS 2025 and will be discussed in more detail in the Code Agent section of Chapter 9.
+The three dimensions above focus on standard RL scaling. When RL enters Agentic scenarios (discussed in detail in Chapter 20), scaling takes new forms. The ZeroTIR method enables models to spontaneously learn to generate and execute code to assist reasoning **without supervised examples**, and discovers a predictable relationship: there is a **power-law relationship** between training steps, code execution frequency, and final accuracy. This means you can predict final performance early in training — if code execution frequency is still rising after 100 training steps, the model is still learning; if the frequency stabilizes, learning is approaching saturation. This finding gives practitioners a **free training progress indicator**: just monitor code execution frequency to determine "whether to continue training." ZeroTIR was accepted at NeurIPS 2025 and will be discussed in more detail in the Code Agent section of Chapter 20.
 
 ## Test-time Scaling: More Compute at Inference Time Too
 

@@ -10,7 +10,7 @@
 
 这一节讨论一个新方向：**Self-play SWE-RL（SSR）**——让模型自己生成训练数据，形成"数据 flywheel"。
 
-## 12.4.1 Self-play 的核心思想
+## 21.3.1 Self-play 的核心思想
 
 Self-play 的灵感来自 AlphaGo Zero——**模型与自己下棋，从对弈结果中学习**。SSR 把这个思想用到 SWE：
 
@@ -56,7 +56,7 @@ SSR 的核心价值是**数据 flywheel**——模型越强，生成数据越好
 
 这种正反馈让 SSR 在训练后期效果显著——模型自己探索的"难题"比人工设计的更能突破能力上限。
 
-## 12.4.2 SSR 的算法细节
+## 21.3.2 SSR 的算法细节
 
 清华 [SSR](https://arxiv.org/abs/2512.18552)（Self-play SWE-RL）的具体设计：
 
@@ -162,7 +162,7 @@ Epoch 500-2000: Generator 生成微妙逻辑错误、跨模块影响
 
 这种 curriculum 是**自适应的**——不需要人工设计难度阶梯。
 
-## 12.4.3 SSR 的实验结果
+## 21.3.3 SSR 的实验结果
 
 SSR 在 SWE-bench Verified 上的实验：
 
@@ -185,7 +185,7 @@ SSR 单独训练（不依赖 SWE-smith）就能达到 47.5%——证明了 self-
 
 **Self-play 让数据效率提升**——同样的训练数据量，self-play 比 static data 多 6 个百分点。
 
-## 12.4.4 SSR 的局限与未来
+## 21.3.4 SSR 的局限与未来
 
 ### Generator 可能产生无效 bug
 
@@ -205,7 +205,7 @@ Self-play 生成的 bug 可能与真实 bug 分布不同——比如 Generator �
 
 缓解：用真实 PR 作为种子，让 Generator 在真实 bug 模式基础上变异。
 
-## 12.4.5 RL-based SWE 的工业落地
+## 21.3.5 RL-based SWE 的工业落地
 
 到 2026 年中，RL-based SWE 已经在多个产品中落地：
 
@@ -245,7 +245,7 @@ OpenAI 重新推出了 Codex——一个基于 o3 的代码 agent。它的特点
 - 长上下文（200K-1M）
 - 在 SWE-bench Verified 上达到 65%+
 
-## 12.4.6 多语言、多仓库扩展
+## 21.3.6 多语言、多仓库扩展
 
 当前 SWE-RL 主要集中在 Python。未来的扩展方向：
 
@@ -268,7 +268,7 @@ OpenAI 重新推出了 Codex——一个基于 o3 的代码 agent。它的特点
 - **领域特化 reward**：不同仓库的"好代码"标准不同
 - **跨仓库 reasoning**：理解仓库间的依赖关系
 
-## 12.4.7 多 agent 协作
+## 21.3.7 多 agent 协作
 
 复杂 SWE 任务可能需要多个 agent 协作：
 
@@ -296,10 +296,10 @@ Reviewer Agent: 检查代码质量
 
 这一章我们梳理了 RL-based SWE 的全貌：
 
-- **12.1 节**：SWE-bench 与 RLVR 范式——为什么 SWE 是 RLVR 的理想战场
-- **12.2 节**：Meta SWE-RL——开源 SOTA，GRPO + 简单 reward
-- **12.3 节**：Code World Model + DeepSWE——加速训练 + 长 horizon 处理
-- **12.4 节**：Self-play SSR——数据 flywheel，工业落地
+- **21.1 节**：SWE-bench 与 RLVR 范式——为什么 SWE 是 RLVR 的理想战场
+- **21.1 节**：Meta SWE-RL——开源 SOTA，GRPO + 简单 reward
+- **21.2 节**：Code World Model + DeepSWE——加速训练 + 长 horizon 处理
+- **21.3 节**：Self-play SSR——数据 flywheel，工业落地
 
 **核心收获**：
 
@@ -311,6 +311,6 @@ Reviewer Agent: 检查代码质量
 
 **接下来的章节**：
 
-- [第 11 章 PRM 与搜索](../chapter20_prm_search/outcome-vs-process)——SWE-RL 中的 step-level reward
-- [第 13 章奖励黑客](../chapter15_rlhf/evaluation)——SWE 任务的 hacking（如"删除测试让 reward 变高"）
+- [第 18 章 PRM 与搜索](../chapter20_prm_search/outcome-vs-process)——SWE-RL 中的 step-level reward
+- [第 28 章奖励黑客](../chapter30_alignment_failures/classical-failures)——SWE 任务的 hacking（如"删除测试让 reward 变高"）
 - [第 20.10 节 Agentic RL 训练系统](../chapter22_agentic/build-agentic-training-system)——SWE-RL 的工程实现

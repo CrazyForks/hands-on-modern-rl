@@ -1,13 +1,11 @@
 ---
-title: B.8 Asynchronous Training
+title: 'Legacy: Asynchronous Training'
 search: false
 ---
 
-# B.8 Asynchronous Training
+# Legacy Page: Asynchronous Training Architecture (Merged into Appendix A.2)
 
-# Legacy Page: Asynchronous Training Architecture (Merged into B.1)
-
-> This page is kept as an entry point for legacy links. The core content has been merged into the "Asynchronous Training Architecture" part of [B.1 RL Training Infrastructure: Sampling, Asynchrony, and Distributed Systems](./rl-infrastructure). The original text is preserved below (in English translation) so readers coming from old links can map the content.
+> This page is kept as an entry point for legacy links. The core content has been merged into the “Asynchronous Training Architecture” part of [Appendix A.2 Training Infrastructure](./rl-infrastructure). The original text is preserved below so readers coming from old links can map the content.
 
 LLM RL training has a core contradiction: **generation (inference) is extremely slow, training is relatively fast, and serializing them causes GPUs to sit idle.** Asynchronous training exists to resolve this.
 

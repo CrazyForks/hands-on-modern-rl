@@ -129,7 +129,7 @@ $\exp(\beta A)$ 给数据中表现好的动作更大权重，让 $\pi_\theta$ �
 
 ## AWAC 与 TD3+BC：保守约束和行为克隆正则化
 
-另一条路线更工程化——**保留 on-policy / off-policy actor-critic 主循环，在策略损失里直接加行为克隆（BC）正则**。这类方法的优势是与 [第 9 章](../chapter11_continuous_control/intro) 的 PPO/SAC 框架兼容，工程改造量极小。
+另一条路线更工程化——**保留 on-policy / off-policy actor-critic 主循环，在策略损失里直接加行为克隆（BC）正则**。这类方法的优势是与第 8 至 9 章的 PPO/SAC 框架兼容，工程改造量极小。
 
 ### TD3+BC：BC 正则化的最简形式
 

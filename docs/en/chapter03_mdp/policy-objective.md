@@ -205,7 +205,7 @@ Reading left to right:
 
 Only the policy terms $\pi_\theta(a_t\mid s_t)$ depend on $\theta$; the initial-state distribution and environment dynamics are properties of the environment.
 
-In the next chapter (policy gradients), we will use this structure to derive REINFORCE and the policy gradient theorem, and then discuss variance reduction (baselines and advantage functions).
+In Chapter 6 (policy gradients), we will use this structure to derive REINFORCE and the policy gradient theorem, and then discuss variance reduction (baselines and advantage functions).
 
 ## The Log-Derivative Trick
 

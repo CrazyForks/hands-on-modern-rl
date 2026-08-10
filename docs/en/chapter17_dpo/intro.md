@@ -1,20 +1,20 @@
 ---
-title: 2. DPO Preference Tuning
+title: 15.1 DPO Preference Tuning
 ---
 
-# Chapter 15: DPO Preference Tuning
+# 15.1 DPO Preference Tuning
 
 > **Chapter code**: [0-download_model.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/0-download_model.py) · [1-generate_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/1-generate_data.py) · [2-test_before.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/2-test_before.py) · [3-train_dpo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/3-train_dpo.py) · [4-test_after.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/4-test_after.py)
 
-In the previous chapter, we built the classic agent loop for traditional reinforcement learning applications, for example making CartPole balance under physics rules. That setup works well when the environment provides an unambiguous scalar feedback signal (game score, survival time, and so on).
+In Chapter 1, we built the classic agent loop for traditional reinforcement learning applications, for example making CartPole balance under physics rules. That setup works well when the environment provides an unambiguous scalar feedback signal (game score, survival time, and so on).
 
 But as soon as we move to modern language tasks, the premise starts to crack: for a large language model (LLM), it is extremely hard to design an "environment" that can reliably return a precise numerical reward for every piece of text it generates.
 
-We also saw PPO in the previous chapter: an algorithm that improves a policy from immediate scalar rewards. PPO pushed the state of the art on many continuous and discrete control tasks when it was introduced [^1]. At the same time, classic RL relies heavily on a simulator that can be reset cheaply and run many trial-and-error rollouts. For an LLM with hundreds of millions (or billions) of parameters that only outputs natural language, it is difficult to directly reuse the "physics simulator" mental model.
+We studied PPO in Chapter 8: an algorithm that improves a policy from immediate scalar rewards. PPO pushed the state of the art on many continuous and discrete control tasks when it was introduced [^1]. At the same time, classic RL relies heavily on a simulator that can be reset cheaply and run many trial-and-error rollouts. For an LLM with hundreds of millions (or billions) of parameters that only outputs natural language, it is difficult to directly reuse the "physics simulator" mental model.
 
 So in this chapter we switch the application from "game control" to "language alignment". At the level of generation, we will see how to convert human preferences about answers into a learning signal [^2]. At the sequence level, we will focus on a modern post-training paradigm called **Direct Preference Optimization (DPO)** [^3], and understand how it bypasses explicit reward modeling by **optimizing the language model directly from preference data**. From a systems perspective, DPO requires minimal architectural changes: we mainly change the loss function. In practical alignment work, we often freeze most parameters and use a small amount of high-quality preference data to efficiently adapt a pretrained model.
 
-## 15.1 The Basic Ingredients of Preference Tuning
+## The Basic Ingredients of Preference Tuning
 
 A text-generation or dialogue model takes a prompt as input and produces a response. Beyond "just" next-token completion, **alignment** is a central training goal: the model should answer in ways that match human values, and in particular should be **helpful** and **honest**.
 

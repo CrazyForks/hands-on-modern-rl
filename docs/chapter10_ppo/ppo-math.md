@@ -994,4 +994,4 @@ flowchart LR
 - $F \to G$：避免 TRPO 的二阶代价 → PPO-Clip 的裁剪近似。
 - $G \to H$：把代理目标变成可优化的 loss → 加上价值损失和熵奖励。
 
-正文从 $D \to E$ 进入（重要性采样），到 $G$ 收口（PPO-Clip），第 7.3 节详细拆解裁剪机制。本附录补全了 $A \to D$ 的起点，并在这一节补上 $E \to F \to G$ 的过渡，使 PG → REINFORCE → TRPO → PPO 的完整推导链在书中成形。
+正文从 $D \to E$ 进入（重要性采样），到 $G$ 收口（PPO-Clip），第 8.2 节详细拆解裁剪机制。本附录补全了 $A \to D$ 的起点，并在这一节补上 $E \to F \to G$ 的过渡，使 PG → REINFORCE → TRPO → PPO 的完整推导链在书中成形。

@@ -4,7 +4,7 @@
 
 ## 策略目标函数
 
-第 3 章引入过[策略目标函数](../chapter08_policy_gradient/policy-gradient) $J(\theta)$——衡量"这个策略整体上有多好"。答案很自然：在所有可能的起点上，策略 $\pi_\theta$ 期望能累积的[折扣总奖励](../chapter03_mdp/mdp)。
+第 2 章引入过[策略目标函数](../chapter03_mdp/policy-value) $J(\theta)$——衡量"这个策略整体上有多好"。答案很自然：在所有可能的起点上，策略 $\pi_\theta$ 期望能累积的[折扣总奖励](../chapter03_mdp/mdp)。
 
 $$J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \sum_{t=0}^{\infty} \gamma^t r_t \right]$$
 
@@ -432,7 +432,7 @@ Q-Learning 更新的是价值函数 $Q(s,a)$（"这个动作值多少分"），�
 
 </details>
 
-REINFORCE 能工作，但高方差让它几乎不可用。好在策略梯度定理有一个奇妙的性质：可以在梯度估计中减去一个不依赖于动作的"基线"，既不改变梯度的期望方向，又能大幅降低方差。这将在第 5.4 节展开。下一节先在 CartPole 上动手跑一遍 REINFORCE：[动手：CartPole 实战](./cartpole)。
+REINFORCE 能工作，但高方差让它几乎不可用。好在策略梯度定理有一个奇妙的性质：可以在梯度估计中减去一个不依赖于动作的"基线"，既不改变梯度的期望方向，又能大幅降低方差。这将在第 6.3 节展开。下一节先在 CartPole 上动手跑一遍 REINFORCE：[动手：CartPole 实战](./cartpole)。
 
 ---
 

@@ -6,11 +6,11 @@ title: '2.4 Chapter Summary: MDP, Value, and Policy'
 
 ## Overview
 
-This chapter develops the core language of reinforcement learning around sequential decision-making: how we model an environment, how we define return, how we evaluate states and actions via value functions, how Bellman equations provide the recursive structure, how we estimate values from data (DP/MC/TD), how tabular Q-Learning works, how we optimize parameterized policies, and why reward design matters.
+Chapters 2-4 develop the core language of reinforcement learning around sequential decision-making: how we model an environment, define return, evaluate states and actions via value functions, use Bellman equations, estimate values from data, apply tabular Q-Learning, optimize parameterized policies, and design rewards.
 
-As the closing summary of Chapter 3, this section collects the key formulas from Sections 3.1 to 3.8 and explains where each one sits in the chapter's logical structure.
+As the closing summary of these foundational chapters, this section collects the key formulas from Sections 2.1-4.3 and explains where each one sits in the overall logical structure.
 
-The main takeaways of this chapter can be summarized in eight points:
+The main takeaways can be summarized in eight points:
 
 1. A reinforcement learning problem can be formalized as an MDP five-tuple.
 2. The agent optimizes discounted cumulative return, not a one-step immediate reward.
@@ -25,138 +25,138 @@ These ideas form the shared theoretical foundation for later topics such as Deep
 
 ## Index Of Core Formulas
 
-Below we list the core formulas from Sections 3.1 to 3.8 in one place. Each formula is annotated with its name, what it is used for, and where it was explained.
+Below we list the core formulas from Sections 2.1-4.3 in one place. Each formula is annotated with its name, what it is used for, and where it was explained.
 
-### 3.1 Two Slot Machines
+### 2.4.1 Two Slot Machines
 
 $$
 \mathbb{E}[R_a] = p_a \cdot (+1) + (1-p_a)\cdot(-1) = 2p_a - 1
-\quad \text{(expected reward of a single arm; role: compare the average payoff of one action; see 3.1)}
+\quad \text{(expected reward of a single arm; role: compare the average payoff of one action; see 2.1)}
 $$
 
 $$
 \mathbb{E}[R_T] = \mathbb{E}[R_{a_1}] + \mathbb{E}[R_{a_2}] + \cdots + \mathbb{E}[R_{a_T}] = \sum_{t=1}^{T} \mathbb{E}[R_{a_t}]
-\quad \text{(expected total return over T rounds; role: measure the cumulative performance of a whole strategy; see 3.1)}
+\quad \text{(expected total return over T rounds; role: measure the cumulative performance of a whole strategy; see 2.1)}
 $$
 
 $$
 \mathrm{Regret}(T) = T\mu^* - \sum_{t=1}^{T}\mu_{a_t}, \qquad \mu^*=\max_a \mu_a
-\quad \text{(regret; role: quantify how much is lost due to exploration compared with the best arm; see 3.1)}
+\quad \text{(regret; role: quantify how much is lost due to exploration compared with the best arm; see 2.1)}
 $$
 
-### 3.2 MDP
+### 2.4.2 MDP
 
 $$
 \mathcal{M} = \langle \mathcal{S}, \mathcal{A}, P, R, \gamma \rangle
-\quad \text{(MDP five-tuple; role: specify the complete rules of a sequential decision problem; see 3.2)}
+\quad \text{(MDP five-tuple; role: specify the complete rules of a sequential decision problem; see 2.2)}
 $$
 
 $$
 P(s' \mid s,a), \qquad R(s,a), \qquad \gamma \in [0,1]
-\quad \text{(transition, reward, and discount; role: define dynamics, immediate feedback, and the weight on the future; see 3.2)}
+\quad \text{(transition, reward, and discount; role: define dynamics, immediate feedback, and the weight on the future; see 2.2)}
 $$
 
 $$
 G_t = \sum_{k=0}^{\infty}\gamma^k r_{t+k} = r_t + \gamma G_{t+1}
-\quad \text{(discounted cumulative return; role: define the long-term objective from time t; see 3.2)}
+\quad \text{(discounted cumulative return; role: define the long-term objective from time t; see 2.2)}
 $$
 
 $$
 a = \pi(s), \qquad \pi(a\mid s)=P(a\mid s)
-\quad \text{(deterministic and stochastic policies; role: describe how the agent chooses actions; see 3.2)}
+\quad \text{(deterministic and stochastic policies; role: describe how the agent chooses actions; see 2.3)}
 $$
 
-### 3.3 V(s) And The Bellman Equation
+### 2.4.3 V(s) And The Bellman Equation
 
 $$
 V^\pi(s)=\mathbb{E}_\pi\left[\sum_{k=0}^{\infty}\gamma^k r_{t+k}\mid s_t=s\right]
-\quad \text{(state-value function; role: evaluate the long-term expected return of a state; see 3.3)}
+\quad \text{(state-value function; role: evaluate the long-term expected return of a state; see 3.1)}
 $$
 
 $$
 V^\pi(s)=\sum_{a\in\mathcal{A}}\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'\in\mathcal{S}}P(s'\mid s,a)V^\pi(s')\right]
-\quad \text{(Bellman expectation equation; role: recursively compute value under a fixed policy; see 3.3)}
+\quad \text{(Bellman expectation equation; role: recursively compute value under a fixed policy; see 3.1)}
 $$
 
 $$
 V^*(s)=\max_a\left[R(s,a)+\gamma\sum_{s'\in\mathcal{S}}P(s'\mid s,a)V^*(s')\right]
-\quad \text{(Bellman optimality equation; role: define the optimal state value; see 3.3)}
+\quad \text{(Bellman optimality equation; role: define the optimal state value; see 3.2)}
 $$
 
 $$
 \text{Target}=r+\gamma V(s'), \qquad \delta=\text{Target}-V(s)
-\quad \text{(Bellman target and the prototype of TD error; role: turn Bellman recursion into a sample-based learning signal; see 3.3)}
+\quad \text{(Bellman target and the prototype of TD error; role: turn Bellman recursion into a sample-based learning signal; see 4.1)}
 $$
 
-### 3.4 DP, MC, TD
+### 2.4.4 DP, MC, TD
 
 $$
 V(s) \leftarrow \sum_a \pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')\right]
-\quad \text{(DP policy evaluation update; role: iterate values when the model is known; see 3.4)}
+\quad \text{(DP policy evaluation update; role: iterate values when the model is known; see 4.1)}
 $$
 
 $$
 \pi'(s)=\arg\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^\pi(s')\right]
-\quad \text{(policy improvement; role: build a better greedy policy from the current value; see 3.4)}
+\quad \text{(policy improvement; role: build a better greedy policy from the current value; see 4.1)}
 $$
 
 $$
 V(s) \leftarrow V(s)+\alpha\left[G_t-V(s)\right]
-\quad \text{(MC value update; role: correct value estimates using complete returns; see 3.4)}
+\quad \text{(MC value update; role: correct value estimates using complete returns; see 4.1)}
 $$
 
 $$
 V(s) \leftarrow V(s)+\alpha\left[r+\gamma V(s')-V(s)\right]
-\quad \text{(TD(0) value update; role: bootstrap from one-step targets for online updates; see 3.4)}
+\quad \text{(TD(0) value update; role: bootstrap from one-step targets for online updates; see 4.1)}
 $$
 
 $$
 \delta = r+\gamma V(s')-V(s)
-\quad \text{(TD error; role: measure how much the current estimate violates the one-step Bellman relation; see 3.4)}
+\quad \text{(TD error; role: measure how much the current estimate violates the one-step Bellman relation; see 4.1)}
 $$
 
-### 3.5 Q(s, a)
+### 2.4.5 Q(s, a)
 
 $$
 Q^\pi(s,a)=\mathbb{E}_\pi\left[G_t\mid s_t=s,a_t=a\right]
-\quad \text{(action-value function; role: evaluate long-term return starting with action a at state s; see 3.5)}
+\quad \text{(action-value function; role: evaluate long-term return starting with action a at state s; see 3.2)}
 $$
 
 $$
 V^\pi(s)=\sum_a\pi(a\mid s)Q^\pi(s,a)
-\quad \text{(V-Q relationship; role: obtain state value as the policy-weighted average of action values; see 3.5)}
+\quad \text{(V-Q relationship; role: obtain state value as the policy-weighted average of action values; see 3.2)}
 $$
 
 $$
 Q^\pi(s,a)=R(s,a)+\gamma\sum_{s'\in\mathcal{S}}P(s'\mid s,a)\sum_{a'\in\mathcal{A}}\pi(a'\mid s')Q^\pi(s',a')
-\quad \text{(Bellman expectation equation for Q; role: recursively compute action values under a fixed policy; see 3.5)}
+\quad \text{(Bellman expectation equation for Q; role: recursively compute action values under a fixed policy; see 3.2)}
 $$
 
 $$
 Q^*(s,a)=R(s,a)+\gamma\sum_{s'\in\mathcal{S}}P(s'\mid s,a)\max_{a'}Q^*(s',a')
-\quad \text{(Bellman optimality equation for Q; role: recursively define the optimal action value; see 3.5)}
+\quad \text{(Bellman optimality equation for Q; role: recursively define the optimal action value; see 3.2)}
 $$
 
 $$
 \pi^*(s)=\arg\max_a Q^*(s,a)
-\quad \text{(greedy optimal policy; role: induce an optimal policy from the optimal action-value function; see 3.5)}
+\quad \text{(greedy optimal policy; role: induce an optimal policy from the optimal action-value function; see 3.2)}
 $$
 
-### 3.5 Q-Learning
+### 2.4.6 Q-Learning
 
 $$
 \text{TD Target}=r+\gamma\max_{a'}Q(s',a')
-\quad \text{(Q-Learning TD target; role: construct a one-step learning target for Q from experience; see 3.5)}
+\quad \text{(Q-Learning TD target; role: construct a one-step learning target for Q from experience; see 3.2)}
 $$
 
 $$
 \delta=r+\gamma\max_{a'}Q(s',a')-Q(s,a)
-\quad \text{(Q-Learning TD error; role: measure the gap between current Q estimate and the TD target; see 3.5)}
+\quad \text{(Q-Learning TD error; role: measure the gap between current Q estimate and the TD target; see 3.2)}
 $$
 
 $$
 Q(s,a)\leftarrow Q(s,a)+\alpha\left[r+\gamma\max_{a'}Q(s',a')-Q(s,a)\right]
-\quad \text{(Q-Learning update; role: incrementally correct the state-action value table; see 3.5)}
+\quad \text{(Q-Learning update; role: incrementally correct the state-action value table; see 3.2)}
 $$
 
 $$
@@ -165,34 +165,34 @@ a_t=
 \text{random action} & \text{with probability }\varepsilon\\
 \arg\max_a Q(s_t,a) & \text{with probability }1-\varepsilon
 \end{cases}
-\quad \text{(}\varepsilon\text{-greedy; role: trade off exploration and exploitation; see 3.5)}
+\quad \text{(}\varepsilon\text{-greedy; role: trade off exploration and exploitation; see 3.2)}
 $$
 
-### 3.6 Policy Objective
+### 2.4.7 Policy Objective
 
 $$
 \pi_\theta(a\mid s)=P_\theta(a\mid s)
-\quad \text{(parameterized stochastic policy; role: represent an action distribution with parameters theta; see 3.6)}
+\quad \text{(parameterized stochastic policy; role: represent an action distribution with parameters theta; see 2.3)}
 $$
 
 $$
 J(\theta)=\mathbb{E}_{\pi_\theta}\left[G_t\right]
 =\mathbb{E}_{\pi_\theta}\left[\sum_{t=0}^{\infty}\gamma^t r_t\right]
-\quad \text{(policy objective; role: measure the expected long-term return of a parameterized policy; see 3.6)}
+\quad \text{(policy objective; role: measure the expected long-term return of a parameterized policy; see 2.3)}
 $$
 
 $$
 \theta^*=\arg\max_\theta J(\theta)
-\quad \text{(optimal policy parameters; role: pose policy learning as a maximization problem; see 3.6)}
+\quad \text{(optimal policy parameters; role: pose policy learning as a maximization problem; see 2.3)}
 $$
 
 $$
 \nabla_\theta J(\theta)\propto
 \mathbb{E}_{\pi_\theta}\left[\nabla_\theta\log\pi_\theta(a\mid s)\cdot G_t\right]
-\quad \text{(policy gradient estimator; role: increase the probability of actions that lead to high return; see 3.6)}
+\quad \text{(policy gradient estimator; role: increase the probability of actions that lead to high return; see 2.3)}
 $$
 
-### 3.8 Reward Design
+### 2.4.8 Reward Design
 
 $$
 R(s,a)=
@@ -201,37 +201,37 @@ R(s,a)=
 0 & \text{otherwise}\\
 -1 & \text{failure}
 \end{cases}
-\quad \text{(sparse reward; role: provide learning signal only at success/failure; see 3.8)}
+\quad \text{(sparse reward; role: provide learning signal only at success/failure; see 4.3)}
 $$
 
 $$
 R_{\text{shaping}}(s,a,s')=-\left(\text{dist}(s',\text{goal})-\text{dist}(s,\text{goal})\right)
-\quad \text{(distance-based shaping; role: provide intermediate rewards from progress toward the goal; see 3.8)}
+\quad \text{(distance-based shaping; role: provide intermediate rewards from progress toward the goal; see 4.3)}
 $$
 
 $$
 F(s,a,s')=\gamma\Phi(s')-\Phi(s)
-\quad \text{(potential-based shaping; role: strengthen intermediate signals without changing the optimal policy; see 3.8)}
+\quad \text{(potential-based shaping; role: strengthen intermediate signals without changing the optimal policy; see 4.3)}
 $$
 
 $$
 r_t^{\text{intrinsic}}=\left\|f(s_t,a_t)-s_{t+1}\right\|^2
-\quad \text{(prediction-error intrinsic reward; role: encourage exploration where the model predicts poorly; see 3.8)}
+\quad \text{(prediction-error intrinsic reward; role: encourage exploration where the model predicts poorly; see 4.3)}
 $$
 
 $$
 r_t^{\text{RND}}=\left\|\hat{\phi}(s_t)-\phi(s_t)\right\|^2
-\quad \text{(RND intrinsic reward; role: measure novelty via random network distillation; see 3.8)}
+\quad \text{(RND intrinsic reward; role: measure novelty via random network distillation; see 4.3)}
 $$
 
 $$
 r_t^{\text{total}}=r_t^{\text{extrinsic}}+\beta r_t^{\text{intrinsic}}
-\quad \text{(total reward combination; role: combine task reward and exploration reward; see 3.8)}
+\quad \text{(total reward combination; role: combine task reward and exploration reward; see 4.3)}
 $$
 
 ## Scalar And Matrix Forms
 
-All formulas in this chapter are presented in a per-state (scalar) form. If we stack all states into vectors and write transitions as matrices, the $n$ scalar equations can be compressed into a single line of matrix form.
+The formulas above are presented in a per-state (scalar) form. If we stack all states into vectors and write transitions as matrices, the $n$ scalar equations can be compressed into a single line of matrix form.
 
 ### Notation
 
@@ -390,13 +390,13 @@ The formulas in this chapter are not isolated; they form a layered sequence of d
 | Policy optimization | How do we optimize a parameterized policy directly?         | $J(\theta)$, $\nabla_\theta J(\theta)$                         |
 | Objective design    | What reward signal is the algorithm maximizing?             | $R(s,a)$, $F(s,a,s')$, $r_t^{\text{total}}$                    |
 
-This hierarchy reflects the chapter's logic: we define the environment before defining return, and define return before defining value. Value recursion underlies DP/MC/TD; state and action values support policy improvement; and the reward signal ultimately determines what every optimization objective means.
+This hierarchy reflects the logic of Chapters 2-4: we define the environment before defining return, and define return before defining value. Value recursion underlies DP/MC/TD; state and action values support policy improvement; and the reward signal ultimately determines what every optimization objective means.
 
-## The Main Thread Of The Chapter
+## The Main Thread Of The Foundations
 
 ### From Return To Bellman Recursion
 
-The most important mathematical structure in Chapter 3 is recursion. Discounted return can be written as an infinite sum:
+The most important mathematical structure in Chapters 2-4 is recursion. Discounted return can be written as an infinite sum:
 
 $$
 G_t=\sum_{k=0}^{\infty}\gamma^k r_{t+k}
@@ -438,17 +438,17 @@ $$
 r+\gamma\max_{a'}Q(s',a')
 $$
 
-and uses it to correct the current estimate $Q(s,a)$. This allows the agent to learn a decision-ready Q-table without a full environment model and without waiting for an episode to end. Tabular Q-Learning fits small, discrete state spaces; once the state space is large or continuous, we need function approximation methods, which we discuss in Chapter 4.
+and uses it to correct the current estimate $Q(s,a)$. This allows the agent to learn a decision-ready Q-table without a full environment model and without waiting for an episode to end. Tabular Q-Learning fits small, discrete state spaces; once the state space is large or continuous, we need function approximation methods, which we discuss in Chapter 5.
 
 ### From Policy Representation To Policy Optimization
 
-Section 3.6 provides another perspective on learning: instead of explicitly learning values for each action first, we can represent the policy as a parameterized distribution $\pi_\theta(a\mid s)$ and maximize
+Section 2.3 provides another perspective on learning: instead of explicitly learning values for each action first, we can represent the policy as a parameterized distribution $\pi_\theta(a\mid s)$ and maximize
 
 $$
 J(\theta)=\mathbb{E}_{\pi_\theta}[G_t]
 $$
 
-The policy gradient expression shows that the update direction has two components. The term $\nabla_\theta\log\pi_\theta(a\mid s)$ describes how to increase the probability of the chosen action, while $G_t$ serves as the return-weight that tells us how strongly to push in that direction. Chapter 5 will derive and refine this result.
+The policy gradient expression shows that the update direction has two components. The term $\nabla_\theta\log\pi_\theta(a\mid s)$ describes how to increase the probability of the chosen action, while $G_t$ serves as the return-weight that tells us how strongly to push in that direction. Chapter 6 will derive and refine this result.
 
 ### The Reward Function Defines The Objective
 
@@ -456,7 +456,7 @@ Every value function, policy objective, and update rule ultimately depends on th
 
 ## Review Questions
 
-After completing this chapter, you should be able to answer the following questions.
+After completing Chapters 2-4, you should be able to answer the following questions.
 
 1. Given a task, how do you write its MDP five-tuple?
 
@@ -554,23 +554,23 @@ $$
 can theoretically preserve the optimal policy, and is therefore a relatively safer form of shaping.
 :::
 
-These questions emphasize the conceptual roles behind the formulas. Mastery of this chapter is not just memorizing symbolic forms, but understanding what each object does in a reinforcement learning problem.
+These questions emphasize the conceptual roles behind the formulas. Mastery of these foundations is not just memorizing symbolic forms, but understanding what each object does in a reinforcement learning problem.
 
 ## How Later Chapters Use These Ideas
 
 | Later Chapter              | Objects From This Chapter                                            | How They Are Used                                                                                                       |
 | -------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Chapter 4: Deep Q-Networks | $Q(s,a)$, $Q^*(s,a)$, $\arg\max_a Q(s,a)$, TD target                 | Approximate action values with neural networks; update Q via bootstrapped targets                                       |
-| Chapter 5: Policy Gradient | $\pi_\theta(a\mid s)$, $J(\theta)$, $\nabla_\theta J(\theta)$, $G_t$ | Directly optimize a parameterized policy; raise probability of high-return actions                                      |
-| Chapter 6: Actor-Critic    | $V(s)$, TD error, $J(\theta)$                                        | Use a value function as a critic to provide low-variance signals for policy updates                                     |
-| Chapter 7: PPO             | $V(s)$, advantage function, TD error, policy objective               | Use a critic to estimate advantages and constrain the update size                                                       |
-| Chapters 8+ (LLM RL)       | policy, reward, return, objective                                    | Treat token generation as sequential decisions; convert preference or verification signals into optimization objectives |
+| Chapter 5: Deep Q-Networks | $Q(s,a)$, $Q^*(s,a)$, $\arg\max_a Q(s,a)$, TD target                 | Approximate action values with neural networks; update Q via bootstrapped targets                                       |
+| Chapter 6: Policy Gradient | $\pi_\theta(a\mid s)$, $J(\theta)$, $\nabla_\theta J(\theta)$, $G_t$ | Directly optimize a parameterized policy; raise probability of high-return actions                                      |
+| Chapter 7: Actor-Critic    | $V(s)$, TD error, $J(\theta)$                                        | Use a value function as a critic to provide low-variance signals for policy updates                                     |
+| Chapter 8: PPO             | $V(s)$, advantage function, TD error, policy objective               | Use a critic to estimate advantages and constrain the update size                                                       |
+| Chapters 13+ (LLM RL)      | policy, reward, return, objective                                    | Treat token generation as sequential decisions; convert preference or verification signals into optimization objectives |
 
-So, the formulas in Chapter 3 are not only for this chapter's exercises. They reappear repeatedly in later algorithms. As representations shift from tables to function approximation, these objects re-emerge as neural networks, loss functions, training targets, advantage estimates, and KL constraints.
+So, the formulas in Chapters 2-4 are not only for the current exercises. They reappear repeatedly in later algorithms. As representations shift from tables to function approximation, these objects re-emerge as neural networks, loss functions, training targets, advantage estimates, and KL constraints.
 
 ## Summary
 
-Chapter 3 establishes the basic structure of reinforcement learning theory:
+Chapters 2-4 establish the basic structure of reinforcement learning theory:
 
 1. Define a sequential decision problem with the MDP five-tuple.
 2. Define the long-term objective using discounted cumulative return $G_t$.
@@ -581,4 +581,4 @@ Chapter 3 establishes the basic structure of reinforcement learning theory:
 7. Distinguish algorithm families by how data is collected (on/off-policy, online/offline).
 8. Use reward design to explain where the objective comes from and why the objective definition itself shapes learning outcomes.
 
-The next chapter starts from $Q(s,a)$ and introduces the first complete algorithm family: [Chapter 4: Deep Q-Networks](../chapter07_dqn/from-q-to-dqn).
+The next chapter develops the value-function route in [Chapter 3: Value Functions and Bellman Equations](./value-bellman), deriving the Bellman expectation equation, the Bellman optimality equation, and the resulting optimal policy.

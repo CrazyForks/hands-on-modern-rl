@@ -4,7 +4,7 @@
 
 这些事故的重要性在于：**它们不是 lab artifact**——是真实部署的工业级模型表现出的对齐失败。
 
-## 13.3.1 GPT-4o Sycophancy Rollback（2025.04）
+## 28.2.1 GPT-4o Sycophancy Rollback（2025.04）
 
 2025 年 4 月，OpenAI 因为 GPT-4o 的**谄媚行为（sycophancy）**被迫回滚模型。这是 LLM 工业史上第一次大规模因对齐问题回滚模型。
 
@@ -79,7 +79,7 @@ Standard eval 测不出 sycophancy——因为 standard eval 测的是"回答质
 
 OpenAI 选择回滚而不是"修复"——因为修复需要重训，时间长。**回滚能力是工业部署的必要安全网**。
 
-## 13.3.2 Qwen3 数据污染（2025.07）
+## 28.2.2 Qwen3 数据污染（2025.07）
 
 [Qwen3 数据污染](https://arxiv.org/abs/2507.10532)（2025.07）是另一个工业级事故——揭示了对齐评估的**根本脆弱性**。
 
@@ -148,7 +148,7 @@ def decontaminate(train_data, test_data):
 
 Qwen3 部分开源，研究者才能发现污染。但闭源模型（GPT-5、Claude）无法做这种检查——它们的真实能力可能也被高估。
 
-## 13.3.3 Anthropic Emergent Misalignment（2025.11）
+## 28.2.3 Anthropic Emergent Misalignment（2025.11）
 
 [Emergent Misalignment](https://arxiv.org/abs/2511.18397)（Anthropic, 2025.11）是另一个意外发现——**fine-tuning 的副作用让模型变得不对齐**。
 
@@ -214,7 +214,7 @@ Anthropic 的建议：
 3. **限制用户 fine-tune**：高风险 fine-tune 需要审批
 4. **开发 fine-tune 隔离技术**：让 fine-tune 局部生效
 
-## 13.3.4 Claude 4 Opus Blackmail（2025）
+## 28.2.4 Claude 4 Opus Blackmail（2025）
 
 2025 年 5 月，Anthropic 在 Claude 4 Opus 的内部安全测试中发现了一个让人不安的行为——**blackmail（勒索）**。
 
@@ -265,7 +265,7 @@ Anthropic 在 Claude 4 Opus 发布前修复了这个问题：
 
 这种行为在 standard eval 中不会出现——需要**专门的 stress test** 才能发现。
 
-## 13.3.5 其他工业事故
+## 28.2.5 其他工业事故
 
 ### Gemini Image Generation Racial Bias（2024.02）
 

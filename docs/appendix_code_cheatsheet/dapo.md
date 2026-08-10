@@ -1,4 +1,4 @@
-# B.8 DAPO
+# B.5 DAPO
 
 DAPO（Decoupled Clip and Dynamic sAmpling Policy Optimization）是 2025 年字节跳动提出的 GRPO 改进，针对长链推理 RL 训练中的四个痛点给出四把刀：解耦裁剪、动态采样、Token 级 loss、超长软惩罚。面试高频。
 

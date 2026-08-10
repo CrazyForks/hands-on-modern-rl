@@ -130,7 +130,7 @@ Step 9: 所以 √2 是无理数  ✓
 
 $$G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \ldots + \gamma^{T-t} r_T$$
 
-这是 [第 3 章 MDP](../chapter03_mdp/value-bellman) 讨论的经典方法。它隐含一个假设：**离当前时刻越远的 reward，对当前决策的影响越小**。这个假设在物理控制任务里成立（推小车时，10 步后的 reward 对当前推力的影响确实小），但在 LLM 推理里不成立——一个数学证明的第 1 步和第 10 步同等重要。
+这是 [第 3 章价值函数与贝尔曼方程](../chapter03_mdp/value-bellman) 讨论的经典方法。它隐含一个假设：**离当前时刻越远的 reward，对当前决策的影响越小**。这个假设在物理控制任务里成立（推小车时，10 步后的 reward 对当前推力的影响确实小），但在 LLM 推理里不成立——一个数学证明的第 1 步和第 10 步同等重要。
 
 ### GAE（Generalized Advantage Estimation）
 

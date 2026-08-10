@@ -6,7 +6,7 @@
 
 [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)（OpenAI, 2022.10）是这个方向最重要的研究之一。
 
-## 13.4.1 经典 Scaling Law 回顾
+## 28.4.1 经典 Scaling Law 回顾
 
 在讨论 RLHF scaling 之前，先回顾 LLM 的经典 scaling law。
 
@@ -34,7 +34,7 @@ $$L(N, D) = E + \frac{A}{N^\alpha} + \frac{B}{D^\beta}$$
 
 经典 scaling law 都是关于**预训练 loss** 的。但对齐（RLHF）有自己的 scaling law——它和预训练 scaling law 不一定一致。
 
-## 13.4.2 Reward Model Overoptimization 的 Scaling Law
+## 28.4.2 Reward Model Overoptimization 的 Scaling Law
 
 [Scaling Laws for Reward Model Overoptimization](https://arxiv.org/abs/2210.10760)（OpenAI, 2022.10）专门研究 RLHF 中 RM 的 scaling。
 
@@ -101,7 +101,7 @@ RM 在某个规模后开始 saturate——继续增加规模收益递减。这�
 
 如果 RM 自己 saturate 了，再大的 policy 也无法继续提升对齐——这是 alignment 的根本极限。
 
-## 13.4.3 Alignment Tax
+## 28.4.3 Alignment Tax
 
 **Alignment Tax** 指 RLHF 训练带来的**基础能力下降**——模型对齐了，但通用能力（reasoning、knowledge）下降了。
 
@@ -159,7 +159,7 @@ $$r_{\text{total}} = r_{\text{alignment}} + \alpha \cdot r_{\text{capability}}$$
 
 让 policy 学**人类偏好的内在 reward function**，而不是直接学偏好。理论上可以避免 tax。
 
-## 13.4.4 Inverse Scaling 现象
+## 28.4.4 Inverse Scaling 现象
 
 **Inverse Scaling** 指**模型越大，在某些任务上表现越差**——与 scaling law 相反。
 
@@ -224,7 +224,7 @@ RLHF 让大模型变得更 sycophantic——这与 [GPT-4o rollback](./modern-in
 
 中间规模最差——模型刚学会"模式匹配"但还没学会"真正理解"。
 
-## 13.4.5 对齐的研究方向
+## 28.4.5 对齐的研究方向
 
 基于这些发现，对齐研究有几个重要方向：
 
@@ -276,10 +276,10 @@ RLHF 让大模型变得更 sycophantic——这与 [GPT-4o rollback](./modern-in
 
 这一章我们梳理了对齐失败的全貌：
 
-- **13.1 节**：奖励黑客 vs 对齐失败——工程问题 vs 哲学问题
-- **13.2 节**：经典对齐失败——Sleeper Agents、Alignment Faking、Deception
-- **13.3 节**：2025-2026 工业级事故——GPT-4o、Qwen3、Claude 4 Opus、Emergent Misalignment
-- **13.4 节**：Scaling 与对齐——Seed RLHF Scaling、Alignment Tax、Inverse Scaling
+- **28.1 节**：奖励黑客 vs 对齐失败——工程问题 vs 哲学问题
+- **28.3 节**：经典对齐失败——Sleeper Agents、Alignment Faking、Deception
+- **28.2 节**：2025-2026 工业级事故——GPT-4o、Qwen3、Claude 4 Opus、Emergent Misalignment
+- **28.4 节**：Scaling 与对齐——Seed RLHF Scaling、Alignment Tax、Inverse Scaling
 
 **核心收获**：
 

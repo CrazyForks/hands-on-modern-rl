@@ -1,6 +1,6 @@
 # 24.4 动手：GeoQA 几何推理实验
 
-11.1 节我们手写了 VLM GRPO 训练循环——几十行代码，跑在合成数据上。这一节我们换一个姿势：用工业级框架 [EasyR1](https://github.com/hiyouga/EasyR1)，在真实数据集 GeoQA-8K 上训练 VLM 做几何推理。
+24.3 节我们手写了 VLM GRPO 训练循环——几十行代码，跑在合成数据上。这一节我们换一个姿势：用工业级框架 [EasyR1](https://github.com/hiyouga/EasyR1)，在真实数据集 GeoQA-8K 上训练 VLM 做几何推理。
 
 手写循环帮你理解原理；EasyR1 帮你跑真实验。两者的关系类似第 1 章手写 CartPole 和用 Stable Baselines3 的区别——算法一样，但框架帮你处理了分布式训练、显存优化、数据流管理等工程细节。
 
@@ -634,7 +634,7 @@ model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
 
 如果开启了 LoRA，`model_merger.py` 会自动把 LoRA 权重合并回基座模型。合并后的模型和全参训练的模型使用方式完全一样，不依赖任何 LoRA 推理库。
 
-## 和 11.1 节手写实验的对比
+## 和 24.3 节手写实验的对比
 
 | 方面     | 11.1 手写 GRPO           | 本节 EasyR1                                  |
 | -------- | ------------------------ | -------------------------------------------- |

@@ -1,4 +1,4 @@
-# B.7 Self-Attention、MHA、MQA 与 GQA
+# B.8 Self-Attention、MHA、MQA 与 GQA
 
 严格来说不属于 RL 算法，但它是大模型岗面试中**出现频率前三**的手写代码题，RL 岗面试也常作为前置知识考查。
 

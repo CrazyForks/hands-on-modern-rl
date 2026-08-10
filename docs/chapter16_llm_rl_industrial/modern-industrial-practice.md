@@ -9,7 +9,7 @@
 
 这些工作代表了 LLM RL 工业训练的**最新 SOTA**——把 [前面章节](./intro) 的算法用到极致。
 
-## 9.9.1 智谱 GLM-4.5 / GLM-4.6
+## 14.3.1 智谱 GLM-4.5 / GLM-4.6
 
 [GLM-4.5](https://github.com/zai-org/GLM-4.5)（智谱 AI, 2025.07 发布）和 GLM-4.6（2025.10）是中国开源推理模型的重要进展。
 
@@ -80,7 +80,7 @@ GLM 系列的工业意义：
 2. **MoE 架构在推理 RL 上的验证**——证明了 [GSPO](../chapter18_grpo/grpo-family) 在 MoE 上的有效性
 3. **代码 + 推理的整合**——GLM-4.6 特别强调 agentic 能力，与 Claude Code 等竞争
 
-## 9.9.2 Meta Llama 4
+## 14.3.2 Meta Llama 4
 
 [Llama 4](https://ai.meta.com/blog/llama-4-multimodal-intelligence/)（Meta, 2025.04 发布）是 Meta 的开源旗舰。
 
@@ -153,7 +153,7 @@ LM Arena 上跑的 Maverick 是一个**经过专门优化的版本**——使用
 2. **多模态新范式**——early fusion 是后续工作的参考
 3. **超长 context**——10M context 开启新应用场景
 
-## 9.9.3 Seed-Thinking 与 字节的 Reasoning 配方
+## 14.3.3 Seed-Thinking 与 字节的 Reasoning 配方
 
 [Seed1.5-Thinking](https://arxiv.org/abs/2504.13914)（字节 Seed, 2025.04）是字节对 reasoning model 工业训练的系统总结。
 
@@ -222,7 +222,7 @@ Seed-Thinking 1.5 在多个 benchmark 上：
 
 这是字节 Seed 内部 reasoning model 的核心配方——后来用于豆包 Pro 推理版等产品。
 
-## 9.9.4 Kimi K2 的 MuonClip + QK-clip
+## 14.3.4 Kimi K2 的 MuonClip + QK-clip
 
 [Kimi K2](https://arxiv.org/abs/2507.20534)（Moonshot, 2025.07）的工业贡献之一是 **MuonClip + QK-clip**——训练稳定性的新工具。
 
@@ -296,7 +296,7 @@ MuonClip 是训练**超大规模 LLM**的关键工具：
 - **超长 context**：QK-clip 让 1M+ context 训练可行
 - **开源生态**：Muon 已经在开源社区普及（OpenLM、PyTorch 都支持）
 
-## 9.9.5 中国工业实践的总结
+## 14.3.5 中国工业实践的总结
 
 到 2026 年中，中国 LLM RL 工业实践的格局：
 
@@ -316,7 +316,7 @@ MuonClip 是训练**超大规模 LLM**的关键工具：
 2. **算法创新主要来自中国**——这与美国闭源派（OpenAI、Anthropic）形成对比
 3. **工业贡献互补**——不是替代，是从不同角度解决 RL 训练问题
 
-## 9.9.6 未来的工业方向
+## 14.3.6 未来的工业方向
 
 ### 万亿参数 + 超长 context
 
@@ -427,5 +427,5 @@ $$
 接下来：
 
 - [第 17 章 Reasoning Models](../chapter19_reasoning/intro)——推理模型的详细讨论
-- [第 9 章 PRM](../chapter20_prm_search/outcome-vs-process)——过程奖励的工业实践
+- [第 18 章 PRM](../chapter20_prm_search/outcome-vs-process)——过程奖励的工业实践
 - [第 21 章 RL-based SWE](../chapter23_rl_based_swe/swe-bench-and-rlvr)——代码 agent 的训练

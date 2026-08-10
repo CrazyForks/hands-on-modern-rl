@@ -147,7 +147,7 @@ This distinction is not obvious in CartPole (every action directly affects the c
 | Learning efficiency | low: many tokens updated equally            | high: key tokens get stronger gradient signals |
 | Typical methods     | REINFORCE                                   | PPO, GRPO                                      |
 
-**The finer the granularity, the more the model can distinguish which decisions truly matter, and the higher the learning efficiency.** Later, GRPO (Chapter 9) and Agentic RL (Chapter 10) will further exploit this property on longer, more complex trajectories.
+**The finer the granularity, the more the model can distinguish which decisions truly matter, and the higher the learning efficiency.** Later, GRPO (Chapter 16) and Agentic RL (Chapter 20) will further exploit this property on longer, more complex trajectories.
 
 #### Current research consensus
 
@@ -303,7 +303,7 @@ But it cannot increase or decrease without limit, so clipping is applied:
 | $A_t>0$ | increase token probability | stop pushing hard once ratio reaches $1+\epsilon$ |
 | $A_t<0$ | decrease token probability | stop pushing hard once ratio reaches $1-\epsilon$ |
 
-This is exactly the same intuition as Chapter 7 PPO. The only difference is that actions have changed from "LunarLander thrust direction" to "a token from the vocabulary."
+This is exactly the same intuition as Chapter 8 PPO. The only difference is that actions have changed from "LunarLander thrust direction" to "a token from the vocabulary."
 
 ### A minimal PPO numerical example
 

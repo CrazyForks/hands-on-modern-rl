@@ -1432,19 +1432,19 @@ const zhSidebar = {
               link: '/appendix_code_cheatsheet/grpo-rlvr'
             },
             {
-              text: 'B.5 Softmax 与交叉熵',
+              text: 'B.6 Softmax 与交叉熵',
               link: '/appendix_code_cheatsheet/softmax-ce'
             },
             {
-              text: 'B.6 采样方法',
+              text: 'B.7 采样方法',
               link: '/appendix_code_cheatsheet/top-k-top-p'
             },
             {
-              text: 'B.7 注意力机制',
+              text: 'B.8 注意力机制',
               link: '/appendix_code_cheatsheet/attention-mha'
             },
             {
-              text: 'B.8 DAPO',
+              text: 'B.5 DAPO',
               link: '/appendix_code_cheatsheet/dapo'
             }
           ]
@@ -1619,7 +1619,7 @@ const enSidebar = {
       ]
     },
     {
-      text: 'Part I · Fundamentals & Classical RL',
+      text: 'Fundamentals & Classical RL',
       collapsed: false,
       items: [
         {
@@ -1698,7 +1698,7 @@ const enSidebar = {
       ]
     },
     {
-      text: 'Part II · Deep Reinforcement Learning',
+      text: 'Deep Reinforcement Learning',
       collapsed: false,
       items: [
         {
@@ -1834,7 +1834,7 @@ const enSidebar = {
       ]
     },
     {
-      text: 'Part III · Advanced RL Methods',
+      text: 'Advanced RL Methods',
       collapsed: false,
       items: [
         {
@@ -1885,7 +1885,7 @@ const enSidebar = {
       ]
     },
     {
-      text: 'Part IV · LLM Alignment & Post-Training',
+      text: 'LLM Alignment & Post-Training',
       collapsed: false,
       items: [
         {
@@ -2061,7 +2061,7 @@ const enSidebar = {
       ]
     },
     {
-      text: 'Part V · Agentic Reinforcement Learning',
+      text: 'Agentic Reinforcement Learning',
       collapsed: false,
       items: [
         {
@@ -2149,7 +2149,7 @@ const enSidebar = {
       ]
     },
     {
-      text: 'Part VI · Multimodal Reinforcement Learning',
+      text: 'Multimodal Reinforcement Learning',
       collapsed: false,
       items: [
         {
@@ -2161,11 +2161,11 @@ const enSidebar = {
               link: '/en/chapter26_vlm/vlm-challenges'
             },
             {
-              text: '24.2 Visual Reflection RL',
-              link: '/en/chapter26_vlm/vlm-grpo-hands-on'
+              text: '24.2 Visual Reflection RL'
             },
             {
-              text: '24.3 Hands-on: Multimodal Frontiers'
+              text: '24.3 Hands-on: Multimodal Frontiers',
+              link: '/en/chapter26_vlm/vlm-grpo-hands-on'
             },
             {
               text: '24.4 Hands-on: GeoQA Geometric Reasoning',
@@ -2209,7 +2209,7 @@ const enSidebar = {
       ]
     },
     {
-      text: 'Part VII · Safety, Evaluation & Research Frontiers',
+      text: 'Safety, Evaluation & Research Frontiers',
       collapsed: false,
       items: [
         {
@@ -2303,19 +2303,19 @@ const enSidebar = {
               link: '/en/appendix_code_cheatsheet/grpo-rlvr'
             },
             {
-              text: 'B.5 Softmax and Cross-Entropy',
+              text: 'B.6 Softmax and Cross-Entropy',
               link: '/en/appendix_code_cheatsheet/softmax-ce'
             },
             {
-              text: 'B.6 Sampling Methods',
+              text: 'B.7 Sampling Methods',
               link: '/en/appendix_code_cheatsheet/top-k-top-p'
             },
             {
-              text: 'B.7 Attention Mechanism',
+              text: 'B.8 Attention Mechanism',
               link: '/en/appendix_code_cheatsheet/attention-mha'
             },
             {
-              text: 'B.8 DAPO',
+              text: 'B.5 DAPO',
               link: '/en/appendix_code_cheatsheet/dapo'
             }
           ]
@@ -2515,21 +2515,6 @@ function compactCourseSidebar(sidebar, groups) {
   )
 }
 
-function removeUnlinkedSidebarPlaceholders(sidebar) {
-  const retainLinkedItems = (items) =>
-    items.filter((item) => {
-      if (item.items) {
-        item.items = retainLinkedItems(item.items)
-      }
-
-      return Boolean(item.link || item.items?.length)
-    })
-
-  Object.keys(sidebar).forEach((routePrefix) => {
-    sidebar[routePrefix] = retainLinkedItems(sidebar[routePrefix])
-  })
-}
-
 function collectEnglishRoutes(directory, relativeDirectory = '') {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const relativePath = path.posix.join(relativeDirectory, entry.name)
@@ -2609,9 +2594,9 @@ compactCourseSidebar(zhSidebar, [
     sections: [
       {
         text: '训练算法',
-        prefixes: ['B.1', 'B.2', 'B.3', 'B.4', 'B.8']
+        prefixes: ['B.1', 'B.2', 'B.3', 'B.4', 'B.5']
       },
-      { text: '模型计算基础', prefixes: ['B.5', 'B.6', 'B.7'] }
+      { text: '模型计算基础', prefixes: ['B.6', 'B.7', 'B.8'] }
     ]
   }
 ])
@@ -2680,14 +2665,12 @@ compactCourseSidebar(enSidebar, [
     sections: [
       {
         text: 'Training Algorithms',
-        prefixes: ['B.1', 'B.2', 'B.3', 'B.4', 'B.8']
+        prefixes: ['B.1', 'B.2', 'B.3', 'B.4', 'B.5']
       },
-      { text: 'Model Computation', prefixes: ['B.5', 'B.6', 'B.7'] }
+      { text: 'Model Computation', prefixes: ['B.6', 'B.7', 'B.8'] }
     ]
   }
 ])
-
-removeUnlinkedSidebarPlaceholders(enSidebar)
 
 const logger = createLogger()
 const originalWarn = logger.warn

@@ -1,14 +1,14 @@
 # 13.7 动手：veRL PPO 训练 GSM8K
 
-8.5 节我们讲了 PPO-RLHF 的四模型协作原理——Actor、Reference、Reward Model、Critic 各自的角色，以及 KL 惩罚、token-level reward、advantage 估计的数学关系。这一节我们换一个姿势：用工业级框架 [veRL](https://github.com/volcengine/verl)，在 GSM8K 数学推理数据集上跑通 PPO 训练。
+13.4 节我们讲了 PPO-RLHF 的四模型协作原理——Actor、Reference、Reward Model、Critic 各自的角色，以及 KL 惩罚、token-level reward、advantage 估计的数学关系。这一节我们换一个姿势：用工业级框架 [veRL](https://github.com/volcengine/verl)，在 GSM8K 数学推理数据集上跑通 PPO 训练。
 
-手写伪代码帮你理解原理；veRL 帮你跑真实验。两者的关系类似第 5 章用 Stable Baselines3 跑 PPO——算法一样，但框架帮你处理了分布式调度、显存优化、推理加速等工程细节。
+手写伪代码帮你理解原理；veRL 帮你跑真实验。两者的关系类似第 8 章用 Stable Baselines3 跑 PPO——算法一样，但框架帮你处理了分布式调度、显存优化、推理加速等工程细节。
 
 ## veRL 简介
 
 [veRL](https://github.com/volcengine/verl)（Volcano Engine Reinforcement Learning）由字节跳动 Seed 团队发起，是当前社区最活跃的 LLM RL 训练框架之一（GitHub 10k+ stars），其论文 HybridFlow 发表于 EuroSys 2025。
 
-和 8.5 节提到的小参数 TRL 实验相比，veRL 的核心增值点：
+和 13.4 节提到的小参数 TRL 实验相比，veRL 的核心增值点：
 
 | 特性       | TRL 小参数实验          | veRL                                         |
 | ---------- | ----------------------- | -------------------------------------------- |
@@ -50,7 +50,7 @@ flowchart LR
 
 [GSM8K](https://huggingface.co/datasets/openai/gsm8k)（Grade School Math 8K）是 OpenAI 发布的小学数学应用题数据集，包含约 7,500 道训练题和 1,319 道测试题。它成为 RL for LLM 的标准 benchmark 有三个原因：
 
-1. **天然有规则奖励**——答案是否正确可以自动验证，不需要训练 Reward Model。这和 8.5 节的 RLHF 不同：那里需要单独训练一个 RM 来提供偏好信号，而数学题直接比较数值就行。
+1. **天然有规则奖励**——答案是否正确可以自动验证，不需要训练 Reward Model。这和 13.4 节的 RLHF 不同：那里需要单独训练一个 RM 来提供偏好信号，而数学题直接比较数值就行。
 2. **推理链长度适中**——典型回答 50~200 token，不会像长代码那样撑爆显存，也不会像单句回答那样让 PPO 的 token-level advantage 失去意义。
 3. **社区基线丰富**——火山引擎官方在 VKE 集群上提供了完整的 Qwen2.5-0.5B PPO 训练教程和评测结果（42.08% → 54.89%），可以对照。
 
@@ -157,7 +157,7 @@ for split in ["train", "test"]:
 
 ## Reward 函数设计
 
-GSM8K 的 reward 不需要训练 Reward Model——直接用规则验证答案即可。这和 8.5 节讲的 RLHF 不同：RLHF 用 RM 提供偏好信号，而数学推理用**可验证奖励**（verifiable reward）。9.4 节会详细讨论 RLVR 范式，这里先用一个简单的实现。
+GSM8K 的 reward 不需要训练 Reward Model——直接用规则验证答案即可。这和 13.4 节讲的 RLHF 不同：RLHF 用 RM 提供偏好信号，而数学推理用**可验证奖励**（verifiable reward）。16.3 节会详细讨论 RLVR 范式，这里先用一个简单的实现。
 
 本仓库已经提供了课程适配版本：[`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py)。如果你在 veRL 仓库内操作，也可以按下面内容创建同名文件：
 
@@ -230,7 +230,7 @@ def compute_score(reward_input: dict[str, Any], **kwargs) -> dict[str, float]:
 - **`check_answer`**：数值比较。`1,000` 和 `1000` 会被视为相同，`42` 和 `42.0` 也相同。
 - **`compute_score`**：返回 `overall`（PPO 使用的总奖励）和两个辅助指标（`accuracy` 和 `format`），后者会记录到训练日志。
 
-为什么不需要 Reward Model？因为 GSM8K 的答案是**客观可验证**的——答对就是 1.0，答错就是 0.0。这个信号虽然稀疏（整段回答只有一个 0/1），但它是精确的、无噪声的、不可被 hack 的。这正是 9.4 节 RLVR 的核心思想。
+为什么不需要 Reward Model？因为 GSM8K 的答案是**客观可验证**的——答对就是 1.0，答错就是 0.0。这个信号虽然稀疏（整段回答只有一个 0/1），但它是精确的、无噪声的、不可被 hack 的。这正是 16.3 节 RLVR 的核心思想。
 
 ## 单卡训练脚本
 
@@ -384,11 +384,11 @@ vLLM 的 KV cache 会预分配显存。单卡场景下 vLLM 和训练模型共�
 
 这是 PPO-RLHF 的常见实践。Critic 需要快速学会准确估计 value function（否则 advantage 估计噪声大），所以学习率比 Actor 高一个量级。Actor 学习率低，是为了让策略更新更保守，配合 PPO clip 和 KL 约束防止走偏。
 
-### 和 8.5 节四模型结构的对应
+### 和 13.4 节四模型结构的对应
 
-回顾 8.5 节的四模型协作表，每个配置项在 veRL 中都有对应：
+回顾 13.4 节的四模型协作表，每个配置项在 veRL 中都有对应：
 
-| 8.5 节角色 | veRL 配置                       | 说明                               |
+| 13.4 节角色 | veRL 配置                       | 说明                               |
 | ---------- | ------------------------------- | ---------------------------------- |
 | Actor      | `actor_rollout_ref.actor.*`     | 可训练策略，负责生成和更新         |
 | Reference  | `actor_rollout_ref.ref.*`       | 冻结的 SFT 模型，计算 KL 约束      |
@@ -398,7 +398,7 @@ vLLM 的 KV cache 会预分配显存。单卡场景下 vLLM 和训练模型共�
 | PPO clip   | `actor.clip_ratio=0.2`          | 限制策略更新幅度                   |
 | GAE        | `algorithm.adv_estimator=gae`   | advantage 估计方法                 |
 
-注意一个关键区别：本实验用**规则 reward**（答案对错自动验证）代替了 8.5 节的 **Reward Model**。这意味着我们不需要训练一个 RM，也不需要偏好数据。代价是 reward 信号只有 0/1 二值（没有"这个回答比那个好多少"的细粒度信息），但对于数学推理来说，0/1 信号已经足够。
+注意一个关键区别：本实验用**规则 reward**（答案对错自动验证）代替了 13.4 节的 **Reward Model**。这意味着我们不需要训练一个 RM，也不需要偏好数据。代价是 reward 信号只有 0/1 二值（没有"这个回答比那个好多少"的细粒度信息），但对于数学推理来说，0/1 信号已经足够。
 
 ## 启动训练
 
@@ -450,7 +450,7 @@ Ray 会在 `main_ppo` 内自动初始化——不需要手动启动 Ray 集群�
 
 ## 训练指标分析
 
-PPO-RLHF 的训练曲线不是"reward 一路冲天"就完事。8.5 节讲过的多个指标必须同时看：
+PPO-RLHF 的训练曲线不是"reward 一路冲天"就完事。13.4 节讲过的多个指标必须同时看：
 
 ### 关键指标解读
 
@@ -701,7 +701,7 @@ algorithm.kl_ctrl.kl_coef=0.001
 algorithm.kl_ctrl.type=fixed
 ```
 
-`kl_coef` 控制KL 惩罚的强度。8.5 节讲过 $\beta$ 旋钮：太大则学不动，太小则 reward hacking。GSM8K 上因为 reward 是 0/1 信号（不可 hack），KL 惩罚可以适当放松。
+`kl_coef` 控制KL 惩罚的强度。13.4 节讲过 $\beta$ 旋钮：太大则学不动，太小则 reward hacking。GSM8K 上因为 reward 是 0/1 信号（不可 hack），KL 惩罚可以适当放松。
 
 ### 第三优先级 与 PPO 更新强度
 
@@ -722,17 +722,17 @@ actor_rollout_ref.actor.clip_ratio=0.2     # 标准裁剪范围
 | 回答越来越长但 accuracy 不涨 | 长度 hack             | 检查 reward 是否和长度相关      |
 | 训练速度极慢                 | vLLM 显存不够         | 降低 `ROLLOUT_GPU_MEM_UTIL`     |
 
-## 和 8.5 节的对照总结
+## 和 13.4 节的对照总结
 
-本节用 veRL 跑的 PPO 训练，和 8.5 节讲的 PPO-RLHF 原理完全一致，但有三点工程层面的差异值得注意：
+本节用 veRL 跑的 PPO 训练，和 13.4 节讲的 PPO-RLHF 原理完全一致，但有三点工程层面的差异值得注意：
 
-**1. Reward 来源不同**：8.5 节用 Reward Model 提供偏好信号（连续值，训练得到），本节用规则验证提供正确性信号（0/1 二值，自动计算）。这是 RLVR 的核心思想——9.4 节会详细展开。
+**1. Reward 来源不同**：13.4 节用 Reward Model 提供偏好信号（连续值，训练得到），本节用规则验证提供正确性信号（0/1 二值，自动计算）。这是 RLVR 的核心思想——16.3 节会详细展开。
 
-**2. 四模型共存方式不同**：8.5 节的 TRL 实验在同一进程内管理四个模型，简单但显存效率低。veRL 通过 Ray + FSDP 把 Actor/Critic（可训练）和 Reference/Reward（冻结）分配到同一组 GPU 上，用 3D-HybridEngine 在训练和推理之间切换，显存效率更高。
+**2. 四模型共存方式不同**：13.4 节的 TRL 实验在同一进程内管理四个模型，简单但显存效率低。veRL 通过 Ray + FSDP 把 Actor/Critic（可训练）和 Reference/Reward（冻结）分配到同一组 GPU 上，用 3D-HybridEngine 在训练和推理之间切换，显存效率更高。
 
 **3. 推理引擎不同**：TRL 用 `model.generate()` 逐条生成，veRL 用 vLLM 做 continuous batching，生成吞吐量可以提升 5~10 倍。在 on-policy RL 中，生成速度直接影响训练效率——PPO 需要不断用当前策略生成新回答，生成是训练循环的瓶颈。
 
-从算法角度看，本节实验就是 8.5 节讲的六步循环：采样 prompt → Actor 生成 → Reward 打分 → Reference 算 KL → Critic 算 advantage → PPO 更新。只是每一步都被 veRL 的工程优化加速了。
+从算法角度看，本节实验就是 13.4 节讲的六步循环：采样 prompt → Actor 生成 → Reward 打分 → Reference 算 KL → Critic 算 advantage → PPO 更新。只是每一步都被 veRL 的工程优化加速了。
 
 ## 扩展实验
 
@@ -756,8 +756,8 @@ actor_rollout_ref.actor.clip_ratio=0.2     # 标准裁剪范围
 
 ## 练习
 
-1. 为什么 GSM8K 上 PPO 的 reward 信号是 0/1 二值，而 8.5 节 RLHF 的 reward 是连续值？这两种信号对 PPO 更新有什么不同的影响？
-2. 把 `ACTOR_LR` 从 `1e-6` 改为 `1e-4`，观察训练曲线变化。用 8.5 节的稳定性分析框架解释发生了什么。
+1. 为什么 GSM8K 上 PPO 的 reward 信号是 0/1 二值，而 13.4 节 RLHF 的 reward 是连续值？这两种信号对 PPO 更新有什么不同的影响？
+2. 把 `ACTOR_LR` 从 `1e-6` 改为 `1e-4`，观察训练曲线变化。用 13.4 节的稳定性分析框架解释发生了什么。
 3. 在 `compute_score` 中增加一个"推理步骤数"的辅助指标，统计模型回答中包含多少行推理。这个指标和 accuracy 有什么相关性？
 4. 设计一个实验：对比"纯 accuracy reward"和"accuracy + format reward"两组配置，哪个最终 accuracy 更高？为什么？
-5. 阅读 veRL 的 `verl/trainer/main_ppo.py` 源码，画出 main function 的执行流程图，标注出 8.5 节讲的六步循环分别对应哪些代码。
+5. 阅读 veRL 的 `verl/trainer/main_ppo.py` 源码，画出 main function 的执行流程图，标注出 13.4 节讲的六步循环分别对应哪些代码。

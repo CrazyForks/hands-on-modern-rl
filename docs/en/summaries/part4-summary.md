@@ -7,22 +7,22 @@ sitemap: false
 The Chinese restructure commit (`d0d5925`) deleted `docs/summaries/` entirely. These per-part summary pages no longer have a Chinese counterpart. They are kept here as translation reference and should be either removed or re-anchored to the new Part I–VII structure on the next translation pass.
 :::
 
-# Part 4: Frontier and Advanced Topics - Knowledge Summary
+# Multimodal and Frontier Topics - Knowledge Summary
 
 ## What Did We Learn in This Part?
 
-The final two chapters cover frontier directions of reinforcement learning in the modern LLM era. Each chapter represents a jump from core algorithms to cutting-edge applications. After finishing this part, you should understand:
+The later chapters cover frontier directions of reinforcement learning in the modern LLM era. Each topic represents a jump from core algorithms to cutting-edge applications. After finishing this part, you should understand:
 
 - **VLM RL**: reinforcement learning for vision-language models; differential learning rates; fine-grained visual penalties and alignment with multi-step logical reasoning.
 - **Future trends**: embodied intelligence (continuous control and robotics), test-time compute and self-play, offline reinforcement learning, and multi-agent RL.
 
 Now let us review the chapters.
 
-## Chapter 11: VLM Reinforcement Learning - Teaching Vision Models to Reason
+## Chapter 24: VLM Reinforcement Learning - Teaching Vision Models to Reason
 
 Once a model gains "eyes," RL becomes harder again. VLM (vision-language model) RL faces differential learning rates (a smaller learning rate for the vision encoder), difficult reward attribution (are visual tokens or text tokens responsible for the mistake?), and penalties for visual hallucinations. We showed how fine-grained reward design can teach a VLM not only to "see" images, but also to perform multi-step logical reasoning grounded in those images.
 
-## Chapter 12: Future Trends - From CartPole to Frontier Exploration
+## Further Directions Across Chapters 9-12, 17, 26, and 29
 
 ### Embodied Intelligence: From Simulation to Reality
 
@@ -61,7 +61,7 @@ By this point, we have completed the journey of the book. From CartPole in Chapt
 - **Efficient RL training**: reduce sample requirements, lower memory usage, speed up training. This is a core bottleneck for real-world deployment.
 - **Safety RL**: constrained optimization, red-teaming, alignment tax; ensure RL-trained models do not exhibit harmful behaviors.
 - **Multi-agent collaboration with LLMs**: combining MARL with LLM roles; how multiple roles learn to collaborate efficiently via RL.
-- **Agentic RL**: the direction discussed in Chapter 9; one of the most active research directions in 2025-2026.
+- **Agentic RL**: the direction discussed in Chapter 20; one of the most active research directions in 2025-2026.
 - **Self-play and self-evolution**: can models keep breaking limits through self-play?
 
 | Stage    | Goal                                       | Suggested Resources                                      | Time Estimate |
@@ -82,16 +82,16 @@ The table below reviews the book's core concepts and how they connect:
 
 | Chapters | Core Concepts               | One-Line Summary                                          |
 | -------- | --------------------------- | --------------------------------------------------------- |
-| 1-2      | CartPole, DPO               | RL intuition: trial-and-error -> learning -> improvement  |
-| 3        | MDP, Bellman equations      | the mathematical language of RL                           |
-| 4        | DQN                         | deep learning + Q-learning = learning from pixels         |
-| 5        | policy gradients, REINFORCE | optimize policies directly; bypass Q-values               |
-| 6-7      | Actor-Critic and PPO        | stable policy optimization; foundation of LLM alignment   |
-| 8        | RLHF pipeline               | the full engineering stack of industrial alignment        |
-| 9        | GRPO, RLVR                  | verifiable rewards elicit reasoning ability               |
-| 10       | agentic RL                  | training agents for multi-turn tool interactions          |
-| 11       | VLM RL                      | reinforcement learning for vision-language models         |
-| 12       | future trends               | test-time search, embodied intelligence, MARL, offline RL |
+| 1        | CartPole                    | RL intuition through a first control experiment             |
+| 2-4      | MDP, values, classical RL    | the mathematical language and classical methods of RL       |
+| 5        | DQN                         | deep learning + Q-learning = learning from pixels            |
+| 6        | policy gradients, REINFORCE | optimize policies directly; bypass Q-values                  |
+| 7-8      | Actor-Critic and PPO        | stable policy optimization; foundation of LLM alignment      |
+| 13       | RLHF pipeline               | the full engineering stack of industrial alignment           |
+| 15-16    | DPO, GRPO, RLVR             | preference alignment and verifiable rewards                  |
+| 20       | agentic RL                  | training agents for multi-turn tool interactions              |
+| 24       | VLM RL                      | reinforcement learning for vision-language models             |
+| 9-12, 17, 26, 29 | further directions | continuous control, offline RL, reasoning, embodiment, self-play |
 
 Your current knowledge is enough to understand most frontier work in RL in 2025-2026. More importantly, you have gained a way of thinking: **how to model a real problem as an RL problem, design a reward function, choose an algorithm, and build training infrastructure.** This way of thinking is more valuable than any single algorithm.
 

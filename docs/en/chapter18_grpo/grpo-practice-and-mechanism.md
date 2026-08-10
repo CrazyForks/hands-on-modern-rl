@@ -266,7 +266,7 @@ $$
 
 Here $R$ is the reward function, and $r_{j,i}$ is a scalar. For math problems, $R$ can be simple: give points for a correct answer and for a proper format. The key to GRPO is not that "the reward function must be complex", but that **multiple answers under the same question are compared together**.
 
-## 9.3.1 GRPO Training Experiment
+## 16.1.1 GRPO Training Experiment
 
 ### Experimental Setup: GSM8K + Rule Rewards
 
@@ -305,7 +305,7 @@ print(rule_based_reward(prompt, good, '63'))  # 1.5
 print(rule_based_reward(prompt, bad, '63'))   # 0.5
 ```
 
-Notice the key difference: **we do not need to train any RM; the rule is the judge**. Math problems have standard answers, so direct comparison is enough. This kind of "verifiable reward" is exactly the core idea of RLVR, which will be discussed in depth in Section 9.4.
+Notice the key difference: **we do not need to train any RM; the rule is the judge**. Math problems have standard answers, so direct comparison is enough. This kind of "verifiable reward" is exactly the core idea of RLVR, which will be discussed in depth in Section 16.3.
 
 In the handwritten code map, the reward function corresponds to **[B]**. It receives only the answer and the ground truth answer and returns a scalar reward:
 
@@ -397,7 +397,7 @@ flowchart LR
     style A3 fill:#e8f5e9,stroke:#2e7d32
 ```
 
-## 9.3.2 Why Within-Group Normalization Is Necessary
+## 16.1.2 Why Within-Group Normalization Is Necessary
 
 We have seen the practical effect of "removing the Critic": memory decreases by 30-40%, and reasoning steps change from "guessing" to "writing equations". But one core question remains unanswered: **why can within-group normalization replace the work of a Critic?**
 
@@ -688,7 +688,7 @@ Putting all steps together, one GRPO training iteration is:
 6. Add the Reference KL penalty.
 7. Backpropagate and update only the Policy.
 
-## 9.3.3 Experimental Comparison and Parameter Tuning
+## 16.1.3 Experimental Comparison and Parameter Tuning
 
 ### Memory Usage Comparison
 

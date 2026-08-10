@@ -38,7 +38,7 @@ $$
 
 The first line constructs the target value: one transition provides a learning target for the current action. The second line computes the error: how far the current Q-network's prediction $Q(s_i,a_i;\theta)$ deviates from the target. Experience replay decides where the batch comes from, the target network decides which parameters compute $y_i$, and gradient descent pushes $\theta$ toward smaller error.
 
-## 4.5.1 From Low-Dimensional States to Screen Pixels
+## 5.5.1 From Low-Dimensional States to Screen Pixels
 
 In LunarLander, the environment already provides a structured state: `x`, `y`, velocities, angle, angular velocity, and whether each leg contacts the ground. The Q-network takes 8 numbers and outputs 4 action values. Section 5.4 used this task to examine training curves, evaluation returns, and replay animations; the question there was whether DQN could stably learn action preferences in a low-dimensional control task.
 
@@ -54,7 +54,7 @@ But the meaning of $s$ has changed: it is no longer a row of hand-designed physi
 
 Therefore, the experiments in this section do not repeat the LunarLander training loop, but use it as a reference: low-dimensional states use MLPs to estimate action values; pixel states must first learn representations via CNN, then output action values. Grasping this distinction clarifies why every engineering setting in Atari DQN is necessary.
 
-## 4.5.2 From Vectors to Pixels
+## 5.5.2 From Vectors to Pixels
 
 DQN attracted widespread attention because of its performance on pixel-input tasks. DeepMind's 2015 Nature paper[^mnih2015] demonstrated a single program that, using only screen pixels and game scores, reached human-level performance on 29 Atari games. The significance was not just a bigger network, but that Q-learning could be combined with representation learning — the agent no longer needed hand-provided ball position, velocity, and distance features; it could learn these decision cues directly from images.
 
@@ -134,7 +134,7 @@ Compared to LunarLander, Atari's training conditions also change significantly. 
 
 Therefore, migrating from LunarLander to Atari is not simply replacing `env_id`. The skeleton of TD learning has not changed; what has become more complex are the state representation and training conditions. Teaching snippets can illustrate principles, but to run an experiment using the full Atari pipeline, one must also add environment preprocessing, evaluation, and checkpointing.
 
-## 4.5.3 Pong: A Complete Atari Experiment
+## 5.5.3 Pong: A Complete Atari Experiment
 
 Before continuing with Pong, we need to clarify what "Atari" means. If you have not encountered classic game benchmarks, it is easy to think Atari refers to a single game. But in the deep reinforcement learning context, Atari usually does not mean one game — it refers to a collection of classic game environments running on an Atari 2600 emulator.
 
@@ -319,7 +319,7 @@ Resource expectations should also match the experimental question. If the goal i
 
 Atari DQN's ability to train stably depends not on some hidden new algorithm, but on whether these stability conditions are all in place: images compressed to appropriate size, states containing motion information, reward scales clipped, replay buffer sufficiently large, learning starting sufficiently late, target network updating sufficiently slowly, and the training process including evaluation and saving. CleanRL, RL-Zoo, and SB3 differ in implementation style but share the same core judgment about Atari DQN.
 
-## 4.5.4 Other DQN Tasks Worth Trying
+## 5.5.4 Other DQN Tasks Worth Trying
 
 Beyond LunarLander and Atari, many more environments are suitable as DQN practice entry points. As long as actions are discrete, observations are sufficient for decision-making, and rewards arrive within a reasonable time, DQN can be tried as a baseline. But "suitable" does not mean "drop it in and it works" — before starting, four conditions are worth checking.
 
@@ -558,7 +558,7 @@ So DQN can train constrained discrete subtasks in Minecraft; if the goal is obta
 - Pokemon reminds us: DQN can train neural-network Q-policies in real emulators, but full completion requires task decomposition, reward engineering, and longer-term memory.
 - Minecraft reminds us: open-world tasks not only have sparse rewards, but also contain hierarchical goals, inventory states, crafting chains, and more complex action spaces.
 
-With this, Chapter 4 completes the transition from tabular Q-learning to deep Q-networks to pixel game experiments. The next chapter turns to a different path: instead of first learning action-value tables, directly optimizing the policy itself. [Policy Gradient and REINFORCE](../chapter08_policy_gradient/policy-gradient)
+With this, Chapter 5 completes the transition from tabular Q-learning to deep Q-networks to pixel game experiments. The next chapter turns to a different path: instead of first learning action-value tables, directly optimizing the policy itself. [Policy Gradient and REINFORCE](../chapter08_policy_gradient/policy-gradient)
 
 ## References
 

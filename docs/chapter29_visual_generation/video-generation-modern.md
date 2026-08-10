@@ -4,7 +4,7 @@
 
 这一节我们换视角——**工业层面**：2025-2026 年的视频生成模型（Seedance、LongCat-Video、Hailuo、Wan、Kling）是怎么用 RL 训练的？这些工作代表了视频生成 RL 的工业 SOTA。
 
-## 11.6.1 从图像到视频 与 RL 的新挑战
+## 27.2.1 从图像到视频 与 RL 的新挑战
 
 图像生成的 RL 已经成熟（[DDPO](./intro)、DPOK）。但视频生成带来新挑战：
 
@@ -42,7 +42,7 @@ RL 训练需要大量 rollout——每次 rollout 几分钟，让视频 RL 的�
 - **DanceGRPO**：把 GRPO 思想用到 diffusion（图像 + 视频）
 - **Seedance / LongCat**：用 RLHF-style 训练 + 工程优化
 
-## 11.6.2 DanceGRPO 与 Diffusion 的 GRPO
+## 27.2.2 DanceGRPO 与 Diffusion 的 GRPO
 
 [DanceGRPO](https://arxiv.org/abs/2505.07818)（字节 Seed, 2025.05）是 diffusion RL 的重要突破。它的核心贡献是：**把 GRPO 思想直接用到 diffusion 训练**。
 
@@ -100,7 +100,7 @@ DanceGRPO 的核心优势：
 
 DanceGRPO 在工业上已经替代 DDPO/DPOK 成为 diffusion RL 的默认选择——这与 GRPO 在 LLM 领域的地位一致。
 
-## 11.6.3 Seedance 与 字节跳动的视频生成旗舰
+## 27.2.3 Seedance 与 字节跳动的视频生成旗舰
 
 [Seedance](https://seed.bytedance.com/)（字节跳动，2025.03 发布，2025.10 升级 1.0 Pro）是中国视频生成 SOTA 之一。它在 VBench（视频生成 benchmark）上多次排名第一。
 
@@ -189,7 +189,7 @@ VBench 2025.10 排行：
 
 Seedance 是中国视频生成 SOTA，超越 Sora 2 和 Veo 3。
 
-## 11.6.4 LongCat-Video 与 高效长视频生成
+## 27.2.4 LongCat-Video 与 高效长视频生成
 
 [LongCat-Video](https://arxiv.org/abs/2510.22200)（美团, 2025.10）是另一个重要工作——专注**长视频生成**。
 
@@ -249,7 +249,7 @@ LongCat-Video 在长视频生成上达到 SOTA：
 | Wan 2.5 Long      | 70%             | 68%        |
 | **LongCat-Video** | **78%**         | **75%**    |
 
-## 11.6.5 Hailuo 与 MiniMax 的视频生成
+## 27.2.5 Hailuo 与 MiniMax 的视频生成
 
 [Hailuo](https://hailuoai.video/)（MiniMax，2024.09 发布，2025.07 升级 02）是另一个中国视频生成 SOTA。
 
@@ -270,7 +270,7 @@ Hailuo 用了类似 Seedance 的训练流程：
 
 MiniMax 内部的研究（如 [CISPO](../chapter18_grpo/grpo-family)）也对 Hailuo 的训练有贡献——CISPO 在低精度训练中的稳定性让大规模 video RL 成为可能。
 
-## 11.6.6 其他主流视频生成模型
+## 27.2.6 其他主流视频生成模型
 
 ### Wan（阿里）
 
@@ -288,7 +288,7 @@ MiniMax 内部的研究（如 [CISPO](../chapter18_grpo/grpo-family)）也对 Ha
 
 [Veo 3](https://deepmind.google/models/veo/)（2025.05）—— Google 视频生成。特点是音频同步生成（视频 + 音频联合）。
 
-## 11.6.7 视频生成 RL 的工业格局
+## 27.2.7 视频生成 RL 的工业格局
 
 到 2026 年中，视频生成 RL 的工业格局：
 
@@ -308,7 +308,7 @@ MiniMax 内部的研究（如 [CISPO](../chapter18_grpo/grpo-family)）也对 Ha
 - **DanceGRPO 是主流算法**——基于 GRPO 的扩展
 - **数据 + 工程 > 算法创新**——大部分提升来自数据质量和工程优化
 
-## 11.6.8 视频生成 RL 的未来方向
+## 27.2.8 视频生成 RL 的未来方向
 
 ### 更长的视频
 

@@ -220,7 +220,7 @@ trainer.train(dataset)
 
 ## Rollout 引擎与 vLLM 集成
 
-RL 训练 99% 的时间在 rollout（[附录 B.1](../appendix_industrial_training/async-training)）。Rollout 引擎是性能瓶颈的核心。vLLM 是事实标准。
+RL 训练的大部分时间花在 rollout（[附录 A.2](../appendix_industrial_training/rl-infrastructure)）。Rollout 引擎是性能瓶颈的核心。vLLM 是事实标准。
 
 ### vLLM 的核心优化
 
@@ -417,7 +417,7 @@ LoRA（[第 14 章](./industrial-post-training)）只训少量参数，显存需
 
 ## 异步 RL 训练
 
-同步训练的瓶颈在 [附录 B.1](../appendix_industrial_training/async-training) 详述——GPU 99% 空闲等 rollout。异步训练把生成和训练解耦，让两边同时跑。下面介绍三个 2025 年的旗舰框架。
+同步训练的瓶颈在[附录 A.2](../appendix_industrial_training/rl-infrastructure)详述——GPU 大量时间在等待 rollout。异步训练把生成和训练解耦，让两边同时跑。下面介绍三个 2025 年的旗舰框架。
 
 ### LlamaRL
 

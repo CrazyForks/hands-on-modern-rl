@@ -26,7 +26,7 @@ After these five chapters, you should understand:
 
 Now let us review the content chapter by chapter.
 
-## Chapter 3: MDP - A Mathematical Description of Decision Problems
+## Chapter 2: MDP - A Mathematical Description of Decision Problems
 
 ### Markov Decision Process
 
@@ -99,7 +99,7 @@ for episode in range(1000):
 
 This snippet contains all essential RL elements: store value estimates in a table $Q(s,a)$, balance exploration and exploitation with $\varepsilon$-greedy, and update using TD error. When the state space becomes large (for example, from a 16-cell grid to Atari frames with $210 \times 160$ pixels), the table no longer fits. This is exactly the problem DQN solves.
 
-## Chapter 4: DQN - The Leap from Tables to Neural Networks
+## Chapter 5: DQN - The Leap from Tables to Neural Networks
 
 ### The Curse of Dimensionality and Function Approximation
 
@@ -143,7 +143,7 @@ $$Q(s, a) = V(s) + A(s, a) - \frac{1}{|\mathcal{A}|}\sum_{a'} A(s, a')$$
 
 When all actions in a state are similarly good, $A(s,a) \approx 0$, and the network mainly needs to learn $V(s)$. This improves efficiency.
 
-## Chapter 5: Policy Gradients - Learning the Policy Directly
+## Chapter 6: Policy Gradients - Learning the Policy Directly
 
 ### From Value-Based to Policy-Based
 
@@ -182,7 +182,7 @@ $$\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[\nabla_\theta \log \pi_
 
 As long as $b(s)$ does not depend on the action $a$, this modification does not change the expected gradient (because $\mathbb{E}_{a \sim \pi}[\nabla \log \pi(a|s)] = 0$), but it can greatly reduce variance. The most common baseline is the state-value function $V(s)$, i.e., the Critic.
 
-## Chapter 6: Actor-Critic - Reducing Variance with a Critic
+## Chapter 7: Actor-Critic - Reducing Variance with a Critic
 
 ### The Actor-Critic Architecture
 
@@ -220,7 +220,7 @@ critic_loss = td_error ** 2                 # Critic: update value using TD erro
 loss = actor_loss + critic_loss
 ```
 
-## Chapter 7: PPO - Making Policy Updates More Stable
+## Chapter 8: PPO - Making Policy Updates More Stable
 
 ### Constraint Mechanisms for Policy Updates
 
@@ -273,7 +273,7 @@ PPO was first validated on classic RL environments such as LunarLander, but its 
 
 $$P(y_w \succ y_l | x) = \sigma(r(x, y_w) - r(x, y_l))$$
 
-This framework is the starting point of Chapter 8, and DPO's key observation is that this framework can be optimized without explicitly training a reward model.
+This framework is the starting point of Chapter 13, and DPO's key observation is that this framework can be optimized without explicitly training a reward model.
 
 ## Summary
 

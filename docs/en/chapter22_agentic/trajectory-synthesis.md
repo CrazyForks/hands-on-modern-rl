@@ -8,7 +8,7 @@ search: false
 
 # Trajectory Synthesis: Where Training Data Comes From
 
-In the previous section, we unpacked the credit assignment problem in multi-turn RL. Before training even begins, however, there is an even more basic question: **where does the data come from?** Standard LLM RL, such as the GRPO setting in Chapter 9, only needs a prompt plus a verifiable answer. The model generates its own response and compares it against the verifier; no external interaction data is required. Agentic RL is different. The model must interact with an environment: calling tools, executing code, browsing the web, and observing results. These interactions produce "trajectories", which are both the training data and the source of reward. The quality of those trajectories determines the ceiling of the model. In this section, we examine the data-engineering core of Agentic RL: trajectory synthesis.
+In the previous section, we unpacked the credit assignment problem in multi-turn RL. Before training even begins, however, there is an even more basic question: **where does the data come from?** Standard LLM RL, such as the GRPO setting in Chapter 16, only needs a prompt plus a verifiable answer. The model generates its own response and compares it against the verifier; no external interaction data is required. Agentic RL is different. The model must interact with an environment: calling tools, executing code, browsing the web, and observing results. These interactions produce "trajectories", which are both the training data and the source of reward. The quality of those trajectories determines the ceiling of the model. In this section, we examine the data-engineering core of Agentic RL: trajectory synthesis.
 
 ## Why Trajectory Synthesis Is Needed
 
@@ -62,7 +62,7 @@ def rejection_sampling(model, task, tool_env, num_samples=64):
 # Worse, those 3 trajectories may all follow the same success path, with little diversity.
 ```
 
-The advantage of rejection sampling is that it is **simple to implement**. You only need a verifier that can decide "success" versus "failure". The RLVR training discussed in Chapter 9 uses exactly this idea.
+The advantage of rejection sampling is that it is **simple to implement**. You only need a verifier that can decide "success" versus "failure". The RLVR training discussed in Chapter 16 uses exactly this idea.
 
 Its weaknesses are just as clear: **low efficiency and poor diversity**. If the model's current success rate is only 5%, you need to sample 20 trajectories to obtain 1 successful trajectory. More seriously, successful trajectories tend to concentrate on strategies the model is already good at. Paths the model has not explored, even if they may be better, will never appear under plain rejection sampling.
 
@@ -166,11 +166,11 @@ Experiments show that a 4B model trained on HardGen data outperforms multiple ma
 
 ### Method 6: Hindsight Rewriting, ECHO[^echo]
 
-ECHO follows the same spirit as HER, hindsight experience replay, which we will discuss in Chapter 11: **failed trajectories do not have to be discarded; with a different goal, they can become successful trajectories**.
+ECHO follows the same spirit as HER, hindsight experience replay, which we discussed in Chapter 8: **failed trajectories do not have to be discarded; with a different goal, they can become successful trajectories**.
 
-In Section 11.3, we saw the idea behind HER. A robot's goal is to "place the ball at position A", but it actually places the ball at position B. From the perspective of goal A, this is a failure. From the perspective of goal B, it is a perfect success. ECHO transfers this idea to LLM trajectories. It first uses an LLM to analyze what a failed trajectory actually accomplished, then changes the goal label to the goal that was actually achieved. The failed trajectory is thereby rewritten as a successful example for a new goal.
+In Section 8.4, we saw the idea behind HER. A robot's goal is to "place the ball at position A", but it actually places the ball at position B. From the perspective of goal A, this is a failure. From the perspective of goal B, it is a perfect success. ECHO transfers this idea to LLM trajectories. It first uses an LLM to analyze what a failed trajectory actually accomplished, then changes the goal label to the goal that was actually achieved. The failed trajectory is thereby rewritten as a successful example for a new goal.
 
-This method greatly improves sample efficiency. Under rejection sampling, failed trajectories are simply thrown away. If the model's current success rate is only 10%, then 90% of generations are wasted. ECHO makes these "wasted" trajectories valuable again. In connection with the discussion in Section 11.3, we can understand ECHO as "HER applied in language space": HER changes the position label of a robot goal, while ECHO changes the semantic goal label of a language task.
+This method greatly improves sample efficiency. Under rejection sampling, failed trajectories are simply thrown away. If the model's current success rate is only 10%, then 90% of generations are wasted. ECHO makes these "wasted" trajectories valuable again. In connection with the discussion in Section 8.4, we can understand ECHO as "HER applied in language space": HER changes the position label of a robot goal, while ECHO changes the semantic goal label of a language task.
 
 ### End-to-End Synthesis: ASTRA[^astra]
 
@@ -229,7 +229,7 @@ def filter_trajectories(trajectories, quality_threshold=0.7):
 
 ## How Trajectory Synthesis Connects to Chapter 9
 
-You may have noticed that many ideas in trajectory synthesis are closely related to RLVR from Chapter 9. The core of RLVR is "use a verifiable result as the reward". Trajectory synthesis pushes this idea one step earlier: it uses verification results not only as rewards, but also to **filter and generate better training data**.
+You may have noticed that many ideas in trajectory synthesis are closely related to RLVR from Chapter 16. The core of RLVR is "use a verifiable result as the reward". Trajectory synthesis pushes this idea one step earlier: it uses verification results not only as rewards, but also to **filter and generate better training data**.
 
 More concretely, RLVR has three data-level uses in Agentic RL.
 

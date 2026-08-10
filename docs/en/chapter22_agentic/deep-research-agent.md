@@ -470,7 +470,7 @@ With Rubrics, the next step is collecting preference data and training a Reward 
 
 **Data collection.** For the same search query, have the model (or different models) generate multiple search results. Then have annotators (or use LLM-as-Judge) score each result according to Rubrics, constructing preference pairs — "result A is better than result B."
 
-**RM training.** Train a Reward Model using the Bradley-Terry model (Chapter 8's reward model). Input is (query, search_result) pairs; output is a scalar score. This RM will serve as the reward source for subsequent RL training.
+**RM training.** Train a Reward Model using the Bradley-Terry model (Chapter 13's reward model). Input is (query, search_result) pairs; output is a scalar score. This RM will serve as the reward source for subsequent RL training.
 
 But there's a key choice: **train a single comprehensive RM, or independent RMs for each Rubric dimension?**
 
@@ -747,7 +747,7 @@ flowchart TD
 
 Search-returned tokens (the `<information>` part) are **masked out** when computing RL loss — only model-generated tokens participate in gradient updates. The reason is intuitive: search result quality is not controlled by the model, so the model should not be penalized for low-quality search engine results.
 
-This is consistent with the Agent Loop design principles discussed in [Section 20.0](./intro): **environment feedback doesn't change policy; only the policy's own decisions change policy.**
+This is consistent with the Agent Loop design principles discussed in [Section 20.1](./intro): **environment feedback doesn't change policy; only the policy's own decisions change policy.**
 
 #### Reward Function
 
@@ -882,7 +882,7 @@ def rollout(model, question, retriever, max_turns=10):
 # - Tokens between <answer>...</answer> -> mask=1 (model output)
 ```
 
-This is consistent with the Agent Loop discussed in [Section 20.0](./intro): environment-returned observations should not affect policy gradients.
+This is consistent with the Agent Loop discussed in [Section 20.1](./intro): environment-returned observations should not affect policy gradients.
 
 ### Reproduction Results Report Template
 
@@ -932,8 +932,8 @@ After reproducing Search-R1, you can explore these directions:
 
 Search-R1 is the concrete implementation of all RL knowledge from previous chapters in the search Agent scenario:
 
-- **RLVR (Chapter 9)**: Search-R1's reward is purely "is the answer correct," requiring no Reward Model — this is exactly RLVR's core idea.
-- **GRPO (Chapter 9)**: Search-R1 defaults to GRPO, with group sampling + relative comparison replacing PPO's Critic network.
+- **RLVR (Chapter 16)**: Search-R1's reward is purely "is the answer correct," requiring no Reward Model — this is exactly RLVR's core idea.
+- **GRPO (Chapter 16)**: Search-R1 defaults to GRPO, with group sampling + relative comparison replacing PPO's Critic network.
 - **Agent Loop ([chapter overview](./intro))**: Search-R1's Rollout is the concrete implementation of the Agent Loop — the model alternates between reasoning and tool calls.
 - **ORM vs PRM ([Section 20.3](./multi-turn-rl))**: Search-R1 only uses ORM (terminal reward). Atom-Searcher[^atom_searcher] and Web-Shepherd[^web_shepherd] add PRM (process rewards) on top.
 - **Retrieved Token Masking**: Consistent with the idea of masking prompt tokens in PPO — only do gradient updates on policy-controllable parts.

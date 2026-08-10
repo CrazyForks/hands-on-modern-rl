@@ -291,45 +291,63 @@ Every chapter includes runnable code examples. **Many intuitions in RL can only 
 
 ### Content and Structure
 
-The book can be roughly divided into four parts, shown in different colors in the core map below:
+The book is organized into seven stages, shown in different colors in the core map below:
 
 <div class="preface-structure-map" align="center" style="margin: 2.5rem 0;">
 
 ```mermaid
 graph TD
-    subgraph P1["Part 1: Quick Start (Chapters 1-2)"]
-        Q["Get running first<br/>CartPole & DPO"]
+    subgraph P1["Fundamentals and Classical RL (Chapters 1-4)"]
+        Q["CartPole<br/>Problem formulation and classical methods"]
     end
 
-    subgraph P2["Part 2: Core Theory and Methods (Chapters 3-7)"]
+    subgraph P2["Deep Reinforcement Learning (Chapters 5-9)"]
         A["Core RL problems<br/>Sequential decisions & long-term return"] --> B["Value-Based<br/>Learn action values first"]
         A --> C["Policy-Based<br/>Learn policy directly"]
-        B --> D["Q-Learning → DQN<br/>(Chapter 4)"]
-        C --> E["REINFORCE<br/>(Chapter 5)"]
-        D --> F["Actor-Critic convergence<br/>(Chapter 6)"]
+        B --> D["Q-Learning → DQN<br/>(Chapter 5)"]
+        C --> E["REINFORCE<br/>(Chapter 6)"]
+        D --> F["Actor-Critic convergence<br/>(Chapter 7)"]
         E --> F
-        F --> G["PPO (Chapter 7)"]
+        F --> G["TRPO and PPO<br/>(Chapter 8)"]
+        G --> H["Continuous control and Model-Based RL<br/>(Chapter 9)"]
     end
 
-    subgraph P3["Part 3: RL for Large Models (Chapters 8-10)"]
-        H["LLM & Agent RL"] --> I["RLHF & DPO<br/>(Chapters 8-9)"]
-        H --> J["GRPO & RLVR (reasoning emergence)<br/>(Chapter 9)"]
-        H --> K["Agentic RL (multi-turn interaction)<br/>(Chapter 10)"]
+    subgraph P3["Advanced RL Methods (Chapters 10-12)"]
+        I["Offline RL"] --> J["Imitation, inverse and meta-RL"]
+        J --> K["Exploration, multi-agent and hierarchical RL"]
     end
 
-    subgraph P4["Part 4: Frontiers and Future Topics (Chapters 11-12)"]
-        L["Frontiers & future trends"] --> M["VLM Multimodal RL<br/>(Chapter 11)"]
-        L --> N["Embodied AI, Self-Play, etc.<br/>(Chapter 12)"]
+    subgraph P4["LLM Alignment and Post-Training (Chapters 13-19)"]
+        L["RLHF and industrial training<br/>(Chapters 13-14)"] --> M["DPO, GRPO and RLVR<br/>(Chapters 15-16)"]
+        M --> N["Reasoning, PRMs and RLAIF<br/>(Chapters 17-19)"]
+    end
+
+    subgraph P5["Agentic Reinforcement Learning (Chapters 20-23)"]
+        O["Tool use and multi-turn RL"] --> P["Code, browser and GUI agents"]
+    end
+
+    subgraph P6["Multimodal Reinforcement Learning (Chapters 24-27)"]
+        R["VLM and audio RL"] --> S["VLA and visual-generation RL"]
+    end
+
+    subgraph P7["Safety, Evaluation and Research Frontiers (Chapters 28-29)"]
+        T["Reward hacking and RL evaluation"] --> U["Self-play, scaling and frontiers"]
     end
 
     Q --> A
-    G --> H
-    H --> L
+    H --> I
+    K --> L
+    N --> O
+    P --> R
+    S --> T
 
     style P1 fill:#f8f9fa,stroke:#616161,color:#000
     style P2 fill:#eef6ff,stroke:#1976d2,color:#000
     style P3 fill:#edf7ed,stroke:#2e7d32,color:#000
     style P4 fill:#f5eef8,stroke:#7b1fa2,color:#000
+    style P5 fill:#fff8e1,stroke:#f9a825,color:#000
+    style P6 fill:#e0f7fa,stroke:#00838f,color:#000
+    style P7 fill:#fce4ec,stroke:#c2185b,color:#000
     style Q fill:#f8f9fa,stroke:#616161,color:#000
     style A fill:#eef6ff,stroke:#1976d2,color:#000
     style B fill:#e3f2fd,stroke:#1976d2,color:#000
@@ -338,45 +356,40 @@ graph TD
     style E fill:#fff3e0,stroke:#f57c00,color:#000
     style F fill:#e8f5e9,stroke:#388e3c,color:#000
     style G fill:#e8f5e9,stroke:#388e3c,stroke-width:3px,color:#000
-    style H fill:#edf7ed,stroke:#2e7d32,color:#000
     style I fill:#edf7ed,stroke:#2e7d32,color:#000
     style J fill:#edf7ed,stroke:#2e7d32,color:#000
     style K fill:#edf7ed,stroke:#2e7d32,color:#000
     style L fill:#f5eef8,stroke:#7b1fa2,color:#000
     style M fill:#f5eef8,stroke:#7b1fa2,color:#000
     style N fill:#f5eef8,stroke:#7b1fa2,color:#000
+    style O fill:#fff8e1,stroke:#f9a825,color:#000
+    style P fill:#fff8e1,stroke:#f9a825,color:#000
+    style R fill:#e0f7fa,stroke:#00838f,color:#000
+    style S fill:#e0f7fa,stroke:#00838f,color:#000
+    style T fill:#fce4ec,stroke:#c2185b,color:#000
+    style U fill:#fce4ec,stroke:#c2185b,color:#000
 
 ```
 
 </div>
 
-The diagram above shows the main thread of the book's algorithms. **Part 1** (gray) gets you started quickly with first-hand experience on CartPole and DPO. **Part 2** (blue) builds core theory: the left blue branch is Value-Based — first estimate how many points each action is worth, then choose the highest-scoring one; the right orange branch is Policy-Based — skip scoring and directly learn what to do in each state. The two routes merge at Actor-Critic, from which PPO emerges. **Part 3** (green) enters the large model era: PPO is the backbone for all subsequent large model alignment and agent algorithms, extending to RLHF, DPO, GRPO, and Agentic RL. **Part 4** (purple) looks at frontiers, exploring multimodal RL and embodied intelligence.
+The diagram follows the book's seven-stage learning path. Chapters 1-4 establish the language of classical RL. Chapters 5-9 develop value-based and policy-based deep RL, bringing them together through Actor-Critic and PPO. Chapters 10-12 cover advanced settings. Chapters 13-19 then introduce LLM alignment and post-training, Chapters 20-23 move to agents that use tools and act over complete trajectories, Chapters 24-27 extend RL to multimodal and embodied systems, and Chapters 28-29 close with safety, evaluation, and research frontiers.
 
 Here is a detailed introduction to each chapter's content.
 
-**Part 1 covers quick start.**
+**Chapters 1-4** begin with CartPole and then establish RL problem definitions, value functions, Bellman equations, and classical solution methods.
 
-- **Chapter 1** guides you from zero to running your first RL training script, gaining first-hand experience of "AI can learn something on its own" on the CartPole inverted pendulum.
-- **Chapter 2** switches the scenario from "game control" to "language alignment," using a complete DPO fine-tuning pipeline to teach a large language model to "not blindly follow the user," experiencing how modern RL directly acts on large models.
+**Chapters 5-9** develop deep RL: DQN learns action values, policy gradients optimize policies directly, Actor-Critic combines the two routes, PPO stabilizes policy updates, and continuous-control and model-based methods broaden the setting.
 
-**The next five chapters focus on building the theory and methodology of reinforcement learning.**
+**Chapters 10-12** cover offline RL, imitation and inverse RL, meta-RL, exploration, multi-agent learning, and hierarchical RL.
 
-- **Chapter 3** introduces the mathematical foundation of RL — the Markov Decision Process (MDP), starting from the multi-armed bandit problem, progressively building the formal framework of states, actions, and rewards, and deriving the Bellman equation.
-- **Chapter 4** enters deep reinforcement learning, showing how DQN moves Q-Learning from a small table into a neural network, using experience replay and target networks to let agents learn to make decisions directly from Atari game pixels — a milestone in the fusion of deep learning and RL.
-- **Chapter 5** turns to the other route — policy gradient methods, from REINFORCE to policy gradients with baselines, understanding the basic paradigm of policy optimization.
-- **Chapter 6** builds the Actor-Critic architecture, introducing the advantage function and Critic training methods, merging the Value-Based and Policy-Based routes.
-- **Chapter 7** focuses on PPO, diving deep into the two core mechanisms of clipping and Generalized Advantage Estimation (GAE), practicing the art of stable training on the Lunar Lander — PPO is both the pinnacle of the game control era and the starting point for all subsequent large model alignment algorithms.
+**Chapters 13-19** form the LLM post-training path, from RLHF pipelines and industrial training to DPO, GRPO, RLVR, reasoning models, process reward models, and RLAIF.
 
-**Part 3 discusses alignment and agent algorithms in the large model era.**
+**Chapters 20-23** shift the training object from a single response to a complete trajectory, covering tool use, multi-turn interaction, code agents, browser agents, and GUI agents.
 
-- **Chapter 8** connects the SFT → RM → RL three stages, building a complete RLHF engineering pipeline, covering core practical challenges including data engineering, reward function design, training stability control, and self-play data flywheels.
-- **Chapter 9** introduces frontier algorithms for post-training alignment. It reveals mathematically how DPO "hides" the reward signal in the policy probability ratio to bypass the reward model; then introduces how GRPO uses within-group relative advantages to further eliminate the Critic network. The focus is on **RLVR (RL with Verifiable Rewards)**, analyzing how rule-based feedback replaces human annotation, and tracing the latest progress in **DeepSeek-R1-Zero**'s pure RL-driven emergence of reasoning capabilities (CoT).
-- **Chapter 10** focuses on **Agentic RL**. It explores how to use RL to train agents that can act continuously in environments, call tools, and interact over multiple turns, covering tool calling, trajectory synthesis, credit assignment, and industrial practice (such as Deep Research Agents). This is the key transition from "dialogue models" to "autonomous agents."
+**Chapters 24-27** extend reward learning and policy optimization to vision, audio, VLA, and visual-generation tasks.
 
-**Part 4 extends RL to vision, the physical world, and frontier directions.**
-
-- **Chapter 11** pushes RL from pure text into vision-language models (VLMs), analyzing unique problems in multimodal RL such as visual hallucination and reward attribution, and introducing frontier frameworks like Open-R1 in visual reasoning and generation.
-- **Chapter 12** surveys the future trends of RL. It covers not only the core challenges of **embodied intelligence** — from discrete to continuous action control and Sim-to-Real domain randomization — but also frontier directions that will fundamentally reshape intelligent systems: Model-Based RL, Self-Play, LLM multi-agent cooperation, and Offline RL.
+**Chapters 28-29** focus on reward hacking, alignment evaluation, self-play, scaling laws, multi-agent cooperation, and research frontiers.
 
 ### Target Audience
 

@@ -375,7 +375,7 @@ If the new reward drops but human quality rises, do not panic. That just means t
 
 Reward hacking requires controlled experiments to practice diagnosis; the data flywheel requires quality gates to prevent self-deception. The truly hard part of RLHF is not just the algorithms — it is making reward, data, and evaluation counterbalance each other.
 
-This chapter is now fully closed: a base model is not an assistant. SFT gives it behavioral starting point, the RM gives it preference direction, PPO lets it practice under the reward, and evaluation plus the data flywheel prevent it from learning the wrong things. The next chapter departs from this classic RLHF pipeline to explain why modern methods aim to simplify the RM, the Critic, or human preferences themselves.
+This chapter is now fully closed: a base model is not an assistant. SFT gives it a behavioral starting point, the RM gives it preference direction, PPO lets it practice under the reward, and evaluation plus the data flywheel prevent it from learning the wrong things. Chapter 14 continues with [industrial LLM RL](../chapter16_llm_rl_industrial/industrial-post-training), showing how this classic pipeline changes at production scale.
 
 ## Exercises
 

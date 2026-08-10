@@ -658,7 +658,7 @@ In short, $\varepsilon=0$ almost freezes the policy near the old one: whether ad
 
 Clipping effectively limits policy change in most situations, but it has a theoretical weakness: it constrains the ratio $r_t$ for each **individual** action, rather than directly constraining the overall distribution distance (KL divergence) between two policies.
 
-Consider an extreme case: a policy has 100 actions, and clipping allows each action probability to change by $\pm 20\%$. If all actions are pushed to the boundary simultaneously, the overall distribution change can exceed a KL constraint such as $\delta=0.01$. In practice, this is rare because advantage estimates are noisy and usually do not push all actions in extreme directions simultaneously. But for settings where policy-change control must be strict (e.g., LLM alignment), practitioners often monitor KL as an additional safety metric. This is why in Chapter 8's RLHF training you will see both `clip_fraction` and `approx_kl` logged.
+Consider an extreme case: a policy has 100 actions, and clipping allows each action probability to change by $\pm 20\%$. If all actions are pushed to the boundary simultaneously, the overall distribution change can exceed a KL constraint such as $\delta=0.01$. In practice, this is rare because advantage estimates are noisy and usually do not push all actions in extreme directions simultaneously. But for settings where policy-change control must be strict (e.g., LLM alignment), practitioners often monitor KL as an additional safety metric. This is why in Chapter 13's RLHF training you will see both `clip_fraction` and `approx_kl` logged.
 
 </details>
 

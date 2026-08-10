@@ -1286,7 +1286,7 @@ Once rubrics exist, the next step is to collect preference data and train a Rewa
 
 **Data collection.** For the same search query, ask the model, or multiple models, to generate several search results. Then ask annotators, or use LLM-as-Judge, to score each result according to the rubrics and build preference pairs: "result A is better than result B."
 
-**RM training.** Train a Reward Model with the Bradley-Terry model from Chapter 8. The input is a `(query, search_result)` pair, and the output is a scalar score. This RM becomes the reward source for later RL training.
+**RM training.** Train a Reward Model with the Bradley-Terry model from Chapter 13. The input is a `(query, search_result)` pair, and the output is a scalar score. This RM becomes the reward source for later RL training.
 
 But there is an important choice: **should we train one single RM with an aggregate score, or train independent RMs for each rubric dimension?**
 
@@ -1583,9 +1583,9 @@ The minimal implementation above can verify that the whole training flow works. 
 
 Reward design for Deep Research Agents is a synthesis of the RL methods discussed throughout the book:
 
-- **RLVR (Chapter 9)**: many Deep Research rewards are verifiable. Whether a citation URL is accessible, whether code passes tests, and whether the answer matches the gold answer are all objectively verifiable and do not require a Reward Model.
-- **GRPO (Chapter 9)**: projects such as DeepResearcher use group sampling and relative comparison for training, exactly the idea of GRPO.
-- **PPO (Chapter 7)**: some projects still use PPO as the base RL algorithm, especially when a value function is needed for step-level credit assignment.
+- **RLVR (Chapter 16)**: many Deep Research rewards are verifiable. Whether a citation URL is accessible, whether code passes tests, and whether the answer matches the gold answer are all objectively verifiable and do not require a Reward Model.
+- **GRPO (Chapter 16)**: projects such as DeepResearcher use group sampling and relative comparison for training, exactly the idea of GRPO.
+- **PPO (Chapter 8)**: some projects still use PPO as the base RL algorithm, especially when a value function is needed for step-level credit assignment.
 - **PRM vs ORM ([credit-assignment supplement](./multi-turn-rl))**: CaRR, Atom-Searcher, and Web-Shepherd are all, in essence, exploring the trade-off between ORM, which scores only the final result, and PRM, which evaluates each step, in the Deep Research setting. The research finding is that for long-horizon research tasks, dense signals from PRMs are crucial.
 
 Deep Research Agent is an excellent setting that ties together all the RL knowledge in this book: from basic reward design to advanced credit assignment, from data synthesis to engineering implementation.
@@ -1646,4 +1646,4 @@ These works address the final mile of Deep Research: transforming retrieved rese
 
 [^memento]: Zhou H, et al. "Memento: Fine-tuning LLM Agents without Fine-tuning LLMs." [arXiv:2508.16153](https://arxiv.org/abs/2508.16153), 2025. **Why it is not grouped above**: Memento follows a completely different route. It **does not modify model parameters**, but uses external episodic memory so that the agent can retrieve similar cases at inference time to guide behavior. It ranks first on the GAIA validation set, with 87.88% Pass@3, strongly showing that sometimes "better retrieval" is more effective than "better training." This work reminds us that RL is not the only path to stronger agents; external memory and inference-time strategy are equally worth attention.
 
-This completes all of Chapter 9. In the next chapter, we look further ahead to the frontier: [future trends](../chapter32_selfplay/self-play-outlook/), and what is changing in the field of RL.
+This concludes the legacy project material on this page. For scaling and research frontiers, continue to [Chapter 29](../chapter32_selfplay/self-play-outlook/).

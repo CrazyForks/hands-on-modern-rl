@@ -135,7 +135,7 @@ $$
 
 Thus every eigenvalue of $\gamma P$ has absolute value less than $1$. The error shrinks in every direction, so **Bellman updates must converge**.
 
-This is the mathematical guarantee behind the Chapter 3 DP instruction "iterate until convergence." $\gamma < 1$ is not merely an engineering choice; it is the mathematical condition for convergence.
+This is the mathematical guarantee behind the Chapter 4 DP instruction "iterate until convergence." $\gamma < 1$ is not merely an engineering choice; it is the mathematical condition for convergence.
 
 ### How the Size of $\gamma$ Affects Convergence Speed
 
@@ -320,4 +320,4 @@ Mapped to the core problems in RL:
 | Why can training be stable?                         | Eigenvalues, contraction mappings | Convergence guarantee                      | D.1.4   |
 | How can policies be updated safely?                 | Weighted norms, trust regions     | Mathematical basis of TRPO/PPO             | D.1.4   |
 
-> **Next**: [D.1.5 Formula Review and Exercises](./linear-algebra-formulas-exercises) revisits the RL concepts from Chapter 3 through the lens of linear algebra.
+> **Next**: [D.1.5 Formula Review and Exercises](./linear-algebra-formulas-exercises) revisits the value functions and classical update methods from Chapters 3–4 through the lens of linear algebra.

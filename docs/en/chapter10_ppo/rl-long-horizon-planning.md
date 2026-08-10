@@ -1,5 +1,5 @@
 ---
-title: RL in Long-Horizon Tasks
+title: 8.4 RL in Long-Horizon Tasks
 ---
 
 # 8.4 Classical Reinforcement Learning in Long-Horizon Tasks

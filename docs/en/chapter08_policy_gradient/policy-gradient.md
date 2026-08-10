@@ -4,7 +4,7 @@ title: 6.1 Policy Gradient Theorem
 
 # 6.1 Policy Gradient Theorem
 
-In Chapter 4, we followed Route 1: learn $Q(s,a)$ to score each action, then pick the action with the highest score (review: [Q(s,a) and the greedy policy](../chapter03_mdp/value-q)). DQN performs well on CartPole and Atari, but it has a fundamental limitation:
+In Chapter 3, we followed Route 1: learn $Q(s,a)$ to score each action, then pick the action with the highest score (review: [Q(s,a) and the greedy policy](../chapter03_mdp/value-q)). DQN performs well on CartPole and Atari, but it has a fundamental limitation:
 
 **it can only handle a finite set of discrete actions.**
 
@@ -46,13 +46,13 @@ Let's begin with the motivation for policy gradients: [from DQN to policy gradie
 
 **Key takeaways**
 
-- Review the core idea of DQN from Chapter 4: learn $Q(s,a)$, then use $\arg\max$ to select actions.
+- Review the core idea of DQN from Chapter 5: learn $Q(s,a)$, then use $\arg\max$ to select actions.
 - Understand the fundamental limitation of value-based methods: they can only handle a finite set of discrete actions.
 - Understand why policy-based methods learn $\pi_\theta(a|s)$ directly, and the essential differences between the two routes in terms of action spaces, exploration mechanisms, and data efficiency.
 
 ## What DQN Got Right
 
-The DQN from Chapter 4 follows a clear recipe: approximate $Q(s,a)$ with a neural network, assign a score to each action, then pick the highest-scoring one with $\arg\max_a Q(s,a)$. The underlying logic is: rather than learning "what to do" directly, first learn "how much each action is worth" and then select the best. The policy is implicit -- it is hidden inside the $\arg\max$ over the $Q$-value table.
+The DQN from Chapter 5 follows a clear recipe: approximate $Q(s,a)$ with a neural network, assign a score to each action, then pick the highest-scoring one with $\arg\max_a Q(s,a)$. The underlying logic is: rather than learning "what to do" directly, first learn "how much each action is worth" and then select the best. The policy is implicit -- it is hidden inside the $\arg\max$ over the $Q$-value table.
 
 Consider a concrete moment in CartPole. Suppose the current state is $s = [0.05,\; 0.1,\; -0.02,\; 0.3]$ (position, velocity, pole angle, angular velocity). The DQN network performs one forward pass on this state and outputs two $Q$ values:
 
@@ -180,7 +180,7 @@ For continuous action spaces, the policy network switches to outputting the para
 | Exploration              | External ($\varepsilon$-greedy)               | Built-in (probability distribution naturally includes exploration) |
 | Data reuse               | Off-policy (replay buffer can reuse old data) | On-policy (must use fresh data from the current policy)            |
 | Variance                 | Low (TD targets are relatively stable)        | High (Monte Carlo returns fluctuate widely)                        |
-| Representative algorithm | DQN (Chapter 4)                               | REINFORCE (this chapter) $\to$ PPO (Chapter 7)                     |
+| Representative algorithm | DQN (Chapter 5)                               | REINFORCE (this chapter) $\to$ PPO (Chapter 8)                     |
 
 Key differences explained row by row.
 
@@ -253,6 +253,6 @@ The core difference is in the last row: DQN's $\arg\max$ confines the action spa
 
 ## The Two Routes Are Not Opposed
 
-Each route has its strengths and weaknesses, but they are not mutually exclusive. Chapter 6's Actor-Critic will merge the two: a policy network for decision-making, a value network for variance reduction. Before that, however, we need to establish the mathematical foundations of the policy-based route.
+Each route has its strengths and weaknesses, but they are not mutually exclusive. Chapter 7's Actor-Critic will merge the two: a policy network for decision-making, a value network for variance reduction. Before that, however, we need to establish the mathematical foundations of the policy-based route.
 
 The next section starts from the policy objective function, derives the policy gradient theorem, and introduces the REINFORCE algorithm: [REINFORCE Algorithm](./reinforce).

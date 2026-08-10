@@ -6,9 +6,9 @@ title: 'Supplement: VLM RL Frameworks and Frontiers'
 
 In the previous two sections we ran VLM GRPO experiments and analyzed the unique challenges of VLM RL. Those discussions focused mainly on the "problem" level — how to do reward attribution, how to prevent visual hallucination, whether to update the visual encoder. This section looks at "solutions" — what frameworks are currently addressing these problems systematically, and where VLM RL may be headed.
 
-## 11.3.1 VisPlay: Co-Evolution of Questioner and Reasoner
+## VisPlay: Co-Evolution of Questioner and Reasoner
 
-VisPlay is a creative VLM RL framework whose core idea is to let two models **play against each other and co-evolve** through RL — one generates questions (Questioner), the other answers them (Reasoner). This follows the Self-Play idea discussed in Chapter 8, but is specifically designed for visual scenarios.
+VisPlay is a creative VLM RL framework whose core idea is to let two models **play against each other and co-evolve** through RL — one generates questions (Questioner), the other answers them (Reasoner). This follows the Self-Play idea discussed in Chapter 29, but is specifically designed for visual scenarios.
 
 ![VisPlay Framework](../../chapter26_vlm/images/ref-visplay-framework.png)
 
@@ -22,13 +22,13 @@ The **Questioner**'s task is to generate challenging visual questions. Its input
 
 The **Reasoner**'s task is to answer the Questioner's questions. Its input is an image plus a question, and its output is an answer. As in the VLM GRPO experiments from the previous section, the Reasoner is optimized through RL for answer quality.
 
-The co-evolution of the two models forms a positive feedback loop: the Questioner generates increasingly difficult questions → the Reasoner is forced to improve to answer them → the Questioner must produce even trickier questions to "stump" the Reasoner → the Reasoner continues improving. This loop is structurally identical to AlphaGo's self-play (recall Chapter 5) — driving evolution by continuously raising the opponent's strength.
+The co-evolution of the two models forms a positive feedback loop: the Questioner generates increasingly difficult questions → the Reasoner is forced to improve to answer them → the Questioner must produce even trickier questions to "stump" the Reasoner → the Reasoner continues improving. This loop is structurally identical to AlphaGo's self-play (recall Chapter 7) — driving evolution by continuously raising the opponent's strength.
 
 VisPlay's reward design is also interesting. The Questioner's reward depends on the Reasoner's performance — if the Reasoner answers correctly, the question was too easy, and the Questioner gets a negative reward; if the Reasoner answers incorrectly, the question was challenging, and the Questioner gets a positive reward. But there is a balance issue: if the Questioner asks an unanswerable question (e.g., about details that do not exist in the image), the Reasoner's failure should not count as the Questioner's success. So the Questioner's reward also needs an "answerability" constraint — the question must be about something that genuinely exists in the image.
 
 The Reasoner's reward is similar to the previous section — answer correctness, reasoning quality, format compliance — with one additional dimension: response speed (inference efficiency). In deployment, VLM inference latency directly affects user experience, so the model is encouraged to generate concise and efficient responses.
 
-## 11.3.2 VISTA-Gym: A Tool-Integrated Visual RL Environment
+## VISTA-Gym: A Tool-Integrated Visual RL Environment
 
 VISTA-Gym's design philosophy is "let VLMs not just look and talk, but also act." It incorporates a Python interpreter, search engine, image annotation tools, and more into the VLM's action space — the model can not only generate text answers but also call tools to verify and improve its reasoning.
 
@@ -55,9 +55,9 @@ where $N_{tools}$ is the number of tool calls and $\lambda$ is the efficiency we
 
 ### Combining with GRPO
 
-VISTA-Gym combines naturally with GRPO. For the same image-question pair, the model generates multiple reasoning chains (each containing a different tool-call sequence), evaluates each group's quality with rule-based rewards, computes within-group relative advantages, and updates the policy. This is exactly the same as GRPO from Chapter 9 — except the generated "answers" go from pure text to "tool-call sequences + final answers."
+VISTA-Gym combines naturally with GRPO. For the same image-question pair, the model generates multiple reasoning chains (each containing a different tool-call sequence), evaluates each group's quality with rule-based rewards, computes within-group relative advantages, and updates the policy. This is exactly the same as GRPO from Chapter 16 — except the generated "answers" go from pure text to "tool-call sequences + final answers."
 
-## 11.3.3 Framework Comparison
+## Framework Comparison
 
 Putting VisPlay, VISTA-Gym, and the VLM GRPO experiment from the previous section side by side:
 
@@ -78,7 +78,7 @@ Putting VisPlay, VISTA-Gym, and the VLM GRPO experiment from the previous sectio
 
 These three frameworks are not substitutes for each other; they solve problems at different levels. VLM GRPO is "basic training" — build foundations with a fixed dataset and rule rewards. VisPlay is "continuous evolution" — break through static data limits through self-play. VISTA-Gym is "reliability enhancement" — verify reasoning through tool calls. In practice, they can be used sequentially: first GRPO for foundations, then VisPlay for ongoing optimization, and finally VISTA-Gym for reliability verification.
 
-## 11.3.4 VeRL-Omni: Training Framework for Multimodal Generative RL
+## VeRL-Omni: Training Framework for Multimodal Generative RL
 
 VisPlay, VISTA-Gym, and the VLM GRPO experiments focus on **algorithmic ideas** — questioner-reasoner co-evolution, tool-augmented reasoning, and within-group relative advantage. To turn these ideas (or broader visual-generation RL ideas) into reproducible, scalable experiments, you also need training infrastructure aimed at multimodal **generation** models. This section introduces [VeRL-Omni](https://github.com/verl-project/verl-omni) — an RL post-training framework built on [veRL](https://github.com/verl-project/verl), focused on diffusion and omni-modality models.
 
@@ -92,7 +92,7 @@ VeRL-Omni targets RL post-training for three families of generative models:
 
 Its relationship to other material in this chapter:
 
-| | VLM GRPO (Sec 11.1 hands-on) | EasyR1 (Sec 11.4 GeoQA) | VisPlay / VISTA-Gym | VeRL-Omni |
+| | VLM GRPO (24.3 hands-on) | EasyR1 (24.4 GeoQA) | VisPlay / VISTA-Gym | VeRL-Omni |
 | --- | --- | --- | --- | --- |
 | **Level** | Teaching / demo | VLM **understanding** RL framework | Research algorithms / environments | Multimodal **generation** RL framework |
 | **Optimized object** | Text answer tokens | Text answer tokens | Dual-model game / tool trajectories | Diffusion denoising trajectories / generation latents |
@@ -113,7 +113,7 @@ VeRL-Omni is **not** a direct substitute for VisPlay or VISTA-Gym — those addr
 
 The next section shifts from "visual understanding" to "visual generation" — discussing how Diffusion formulates denoising as an MDP and how DDPO applies policy gradients. VeRL-Omni is the framework that engineers these generation-side algorithms (FlowGRPO, DanceGRPO, DiffusionNFT, etc.) into runnable recipes. After learning the algorithmic foundations, see the [VeRL-Omni documentation](https://verl-omni.readthedocs.io/en/latest/index.html) for Quickstart guides and recipes.
 
-## 11.3.5 Frontiers of VLM RL
+## Frontiers of VLM RL
 
 VLM RL is a rapidly evolving field. Several directions are worth watching:
 
@@ -127,7 +127,7 @@ Moving from 2D images to 3D scenes, VLMs need to understand depth, occlusion, an
 
 ### Robotic VLM-RL
 
-VLM-RL has the broadest application prospects in robotics. Robots need to understand the environment from camera input, then make manipulation decisions. Unlike the continuous control discussed in Section 12.1 on embodied intelligence, the core of VLM-RL is "using visual understanding to guide actions" — not directly from pixels to torques, but first understanding "what object is in front" and then deciding "how to manipulate it."
+VLM-RL has the broadest application prospects in robotics. Robots need to understand the environment from camera input, then make manipulation decisions. Unlike the continuous control discussed in Section 26.1 on embodied intelligence, the core of VLM-RL is "using visual understanding to guide actions" — not directly from pixels to torques, but first understanding "what object is in front" and then deciding "how to manipulate it."
 
 | Approach            | How Input Enters Policy                                        | Strengths                                             | Risks                                                          |
 | ------------------- | -------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------- |
@@ -143,7 +143,7 @@ Robotic VLM-RL training typically follows a "sim pretraining → sim fine-tuning
 
 In the **sim pretraining** phase, RL trains the VLM's visual understanding and decision-making across many simulated scenarios. Simulation environments can quickly generate large amounts of training data (including various edge cases), and the training process is absolutely safe.
 
-In the **sim fine-tuning** phase, targeted fine-tuning is done for the target robot's specific scenarios. This step introduces domain randomization (recall Section 12.1 on embodied intelligence) — randomizing lighting, textures, object positions, and other parameters so the policy works across varied conditions.
+In the **sim fine-tuning** phase, targeted fine-tuning is done for the target robot's specific scenarios. This step introduces domain randomization (recall Section 26.1 on embodied intelligence) — randomizing lighting, textures, object positions, and other parameters so the policy works across varied conditions.
 
 In the **real-world transfer** phase, the simulation-trained model is deployed on a real robot and fine-tuned with small amounts of real data. This step is the hardest — because there is always an unavoidable gap between simulation and reality (imprecise physical parameters, sensor noise, control latency, etc.).
 
@@ -195,7 +195,7 @@ def robot_vlm_rl_train(vlm, simulator, num_episodes=10000):
                   f"Eval reward: {eval_reward:.1f}")
 ```
 
-## 11.3.6 From Text RL to Multimodal RL: Review and Outlook
+## From Text RL to Multimodal RL: Review and Outlook
 
 Reviewing the full learning path across chapters, we see RL develop from the simplest tabular methods to complex multimodal scenarios:
 
@@ -208,7 +208,7 @@ Reviewing the full learning path across chapters, we see RL develop from the sim
 | Ch 10: Agentic RL     | Text + tool trajectories | Tool calls / tokens | Outcome + process rewards | PPO/GRPO       |
 | Ch 11: VLM RL         | Image + tokens           | Discrete (tokens)   | Rules + model + grounding | GRPO           |
 
-The core ideas remain the same throughout — the policy gradient theorem (Chapter 5), Actor-Critic architecture (Chapter 6), PPO's clipping stability (Chapter 7), GRPO's within-group advantage (Chapter 9). What changes is the input modality, the action space, and the reward source. This is why earlier chapters spent considerable time building theoretical foundations — these foundations apply fully in multimodal settings.
+The core ideas remain the same throughout — the policy gradient theorem (Chapter 6), Actor-Critic architecture (Chapter 7), PPO's clipping stability (Chapter 8), GRPO's within-group advantage (Chapter 16). What changes is the input modality, the action space, and the reward source. This is why earlier chapters spent considerable time building theoretical foundations — these foundations apply fully in multimodal settings.
 
 <details>
 <summary>Exercise: If you replaced the VLM's input from static images to video streams, which parts of GRPO code would need to change?</summary>
@@ -221,7 +221,7 @@ The reward function also needs corresponding adjustment — video understanding 
 
 VLM RL is one of the most active research directions today. From GPT-4V to Gemini, from LLaVA to Qwen-VL, every multimodal large model release comes with improvements in RL training methods. This field still has too many unsolved problems — visual hallucination, reward attribution, safety-efficiency tradeoffs, sim-to-real transfer — solving each one may spawn new application scenarios.
 
-## 11.3.7 From VLM RL to Multimodal Agents
+## From VLM RL to Multimodal Agents
 
 VLM RL produces "models that can understand images." But in real scenarios, users often need "agents that can both understand images and take action" — such as screenshot understanding + automated operation (GUI Agent), chart analysis + data querying (Data Agent). This is the leap from VLM RL to multimodal Agents: **visual understanding + tool calling**.
 
@@ -251,7 +251,7 @@ def multimodal_agent_reward(trajectory, task):
     return 0.2 * visual_reward + 0.3 * tool_reward + 0.5 * outcome_reward
 ```
 
-**3. Cross-modal credit assignment.** In a 10-turn trajectory, a visual understanding error at turn 2 may cause a tool-call failure at turn 5. This is harder than credit assignment in text-only Agents, because the cross-modal error propagation chain is longer and more subtle. The ORM vs PRM tradeoff discussed in [Chapter 10](../chapter22_agentic/multi-turn-rl) is even more prominent here.
+**3. Cross-modal credit assignment.** In a 10-turn trajectory, a visual understanding error at turn 2 may cause a tool-call failure at turn 5. This is harder than credit assignment in text-only Agents, because the cross-modal error propagation chain is longer and more subtle. The ORM vs PRM tradeoff discussed in [Chapter 20](../chapter22_agentic/multi-turn-rl) is even more prominent here.
 
 ### Representative Work
 
@@ -271,7 +271,7 @@ If you want to train multimodal Agents, the recommended path is:
 
 Key principle: **verify that visual understanding and tool use each meet baseline independently before attempting end-to-end joint training.** If the underlying components have problems, joint training will not rescue them.
 
-The next section shifts perspective from "visual understanding" to "visual generation" — looking at how Diffusion and video generation models can improve text alignment, visual quality, and instruction following through RL post-training. For hands-on practice, see VeRL-Omni introduced in Sec 11.3.4.
+The next section shifts perspective from "visual understanding" to "visual generation" — looking at how Diffusion and video generation models can improve text alignment, visual quality, and instruction following through RL post-training. For hands-on practice, use the VeRL-Omni framework introduced above.
 
 ## References
 

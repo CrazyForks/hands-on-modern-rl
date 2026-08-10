@@ -1,8 +1,8 @@
 ---
-title: B.6 Sampling Methods
+title: B.7 Sampling Methods
 ---
 
-# B.6 Top-k / Top-p Sampling + Temperature
+# B.7 Top-k / Top-p Sampling + Temperature
 
 Decoding strategies are a frequent LLM interview topic, and they connect directly to RL: how do you sample from a policy after RLHF? How does temperature change the action distribution?
 

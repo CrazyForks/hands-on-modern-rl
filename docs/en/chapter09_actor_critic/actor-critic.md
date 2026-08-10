@@ -15,11 +15,11 @@ In the previous two sections we met the [advantage function](./advantage-functio
 
 ## From REINFORCE to Actor-Critic
 
-Recall the gradient formula of REINFORCE from Chapter 5 (review: [policy gradient theorem](../chapter08_policy_gradient/reinforce)):
+Recall the gradient formula of REINFORCE from Chapter 6 (review: [policy gradient theorem](../chapter08_policy_gradient/reinforce)):
 
 $$\nabla_\theta J \approx \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot G_t$$
 
-$G_t$ is the cumulative return over the full trajectory -- this is precisely why REINFORCE has high variance. The [baseline analysis](../chapter08_policy_gradient/pg-improvements) in Chapter 5 showed that subtracting $V(s)$ reduces variance. In the previous section we also found that we need not wait for the episode to end -- the [TD Error](./critic-training) $\delta = r + \gamma V(s') - V(s)$ can replace $G_t - V(s)$ as an advantage estimate:
+$G_t$ is the cumulative return over the full trajectory -- this is precisely why REINFORCE has high variance. The [baseline analysis](../chapter08_policy_gradient/pg-improvements) in Chapter 6 showed that subtracting $V(s)$ reduces variance. In the previous section we also found that we need not wait for the episode to end -- the [TD Error](./critic-training) $\delta = r + \gamma V(s') - V(s)$ can replace $G_t - V(s)$ as an advantage estimate:
 
 $$\nabla_\theta J \approx \nabla_\theta \log \pi_\theta(a_t|s_t) \cdot \delta$$
 
@@ -157,7 +157,7 @@ Both networks share the same input (state $s$) but perform different tasks:
 | Actor   | select actions  | state $s$ | action probabilities $\pi(a\|s)$ | maximize cumulative reward       |
 | Critic  | evaluate states | state $s$ | value estimate $V(s)$            | predict future return accurately |
 
-If you look carefully at the Critic's update rule, $V(s) \leftarrow V(s) + \alpha \cdot \delta$ -- isn't this exactly [TD learning](../chapter03_mdp/dp-mc-td) from Chapter 3? **The Critic is, in essence, a neural-network implementation of the [value function $V(s)$](../chapter03_mdp/value-bellman) from Chapter 3**, independently learning "how many points each state is worth." The Actor is a neural-network implementation of the [policy $\pi(a|s)$](../chapter03_mdp/policy-objective), adjusting its behavior based on the evaluation provided by the Critic.
+If you look carefully at the Critic's update rule, $V(s) \leftarrow V(s) + \alpha \cdot \delta$ -- isn't this exactly [TD learning](../chapter03_mdp/dp-mc-td) from Chapter 4? **The Critic is, in essence, a neural-network implementation of the [value function $V(s)$](../chapter03_mdp/value-bellman) from Chapter 3**, independently learning "how many points each state is worth." The Actor is a neural-network implementation of the [policy $\pi(a|s)$](../chapter03_mdp/policy-objective), adjusting its behavior based on the evaluation provided by the Critic.
 
 Two function approximators work in concert -- the Critic helps the Actor judge "how much better this action is than average," the Actor adjusts its policy accordingly, and the new policy generates new data that helps the Critic learn better. This is where the name Actor-Critic comes from.
 
@@ -371,7 +371,7 @@ for episode in range(500):
         print(f"Episode {episode+1} | Avg Reward: {avg:.1f}")
 ```
 
-Compared with the REINFORCE code in Chapter 5, the key differences are: there is an additional Critic network (outputting $V(s)$); TD Error (`td_target - value`) replaces $G_t$; the Critic has its own loss function (MSE); and updates happen every step rather than waiting for the episode to end.
+Compared with the REINFORCE code in Chapter 6, the key differences are: there is an additional Critic network (outputting $V(s)$); TD Error (`td_target - value`) replaces $G_t$; the Critic has its own loss function (MSE); and updates happen every step rather than waiting for the episode to end.
 
 ### Code Trace: A Complete Training Step
 
@@ -529,7 +529,7 @@ The Actor's value lies in directly outputting action probabilities, which natura
 
 The bias comes from the Critic's [bootstrapping](../chapter03_mdp/dp-mc-td) -- the Critic uses its own estimate $V(s')$ to update $V(s)$. If $V(s')$ is itself inaccurate, the error propagates backward. It is like calibrating one ruler with another inaccurate ruler -- the errors accumulate.
 
-But this bias is not necessarily harmful. A moderate amount of bias can buy much lower variance, and overall convergence may be faster than the unbiased but high-variance REINFORCE. In Chapter 7, GAE is precisely about controlling this "bias-variance tradeoff" -- using a parameter $\lambda$ to smoothly interpolate between pure TD (high bias, low variance) and pure MC (unbiased, high variance).
+But this bias is not necessarily harmful. A moderate amount of bias can buy much lower variance, and overall convergence may be faster than the unbiased but high-variance REINFORCE. In Chapter 8, GAE is precisely about controlling this "bias-variance tradeoff" -- using a parameter $\lambda$ to smoothly interpolate between pure TD (high bias, low variance) and pure MC (unbiased, high variance).
 
 </details>
 

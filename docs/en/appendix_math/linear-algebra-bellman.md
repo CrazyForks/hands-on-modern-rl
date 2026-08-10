@@ -136,7 +136,7 @@ The key is the term $P\boldsymbol{v}$. Each row of $P$ is exactly a set of trans
 | **r**         | Immediate rewards of all states              | n x 1     |
 | gamma P **v** | Discounted probability-weighted future value | n x 1     |
 
-All three quantities have dimension $n \times 1$, so both sides of the equation have the same shape. This is the operation behind DP in Chapter 3: repeatedly apply $v_{k+1} = r + \gamma P v_k$ until convergence.
+All three quantities have dimension $n \times 1$, so both sides of the equation have the same shape. This is the operation behind DP in Chapter 4: repeatedly apply $v_{k+1} = r + \gamma P v_k$ until convergence.
 
 ---
 
@@ -240,7 +240,7 @@ More precisely, the spectral radius of $\gamma P$, meaning the largest absolute 
 The derivation makes the closed-form solution look simple: write the matrix equation, invert the matrix, and obtain the answer. In practice, this path is usually infeasible for three reasons:
 
 1. **The scale is too large.** If the number of states is $n=10^6$, then $I-\gamma P$ is a $10^6 \times 10^6$ matrix. Matrix inversion costs $O(n^3)$ and is essentially impossible.
-2. **The matrix may not be explicitly available.** In many practical problems, the entries of $P$ are unknown; we only observe sampled transitions. The MC and TD methods in Chapter 3 operate exactly under this condition.
+2. **The matrix may not be explicitly available.** In many practical problems, the entries of $P$ are unknown; we only observe sampled transitions. The MC and TD methods in Chapter 4 operate exactly under this condition.
 3. **The state may be continuous.** If the state is an image or text, there may be no finite matrix at all, so $P$ cannot be constructed.
 
 Practical algorithms approximate the solution with iterative methods:
@@ -249,7 +249,7 @@ Practical algorithms approximate the solution with iterative methods:
 - **Policy evaluation**: repeatedly apply Bellman updates inside policy iteration.
 - **TD learning**: use sampled data for incremental updates.
 
-All of these methods approximate the solution $(I-\gamma P)^{-1}\boldsymbol{r}$ in a more scalable way, without actually computing the inverse. The evolution from DP to MC to TD in Chapter 3 corresponds to this path: direct iteration with a known model, sampling without a known model, and one-step sampling updates.
+All of these methods approximate the solution $(I-\gamma P)^{-1}\boldsymbol{r}$ in a more scalable way, without actually computing the inverse. The evolution from DP to MC to TD in Chapter 4 corresponds to this path: direct iteration with a known model, sampling without a known model, and one-step sampling updates.
 
 ::: warning Common Pitfall
 When you see $\boldsymbol{v} = (I-\gamma P)^{-1}\boldsymbol{r}$, do not assume a practical algorithm is really computing a matrix inverse. This formula is a theoretical closed-form solution used to show existence and uniqueness. Practical algorithms are iterative.
@@ -349,7 +349,7 @@ This is the same $\boldsymbol{v}_\pi = \boldsymbol{r}_\pi + \gamma P_\pi \boldsy
 
 ## Matrix Form of DP Iteration
 
-Chapter 3 introduced the state-by-state update for DP policy evaluation:
+Chapter 4 introduced the state-by-state update for DP policy evaluation:
 
 $$
 V(s) \leftarrow \sum_a \pi(a|s)\left[R(s,a) + \gamma \sum_{s'} P(s'|s,a) V(s')\right].

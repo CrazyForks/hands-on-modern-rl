@@ -2,7 +2,7 @@
 
 ## 本节导读
 
-第 7.2 节推导出 PPO 的裁剪代理目标：
+PPO 的裁剪代理目标写为：
 
 $$L^{\text{CLIP}}(\theta) = \mathbb{E}_t \left[ \min \left( r_t(\theta) \cdot A_t, \; \text{clip}(r_t(\theta), 1-\varepsilon, 1+\varepsilon) \cdot A_t \right) \right]$$
 
@@ -20,7 +20,7 @@ $$L^{\text{CLIP}}(\theta) = \mathbb{E}_t \left[ \min \left( r_t(\theta) \cdot A_
 
 ## 原始策略梯度的更新风险
 
-回顾第 5 章的策略梯度更新（[REINFORCE](../chapter08_policy_gradient/reinforce)）：
+回顾第 6 章的策略梯度更新（[REINFORCE](../chapter08_policy_gradient/reinforce)）：
 
 $$\theta \leftarrow \theta + \alpha \cdot \nabla_\theta \log \pi_\theta(a\mid s) \cdot A(s,a)$$
 

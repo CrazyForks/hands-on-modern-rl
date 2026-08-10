@@ -308,45 +308,63 @@ $$J(\theta) = \mathbb{E}_{\pi_\theta}\left[G_t\right], \quad \theta^* = \arg\max
 
 ### 内容和结构
 
-全书大致可分为四个部分，在下图的核心脉络中用不同的颜色呈现：
+全书分为七个部分，在下图的核心脉络中用不同的颜色呈现：
 
 <div class="preface-structure-map" align="center" style="margin: 2.5rem 0;">
 
 ```mermaid
 graph TD
-    subgraph P1["第一部分：快速入门（第 1-2 章）"]
-        Q["先动手跑起来<br/>CartPole 与 DPO"]
+    subgraph P1["Part I · 基础与经典强化学习（第 1-4 章）"]
+        Q["CartPole 入门<br/>问题定义与经典方法"]
     end
 
-    subgraph P2["第二部分：核心理论与方法（第 3-7 章）"]
-        A["RL 的核心问题<br/>序列决策与长期回报"] --> B["Value-Based<br/>先学动作价值"]
+    subgraph P2["Part II · 深度强化学习（第 5-9 章）"]
+        A["RL 的核心问题<br/>序列决策与长期回报"] --> B["Value-Based<br/>学习动作价值"]
         A --> C["Policy-Based<br/>直接学策略"]
-        B --> D["Q-Learning → DQN<br/>（第 4 章）"]
-        C --> E["REINFORCE<br/>（第 5 章）"]
-        D --> F["Actor-Critic 汇合<br/>（第 6 章）"]
+        B --> D["Q-Learning → DQN<br/>（第 5 章）"]
+        C --> E["REINFORCE<br/>（第 6 章）"]
+        D --> F["Actor-Critic 汇合<br/>（第 7 章）"]
         E --> F
-        F --> G["PPO（第 5 章）"]
+        F --> G["TRPO 与 PPO<br/>（第 8 章）"]
+        G --> H["连续控制与 Model-Based RL<br/>（第 9 章）"]
     end
 
-    subgraph P3["第三部分：大模型强化学习（第 8-10 章）"]
-        H["大模型与智能体 RL"] --> I["RLHF 与 DPO<br/>（第 8-9 章）"]
-        H --> J["GRPO 与 RLVR (推理涌现)<br/>（第 7 章）"]
-        H --> K["Agentic RL (多轮交互)<br/>（第 8 章）"]
+    subgraph P3["Part III · 高级 RL 方法（第 10-12 章）"]
+        I["离线 RL"] --> J["模仿学习、逆向 RL 与元 RL"]
+        J --> K["探索、多智能体与分层 RL"]
     end
 
-    subgraph P4["第四部分：前沿与未来专题（第 11-12 章）"]
-        L["前沿与未来趋势"] --> M["VLM 多模态 RL<br/>（第 9 章）"]
-        L --> N["具身智能与 Self-Play 等<br/>（第 10 章）"]
+    subgraph P4["Part IV · 大语言模型对齐与后训练（第 13-19 章）"]
+        L["RLHF 与工业训练<br/>（第 13-14 章）"] --> M["DPO、GRPO 与 RLVR<br/>（第 15-16 章）"]
+        M --> N["推理、PRM 与 RLAIF<br/>（第 17-19 章）"]
+    end
+
+    subgraph P5["Part V · Agentic 强化学习（第 20-23 章）"]
+        O["工具调用与多轮 RL"] --> P["代码、浏览器与 GUI Agent"]
+    end
+
+    subgraph P6["Part VI · 多模态强化学习（第 24-27 章）"]
+        R["VLM 与音频 RL"] --> S["VLA 与视觉生成 RL"]
+    end
+
+    subgraph P7["Part VII · 安全、评估与研究前沿（第 28-29 章）"]
+        T["奖励黑客与 RL 评估"] --> U["Self-Play、Scaling 与研究前沿"]
     end
 
     Q --> A
-    G --> H
-    H --> L
+    H --> I
+    K --> L
+    N --> O
+    P --> R
+    S --> T
 
     style P1 fill:#f8f9fa,stroke:#616161,color:#000
     style P2 fill:#eef6ff,stroke:#1976d2,color:#000
     style P3 fill:#edf7ed,stroke:#2e7d32,color:#000
     style P4 fill:#f5eef8,stroke:#7b1fa2,color:#000
+    style P5 fill:#fff8e1,stroke:#f9a825,color:#000
+    style P6 fill:#e0f7fa,stroke:#00838f,color:#000
+    style P7 fill:#fce4ec,stroke:#c2185b,color:#000
     style Q fill:#f8f9fa,stroke:#616161,color:#000
     style A fill:#eef6ff,stroke:#1976d2,color:#000
     style B fill:#e3f2fd,stroke:#1976d2,color:#000
@@ -355,45 +373,40 @@ graph TD
     style E fill:#fff3e0,stroke:#f57c00,color:#000
     style F fill:#e8f5e9,stroke:#388e3c,color:#000
     style G fill:#e8f5e9,stroke:#388e3c,stroke-width:3px,color:#000
-    style H fill:#edf7ed,stroke:#2e7d32,color:#000
     style I fill:#edf7ed,stroke:#2e7d32,color:#000
     style J fill:#edf7ed,stroke:#2e7d32,color:#000
     style K fill:#edf7ed,stroke:#2e7d32,color:#000
     style L fill:#f5eef8,stroke:#7b1fa2,color:#000
     style M fill:#f5eef8,stroke:#7b1fa2,color:#000
     style N fill:#f5eef8,stroke:#7b1fa2,color:#000
+    style O fill:#fff8e1,stroke:#f9a825,color:#000
+    style P fill:#fff8e1,stroke:#f9a825,color:#000
+    style R fill:#e0f7fa,stroke:#00838f,color:#000
+    style S fill:#e0f7fa,stroke:#00838f,color:#000
+    style T fill:#fce4ec,stroke:#c2185b,color:#000
+    style U fill:#fce4ec,stroke:#c2185b,color:#000
 
 ```
 
 </div>
 
-上图是全书算法的主线。**第一部分**（灰色）带你快速上手，在 CartPole 和 DPO 上获得第一手感受。**第二部分**（蓝色）构建核心理论：左侧蓝色分支是 Value-Based——先估计每个动作能得多少分，再选得分最高的；右侧橙色分支是 Policy-Based——跳过打分，直接学习在什么状态下该做什么动作。两条路线在 Actor-Critic 处合流，由此长出 PPO。**第三部分**（绿色）进入大模型时代：PPO 正是后续所有大模型对齐与智能体算法的骨架，由此延伸出 RLHF、DPO、GRPO 和 Agentic RL。**第四部分**（紫色）展望前沿，探索多模态 RL 与具身智能。
+上图按七个部分串起全书。第 1 至 4 章建立经典强化学习的语言；第 5 至 9 章把价值方法和策略方法推进到深度强化学习，并在 Actor-Critic 与 PPO 处汇合。第 10 至 12 章补充离线学习、模仿学习和多智能体等高级方法。具备这些基础后，第 13 至 19 章进入大模型对齐与后训练，第 20 至 23 章转向可调用工具并持续行动的智能体，第 24 至 27 章扩展到多模态与具身系统，最后在第 28 至 29 章讨论安全、评估和研究前沿。
 
 以下是各章内容的详细介绍。
 
-**第一部分包括快速入门。**
+**Part I（第 1 至 4 章）**从 CartPole 开始，依次建立 RL 问题定义、价值函数、贝尔曼方程和经典求解方法。
 
-- **第 1 章**带你零基础运行第一个 RL 训练脚本，在 CartPole 倒立摆上获得"AI 能自己学会一件事"的第一手感受。
-- **第 2 章**将场景从"游戏控制"切换到"语言对齐"，用一个完整的 DPO 微调流程让大语言模型学会"不盲从用户"，体验现代 RL 如何直接作用于大模型。
+**Part II（第 5 至 9 章）**进入深度强化学习：DQN 学习动作价值，策略梯度直接优化策略，Actor-Critic 将两条路线结合，PPO 提供稳定的策略更新，连续控制与 Model-Based RL 再扩展问题边界。
 
-**接下来的五章集中构建强化学习的理论与方法体系。**
+**Part III（第 10 至 12 章）**讨论离线 RL、模仿学习、逆向 RL、元 RL、探索、多智能体与分层 RL，为更复杂的数据和环境设定补齐方法工具。
 
-- **第 3 章**讲解强化学习过程的基本定义，从多臂老虎机中的探索和利用问题出发，引入马尔可夫决策过程（MDP），逐步建立状态、动作、奖励、转移和长期回报的形式化框架，并推导出贝尔曼方程。
-- **第 4 章**进入深度强化学习，展示 DQN 如何将 Q-Learning 从一张小表格搬进神经网络，通过经验回放和目标网络让智能体直接从 Atari 游戏像素中学会决策——这也是深度学习与强化学习融合的里程碑。
-- **第 5 章**转向另一条路线——策略梯度方法，从 REINFORCE 到带基线的策略梯度，理解策略优化的基本范式。
-- **第 6 章**搭建 Actor-Critic 架构，引入优势函数和 Critic 训练方法，让 Value-Based 和 Policy-Based 两条路线在此汇合。
-- **第 5 章**聚焦 PPO，深入裁剪（Clipping）和广义优势估计（GAE）两大核心机制，在月球着陆器上实践稳定训练的艺术——PPO 既是游戏控制时代的集大成者，也是后续所有大模型对齐算法的出发点。
+**Part IV（第 13 至 19 章）**覆盖 RLHF 工程流水线、工业训练、DPO、GRPO、RLVR、推理模型、过程奖励模型和 RLAIF，形成完整的大模型后训练路线。
 
-**第三部分讨论大模型时代的对齐与智能体算法。**
+**Part V（第 20 至 23 章）**把训练对象从单段回答扩展到完整轨迹，依次讨论工具调用、多轮交互、代码智能体、浏览器智能体与 GUI Agent。
 
-- **第 6 章**串联 SFT → RM → RL 三阶段，构建一条完整的 RLHF 工程流水线，覆盖数据工程、奖励函数设计、训练稳定性控制和自我博弈数据飞轮等实际工作中的核心挑战。
-- **第 7 章**介绍后训练对齐的前沿算法。从数学上揭示 DPO 如何将奖励信号"隐藏"在策略概率比中绕过奖励模型；随后介绍 GRPO 如何用组内相对优势进一步省去 Critic 网络。重点探讨 **RLVR（基于可验证奖励的 RL）**，解析如何用规则反馈替代人工标注，追踪 **DeepSeek-R1-Zero** 纯强化学习驱动推理能力（CoT）自发涌现的最新进展。
-- **第 8 章**聚焦 **Agentic RL（智能体强化学习）**。探讨如何用 RL 训练能在环境中连续行动、调用工具、多轮交互的智能体，涵盖工具调用、轨迹合成、信用分配和工业界实践（如 Deep Research Agent）。这是从"对话模型"到"自主智能体"的关键跨越。
+**Part VI（第 24 至 27 章）**把奖励学习和策略优化扩展到视觉、音频、VLA 与视觉生成任务。
 
-**第四部分将 RL 拓展到视觉、物理世界与前沿方向。**
-
-- **第 9 章**把 RL 从纯文本推进到视觉-语言模型（VLM），分析多模态 RL 中视觉幻觉、奖励归因等独特问题，并介绍 Open-R1 等前沿框架在视觉推理与生成上的探索。
-- **第 10 章**展望强化学习的未来趋势。不仅探讨从离散动作到连续动作控制，以及 Sim-to-Real 域随机化等**具身智能**的核心挑战，还覆盖了 Model-Based RL、自我博弈（Self-Play）、LLM 多智能体协作与离线 RL（Offline RL）等将彻底改变智能系统形态的前沿方向。
+**Part VII（第 28 至 29 章）**集中讨论奖励黑客、对齐评估、Self-Play、Scaling Laws、多智能体协作和研究前沿。
 
 ### 目标读者
 

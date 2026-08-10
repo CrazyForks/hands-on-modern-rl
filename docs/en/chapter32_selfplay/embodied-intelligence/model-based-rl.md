@@ -678,10 +678,10 @@ The more likely path is hybridization: use model-free methods for stable optimiz
 
 | Concept from earlier chapters                        | Correspondence in MBRL                                                                   |
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| MDP transition probability (Chapter 3)               | The world model predicts next state, reward, and termination probability                 |
-| DQN and value functions (Chapter 4)                  | Dyna uses model-generated experience to update value functions                           |
+| MDP transition probability (Chapter 2)               | The world model predicts next state, reward, and termination probability                 |
+| Value functions and DQN (Chapters 3 and 5)                  | Dyna uses model-generated experience to update value functions                           |
 | Policy gradients and actor-critic (Chapters 5-6)     | Dreamer trains actor and critic on imagined trajectories                                 |
-| Stable PPO training (Chapter 7)                      | Embodied RL often uses PPO first to obtain a strong simulation baseline                  |
+| Stable PPO training (Chapter 8)                      | Embodied RL often uses PPO first to obtain a strong simulation baseline                  |
 | Embodied intelligence (main article in this section) | MBRL addresses expensive real interaction and the need to predict the future             |
 | [Offline RL](../offline-rl/)                               | Offline data can be used to pretrain world models before planning or policy optimization |
 

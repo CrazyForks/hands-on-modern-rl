@@ -42,7 +42,7 @@ $$A(s_t, a_t) = Q(s_t, a_t) - V(s_t)$$
 
 It measures how much better action $a_t$ is at state $s_t$ compared to the policy's average behavior. The difficulty is that $Q(s_t, a_t)$ is unknown — we cannot read the future, only estimate it.
 
-Chapter 3 already compared the two classical estimators (review: [DP/MC/TD](../chapter03_mdp/dp-mc-td)). Here we compute both on the 5-step episode and look at the gap.
+Chapter 4 already compared the two classical estimators (review: [DP/MC/TD](../chapter03_mdp/dp-mc-td)). Here we compute both on the 5-step episode and look at the gap.
 
 ### TD estimator: one-step signal
 
@@ -338,4 +338,4 @@ This is why RM training must carefully control capacity and regularization — b
 
 </details>
 
-**The RM is the heaviest burden in PPO-for-LLM alignment — heavy to label, heavy to host, and risky to trust. Can we skip it?** The next chapter gives DPO's answer: [Chapter 15: DPO — Bypassing the Reward Model](../chapter17_dpo/intro).
+**The RM is the heaviest burden in PPO-for-LLM alignment — heavy to label, heavy to host, and risky to trust. Can we skip it?** Chapter 15 later gives DPO's answer: [DPO — Bypassing the Reward Model](../chapter17_dpo/intro).

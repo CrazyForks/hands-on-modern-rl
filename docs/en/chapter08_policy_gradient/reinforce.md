@@ -7,7 +7,7 @@ The previous section explained why we need policy-based methods: DQN's $\arg\max
 
 ## The Policy Objective
 
-Chapter 3 introduced the [policy objective](../chapter03_mdp/policy-objective) $J(\theta)$ — a measure of "how good this policy is overall." The answer is natural: across all possible starting points, how much [discounted return](../chapter03_mdp/mdp) does policy $\pi_\theta$ accumulate on average?
+Chapter 2 introduced the [policy objective](../chapter03_mdp/policy-objective) $J(\theta)$ — a measure of "how good this policy is overall." The answer is natural: across all possible starting points, how much [discounted return](../chapter03_mdp/mdp) does policy $\pi_\theta$ accumulate on average?
 
 $$J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \sum_{t=0}^{\infty} \gamma^t r_t \right]$$
 

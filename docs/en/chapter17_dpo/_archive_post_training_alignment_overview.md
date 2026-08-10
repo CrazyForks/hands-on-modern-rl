@@ -5,8 +5,8 @@ title: 9. Post-Training Alignment (archived)
 ::: warning TODO: Archived during English restructure (2026-06-25)
 This was the combined intro for the old Chapter 9 "Post-Training Alignment", which merged DPO + GRPO + RLVR. The Chinese restructure split this into three separate chapters:
 
-- Chapter 17 (DPO) — `docs/chapter17_dpo/intro.md`
-- Chapter 18 (GRPO / RLVR) — `docs/chapter18_grpo/grpo-practice-and-mechanism.md`
+- Chapter 15 (DPO) — `docs/chapter17_dpo/intro.md`
+- Chapter 16 (GRPO / RLVR) — `docs/chapter18_grpo/grpo-practice-and-mechanism.md`
 - Chapter 16 (LLM RL industrial) — `docs/chapter16_llm_rl_industrial/industrial-post-training.md`
 
 The file is kept as translation reference. It will be removed or rewritten when Chapter 17 / 18 English translations catch up.
@@ -14,7 +14,7 @@ The file is kept as translation reference. It will be removed or rewritten when 
 
 # Alignment and Reasoning RL
 
-In the previous chapter, we walked through the full [RLHF pipeline](../chapter15_rlhf/standard-rlhf-pipeline). If you actually ran that pipeline, a few numbers probably stayed with you:
+In Chapter 13, we walked through the full [RLHF pipeline](../chapter15_rlhf/standard-rlhf-pipeline). If you actually ran that pipeline, a few numbers probably stayed with you:
 
 - four models may live in memory at the same time: Actor, Reference, Critic, and Reward Model
 - each training round needs many on-policy generations

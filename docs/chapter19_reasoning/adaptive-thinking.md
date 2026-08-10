@@ -4,7 +4,7 @@
 
 Anthropic 把 Opus 4.6 称为"reasoning model that thinks adaptively"——一个**自适应思考**的推理模型。它的设计与 o1、DeepSeek-R1 都有不同，代表了推理模型的另一条工业路线。
 
-## 10.5.1 自适应思考的核心思想
+## 17.5.1 自适应思考的核心思想
 
 **自适应思考（Adaptive Thinking）** 是 Hybrid Thinking 的进化版。Hybrid Thinking 是二选一——要么 think，要么 don't think；自适应思考是**连续的思考深度控制**——模型自己决定每道题该思考多深。
 
@@ -27,7 +27,7 @@ Qwen3 的 thinking_budget 是**用户控制**的——用户在 API 调用里指
 
 实际工业部署经常**两者结合**——模型自己决定一个 $\tau$，用户再加一个 budget 上限作为安全网。
 
-## 10.5.2 Opus 4.6 的训练细节
+## 17.5.2 Opus 4.6 的训练细节
 
 Anthropic 没有公开 Opus 4.6 的完整训练细节（这是闭源策略），但从 [官方博客](https://www.anthropic.com/news/claude-opus-4-6) 和 [Extended Thinking 文档](https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking) 可以推断出几个关键设计：
 
@@ -70,7 +70,7 @@ Opus 4.6 在输出 CoT 时，敏感内容会被替换为 `<thinking_signature>`�
 - Hidden：敏感的具体内容被加密
 - 防蒸馏：签名无法被反向工程，竞品无法直接用 CoT 训练
 
-## 10.5.3 Opus 4.6 的旗舰能力 与 AI Research Eval Suite
+## 17.5.3 Opus 4.6 的旗舰能力 与 AI Research Eval Suite
 
 Anthropic 在 Opus 4.6 发布时，重点宣传了一个内部 benchmark——**AI Research Eval Suite**。这个 suite 包含几个 RL 研究相关的子任务：
 
@@ -88,7 +88,7 @@ Anthropic 在 Opus 4.6 发布时，重点宣传了一个内部 benchmark——**
 
 这三个子任务展示了一个重要趋势：**推理模型不只是"会做题"，还能"做研究"**。Claude Opus 4.6 在这些任务上的表现，标志着推理模型从"考试高手"向"科研助手"的进化。
 
-## 10.5.4 Anthropic 的 80 页 Constitution
+## 17.5.4 Anthropic 的 80 页 Constitution
 
 2026 年 2 月，Anthropic 发布了一个 80 页的 Constitution 2.0——详细规定了 Claude 在推理时应该遵循的价值观。这个 Constitution 与推理模型的关系是：
 
@@ -114,7 +114,7 @@ Constitution 不是"prompt 注入"——它不是在推理时给模型读 80 页
 
 80 页 Constitution 也提供了**对齐可解释性**的新工具——研究者和用户可以用 Constitution 来检查模型的推理是否符合预期。如果模型在某个推理步骤中违反了 Constitution 的某条准则，就是潜在的对齐问题。
 
-## 10.5.5 推理模型的安全挑战
+## 17.5.5 推理模型的安全挑战
 
 Opus 4.6 的自适应思考也带来了新的安全挑战：
 
@@ -136,7 +136,7 @@ Anthropic 的应对是在训练时加入"思考质量"奖励——CoT 的内容�
 
 这是 [OpenAI 的 Instruction Hierarchy](https://openai.com/index/the-instruction-hierarchy/)（2025）要解决的问题——明确系统 prompt、用户 prompt、工具返回结果的优先级，防止低优先级内容劫持高优先级行为。
 
-## 10.5.6 自适应思考 vs 固定深度思考
+## 17.5.6 自适应思考 vs 固定深度思考
 
 最后做一个对比总结：
 
@@ -178,11 +178,11 @@ Opus 4.6 的 AI Research Eval Suite 已经展示了这个趋势——推理模�
 
 这一章我们把推理模型的全貌梳理了一遍：
 
-- **10.1 节**：推理模型的兴起——o1/o3/o4 的演化、Competitive Programming 论文的涌现证据、推理能力的本质
-- **10.2 节**：Test-time Compute Scaling——Snell 的研究、并行 vs 顺序推理、Gemini Deep Think 的旗舰案例
-- **10.3 节**：Hybrid Thinking 与思考预算——DeepSeek V3.1、Qwen3 Thinking Mode Fusion、NoThinking 反直觉发现、Kimi k1.5 long2short RL
-- **10.4 节**：Hidden vs Visible CoT——OpenAI 的隐藏路线、DeepSeek 的开放路线、推理对齐的挑战
-- **10.5 节**：自适应思考——Claude Opus 4.6 的旗舰案例、80 页 Constitution、AI Research Eval Suite
+- **17.1 节**：推理模型的兴起——o1/o3/o4 的演化、Competitive Programming 论文的涌现证据、推理能力的本质
+- **17.3 节**：Test-time Compute Scaling——Snell 的研究、并行 vs 顺序推理、Gemini Deep Think 的旗舰案例
+- **17.4 节**：Hybrid Thinking 与思考预算——DeepSeek V3.1、Qwen3 Thinking Mode Fusion、NoThinking 反直觉发现、Kimi k1.5 long2short RL
+- **17.6 节**：Hidden vs Visible CoT——OpenAI 的隐藏路线、DeepSeek 的开放路线、推理对齐的挑战
+- **17.5 节**：自适应思考——Claude Opus 4.6 的旗舰案例、80 页 Constitution、AI Research Eval Suite
 
 **核心收获**：
 
@@ -194,6 +194,6 @@ Opus 4.6 的 AI Research Eval Suite 已经展示了这个趋势——推理模�
 
 **接下来的章节**：
 
-- [第 16 章 PRM 与推理时搜索](../chapter18_grpo/grpo-family)——怎么用过程奖励引导推理
+- [第 18 章 PRM 与推理时搜索](../chapter20_prm_search/outcome-vs-process)——怎么用过程奖励引导推理
 - [第 20 章 Agentic RL](../chapter22_agentic/overview)——推理模型如何与工具调用结合
-- [第 13 章奖励黑客与对齐失败](../chapter15_rlhf/evaluation)——推理模型特有的对齐挑战
+- [第 28 章奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures)——推理模型特有的对齐挑战

@@ -347,7 +347,7 @@ $$
 - $\operatorname{clip}(\rho, 1-\epsilon_{\text{clip}}, 1+\epsilon_{\text{clip}})$：把概率比值限制在一个区间内。例如 $\epsilon_{\text{clip}}=0.2$ 时，$\rho$ 会被限制在 $[0.8, 1.2]$。
 - $\min(\cdot, \cdot)$：选择更保守的那个目标，避免一次更新太大。
 
-为什么要裁剪？因为这批回答是 $\pi_{\text{old}}$ 生成的。如果训练几步后 $\pi_\theta$ 已经离 $\pi_{\text{old}}$ 很远，那么这批数据就不再能可靠代表新策略的行为。裁剪的作用就是：**允许模型学习，但不允许它因为同一批数据一下子改得太猛**。这部分和第 5 章 PPO 裁剪机制完全一致，详细推导见[策略更新的约束机制](../chapter10_ppo/trust-region-clipping)。
+为什么要裁剪？因为这批回答是 $\pi_{\text{old}}$ 生成的。如果训练几步后 $\pi_\theta$ 已经离 $\pi_{\text{old}}$ 很远，那么这批数据就不再能可靠代表新策略的行为。裁剪的作用就是：**允许模型学习，但不允许它因为同一批数据一下子改得太猛**。这部分和第 8 章 PPO 裁剪机制完全一致，详细推导见[策略更新的约束机制](../chapter10_ppo/trust-region-clipping)。
 
 <GrpoCodeFocus focus="clip" />
 

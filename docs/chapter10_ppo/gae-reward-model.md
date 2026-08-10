@@ -28,7 +28,7 @@
 - [优势函数 $A(s,a) = Q - V$](../chapter09_actor_critic/advantage-function)——GAE 要估计的对象
 - [TD Error $\delta = r + \gamma V(s') - V(s)$](../chapter09_actor_critic/critic-training)——GAE 的基本构建块
 - [DP/MC/TD 三种方法](../chapter03_mdp/dp-mc-td)——GAE 是 TD 和 MC 的插值
-- [奖励函数设计](../chapter03_mdp/reward-design)——RM 的设计思路与第 3 章的奖励塑形一脉相承
+- [奖励函数设计](../chapter03_mdp/reward-design)——RM 的设计思路与第 4 章的奖励塑形一脉相承
   :::
 
 ## TD 与 MC
@@ -39,7 +39,7 @@ $$A(s_t, a_t) = Q(s_t, a_t) - V(s_t)$$
 
 意思是"在这个状态下选这个动作，比按策略的平均水平好了多少"。问题在于 $Q(s_t, a_t)$ 未知——没法精确知道"做完这个动作之后未来能拿多少分"，只能估计。
 
-第 3 章已经讨论过两种估计方式（回顾：[DP/MC/TD 对比](../chapter03_mdp/dp-mc-td)）。这里把它们的差距在 5 步 episode 上算出来。
+第 4 章已经讨论过两种估计方式（回顾：[DP/MC/TD 对比](../chapter03_mdp/dp-mc-td)）。这里把它们的差距在 5 步 episode 上算出来。
 
 ### TD 估计 与 一步信号
 
@@ -432,4 +432,4 @@ $\lambda=1$ 时 $\hat{A}_t = G_t - V(s_t)$。$V(s_t)$ 是噪声，但 $G_t$ 是�
 
 </details>
 
-**RM 是 PPO 在 LLM 对齐中最沉重的负担——训练它需要大量标注，维护它需要大量显存，信任它需要冒 reward hacking 的风险。能不能跳过这一步？** 下一章我们就会看到，DPO 给出了一个漂亮的答案——[第 15 章：DPO——绕过奖励模型的魔法](../chapter17_dpo/intro)。
+**RM 是 PPO 在 LLM 对齐中最沉重的负担——训练它需要大量标注，维护它需要大量显存，信任它需要冒 reward hacking 的风险。能不能跳过这一步？** 到第 15 章，我们会看到 DPO 给出的答案——[DPO：绕过奖励模型](../chapter17_dpo/intro)。

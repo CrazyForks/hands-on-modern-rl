@@ -259,7 +259,7 @@ Tongyi DeepResearch 的数据合成管线 [^tongyi_dr] 是其核心创新之一�
 
 ## 什么叫"好的" Deep Research？
 
-> 本节聚焦 Deep Research 场景特有的评估维度。更广泛的 Agentic 评测体系（包括工具调用、端到端任务、综合能力的 benchmark 全景和评测系统搭建）见 [10.3 节：工业实践、评测与 Badcase](../chapter22_agentic/industrial-evaluation)。
+> 本节聚焦 Deep Research 场景特有的评估维度。更广泛的 Agentic 评测体系（包括工具调用、端到端任务、综合能力的 benchmark 全景和评测系统搭建）见 [附录 A.4：评测基准](../appendix_industrial_training/evaluation-badcase)。
 
 Deep Research Agent 的"好"远不止是最终答案的正确性。一个优秀的 Deep Research 结果需要同时满足四个层次：
 
@@ -424,7 +424,7 @@ def report_reward(report, task, verified_facts=None):
     )
 ```
 
-训练时建议采用**从短到长的课程学习**——先训 500 字短报告，逐步增加到 5000 字完整报告。这和 10.2 节 HardGen[^hardgen] 的难度自适应思路一致。
+训练时建议采用**从短到长的课程学习**——先训 500 字短报告，逐步增加到 5000 字完整报告。这和 20.4 节 HardGen[^hardgen] 的难度自适应思路一致。
 
 ### Deep Research 的两阶段 RL
 
@@ -466,7 +466,7 @@ Rubrics（评分标准）是把"什么是好的搜索结果"转化为可测量�
 
 **数据收集。** 对同一个搜索 query，让模型（或不同模型）生成多条搜索结果。然后让标注员（或用 LLM-as-Judge）按照 Rubrics 对每条结果打分，并构建偏好对——"结果 A 比结果 B 好"。
 
-**RM 训练。** 用 Bradley-Terry 模型（第 6 章的奖励模型）训练一个 Reward Model。输入是 (query, search_result) 对，输出是一个标量分数。这个 RM 将作为后续 RL 训练的 reward 来源。
+**RM 训练。** 用 Bradley-Terry 模型（第 13 章的奖励模型）训练一个 Reward Model。输入是 (query, search_result) 对，输出是一个标量分数。这个 RM 将作为后续 RL 训练的 reward 来源。
 
 但这里有一个关键选择：**是训练一个综合评分的单一 RM，还是为每个 Rubrics 维度训练独立的 RM？**
 
@@ -950,10 +950,10 @@ Search-R1 使用 veRL 实现的 GRPO，核心步骤：
 
 Search-R1 是本书前面所有 RL 知识在搜索 Agent 场景的具体落地：
 
-- **RLVR（第 7 章）**：Search-R1 的 reward 是纯粹的"答案对不对"，不需要 Reward Model——这正是 RLVR 的核心思想。
-- **GRPO（第 7 章）**：Search-R1 默认使用 GRPO，组采样 + 相对比较替代了 PPO 的 Critic 网络。
-- **Agent Loop（10.1 节）**：Search-R1 的 Rollout 就是 Agent Loop 的具体实现——模型在推理和工具调用之间交替。
-- **ORM vs PRM（10.1 节）**：Search-R1 只用 ORM（终态 reward）。Atom-Searcher[^atom_searcher] 和 Web-Shepherd[^web_shepherd] 在此基础上加了 PRM（过程奖励）。
+- **RLVR（第 16 章）**：Search-R1 的 reward 是纯粹的"答案对不对"，不需要 Reward Model——这正是 RLVR 的核心思想。
+- **GRPO（第 16 章）**：Search-R1 默认使用 GRPO，组采样 + 相对比较替代了 PPO 的 Critic 网络。
+- **Agent Loop（20.1 节）**：Search-R1 的 Rollout 就是 Agent Loop 的具体实现——模型在推理和工具调用之间交替。
+- **ORM vs PRM（20.3 节）**：Search-R1 只用 ORM（终态 reward）。Atom-Searcher[^atom_searcher] 和 Web-Shepherd[^web_shepherd] 在此基础上加了 PRM（过程奖励）。
 - **Retrieved Token Masking**：与 PPO 中 mask prompt token 的思路一致——只对策略可控的部分做梯度更新。
 
 </details>

@@ -1,13 +1,11 @@
 ---
-title: B.7 Monitoring
+title: 'Legacy: Training Monitoring'
 search: false
 ---
 
-# B.7 Monitoring
+# Legacy Page: Training Monitoring and Troubleshooting (Merged into Appendix A.4)
 
-# Legacy Page: Training Monitoring and Troubleshooting (Merged into B.3)
-
-> This page is kept as an entry point for legacy links. The core content has been merged into the "Training Monitoring and Troubleshooting" part of [B.3 RL Post-Training and Agentic RL Benchmarks](./evaluation-badcase). The original text is preserved below (in English translation) so readers coming from old links can map the content.
+> This page is kept as an entry point for legacy links. The core content has been merged into the “Training Monitoring and Troubleshooting” part of [Appendix A.4 Evaluation Benchmarks](./evaluation-badcase). The original text is preserved below so readers coming from old links can map the content.
 
 RL training is not as stable as supervised learning. Reward can collapse, the policy can collapse, and KL divergence can spike, and these changes can happen within just a few training steps.
 
@@ -69,4 +67,4 @@ Do not wait until training finishes to look at results. Stop immediately if any 
 3. **Entropy drops close to zero**: the policy has collapsed; continuing is unlikely to help.
 4. **Benchmark scores drop twice in a row**: the model may be regressing.
 
-Best practice: run a benchmark evaluation every 100-500 steps and set up automatic rollback. Once the evaluation score falls below the historical best, automatically revert to the previous checkpoint. See the automation loop described in [B.3 RL Post-Training and Agentic RL Benchmarks](./evaluation-badcase).
+Best practice: run a benchmark evaluation every 100-500 steps and set up automatic rollback. Once the evaluation score falls below the historical best, automatically revert to the previous checkpoint. See the automation loop described in [A.4 RL Post-Training and Agentic RL Benchmarks](./evaluation-badcase).

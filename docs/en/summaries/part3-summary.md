@@ -7,11 +7,11 @@ sitemap: false
 The Chinese restructure commit (`d0d5925`) deleted `docs/summaries/` entirely. These per-part summary pages no longer have a Chinese counterpart. They are kept here as translation reference and should be either removed or re-anchored to the new Part I–VII structure on the next translation pass.
 :::
 
-# Part 3: Reinforcement Learning for LLMs - Knowledge Summary
+# LLM Alignment and Agentic RL - Knowledge Summary
 
 ## What Did We Learn in This Part?
 
-These three chapters are the main turning point of the book. We took the RL theory built up in the first six chapters and applied it to real scenarios: LLM alignment and agent training. After finishing this part, you should understand:
+These topics are a major turning point in the book. We take the RL theory built up in the foundational chapters and applied it to real scenarios: LLM alignment and agent training. After finishing this part, you should understand:
 
 - **The RLHF engineering pipeline**: the three stages SFT -> RM -> RL; mixed reward functions such as $R = R_{\text{RM}} + \alpha R_{\text{format}} + \beta R_{\text{length}}$; defenses against reward hacking; and RLAIF, which uses AI instead of humans for labeling.
 - **DPO implicit reward**: $r(x,y) = \beta \log \frac{\pi_\theta(y|x)}{\pi_{\text{ref}}(y|x)}$. The reward function is hidden in the policy probability ratio; no separate reward model is required.
@@ -24,7 +24,7 @@ These three chapters are the main turning point of the book. We took the RL theo
 
 Now let us review the chapters.
 
-## Chapter 7: The Full RLHF Pipeline - From Theory to Engineering
+## Chapter 13: The Full RLHF Pipeline - From Theory to Engineering
 
 ### Reward Function Design
 
@@ -42,7 +42,7 @@ Classic reward hacking patterns include length inflation, repetitive score farmi
 
 RLAIF replaces humans with stronger models for preference labeling. Constitutional AI lets a model critique and revise its own outputs, forming a data flywheel: deploy model -> collect user feedback -> identify weak spots -> use AI to construct preference data -> retrain.
 
-## Chapter 9: Alignment and Reasoning Reinforcement (DPO + GRPO + RLVR)
+## Chapters 15-16: Alignment and Reasoning Reinforcement (DPO + GRPO + RLVR)
 
 ### From RLHF to DPO: A Key Mathematical Equivalence
 
@@ -82,7 +82,7 @@ This matches PPO's logic of "how much better than baseline" (PPO uses $A=Q-V$ fr
 
 GRPO/DAPO no longer rely on a reward model. As long as something can produce a score, training can proceed. For objective tasks like math reasoning and code generation, that scorer can be a rule-based verifier: for math, match the final answer; for code, run unit tests. Experiments such as DeepSeek-R1-Zero suggest that a base model can exhibit emergent chain-of-thought reasoning after RLVR-only training, even without any SFT.
 
-## Chapter 10: Agentic RL - Teaching Models to Use Tools
+## Chapter 20: Agentic RL - Teaching Models to Use Tools
 
 ### Multi-Turn Interaction and Credit Assignment
 
@@ -94,7 +94,7 @@ Web agents and code agents are typical agentic RL settings. A common recipe is "
 
 ## Summary
 
-Part 3 shows a clear evolution:
+The LLM alignment chapters show a clear evolution:
 
 RLHF needs 4 models -> DPO cuts it down to 2 via implicit reward -> GRPO cuts it down to 1 via within-group normalization -> RLVR removes the reward model entirely via rule-based verification.
 
@@ -102,4 +102,4 @@ Each step replaces complex components with simpler mechanisms while remaining ma
 
 At the same time, RL expands from "aligning human preferences" to "eliciting reasoning" and "training agents." Moving from single-turn dialogue to multi-turn tool interactions, RL is playing an increasingly central role in LLM post-training.
 
-> **Next stop**: [Part 4: Frontier and Advanced Topics](/en/chapter26_vlm/vlm-challenges)
+> **Next stop**: [Multimodal and Frontier Topics](/en/chapter26_vlm/vlm-challenges)

@@ -277,7 +277,7 @@ R1.5 的 RL 损失综合 RLVR 和 RLHF：
 
 $$\mathcal{L}_{\text{RL}} = \underbrace{\mathbb{E}_{\mathcal{D}_{\text{verified}}}\left[R_{\text{verify}}(r, a)\right]}_{\text{客观正确性（RLVR）}} + \lambda \cdot \underbrace{\mathbb{E}_{\mathcal{D}_{\text{pref}}}\left[\log\sigma\left(\beta \log\frac{\pi_\theta(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \beta \log\frac{\pi_\theta(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\right)\right]}_{\text{主观偏好（DPO 形式）}}$$
 
-前项保住客观推理能力（不让 RLHF 把 RLVR 学到的东西遗忘），后项用 DPO 损失（见 [第 16 章 GRPO/DPO](../chapter18_grpo/grpo-family)）对齐主观体验。$\lambda$ 平衡两者——这是音频 RL 的核心超参。
+前项保住客观推理能力（不让 RLHF 把 RLVR 学到的东西遗忘），后项用 DPO 损失（见[第 15 章 DPO](../chapter17_dpo/dpo-theory-and-family)）对齐主观体验。$\lambda$ 平衡两者——这是音频 RL 的核心超参。
 
 ### 保留韵律自然度
 

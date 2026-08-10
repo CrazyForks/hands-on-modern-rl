@@ -1,13 +1,11 @@
 ---
-title: B.6 Parallelism
+title: 'Legacy: Distributed Parallelism'
 search: false
 ---
 
-# B.6 Parallelism
+# Legacy Page: Distributed Parallelism (Merged into Appendix A.2)
 
-# Legacy Page: Distributed Parallelism (Merged into B.1)
-
-> This page is kept as an entry point for legacy links. The core content has been merged into the "Distributed Parallelism and Memory Optimization" part of [B.1 RL Training Infrastructure: Sampling, Asynchrony, and Distributed Systems](./rl-infrastructure). The original text is preserved below (in English translation) so readers coming from old links can map the content.
+> This page is kept as an entry point for legacy links. The core content has been merged into the “Distributed Parallelism and Memory Optimization” part of [Appendix A.2 Training Infrastructure](./rl-infrastructure). The original text is preserved below so readers coming from old links can map the content.
 
 PPO training often needs to load four models at the same time (Actor, Critic, Reference, Reward Model). A 7B model in FP16 is roughly 14 GB just for parameters. Four of them is roughly 56 GB, which does not fit comfortably on a single A100 (80 GB) once you include optimizer states, gradients, and runtime overhead. Larger models only make this problem worse.
 
@@ -78,7 +76,7 @@ RL training (PPO/GRPO) is more complex than ordinary fine-tuning, because you mu
 
 **The training phase is compute-intensive**. Backpropagation consumes substantial GPU compute.
 
-**GPU demand fluctuates across the two phases**: during rollout, training GPUs can idle; during training, inference GPUs can idle. A standard solution is an asynchronous architecture where rollout and training use different GPU groups. See the async-training section in [B.1 RL Training Infrastructure](./rl-infrastructure).
+**GPU demand fluctuates across the two phases**: during rollout, training GPUs can idle; during training, inference GPUs can idle. A standard solution is an asynchronous architecture where rollout and training use different GPU groups. See the async-training section in [A.2 RL Training Infrastructure](./rl-infrastructure).
 
 **Common memory-saving tricks**:
 

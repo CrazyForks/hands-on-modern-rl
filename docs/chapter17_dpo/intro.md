@@ -2,9 +2,9 @@
 
 > 📁 **本章代码**：[0-download_model.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/0-download_model.py) · [1-generate_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/1-generate_data.py) · [2-test_before.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/2-test_before.py) · [3-train_dpo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/3-train_dpo.py) · [4-test_after.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/4-test_after.py)
 
-在上一章中，我们为传统强化学习应用设计了经典的智能体模型，例如让 CartPole 在物理规则下保持平衡。这些模型在有明确环境反馈（如游戏得分、存活时间）的情况下是有帮助的。但是，当我们面对现代自然语言处理任务时，为每个大语言模型精心设计一个能够精确给出数值奖励的"环境"实际上是极其困难的。
+在第 1 章中，我们为传统强化学习应用设计了经典的智能体模型，例如让 CartPole 在物理规则下保持平衡。这些模型在有明确环境反馈（如游戏得分、存活时间）的情况下是有帮助的。但是，当我们面对现代自然语言处理任务时，为每个大语言模型精心设计一个能够精确给出数值奖励的"环境"实际上是极其困难的。
 
-在上一章中，我们介绍了一个名为 PPO 的算法，该算法通过环境给出的即时标量奖励来优化策略。一方面，在提出时，PPO 改进了各种连续和离散控制任务的技术水平 [^1]。另一方面，正如我们在第一章指出的那样，传统的 RL 强依赖于一个可以不断重置、快速试错的模拟器。因此，当面对一个拥有数亿参数、只输出自然语言的大模型时，我们很难直接套用上一章的物理模拟器思维。
+在第 8 章中，我们介绍了 PPO 算法，该算法通过环境给出的即时标量奖励来优化策略。一方面，在提出时，PPO 改进了各种连续和离散控制任务的技术水平 [^1]。另一方面，正如我们在第一章指出的那样，传统的 RL 强依赖于一个可以不断重置、快速试错的模拟器。因此，当面对一个拥有数亿参数、只输出自然语言的大模型时，我们很难直接套用经典控制任务的物理模拟器思维。
 
 下面，我们将强化学习的应用场景从"游戏控制"切换到"语言对齐"。在语言生成层次上，我们将介绍如何将人类对回答的好坏偏好（Preference）转化为模型更新的信号 [^2]。在序列级别，我们将简要介绍一种被称为**直接偏好优化（Direct Preference Optimization, DPO）** 的新范式 [^3]，并说明它如何绕过复杂的奖励建模，**直接根据偏好数据优化语言模型**。在微调期间，DPO 所需的"最小架构更改"仅仅是改变损失函数的计算方式。在下游对齐任务的监督学习期间，我们将冻结大部分参数，利用少量高质量的人类偏好数据，对预训练模型进行高效微调。
 

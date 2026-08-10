@@ -60,7 +60,7 @@ class AudioDialoguePolicy(nn.Module):
 
 ### 奖励函数
 
-实现 30.4 节描述的三类奖励：
+实现 25.1 节描述的三类奖励：
 
 ```python
 class AudioReward:
@@ -144,7 +144,7 @@ def grpo_train_step(policy, ref_policy, reward_fn, batch, config):
         # 简化：实际实现要按 token 求 ratio
         pass
 
-    # 完整 PPO clip（参考第 5 章）
+    # 完整 PPO clip（参考第 8 章）
     # ratio = exp(logp_new - logp_old)
     # clipped = clip(ratio, 1-eps, 1+eps)
     # loss = -min(ratio * adv, clipped * adv).mean()

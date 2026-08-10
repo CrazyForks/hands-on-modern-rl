@@ -11,7 +11,7 @@
 
 这一节我们详细讨论这两个方向。
 
-## 12.3.1 Code World Model（CWM）
+## 21.2.1 Code World Model（CWM）
 
 [Code World Model](https://arxiv.org/abs/2510.02387)（CWM，2025.09）的核心思想：**把代码执行建模为 MDP，训练一个 world model 预测代码的状态变化**。
 
@@ -93,9 +93,9 @@ World model 是个 LLM，会错。如果它预测错了"代码执行结果"，po
 
 CWM 是 model-based RL 在 SWE 领域的应用。经典 model-based RL（如 MuZero、Dreamer）已经在游戏、控制任务上证明了价值。CWM 把这个思想带到 LLM + SWE 领域。
 
-参考：[第 8 章 model-based RL](../chapter10_ppo/rl-long-horizon-planning) 和 [第 12 章 future trends / model-based RL](../chapter28_vla/embodied-intelligence/model-based-rl/)。
+参考：[第 8 章长程任务中的模型规划](../chapter10_ppo/rl-long-horizon-planning)和[第 26 章具身世界模型](../chapter28_vla/embodied-intelligence/model-based-rl/)。
 
-## 12.3.2 DeepSWE 与 长 horizon agent 的 RL
+## 21.2.2 DeepSWE 与 长 horizon agent 的 RL
 
 [DeepSWE-Preview](https://www.together.ai/blog/deepswe)（Agentica × Together AI，2025.07）是另一个 SWE-RL 突破。它的核心贡献是：**用 verifiable reward 训练长 horizon agent（32 步以上 trajectory）**。
 
@@ -189,7 +189,7 @@ DeepSWE 的设计与 [字节 VAPO](../chapter18_grpo/grpo-family) 高度相似�
 
 这也印证了 [第 16 章 GRPO 改进家族](../chapter18_grpo/grpo-family) 的结论——**critic-free 是工程妥协，不是算法必然**。在长 horizon 任务（长 CoT 推理、长 SWE trajectory）上，value model 重新证明了自己的价值。
 
-## 12.3.3 Test-time Search 集成
+## 21.2.3 Test-time Search 集成
 
 CWM 和 DeepSWE 都集成了 **test-time search**——推理时用 MCTS 或 Beam Search 提升性能。
 
@@ -253,7 +253,7 @@ def deep_swe_beam_search(issue, model, value_model, K=4):
 
 Beam Search 让 DeepSWE 在推理时多花算力换准确率——与 [第 17 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 一致。
 
-## 12.3.4 工业实践的对比
+## 21.2.4 工业实践的对比
 
 到 2026 年中，主流 SWE-RL 工业方案：
 

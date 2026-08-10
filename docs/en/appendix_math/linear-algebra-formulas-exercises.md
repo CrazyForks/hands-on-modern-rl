@@ -8,9 +8,9 @@ title: D.1.5 Formula Review and Exercises
 
 ---
 
-## Revisiting Chapter 3
+## Revisiting Chapters 2–4
 
-You now have the tools of vectors, matrices, dot products, norms, and eigenvalues. Looking back at Chapter 3, many formulas that may have seemed acceptable by definition have cleaner matrix expressions underneath.
+You now have the tools of vectors, matrices, dot products, norms, and eigenvalues. Looking back at Chapters 2–4, many formulas that may have seemed acceptable by definition have cleaner matrix expressions underneath.
 
 ### Bellman Equation: From State-by-State Writing to One Matrix Line
 
@@ -26,11 +26,11 @@ $$
 \boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}.
 $$
 
-The closed-form solution is $\boldsymbol{v} = (I-\gamma P)^{-1}\boldsymbol{r}$. The DP methods in Chapter 3 repeatedly apply $v_{k+1} = r + \gamma Pv_k$; in essence, they iteratively approximate this closed-form solution.
+The closed-form solution is $\boldsymbol{v} = (I-\gamma P)^{-1}\boldsymbol{r}$. The DP methods in Chapter 4 repeatedly apply $v_{k+1} = r + \gamma Pv_k$; in essence, they iteratively approximate this closed-form solution.
 
 ### TD Error: Incremental Updates and the Matrix Equation
 
-The TD update in Chapter 3 is:
+The TD update in Chapter 4 is:
 
 $$
 V(s) \leftarrow V(s) + \alpha\left[r + \gamma V(s') - V(s)\right].
@@ -50,7 +50,7 @@ Chapter 3's Q-Learning stores one number for every state-action pair. From the l
 
 ### Policy Gradient Updates: The Stage for Norms and Trust Regions
 
-The second route in Chapter 3 defined a policy objective $J(\theta)$. When updating parameters, gradient clipping limits $\|\boldsymbol{g}\|_2 \leq c$, and the trust-region constraint $\Delta\theta^\top F\,\Delta\theta \leq \delta$ keeps training safe. These are all uses of linear algebra tools for stability.
+Chapter 2 defined a policy objective $J(\theta)$. When updating parameters, gradient clipping limits $\|\boldsymbol{g}\|_2 \leq c$, and the trust-region constraint $\Delta\theta^\top F\,\Delta\theta \leq \delta$ keeps training safe. These are all uses of linear algebra tools for stability.
 
 ---
 
@@ -91,7 +91,7 @@ The central thread of module D.1 is moving from "cannot compute it" to "can comp
 ## Common Pitfalls
 
 1. **Treating matrices as abstract symbols.** In the Bellman equation, every row of transition matrix $P$ is a probability table describing where the next state goes from the current state.
-2. **Thinking inversion is the practical algorithm.** $\boldsymbol{v}=(I-\gamma P)^{-1}\boldsymbol{r}$ is a theoretical closed-form solution. Real large-scale problems usually use iteration or function approximation, which is exactly the DP -> MC -> TD progression in Chapter 3.
+2. **Thinking inversion is the practical algorithm.** $\boldsymbol{v}=(I-\gamma P)^{-1}\boldsymbol{r}$ is a theoretical closed-form solution. Real large-scale problems usually use iteration or function approximation, which is exactly the DP -> MC -> TD progression in Chapter 4.
 3. **Ignoring vector direction.** Gradients, advantage updates, and trust-region constraints care not only about numerical magnitude, but also about direction in parameter space.
 4. **Confusing norms and regularization.** A norm is a measurement tool, answering "how large." Regularization adds a norm to the training objective to constrain parameters. Gradient clipping limits the magnitude of a single update. These are three different uses.
 5. **Thinking the L2 norm is the only norm.** The L1 norm encourages sparse solutions, the Frobenius norm measures matrix size, and weighted norms, or quadratic forms, account for direction sensitivity. Different settings use different norms.

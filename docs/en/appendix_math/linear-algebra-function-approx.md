@@ -35,7 +35,7 @@ Start with a concrete comparison:
 | Go board                               | ~10^170          | No         |
 | Continuous state, such as robot joints | Infinite         | No         |
 
-The DP, MC, and TD methods introduced in Chapter 3 all share one premise, whether they solve the Bellman equation directly, estimate returns from complete trajectories, or update immediately at each step: **store one $v(s)$ for every state**. Q-Learning in Chapter 4 follows the same idea, but stores $Q(s,a)$ for every state-action pair instead.
+The DP, MC, and TD methods introduced in Chapter 4 all share one premise, whether they solve the Bellman equation directly, estimate returns from complete trajectories, or update immediately at each step: **store one $v(s)$ for every state**. Q-Learning in Chapter 3 follows the same idea, but stores $Q(s,a)$ for every state-action pair instead.
 
 Once the number of states grows beyond a certain scale, storing one independent number for every state is no longer feasible. The solution path is: **stop storing each state's value independently, and instead use one function to approximate them all**. The input to the function is a state's features, and the output is the estimated value of that state.
 
@@ -82,7 +82,7 @@ $$
 Q(s,a) = \boldsymbol{w}^\top\phi(s,a),
 $$
 
-where $\phi(s,a)$ is the feature vector of the state-action pair. DQN in Chapter 4 generalizes linear approximation to a neural network, but whether the model is linear or deep, the underlying operations are vector operations.
+where $\phi(s,a)$ is the feature vector of the state-action pair. DQN in Chapter 5 generalizes linear approximation to a neural network, but whether the model is linear or deep, the underlying operations are vector operations.
 
 ### How Are Features Constructed?
 
@@ -112,7 +112,7 @@ These features include normalized position information and distance to the goal.
 
 **Features learned by a neural network**:
 
-In deep RL, features are not designed manually. They are learned automatically by a neural network. An input image passes through several convolutional layers to produce a vector $\boldsymbol{x}(s)$, and a linear layer then computes $\boldsymbol{w}^\top \boldsymbol{x}(s)$. DQN in Chapter 4 follows this idea.
+In deep RL, features are not designed manually. They are learned automatically by a neural network. An input image passes through several convolutional layers to produce a vector $\boldsymbol{x}(s)$, and a linear layer then computes $\boldsymbol{w}^\top \boldsymbol{x}(s)$. DQN in Chapter 5 follows this idea.
 
 The path from tables to deep networks is a gradual increase in feature automation:
 
@@ -144,7 +144,7 @@ In RL value estimation, a positive dot product means the state is evaluated posi
 
 So far, we know that the dot product $\hat{v}(s) = \boldsymbol{w}^\top \boldsymbol{x}(s)$ can approximate value. But where does $\boldsymbol{w}$ come from?
 
-The answer is: it is learned through training. In Chapter 3, TD methods update value estimates using TD Error:
+The answer is: it is learned through training. In Chapter 4, TD methods update value estimates using TD Error:
 
 $$
 V(s) \leftarrow V(s) + \alpha\left[r + \gamma V(s') - V(s)\right].
@@ -274,7 +274,7 @@ torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
 
 ### Why Gradient Clipping Is Needed in RL
 
-RL gradients come from policy gradients and temporal-difference estimates, and their noise level is naturally higher than in supervised learning. The reason is that data comes from a continually changing sampling policy rather than a fixed training set. A single high-return trajectory may produce a very large gradient, causing a drastic parameter change and making the next policy very different from the previous one. The REINFORCE algorithm in Chapter 5 faces exactly this issue: its gradient estimates have very high variance. Gradient clipping places a hard upper bound on this fluctuation and prevents a single update from moving too far.
+RL gradients come from policy gradients and temporal-difference estimates, and their noise level is naturally higher than in supervised learning. The reason is that data comes from a continually changing sampling policy rather than a fixed training set. A single high-return trajectory may produce a very large gradient, causing a drastic parameter change and making the next policy very different from the previous one. The REINFORCE algorithm in Chapter 6 faces exactly this issue: its gradient estimates have very high variance. Gradient clipping places a hard upper bound on this fluctuation and prevents a single update from moving too far.
 
 ---
 
@@ -298,7 +298,7 @@ This article solved the problem "how do we store value when the state space is t
 
 But after introducing function approximation, two questions remain:
 
-1. Whether we use tables or function approximation, if we repeatedly apply the Bellman update $v_{k+1} = r + \gamma Pv_k$, will it converge stably? In Chapter 3, DP methods "iterate until convergence." Is this convergence theoretically guaranteed, or can the process oscillate or diverge?
+1. Whether we use tables or function approximation, if we repeatedly apply the Bellman update $v_{k+1} = r + \gamma Pv_k$, will it converge stably? In Chapter 4, DP methods "iterate until convergence." Is this convergence theoretically guaranteed, or can the process oscillate or diverge?
 2. In the policy-gradient update from the second route in Chapter 3, $\theta \leftarrow \theta + \alpha\nabla_\theta J(\theta)$, can a single update be so large that the policy becomes worse? Gradient clipping limits step size, but it treats all directions equally. Moving $0.1$ in one direction may barely matter, while moving $0.1$ in another direction may drastically change the policy.
 
 The common essence of these two questions is that we must analyze how "amount of change" behaves differently in different directions. This leads to eigenvalues, spectral radius, and weighted norms, the topic of the next article.

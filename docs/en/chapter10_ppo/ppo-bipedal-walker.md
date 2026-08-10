@@ -11,7 +11,7 @@ In earlier chapters, we used CartPole and LunarLander to get comfortable with **
 
 One of PPO's core advantages is that it handles continuous actions natively. A common parameterization is a Gaussian policy: the network outputs the mean and standard deviation of a Gaussian distribution, and we sample continuous actions from it. There is no need to discretize the action space. `BipedalWalker-v3` is a canonical benchmark of this kind.
 
-## 7.1.1 Running BipedalWalker Training
+## 8.5.1 Running BipedalWalker Training
 
 The task in BipedalWalker is to control a bipedal robot to walk across randomly generated terrain. The state is 24-dimensional (including lidar distance readings, joint angles, and joint velocities). The action is a 4-dimensional continuous vector (torques for the hips and knees of both legs). Compared with LunarLander, this environment is a better main experiment for this chapter: you are no longer selecting among a few discrete actions; instead you must learn continuous control signals directly.
 
@@ -55,7 +55,7 @@ model = PPO(
 
 We set `batch_size=256` because policy updates in continuous action spaces tend to have higher variance; larger batches help stabilize the gradient estimate. We set `ent_coef=0.005` because a Gaussian policy already has persistent exploration (each sampled action contains randomness), so we do not need a large additional entropy bonus. We run 8 parallel environments because BipedalWalker episodes are longer (up to 1600 steps), and more parallelism helps maintain sampling throughput.
 
-## 7.1.2 Reading the Training Curves
+## 8.5.2 Reading the Training Curves
 
 This experiment uses the PPO implementation from **Stable-Baselines3 (SB3)**, one of the most widely used RL libraries today. Our training configuration is: 8 parallel `DummyVecEnv` environments, `MlpPolicy` (an MLP), learning rate `3e-4`, `batch_size=256`, `clip_range=0.2`, and 2 million total training steps. The training script will generate four separate plots under `output/`.
 
@@ -140,7 +140,7 @@ These four metrics are not independent; they reflect a causal chain:
 
 A sharp drop in reward is often accompanied by a spike in clip fraction and an abrupt increase in KL divergence. When these three metrics all look abnormal, it is a strong signal that the update step is too aggressive. Two standard fixes are: lower the learning rate, or increase `n_steps` (so each rollout collects more data, yielding a lower-variance gradient estimate).
 
-## 7.1.3 What Counts as "Solved"
+## 8.5.3 What Counts as "Solved"
 
 The BipedalWalker-v3 reward is composed of several parts:
 
@@ -192,7 +192,7 @@ Best episode: -77.8
 Worst episode: -124.7
 ```
 
-## 7.1.4 Replays at Three Training Stages
+## 8.5.4 Replays at Three Training Stages
 
 To make PPO's learning progression more concrete, let's compare policies from three different stages under the same hyperparameter settings. The three models share identical hyperparameters; the only difference is the number of training steps.
 
@@ -233,7 +233,7 @@ Evaluation summary across the three stages (20-episode mean):
 
 This trajectory is typical for PPO in continuous control: first learn "do not fall" (100k), then learn "walk a little" (500k), and finally form an efficient gait (2M). The process is slower than in discrete control tasks, but the stage boundaries are often clearer because the policy space is much larger in continuous actions, and each phase requires more data to break through.
 
-## 7.1.5 States, Actions, and Continuous Policies
+## 8.5.5 States, Actions, and Continuous Policies
 
 The 24-dimensional state of BipedalWalker can be grouped as follows:
 
@@ -272,7 +272,7 @@ Training in BipedalWalker often goes through three qualitative stages:
 
 These boundaries are not strict; different random seeds may shift them. But the high-level trend is consistent: learn "do not fall" first, then "take steps," and finally "walk efficiently."
 
-## 7.1.6 Common Failures and Tuning
+## 8.5.6 Common Failures and Tuning
 
 BipedalWalker is more prone to training failure than typical discrete-action environments. If your results are not satisfactory, diagnose in the following order.
 
@@ -310,7 +310,7 @@ Common hyperparameter reference:
 | `clip_range`    | `0.2`        | Too large causes abrupt gait shifts and falls; too small can stall training     |
 | `gamma`         | `0.99`       | Too low focuses only on short-term survival and ignores long-term efficiency    |
 
-## 7.1.7 Why BipedalWalker
+## 8.5.7 Why BipedalWalker
 
 From a teaching perspective, BipedalWalker has several important advantages:
 

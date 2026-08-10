@@ -476,7 +476,7 @@ Minimizing this loss is equivalent to maximizing the policy gradient objective. 
 | $\hat{A}_t<0$        | Decrease the log probability of this step's sampled action |
 | $\hat{A}_t\approx 0$ | Essentially no update at this step                         |
 
-This is completely consistent with Chapter 5's REINFORCE, except the action has changed from "choosing a token" to "choosing the next latent."
+This is completely consistent with Chapter 6's REINFORCE, except the action has changed from "choosing a token" to "choosing the next latent."
 
 ### Why Still Need a KL Constraint?
 
@@ -936,10 +936,10 @@ Visual generation RL may seem far from VLM QA, but it reuses several main thread
 
 | Earlier Chapter           | Correspondence in Visual Generation RL                                                                  |
 | ------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Chapter 5 REINFORCE       | DDPO treats denoising chains as policy trajectories, updating each step's sampling with terminal reward |
-| Chapter 7 Reward Hacking  | Generation models may please the reward model while sacrificing real user intent                        |
-| Chapter 9 RLVR            | Fine-grained attributes, counts, relationships can become locally verifiable signals                    |
-| Chapter 10 Agentic RL     | Long-horizon credit assignment, multi-component rewards, and KL constraints reappear                    |
+| Chapter 6 REINFORCE       | DDPO treats denoising chains as policy trajectories, updating each step's sampling with terminal reward |
+| Chapter 28 Reward Hacking  | Generation models may please the reward model while sacrificing real user intent                        |
+| Chapter 16 RLVR            | Fine-grained attributes, counts, relationships can become locally verifiable signals                    |
+| Chapter 20 Agentic RL     | Long-horizon credit assignment, multi-component rewards, and KL constraints reappear                    |
 | Sections 11.1-11.3 VLM RL | VLMs can in turn serve as judges, captioners, and reward models for generation models                   |
 
 The last point is especially important. Understanding models and generation models are not two completely separate threads. After VLMs learn to see images better, they can check whether generated images match prompts; generation models can synthesize richer data to train VLMs in turn. In the multimodal post-training stage, "seeing" and "generating" will increasingly form a closed loop.
@@ -955,7 +955,7 @@ This section's four most important conclusions:
 3. **Reward models are the bottleneck of generation RL**: human preferences, text alignment, and visual quality are all important, but reward hacking must be prevented.
 4. **Rewards can be used at both training and inference time**: reranking is safer, RL fine-tuning better internalizes capabilities, and video generation further amplifies temporal and computational challenges.
 
-With this, we have covered both understanding and generation directions of VLM RL training. The next chapter enters broader frontier trends: [Embodied Intelligence, Self-Play, and Offline RL](../chapter32_selfplay/self-play-outlook/).
+With this, we have covered both visual understanding and visual generation in RL training. Chapter 28 next turns to reward hacking, alignment failures, and evaluation.
 
 ## References
 

@@ -37,7 +37,7 @@ $$
 
 ## Why These Formulas Matter
 
-In Chapter 7, we discussed PPO in classic RL environments: policy updates, advantage estimation, clipping, and stability. In this chapter we reuse the same language, but the objects change their clothing:
+In Chapter 8, we discussed PPO in classic RL environments: policy updates, advantage estimation, clipping, and stability. In this chapter we reuse the same language, but the objects change their clothing:
 
 - the prompt is the start state,
 - tokens are actions,
@@ -83,7 +83,7 @@ flowchart LR
 
 ## RL Language Echoes
 
-In Chapter 3, we described sequential decision-making with the MDP tuple:
+In Chapter 2, we described sequential decision-making with the MDP tuple:
 
 $$
 \mathcal{M}=\langle \mathcal{S},\mathcal{A},P,R,\gamma\rangle
@@ -101,7 +101,7 @@ In LLM RLHF, these objects change their clothing:
 
 RLHF is not "forcing RL onto LLMs." It treats LLM generation as a high-dimensional sequential decision problem. The difference: CartPole rewards come from environment rules; LLM rewards come from human preferences or a reward model. CartPole gives feedback at every step; LLM usually gets feedback only after the full response.
 
-This chapter will repeatedly use Chapter 3's language to explain large-model alignment: SFT is behavior cloning, RM is learning reward from preferences, and PPO is KL-constrained policy optimization.
+This chapter will repeatedly use the reinforcement-learning language established earlier to explain large-model alignment: SFT is behavior cloning, RM is learning reward from preferences, and PPO is KL-constrained policy optimization.
 
 ## A Mental Model: RLHF as an Artifact Pipeline
 
@@ -130,7 +130,7 @@ If you cannot trace which dataset, which checkpoint, and which evaluation produc
 
 RLHF can easily create an illusion: training logs look good, but the model has actually gotten worse. Rising RM scores may mean the model has learned to game the RM. Longer answers may be misjudged as more helpful. Higher win rates on preference data may come with degraded math, code, or factual accuracy.
 
-This is why evaluation in this chapter is not optional — it is part of the RLHF pipeline. Section 8.6 uses three layers of evaluation:
+This is why evaluation in this chapter is not optional — it is part of the RLHF pipeline. Section 13.6 uses three layers of evaluation:
 
 - **Automated benchmarks**: fixed task sets checking whether general and domain-specific capabilities have regressed (instruction following, reasoning, factual QA, format compliance).
 - **Preference evaluation**: pairwise battles between base / SFT / RLHF answers, judged by humans or strong models.
@@ -140,14 +140,14 @@ A qualified RLHF experiment cannot just report "reward went up." It must answer 
 
 ## Boundary with Chapter 9
 
-This chapter covers the **classical RLHF standard pipeline**. Chapter 9 departs from this pipeline and explains why modern post-training has progressively simplified it:
+This chapter covers the **classical RLHF standard pipeline**. Chapters 14-16 depart from this pipeline and explains why modern post-training has progressively simplified it:
 
 - DPO tries to eliminate the explicit Reward Model.
 - GRPO tries to eliminate the Critic.
 - RLVR replaces subjective preferences with verifiable rewards.
 - DAPO, RLAIF, distillation, and data flywheels further change how training signals are sourced and scaled.
 
-In other words, Chapter 8 is the "standard answer," and Chapter 9 is the "modern evolution." Run the standard RLHF pipeline first, then understand why people are reforming it, and the whole arc of large-model reinforcement learning will make sense.
+In other words, Chapter 13 is the "standard answer," and Chapters 14-16 are the "modern evolution." Run the standard RLHF pipeline first, then understand why people are reforming it, and the whole arc of large-model reinforcement learning will make sense.
 
 When you are ready, we start from the first step: why a pretrained base model is not yet an assistant — [From Base Model to Aligned Assistant](./base-model-to-assistant).
 
@@ -190,7 +190,7 @@ $$
 >
 > A base model learns "how text usually continues on the internet"; an assistant must learn "how to respond responsibly to a user request."
 
-In Chapter 7, we clarified PPO as a stability-oriented policy optimization algorithm: do not update too far in one step, so you use clipping, advantage estimation, and KL regularization. Now we want to apply the same toolkit to large language models.
+In Chapter 8, we clarified PPO as a stability-oriented policy optimization algorithm: do not update too far in one step, so you use clipping, advantage estimation, and KL regularization. Now we want to apply the same toolkit to large language models.
 
 But before we write any PPO code, we need to answer a more basic question:
 
@@ -257,7 +257,7 @@ This objective does not distinguish user vs assistant roles, and it does not enc
 
 ## Rewriting Generation as an MDP
 
-In Chapter 3 we described RL problems with an MDP. LLM generation fits the same template, but the objects are token-based.
+In Chapter 2 we described RL problems with an MDP. LLM generation fits the same template, but the objects are token-based.
 
 | MDP element         | Classic RL example            | LLM generation counterpart                    |
 | ------------------- | ----------------------------- | --------------------------------------------- |

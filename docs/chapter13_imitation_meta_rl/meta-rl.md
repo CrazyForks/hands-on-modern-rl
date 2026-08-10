@@ -171,7 +171,7 @@ LLM 的 in-context learning 历史与 in-context RL 高度平行：
 
 $$\mathcal{L}_{\text{SFT}}(\theta) = -\sum_{t=1}^T \log \pi_\theta(y_t \mid x, y_{<t})$$
 
-这正是 14.1 节的行为克隆损失——$(x, y)$ 是"专家示范"，$\pi_\theta$ 是策略。SFT 的所有问题都是 BC 的经典问题：
+这正是 11.1 节的行为克隆损失——$(x, y)$ 是"专家示范"，$\pi_\theta$ 是策略。SFT 的所有问题都是 BC 的经典问题：
 
 - **分布偏移**：训练时专家状态是高质量指令-回答，部署时模型生成的下一步 token 会偏离
 - **错误累积**：一旦生成 token 偏离，后续 token 在"未见过的状态"上更易出错
@@ -230,7 +230,7 @@ LLM 的 few-shot in-context learning 可以看作"**RL² 的零样本版本**"�
 5. **In-Context RL / Algorithm Distillation** 把整个 RL 算法蒸馏进 transformer 的 in-context 能力，连接到 LLM 的 few-shot 学习
 6. **LLM 后训练**可重写为 BC（SFT）+ 反向 RL（RM）+ 前向 RL（PPO），DPO 是 GAIL 的对偶形式
 
-下一章 [第 12 章 探索、MARL 与分层 RL](../chapter14_exploration_marl_hierarchical/intro)转向另外三个进阶主题：当奖励稀疏时如何探索、当多个智能体互动时如何训练、当 horizon 极长时如何分层规划。
+下一章 [第 12 章 探索、MARL 与分层 RL](../chapter14_exploration_marl_hierarchical/intro) 转向另外三个进阶主题：当奖励稀疏时如何探索、当多个智能体互动时如何训练、当 horizon 极长时如何分层规划。
 
 ## 延伸阅读
 

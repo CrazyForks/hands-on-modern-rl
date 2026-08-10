@@ -8,13 +8,13 @@ title: 'Supplement: Why Policy Gradients'
 
 **Key ideas**
 
-- Recall the core idea of DQN in Chapter 4: learn $Q(s,a)$, then choose actions via $\arg\max$.
+- Recall the core idea of DQN in Chapter 5: learn $Q(s,a)$, then choose actions via $\arg\max$.
 - Understand the fundamental limitation of value-based methods: they can only handle a finite set of discrete actions.
 - See why policy-based methods learn $\pi_\theta(a|s)$ directly, and how the two routes differ in action spaces, exploration mechanisms, and data reuse.
 
 ## What DQN Got Right
 
-In Chapter 4, DQN follows a clean route: use a neural network to approximate $Q(s,a)$, score every action, and then pick the best one via $\arg\max_a Q(s,a)$. On tasks like CartPole (2 actions) and LunarLander (4 actions), this works well because the action set is small: you can simply compare the $Q$ values for all actions.
+In Chapter 5, DQN follows a clean route: use a neural network to approximate $Q(s,a)$, score every action, and then pick the best one via $\arg\max_a Q(s,a)$. On tasks like CartPole (2 actions) and LunarLander (4 actions), this works well because the action set is small: you can simply compare the $Q$ values for all actions.
 
 The underlying logic is: instead of learning "what to do" directly, you first learn "how good each action is," and only then choose the best. The policy is implicit: it is hidden inside the $\arg\max$ over the $Q$ values.
 
@@ -45,7 +45,7 @@ One analogy makes the difference vivid. Value-based methods are like a food crit
 | Exploration               | Added externally ($\varepsilon$-greedy)      | Built in (a distribution naturally explores)          |
 | Data reuse                | Off-policy (replay buffer reuses old data)   | On-policy (must use fresh data from current policy)   |
 | Variance                  | Low (TD targets are relatively stable)       | High (Monte Carlo returns can be noisy)               |
-| Representative algorithms | DQN (Chapter 4)                              | REINFORCE (this chapter) $\to$ PPO (Chapter 7)        |
+| Representative algorithms | DQN (Chapter 5)                              | REINFORCE (this chapter) $\to$ PPO (Chapter 8)        |
 
 Let's explain the key differences row by row.
 
@@ -57,6 +57,6 @@ Let's explain the key differences row by row.
 
 ## The Two Routes Are Not Enemies
 
-Each route has strengths and weaknesses, but they are not mutually exclusive. In Chapter 6, Actor-Critic methods combine them: a policy network makes decisions, while a value network reduces variance. Before we get there, we need to build a solid mathematical foundation for the policy-based route.
+Each route has strengths and weaknesses, but they are not mutually exclusive. In Chapter 7, Actor-Critic methods combine them: a policy network makes decisions, while a value network reduces variance. Before we get there, we need to build a solid mathematical foundation for the policy-based route.
 
 In the next section, we start from the policy objective, derive the policy gradient theorem, and arrive at the REINFORCE algorithm: [REINFORCE](./reinforce).

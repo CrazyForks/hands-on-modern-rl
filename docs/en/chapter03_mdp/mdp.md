@@ -247,7 +247,7 @@ Back to bandits: Policy 1 (uniform random) is $\pi(\text{choose A}) = 0.5, \pi(\
 
 In CartPole, the policy takes a 4D state vector as input and outputs probabilities for "left" and "right". Early in training it is close to uniform (e.g. $\pi(\text{left}) \approx 0.5$). After learning, it outputs something like $\pi(\text{right}) \approx 0.95$ when the pole tilts right. This corresponds to the Chapter 1 training curve moving from random behavior to stable balancing.
 
-In LLM alignment, the policy is the language model itself: given the generated token prefix (state), it outputs a distribution over the next token (action). In Chapter 2, the model you trained via DPO is exactly a policy network.
+In LLM alignment, the policy is the language model itself: given the generated token prefix (state), it outputs a distribution over the next token (action). In Chapter 15, the model you train via DPO is exactly a policy network.
 
 ### Why Stochastic Policies Are Common
 

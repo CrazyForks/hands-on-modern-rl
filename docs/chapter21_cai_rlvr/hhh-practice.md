@@ -1,6 +1,6 @@
 # 19.1 HHH 原则与 Claude 实践
 
-> [第 13 章 RLHF](../chapter15_rlhf/base-model-to-assistant) 把"人类标注偏好 → 奖励模型 → PPO"这条流水线讲通了；[第 15 章 DPO/GRPO](../chapter17_dpo/intro) 进一步把它精简成不需要 RM、不需要 Critic 的形式。但所有这些方法都默认一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，这个前提就崩了——人类既标不动（成本和速度），也标不准（在数学、代码、长上下文上判断力不够）。本章回答一个问题：**当人类标注成为对齐瓶颈时，训练信号从哪来？** Anthropic 2022 年的答案是 _Constitutional AI: Harmlessness from AI Feedback_——让 AI 自己当裁判、自己改作文、自己生成偏好对。
+> [第 13 章 RLHF](../chapter15_rlhf/base-model-to-assistant) 把"人类标注偏好 → 奖励模型 → PPO"这条流水线讲通了；[第 15 章 DPO](../chapter17_dpo/intro) 和[第 16 章 GRPO](../chapter18_grpo/grpo-practice-and-mechanism) 分别省去了显式 RM 或 Critic。但所有这些方法都默认一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，这个前提就崩了——人类既标不动（成本和速度），也标不准（在数学、代码、长上下文上判断力不够）。本章回答一个问题：**当人类标注成为对齐瓶颈时，训练信号从哪来？** Anthropic 2022 年的答案是 _Constitutional AI: Harmlessness from AI Feedback_——让 AI 自己当裁判、自己改作文、自己生成偏好对。
 
 ## Constitutional AI 框架
 

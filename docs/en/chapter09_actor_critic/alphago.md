@@ -25,7 +25,7 @@ AlphaGo consists of three core components:
 | Component               | Role                                                | Related Concept In This Chapter                                     |
 | ----------------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
 | Policy network          | Outputs probabilities over legal moves              | [Chapter 6 Policy Gradient](../chapter08_policy_gradient/reinforce) |
-| Value network           | Evaluates the win rate of the current position      | [Section 6.2 Training the Critic](./critic-training)                |
+| Value network           | Evaluates the win rate of the current position      | [Supplement: Training the Critic](./critic-training)                |
 | Monte Carlo Tree Search | Looks ahead for several moves to find the best play | Newly introduced in this section                                    |
 
 Their relationship is simple: MCTS is the "brain," the policy network provides "intuition" (which branches to prioritize),
@@ -535,7 +535,7 @@ The training loop has only two phases:
 1. **Self-play**: use the current model plus MCTS to play games, collecting triplets (position, MCTS policy, outcome)
 2. **Network training**: train the policy network to imitate MCTS search results, and train the value network to predict the final outcome
 
-There is a subtle but important difference from the [policy gradient](../chapter08_policy_gradient/reinforce) method in Chapter 5:
+There is a subtle but important difference from the [policy gradient](../chapter08_policy_gradient/reinforce) method in Chapter 6:
 AlphaGo's policy network does not learn directly from game returns (as in REINFORCE).
 Instead, it **learns to imitate the search policy produced by MCTS**.
 Because MCTS aggregates many simulations, its policy signal is much more reliable than a single sampled trajectory.

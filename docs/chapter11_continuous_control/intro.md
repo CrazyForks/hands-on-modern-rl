@@ -1,8 +1,8 @@
-# 第 9 章 · 连续控制与基于模型的深度 RL
+# 9.1 DDPG 与确定性策略梯度
 
 > [第 8 章 PPO](../chapter10_ppo/intro) 解决了连续动作空间的策略学习问题——用高斯策略输出连续动作 + clip 保证稳定更新。但 PPO 是 on-policy 的：每次策略更新后必须重新采样数据，**样本效率极低**。本章解决两个问题：(1) 如何 off-policy 地处理连续动作（DDPG/TD3/SAC）；(2) 如何用环境模型进一步提升样本效率（Model-Based RL + AlphaZero/Dreamer）。
 
-## 9.1 确定性策略梯度与 DDPG
+## 确定性策略梯度与 DDPG
 
 CartPole、Atari 这类问题动作是离散的（左/右、上下左右），用 Q-Learning 或 softmax 策略直接处理。但机器人控制、自动驾驶、机械臂操作——动作是**连续的**：关节角度 $\theta \in \mathbb{R}^n$、油门开度 $[0, 1]$、方向盘转角 $[-\pi, \pi]$。
 

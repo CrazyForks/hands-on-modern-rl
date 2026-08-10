@@ -56,7 +56,7 @@ This chapter is organized as: run something minimal -> see the new problems -> u
 
 | Section                                              | Question it answers                                                                       |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [24.2 Hands-On: GRPO for a VLM](./vlm-grpo-hands-on) | How do we train a VLM to "look then reason" under verifiable rewards?                     |
+| [24.3 Hands-On: GRPO for a VLM](./vlm-grpo-hands-on) | How do we train a VLM to "look then reason" under verifiable rewards?                     |
 | [24.1 Challenges](./vlm-challenges)                  | How do we assign reward across vision vs language? How do we reduce visual hallucination? |
 | [VLM RL Frameworks](./vlm-frameworks)                | What systems bridge experiments to applications (tools, environments, self-play)?         |
 | [Visual Generation RL](./visual-generation-rl)       | How does RL apply to diffusion/video generation, and what does "policy" mean there?       |
@@ -140,7 +140,7 @@ Visual hallucination is one of the most troublesome problems for VLMs. It refers
 
 Visual hallucination does not exist in text-only RL — because a text-only model does not "see" anything; all its outputs are generated from text input. But a VLM's input includes an image, and the model must make judgments about the image's content, and those judgments can be wrong.
 
-In RL training, visual hallucination can appear in a particularly insidious way. If one of the model's hallucinations happens to receive a high reward (e.g., it "fabricated" the correct number of figures), RL will reinforce this behavior — the model learns that "guessing" is more cost-effective than "looking." This is essentially the same as the reward hacking discussed in Chapter 7, but with an additional dimension: the model can cheat not only in text generation but also in visual understanding.
+In RL training, visual hallucination can appear in a particularly insidious way. If one of the model's hallucinations happens to receive a high reward (e.g., it "fabricated" the correct number of figures), RL will reinforce this behavior — the model learns that "guessing" is more cost-effective than "looking." This is essentially the same as the reward hacking discussed in Chapter 28, but with an additional dimension: the model can cheat not only in text generation but also in visual understanding.
 
 Several strategies for addressing visual hallucination:
 

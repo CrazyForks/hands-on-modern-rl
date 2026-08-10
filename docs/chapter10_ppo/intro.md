@@ -1,4 +1,4 @@
-# 第 8 章 · PPO 信任域方法
+# 8.2 PPO-Clip 裁剪目标
 
 上一章我们搭建了 [Actor-Critic 架构](../chapter09_actor_critic/actor-critic)——Actor 负责选择动作，Critic 负责评估动作的好坏，两者通过[优势函数](../chapter09_actor_critic/advantage-function) $A(s,a)$ 协作。在 CartPole 上，Actor-Critic 表现得相当不错。但当你把同样的架构搬到更复杂的环境（比如月球着陆器）或者更大的模型（比如数十亿参数的语言模型）时，一个严重的问题会浮出水面：**训练不稳定**。
 

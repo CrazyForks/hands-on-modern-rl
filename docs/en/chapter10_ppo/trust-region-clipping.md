@@ -5,7 +5,7 @@ title: 8.1 Constraint Mechanisms for Policy Updates
 # 8.1 Constraint Mechanisms for Policy Updates
 ## Section Overview
 
-Section 8.2 derived PPO's clipped surrogate objective:
+PPO's clipped surrogate objective is:
 
 $$L^{\text{CLIP}}(\theta) = \mathbb{E}_t \left[ \min \left( r_t(\theta) \cdot A_t, \; \text{clip}(r_t(\theta), 1-\varepsilon, 1+\varepsilon) \cdot A_t \right) \right]$$
 
@@ -23,7 +23,7 @@ To keep the derivation concrete, this section uses a single running example thro
 
 ## The Update Risk of Vanilla Policy Gradient
 
-Recall the policy-gradient update from Chapter 5 ([REINFORCE](../chapter08_policy_gradient/reinforce)):
+Recall the policy-gradient update from Chapter 6 ([REINFORCE](../chapter08_policy_gradient/reinforce)):
 
 $$\theta \leftarrow \theta + \alpha \cdot \nabla_\theta \log \pi_\theta(a \mid s) \cdot A(s,a)$$
 

@@ -15,14 +15,14 @@
 
 | 节                                           | 算法                                        | 考查频率 |
 | -------------------------------------------- | ------------------------------------------- | -------- |
-| [C.1 SFT Loss 与 KL 散度](./sft-kl)          | SFT 自回归 loss、shift right、KL 估计       | ★★★★     |
-| [C.2 PPO 策略损失与 GAE](./ppo-gae)          | Clipped surrogate、value loss、GAE 逆向递推 | ★★★★★    |
-| [C.3 DPO 及其变体](./dpo-family)             | DPO loss、IPO、KTO、SimPO                   | ★★★★★    |
-| [C.4 GRPO 与 Reward Model](./grpo-rlvr)      | GRPO 组内归一化、Bradley-Terry RM           | ★★★★     |
-| [C.5 Softmax 与 Cross-Entropy](./softmax-ce) | 数值稳定 softmax、log-sum-exp、CE loss      | ★★★★     |
-| [C.6 Top-k / Top-p Sampling](./top-k-top-p)  | Temperature、Top-k、Top-p (Nucleus) 解码    | ★★★★     |
-| [C.7 Attention / MHA / GQA](./attention-mha) | Scaled dot-product、多头注意力、MQA、GQA    | ★★★★★    |
-| [C.8 DAPO](./dapo)                           | 解耦裁剪、动态采样、超长惩罚                | ★★★      |
+| [B.1 SFT Loss 与 KL 散度](./sft-kl)          | SFT 自回归 loss、shift right、KL 估计       | ★★★★     |
+| [B.2 PPO 策略损失与 GAE](./ppo-gae)          | Clipped surrogate、value loss、GAE 逆向递推 | ★★★★★    |
+| [B.3 DPO 及其变体](./dpo-family)             | DPO loss、IPO、KTO、SimPO                   | ★★★★★    |
+| [B.4 GRPO 与 Reward Model](./grpo-rlvr)      | GRPO 组内归一化、Bradley-Terry RM           | ★★★★     |
+| [B.6 Softmax 与 Cross-Entropy](./softmax-ce) | 数值稳定 softmax、log-sum-exp、CE loss      | ★★★★     |
+| [B.7 Top-k / Top-p Sampling](./top-k-top-p)  | Temperature、Top-k、Top-p (Nucleus) 解码    | ★★★★     |
+| [B.8 Attention / MHA / GQA](./attention-mha) | Scaled dot-product、多头注意力、MQA、GQA    | ★★★★★    |
+| [B.5 DAPO](./dapo)                           | 解耦裁剪、动态采样、超长惩罚                | ★★★      |
 
 ## 使用建议
 
