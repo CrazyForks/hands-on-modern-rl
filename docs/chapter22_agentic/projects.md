@@ -4,7 +4,7 @@ search: false
 
 # 项目实践（已拆分为两个项目页）
 
-> 这一页保留为旧链接入口。核心内容已经迁移至 [20.8 rLLM DeepCoder 实验](./rllm-deepcoder-lab) 和 [第 22 章：Deep Research 与浏览器智能体](../chapter24_deep_research/intro)。下面保留原文，方便从旧链接进入的读者对照。
+> 这一页保留为旧链接入口。核心内容已经迁移至 [20.8 rLLM DeepCoder 实验](./rllm-deepcoder-lab) 和 [第 22 章：Deep Research 与浏览器智能体](../chapter24_deep_research/browser-rl-harness)。下面保留原文，方便从旧链接进入的读者对照。
 
 # 多工具 Agentic RL——搜索文档、写代码、跑测试
 
@@ -1645,4 +1645,4 @@ Deep Research Agent 是一个把本书所有 RL 知识"串起来"的绝佳场景
 
 [^memento]: Zhou H, et al. "Memento: Fine-tuning LLM Agents without Fine-tuning LLMs." [arXiv:2508.16153](https://arxiv.org/abs/2508.16153), 2025. **为什么不归入上述任何一类**：Memento 提供了一条完全不同的技术路线——**不修改模型参数**，而是通过外部情景记忆机制让 Agent 在推理时检索相似案例来指导行为。它在 GAIA 验证集上排名第一（87.88% Pass@3），有力地证明了：有时候"更好的检索"比"更好的训练"更有效。这个工作提示我们，RL 并非提升 Agent 能力的唯一路径，外部记忆与推理时策略同样是值得关注的方向。
 
-到这里，第 7 章的全部内容就结束了。下一章，让我们把目光投向更远的前沿——[未来趋势](../chapter32_selfplay/intro)，看看 RL 领域正在发生哪些激动人心的变化。
+到这里，第 7 章的全部内容就结束了。下一章，让我们把目光投向更远的前沿——[未来趋势](../chapter32_selfplay/self-play-outlook/)，看看 RL 领域正在发生哪些激动人心的变化。

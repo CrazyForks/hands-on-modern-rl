@@ -23,7 +23,7 @@ search: false
 | **Value Loss**      | 持续下降   | 不降 = Critic 学不动                  |
 | **Reward Margin**   | 稳定或增大 | 缩小 = Reward Model 失效              |
 
-**最危险的信号**：Reward 在涨但 Entropy 在暴跌——模型可能在 reward hacking（学到了"骗取"奖励的捷径），详见 [附录 A](/appendix_common_pitfalls/intro)。
+**最危险的信号**：Reward 在涨但 Entropy 在暴跌——模型可能在 reward hacking（学到了"骗取"奖励的捷径），详见 [附录 A](/appendix_industrial_training/training-debugging)。
 
 ## 常见问题速查表
 

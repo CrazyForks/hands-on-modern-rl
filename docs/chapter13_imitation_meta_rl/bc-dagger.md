@@ -1,8 +1,10 @@
-# 第 11 章 · 模仿学习、反向 RL 与元 RL
+# 11.1 行为克隆与 DAgger
 
 > [第 10 章 离线强化学习](../chapter12_offline_rl/intro)处理"只有历史数据、不能交互"的场景，但仍假设数据带有显式奖励信号。本章处理两种更极端的情形：(1) **完全没有奖励函数**——只有专家示范轨迹，怎么办？(2) **环境本身在不断变化**——智能体必须学会"快速适应新任务"。前者引出**模仿学习（Imitation Learning, IL）**与**反向 RL（Inverse RL）**，后者引出**元 RL（Meta-RL）**。两者最终在 LLM 时代合流：SFT 本质是行为克隆，InstructGPT 三阶段可重写为 BC + RL + RL，而 In-Context RL 揭示了"RL 算法本身可被蒸馏进 transformer"。
 
-## 11.1 行为克隆与 DAgger
+本章沿着三步展开：先用行为克隆与 DAgger 解释如何直接学习专家动作，再用逆向 RL 与 GAIL 讨论如何从示范反推奖励，最后进入 MAML、RL²、PEARL 与 In-Context RL，研究策略如何快速适应新任务。
+
+## 从专家示范学习策略
 
 [第 6 章策略梯度](../chapter08_policy_gradient/reinforce)假设环境提供 reward。但很多真实任务中我们只有**专家示范**——人类驾驶员的轨迹、熟练工人的操作记录、高质量问答对。**模仿学习**直接从示范学策略，跳过奖励函数的设计。
 
@@ -35,7 +37,7 @@ $$\mathbb{E}\left[\sum_{t=0}^T \mathbb{1}[\pi_\theta(s_t) \neq \pi^*(s_t)]\right
 
 误差随 horizon **平方级放大**。这就是为什么纯行为克隆的自动驾驶在长程任务上几乎不可用。
 
-### DAgger 与 迭代收集"失败状态"
+### DAgger：迭代收集失败状态
 
 Dataset Aggregation 的核心洞察：与其让智能体在专家没见过的状态下挣扎，不如**主动收集这些失败状态，请专家标注**。
 

@@ -411,7 +411,7 @@ WebArena 的难度在于环境的动态性和不确定性。BFCL 的函数签名
 - **WebArena / Mind2Web**：网页环境中的操作成功率
 - **BFCL**：工具/API 调用的精确性
 
-更多细节见 [项目：Deep Research Agent](../chapter24_deep_research/intro) 的评估体系部分。
+更多细节见 [项目：Deep Research Agent](../chapter24_deep_research/browser-rl-harness) 的评估体系部分。
 
 ### 怎么选基准？
 
@@ -447,7 +447,7 @@ Agent 评测需要同时考察两个层面。
 
 **结果评测（Outcome Evaluation）** 检验最终交付物是否满足要求。报告的结论是否正确，数据是否准确，格式是否符合预期。这是最基本的检验。SWE-bench 就是典型的纯结果评测——只要补丁通过了测试用例就算成功，不管 Agent 中间折腾了多少轮。
 
-**过程评测（Process Evaluation）** 检验 Agent 在完成任务过程中每一步的决策是否合理。工具选择是否恰当，搜索策略是否高效，遇到障碍时是否正确调整方向。Web-Shepherd（[项目：Deep Research Agent](../chapter24_deep_research/intro)会详细讨论）是典型的过程评测——它对 Agent 在网页上的每一步操作独立打分。
+**过程评测（Process Evaluation）** 检验 Agent 在完成任务过程中每一步的决策是否合理。工具选择是否恰当，搜索策略是否高效，遇到障碍时是否正确调整方向。Web-Shepherd（[项目：Deep Research Agent](../chapter24_deep_research/browser-rl-harness)会详细讨论）是典型的过程评测——它对 Agent 在网页上的每一步操作独立打分。
 
 过程评测并不是锦上添花。Berkeley RDI 的研究发现，几乎每一个主流 agentic benchmark 都可以被"钻空子"拿到接近满分的成绩，而根本不需要真正完成任务 [^benchmark-exploit]。SWE-bench、WebArena、GAIA 都不例外。如果没有过程评测，你可能只测到了模型钻空子的能力。
 

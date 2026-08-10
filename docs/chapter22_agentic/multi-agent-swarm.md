@@ -287,4 +287,4 @@ Anthropic 内部数据：多 agent 系统的"连锁错误率"是单 agent 的 2.
 
 LLM-era 多智能体的 RL 训练核心挑战：**信用分配**与**token 成本**。前者决定训练能否收敛，后者决定能否商业化。2026 年主流是 Orchestrator-Worker + 显式归因，Swarm 仍处于研究阶段。
 
-下一章 [第 21 章 代码智能体强化学习](../chapter23_rl_based_swe/intro) 把这套协作框架用在 SWE 任务上——你会看到 SWE-Agent 如何用 Orchestrator-Worker 训练单 agent 代码智能体，DeepSWE 如何用 self-play 训练多 agent 协作开发。
+下一章 [第 21 章 代码智能体强化学习](../chapter23_rl_based_swe/swe-bench-and-rlvr) 把这套协作框架用在 SWE 任务上——你会看到 SWE-Agent 如何用 Orchestrator-Worker 训练单 agent 代码智能体，DeepSWE 如何用 self-play 训练多 agent 协作开发。

@@ -646,25 +646,28 @@ function optimizedMermaidPlugin(md) {
 
 const zhNav = [
   { text: '预备知识', link: '/preface/intro' },
-  { text: '基础与经典 RL', link: '/chapter01_cartpole/intro' },
+  { text: '基础与经典 RL', link: '/chapter01_cartpole/principles' },
   { text: '深度强化学习', link: '/chapter07_dqn/from-q-to-dqn' },
-  { text: '大模型对齐', link: '/chapter15_rlhf/intro' },
-  { text: 'Agentic 与多模态', link: '/chapter22_agentic/intro' },
-  { text: '安全与前沿', link: '/chapter30_alignment_failures/intro' },
-  { text: '附录', link: '/appendix_common_pitfalls/intro' }
+  { text: '大模型对齐', link: '/chapter15_rlhf/base-model-to-assistant' },
+  { text: 'Agentic 与多模态', link: '/chapter22_agentic/overview' },
+  {
+    text: '安全与前沿',
+    link: '/chapter30_alignment_failures/classical-failures'
+  },
+  { text: '附录', link: '/appendix_industrial_training/training-debugging' }
 ]
 
 const enNav = [
   { text: 'Preface', link: '/en/preface/intro' },
-  { text: 'Part I · Fundamentals', link: '/en/chapter01_cartpole/intro' },
-  { text: 'Part II · Deep RL', link: '/en/chapter07_dqn/from-q-to-dqn' },
-  { text: 'Part IV · LLM Alignment', link: '/en/chapter15_rlhf/intro' },
-  { text: 'Part V · Agentic RL', link: '/en/chapter22_agentic/intro' },
+  { text: 'Fundamentals', link: '/en/chapter01_cartpole/principles' },
+  { text: 'Deep RL', link: '/en/chapter07_dqn/from-q-to-dqn' },
+  { text: 'LLM Alignment', link: '/en/chapter15_rlhf/base-model-to-assistant' },
+  { text: 'Agentic RL', link: '/en/chapter22_agentic/intro' },
   {
-    text: 'Part VII · Safety & Frontiers',
-    link: '/en/chapter32_selfplay/intro'
+    text: 'Safety & Frontiers',
+    link: '/en/chapter32_selfplay/self-play-outlook/'
   },
-  { text: 'Appendices', link: '/en/appendix_common_pitfalls/intro' }
+  { text: 'Appendices', link: '/en/appendix_industrial_training/intro' }
 ]
 
 const zhSidebar = {

@@ -4,6 +4,8 @@ title: 20.1 Agentic RL Overview
 
 # 20.1 Agentic RL Overview
 
+Part IV trained models to produce preference-aligned single responses. Once a model can search, execute code, and call external tools, each decision changes the next observation and the training object expands into a complete trajectory. Part V begins with that shift, then develops multi-turn formulation, credit assignment, tool use, code and browser agents, and multi-agent collaboration.
+
 The RL problems covered in earlier chapters are essentially **single-turn decision-making**: the model receives a prompt, emits a complete response, a reward model scores it, and the policy is updated once. Whether the underlying algorithm is PPO or GRPO, the skeleton of "one prompt, one response, one score" never changes.
 
 Real agents do not work this way.

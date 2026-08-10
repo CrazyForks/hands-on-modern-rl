@@ -263,4 +263,4 @@ Deep Research 评测的四大基准（BrowseComp / xbench-DeepSearch / GAIA / �
 
 开源复现上，**GPT-Researcher 适合做产品，OpenResearcher 适合做研究**。前者工程成熟，后者训练透明。如果你是研究 / 学习目的，从 OpenResearcher 入手；如果是产品落地，从 GPT-Researcher 入手。
 
-下一章 [第 23 章 Computer Use 与 GUI Agent](../chapter25_computer_use/intro) 从浏览器转移到整个桌面——agent 不再只是查网页，而是操作任意 GUI 应用（Excel、PS、内部 OA）。
+下一章 [第 23 章 Computer Use 与 GUI Agent](../chapter25_computer_use/training) 从浏览器转移到整个桌面——agent 不再只是查网页，而是操作任意 GUI 应用（Excel、PS、内部 OA）。

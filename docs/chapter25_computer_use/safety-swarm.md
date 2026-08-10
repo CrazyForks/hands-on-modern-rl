@@ -362,7 +362,7 @@ Anthropic 在 Claude Computer Use（2024.10 发布）上实践了一套完整的
 
 ### Constitutional AI 的扩展
 
-[第 19 章 Constitutional AI](../chapter21_cai_rlvr/intro) 的核心思想是让模型自己判断"该做 vs 不该做"。Computer Use 扩展了 constitution：
+[第 19 章 Constitutional AI](../chapter21_cai_rlvr/hhh-practice) 的核心思想是让模型自己判断"该做 vs 不该做"。Computer Use 扩展了 constitution：
 
 ```
 1. 不要执行任何 destructive 操作（删文件、改密码）除非用户明确确认
@@ -388,13 +388,13 @@ Anthropic 的 Responsible Scaling Policy 定义了 ASL（AI Safety Level）等�
 
 ## 与 [第 28 章 Alignment Failures] 的呼应
 
-[第 28 章 奖励黑客与对齐失败](../chapter30_alignment_failures/intro) 详细讨论过 Sleeper Agent、Reward Hacking、Specification Gaming 等更深层的安全问题。本节的指令层级是**工程上可落地**的第一道防线——它解决的是"模型被外部内容劫持"这个问题，但解决不了：
+[第 28 章 奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures) 详细讨论过 Sleeper Agent、Reward Hacking、Specification Gaming 等更深层的安全问题。本节的指令层级是**工程上可落地**的第一道防线——它解决的是"模型被外部内容劫持"这个问题，但解决不了：
 
 - **奖励误设**（reward misspecification）：模型学会钻 verifier 漏洞
 - **Sleeper Agent**：模型在训练时潜伏触发器，部署后激活
 - **Power-seeking**：模型主动获取更多权限
 
-这些深层问题需要 [第 28 章](../chapter30_alignment_failures/intro) 讲的可解释性、mechanistic interpretability 等更前沿的工具。
+这些深层问题需要 [第 28 章](../chapter30_alignment_failures/classical-failures) 讲的可解释性、mechanistic interpretability 等更前沿的工具。
 
 ## 本节总结
 
@@ -406,4 +406,4 @@ Computer Use 场景的安全防御分三层：
 
 这三层不是互斥的——工业级系统同时部署三层。指令层级解决"模型被劫持"，动作级防御解决"即使被劫持也限制损害"，Constitutional AI 解决"模型自身价值观"。
 
-下一章 [第 24 章 视觉语言模型 RL](../chapter26_vlm/intro) 从 GUI 转向更广泛的视觉语言模型——VLM 如何用 RL 学会图像理解、视频推理、多模态决策。
+下一章 [第 24 章 视觉语言模型 RL](../chapter26_vlm/vlm-challenges) 从 GUI 转向更广泛的视觉语言模型——VLM 如何用 RL 学会图像理解、视频推理、多模态决策。

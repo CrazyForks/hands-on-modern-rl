@@ -3,6 +3,76 @@ title: 2.1 Exploration and Exploitation
 ---
 
 # 2.1 Exploration and Exploitation
+
+**Core Content**
+
+- Master the unified language of the MDP tuple, discounted cumulative return, value functions, and the Bellman equation.
+- Understand how DP, MC, and TD estimate value functions under different assumptions.
+- Distinguish the $Q(s,a)$ route from the $J(\theta)$ route, and understand how the reward function determines the optimization objective.
+
+**Core Formulas**
+
+$$
+\mathcal{M} = \langle \mathcal{S}, \mathcal{A}, P, R, \gamma \rangle \quad \text{(MDP tuple: defining the rules of the environment)}
+$$
+
+$$
+G_t = \sum_{k=0}^{\infty} \gamma^k r_{t+k} \quad \text{(Discounted cumulative return: defining the long-term objective)}
+$$
+
+$$
+V^\pi(s) = \mathbb{E}_\pi[G_t \mid s_t = s], \quad Q^\pi(s,a) = \mathbb{E}_\pi[G_t \mid s_t = s, a_t = a] \quad \text{(State value and action value: evaluating states and actions)}
+$$
+
+$$
+J(\theta) = \mathbb{E}_{\pi_\theta}\left[\sum_{t=0}^{\infty}\gamma^t r_t\right] \quad \text{(Policy optimization objective: measuring a policy's average return)}
+$$
+
+**Role of This Chapter's Formulas**
+
+Chapter 3 establishes a unified formulation of reinforcement learning through a set of foundational formulas. The MDP tuple is used to characterize the sequential decision-making environment the agent operates in; the discounted cumulative return $G_t$ defines the long-term optimization objective; the state value function and action value function evaluate the long-term return of states and actions; the policy objective $J(\theta)$ formulates the optimization problem for parameterized policies. Subsequent topics — DQN, policy gradient, Actor-Critic, and PPO — all build on these basic objects.
+
+Chapter 1 trained a CartPole agent end to end. That run already contained the full reinforcement-learning loop, but action selection, state transitions, delayed return, and policy updates all appeared at once. Before formalizing the complete process, this section isolates the smallest decision problem: choosing among actions with unknown rewards.
+
+The CartPole run let us use RL before defining its objects precisely. We now move from “how to run it” to “why it works”: what a reward measures, how actions acquire value, and how a sequence of decisions becomes an optimization problem.
+
+Back to the most fundamental question: **What does reinforcement learning study?** The answer is **sequential decision-making** — the agent chooses an action at each step, the environment provides feedback and transitions to the next state, and so on. The key is that the agent pursues not the immediate reward at any single step, but the **cumulative return over the entire process**. Greedily taking the largest immediate reward is often not the optimal strategy.
+
+To formally describe this process requires a unified formal framework — the **Markov Decision Process** (MDP). The MDP packages **states, actions, transition probabilities, reward functions, and discount factors** into a tuple $\langle \mathcal{S}, \mathcal{A}, P, R, \gamma \rangle$. With it, value functions, the Bellman equation, Q-Learning, policy gradient, PPO — these seemingly diverse algorithms — all share a common language.
+
+After defining the problem, the next step is to define a **measure of "goodness."** The **discounted cumulative return** $G_t$ describes the total reward obtainable from a trajectory starting at a given time, while the **value function** distributes the expectation of this reward to specific states or actions. Building on this, the **Bellman equation** reveals a key recursive structure: the value of a state equals "the immediate reward for the current step" plus "the discounted value of the next state." This seemingly simple equation is the common starting point for dynamic programming, Monte Carlo methods, and temporal difference methods.
+
+Following the value function further naturally splits into **two algorithmic routes**:
+
+- **Value-based route**: Learn $Q(s,a)$, score each action, then choose the action with the highest score — leading to Q-Learning and Deep Q-Networks.
+- **Policy-based route**: Directly define a policy objective $J(\theta)$ and optimize the policy parameters through gradient methods — leading to policy gradient, Actor-Critic, and PPO.
+
+This chapter serves as the **theoretical foundation** for the entire book. Chapter 5's Deep Q-Networks depend on $Q(s,a)$, Chapter 6's policy gradient depends on $J(\theta)$, and Chapters 7–8 use both value estimation and policy optimization in Actor-Critic and PPO. After understanding this chapter, many formulas in subsequent algorithms will no longer appear as isolated techniques, but as natural consequences derived from **the same decision modeling framework**.
+
+## Section Outline
+
+| Section                                                     | Core Content                                                                                  |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [Two-Armed Bandit](./bandit)                                | Understand exploration, exploitation, and expected return from the smallest decision problem  |
+| [Markov Decision Process](./mdp)                            | Define the MDP tuple, discounted return, and policy                                           |
+| [Value Functions and the Bellman Equation](./value-bellman) | Introduce the state value function and derive its recursive structure                         |
+| [DP, MC, and TD](./dp-mc-td)                                | Compare three value estimation methods by assumptions, data requirements, and update rules    |
+| [From Q to Q-Learning](./value-q)                           | Use GridWorld to illustrate action value, TD targets, exploration, and tabular boundaries     |
+| [From Value to Policy](./policy-objective)                  | Define the objective function from the perspective of directly optimizing the policy          |
+| [Where Does Data Come From](./algorithm-taxonomy)           | Discuss On-policy vs. Off-policy, Online vs. Offline                                          |
+| [Reward Function Design](./reward-design)                   | Discuss how rewards express task objectives and the problems that incorrect rewards can cause |
+| [Chapter Summary](./panorama)                               | Summarize core formulas, algorithmic routes, and connections to subsequent chapters           |
+
+## Learning Objectives
+
+After reading this chapter, you should be able to:
+
+- Formally describe a reinforcement learning problem using the MDP tuple $\langle \mathcal{S}, \mathcal{A}, P, R, \gamma \rangle$;
+- Understand how the **Bellman equation** writes long-term return as a recursive structure, and grasp the core differences among dynamic programming, Monte Carlo, and temporal difference methods for value estimation;
+- Articulate the distinction between two algorithmic routes — the **$Q(s,a)$ route** scores actions and selects the best, while the **$J(\theta)$ route** directly optimizes policy parameters — leading respectively to Deep Q-Networks and PPO.
+
+We begin with the multi-armed bandit, observe the exploration-exploitation tradeoff in a minimal environment, and then lift that intuition into the formal language of MDPs.
+
 ## What This Section Solves
 
 **Core content**
@@ -11,7 +81,7 @@ title: 2.1 Exploration and Exploitation
 - Learn to compare policies (uniform random, oracle-optimal, explore-then-commit) using expected return.
 - See why the **policy** is the core object in RL: in the same environment, different action-selection rules can lead to completely different long-term outcomes.
 
-In the first two chapters, you ran CartPole and DPO end to end. But there is an even more basic question hiding underneath: **how does an agent know which action is better?** If we cannot answer "which of two options should I pick?", then dealing with continuously changing states in CartPole is even harder.
+In Chapter 1, you ran CartPole end to end. But there is an even more basic question hiding underneath: **how does an agent know which action is better?** If we cannot answer "which of two options should I pick?", then dealing with continuously changing states in CartPole is even harder.
 
 RL differs from supervised learning in two core ways. First, it is **trial-and-error**: nobody gives you the correct action, you must try. Second, it often involves **delayed reward**: the consequences of an action may only show up many steps later [^5]. Together, these create the characteristic difficulty of RL.
 

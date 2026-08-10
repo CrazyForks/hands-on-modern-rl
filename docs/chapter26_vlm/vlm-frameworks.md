@@ -196,7 +196,7 @@ VLM RL 训练出的是"能看懂图的模型"。但真实场景中，用户需�
 
 ### 多模态 Agent RL 的特殊挑战
 
-把本章的 VLM RL 和[第 20 章](../chapter22_agentic/intro)的 Agent RL 结合，会面临三个额外的挑战：
+把本章的 VLM RL 和[第 20 章](../chapter22_agentic/overview)的 Agent RL 结合，会面临三个额外的挑战：
 
 **1. 错误归因。** 当多模态 Agent 给出错误结果时，错误可能来自视觉理解（"看错了"图表中的数值）或工具调用（"做错了"传了错误参数）。这两种错误的修复方式完全不同——前者需要更多的 VLM RL 训练（本章的方法），后者需要更多的 [Agent RL 训练](../chapter22_agentic/tool-use-and-trajectory)。实践中需要**分阶段验证**：先检查视觉理解是否正确，再检查工具调用是否合理。
 
@@ -217,7 +217,7 @@ def multimodal_agent_reward(trajectory, task):
 
 **GUI Agent。** 通过 RL 训练模型理解屏幕截图中的 UI 元素（按钮、输入框），并执行点击、输入、滚动等操作。代表工作包括 CRAFT-GUI（桌面环境 GUI 操作）、MobileRL（移动端触屏操作）。GUI Agent 有一个天然的 RLVR 优势——操作是否成功是客观可验证的。
 
-**多模态 Deep Research。** [Tongyi DeepResearch](../chapter24_deep_research/intro) 已经支持多模态输入，能分析搜索结果中的图表和图片、从 PDF 论文中提取图表数据。这是 VLM RL + Agent RL 整合的前沿方向。
+**多模态 Deep Research。** [Tongyi DeepResearch](../chapter24_deep_research/browser-rl-harness) 已经支持多模态输入，能分析搜索结果中的图表和图片、从 PDF 论文中提取图表数据。这是 VLM RL + Agent RL 整合的前沿方向。
 
 **创作型 Agent。** 接收用户需求和参考图片，调用图片生成/编辑工具创作。挑战在于 reward 的主观性——"风格转换得好不好"没有客观标准，需要用 LLM-as-Judge 评估。
 

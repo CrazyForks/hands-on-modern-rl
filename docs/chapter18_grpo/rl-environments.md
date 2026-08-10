@@ -1,6 +1,6 @@
 # 16.5 RL Environments 与 Verifier 工程
 
-> [第 19 章 CAI 与 RLVR](../chapter21_cai_rlvr/intro) 解决了"如何在没有人工标注的情况下训练推理模型"——RLVR 用规则验证器替代奖励模型，CAI 用 AI 反馈替代人类标注。但当任务从"数学题答对/答错"扩展到"写代码、调工具、订机票、修 Bug"时，**奖励信号本身成了瓶颈**。本章解决一个工程问题：如何把真实世界任务封装成可训练的 RL 环境，以及如何设计能抵抗作弊的 Verifier。这是 2025 年下半年 RL 训练流水线最受关注的工程方向。
+> [第 19 章 CAI 与 RLVR](../chapter21_cai_rlvr/hhh-practice) 解决了"如何在没有人工标注的情况下训练推理模型"——RLVR 用规则验证器替代奖励模型，CAI 用 AI 反馈替代人类标注。但当任务从"数学题答对/答错"扩展到"写代码、调工具、订机票、修 Bug"时，**奖励信号本身成了瓶颈**。本章解决一个工程问题：如何把真实世界任务封装成可训练的 RL 环境，以及如何设计能抵抗作弊的 Verifier。这是 2025 年下半年 RL 训练流水线最受关注的工程方向。
 
 ## RL Environments 作为新瓶颈
 
@@ -644,7 +644,7 @@ def select_checkpoint(eval_history):
 
 ### 与模型对齐失败的关系
 
-RL 环境质量差会导致一系列 alignment failures——策略学到 verifier 漏洞、过拟合 eval set、对噪声敏感。这些问题在 [第 28 章 Alignment Failures](../chapter30_alignment_failures/intro) 有详细分析，本章从工程角度预防：**先把环境做好，再谈策略对齐**。
+RL 环境质量差会导致一系列 alignment failures——策略学到 verifier 漏洞、过拟合 eval set、对噪声敏感。这些问题在 [第 28 章 Alignment Failures](../chapter30_alignment_failures/classical-failures) 有详细分析，本章从工程角度预防：**先把环境做好，再谈策略对齐**。
 
 ## 本章总结
 
@@ -657,7 +657,7 @@ RL 环境质量差会导致一系列 alignment failures——策略学到 verifi
 7. **基准生态**——SWE-bench、τ-bench、WebArena、Vending-Bench、CyberGym 等覆盖不同能力维度，组合使用避免过拟合
 8. **训练-评估循环**——Eval-driven training、增量评测、污染检测、Pareto checkpoint 选择，是工业级 RL 工程的标配
 
-接下来可以阅读[第 24 章 VLM RL](../chapter26_vlm/intro)，了解当观察从文本变成图像或视频后，奖励信号如何设计、训练如何扩展。
+接下来可以阅读[第 24 章 VLM RL](../chapter26_vlm/vlm-challenges)，了解当观察从文本变成图像或视频后，奖励信号如何设计、训练如何扩展。
 
 ## 延伸阅读
 

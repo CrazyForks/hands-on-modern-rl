@@ -47,7 +47,7 @@ $$
 其中 $\mathcal{L}_{\text{context-consistency}}$ 衡量模型在不同情境下的回答是否与 Constitution 框架一致。
 
 ::: details 为什么 Socialization 比 Rule-Listing 更鲁棒
-规则列表的根本问题：**规则无法穷尽**。80 条原则覆盖不了真实部署中遇到的千变万化情境。Socialization 让模型学的是"价值判断的能力"，而不是"规则匹配"。Anthropic 报告：Claude 4 在 OOD（训练时未见过）的安全情境上，鲁棒性比规则列表版本高 40%+。这与 [第 23 章 Computer Use](../chapter25_computer_use/intro) 中"模型需要在新环境泛化"的需求直接对应。
+规则列表的根本问题：**规则无法穷尽**。80 条原则覆盖不了真实部署中遇到的千变万化情境。Socialization 让模型学的是"价值判断的能力"，而不是"规则匹配"。Anthropic 报告：Claude 4 在 OOD（训练时未见过）的安全情境上，鲁棒性比规则列表版本高 40%+。这与 [第 23 章 Computer Use](../chapter25_computer_use/training) 中"模型需要在新环境泛化"的需求直接对应。
 :::
 
 ### 可审计性（Auditability）
@@ -77,7 +77,7 @@ Entropy 项鼓励 attribution 不要坍缩到单一原则（多原则兼容时�
 | OOD 鲁棒性 | 弱                      | 强（socialization 泛化）      |
 | 审计能力   | 黑盒                    | 每个决策可追溯到原则          |
 
-这条路线和 [第 28 章 Scalable Oversight](../chapter30_alignment_failures/intro) 的"AI supervision"研究、[第 36 章 Distributed RL Training](../appendix_industrial_training/rl-infrastructure) 的大规模对齐训练形成了完整的工业级对齐体系。
+这条路线和 [第 28 章 Scalable Oversight](../chapter30_alignment_failures/classical-failures) 的"AI supervision"研究、[第 36 章 Distributed RL Training](../appendix_industrial_training/rl-infrastructure) 的大规模对齐训练形成了完整的工业级对齐体系。
 
 ## 本章总结
 

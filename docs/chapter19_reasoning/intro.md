@@ -47,13 +47,13 @@
 
 - [第 16 章 GRPO 改进家族](../chapter18_grpo/grpo-family)——R1-Zero 与 DAPO 的训练细节
 - [第 16 章 DeepSeek-R1 与 DAPO](../chapter18_grpo/deepseek-dapo)——纯 RL 训练范式的具体实现
-- [第 13 章 RLHF](../chapter15_rlhf/intro)——奖励信号的基础知识
+- [第 13 章 RLHF](../chapter15_rlhf/base-model-to-assistant)——奖励信号的基础知识
 
 本章后续会指向：
 
-- [第 18 章 PRM 与推理时搜索](../chapter20_prm_search/intro)——过程奖励与树搜索
-- [第 28 章奖励黑客与对齐失败](../chapter30_alignment_failures/intro)——推理模型特有的 reward hacking
-- [第 20 章 Agentic RL](../chapter22_agentic/intro)——推理模型作为智能体的"大脑"
+- [第 18 章 PRM 与推理时搜索](../chapter20_prm_search/outcome-vs-process)——过程奖励与树搜索
+- [第 28 章奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures)——推理模型特有的 reward hacking
+- [第 20 章 Agentic RL](../chapter22_agentic/overview)——推理模型作为智能体的"大脑"
 
 ## 一个直觉性的开场
 

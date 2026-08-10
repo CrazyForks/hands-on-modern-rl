@@ -173,4 +173,4 @@ Second, RL can be used both for traditional control tasks (CartPole) and for LLM
 
 In Part 2, we will build the mathematical foundation behind this logic - MDPs, Bellman equations, DQN, the policy gradient theorem, and PPO - to prepare for later LLM alignment chapters.
 
-> **Next stop**: [Part 2: Theory and Methods](/chapter03_mdp/intro)
+> **Next stop**: [Part 2: Theory and Methods](/chapter03_mdp/bandit)

@@ -52,6 +52,70 @@ const ROUTE_LOADING_TIMEOUT_MS = 5000
 const ROUTE_RECOVERY_MAX_ATTEMPTS = 5
 const ROUTE_RECOVERY_BASE_DELAY_MS = 400
 
+const SIDEBAR_NAV_GROUP_PREFIXES = {
+  '/preface/intro': '序章 · 导论',
+  '/chapter01_cartpole/principles': 'Part I ·',
+  '/chapter07_dqn/from-q-to-dqn': 'Part II ·',
+  '/chapter15_rlhf/base-model-to-assistant': 'Part IV ·',
+  '/chapter22_agentic/overview': 'Part V ·',
+  '/chapter30_alignment_failures/classical-failures': 'Part VII ·',
+  '/appendix_industrial_training/training-debugging': '附录',
+  '/en/preface/intro': 'Preface ·',
+  '/en/chapter01_cartpole/principles': 'Part I ·',
+  '/en/chapter07_dqn/from-q-to-dqn': 'Part II ·',
+  '/en/chapter15_rlhf/base-model-to-assistant': 'Part IV ·',
+  '/en/chapter22_agentic/intro': 'Part V ·',
+  '/en/chapter32_selfplay/self-play-outlook': 'Part VII ·',
+  '/en/appendix_industrial_training/intro': 'Appendices'
+}
+
+const LEGACY_INTRO_REDIRECTS = {
+  '/chapter01_cartpole/intro': '/chapter01_cartpole/principles',
+  '/chapter02_bandits/intro': '/chapter03_mdp/bandit',
+  '/chapter03_mdp/intro': '/chapter03_mdp/bandit',
+  '/chapter07_dqn/intro': '/chapter07_dqn/from-q-to-dqn',
+  '/chapter08_policy_gradient/intro':
+    '/chapter08_policy_gradient/policy-gradient',
+  '/chapter09_actor_critic/intro': '/chapter09_actor_critic/advantage-function',
+  '/chapter15_rlhf/intro': '/chapter15_rlhf/base-model-to-assistant',
+  '/chapter21_cai_rlvr/intro': '/chapter21_cai_rlvr/hhh-practice',
+  '/chapter20_prm_search/intro': '/chapter20_prm_search/outcome-vs-process',
+  '/chapter22_agentic/intro': '/chapter22_agentic/overview',
+  '/chapter23_rl_based_swe/intro': '/chapter23_rl_based_swe/swe-bench-and-rlvr',
+  '/chapter24_deep_research/intro':
+    '/chapter24_deep_research/browser-rl-harness',
+  '/chapter25_computer_use/intro': '/chapter25_computer_use/training',
+  '/chapter26_vlm/intro': '/chapter26_vlm/vlm-challenges',
+  '/chapter27_audio_rl/intro': '/chapter27_audio_rl/reward-design',
+  '/chapter30_alignment_failures/intro':
+    '/chapter30_alignment_failures/classical-failures',
+  '/chapter31_alphaevolve/intro': '/chapter32_selfplay/alphaevolve/',
+  '/chapter32_selfplay/intro': '/chapter32_selfplay/self-play-outlook',
+  '/chapter13_imitation_meta_rl/intro':
+    '/chapter13_imitation_meta_rl/bc-dagger',
+  '/appendix_common_pitfalls/intro':
+    '/appendix_industrial_training/training-debugging',
+  '/appendix_code_cheatsheet/intro': '/appendix_code_cheatsheet/sft-kl',
+  '/appendix_game_projects/intro': '/appendix_paper_reading/intro',
+  '/appendix_industrial_training/intro':
+    '/appendix_industrial_training/training-debugging',
+  '/appendix_math/intro': '/appendix_math/linear-algebra-basics',
+  '/en/chapter01_cartpole/intro': '/en/chapter01_cartpole/principles',
+  '/en/chapter03_mdp/intro': '/en/chapter03_mdp/bandit',
+  '/en/chapter07_dqn/intro': '/en/chapter07_dqn/from-q-to-dqn',
+  '/en/chapter08_policy_gradient/intro':
+    '/en/chapter08_policy_gradient/policy-gradient',
+  '/en/chapter09_actor_critic/intro':
+    '/en/chapter09_actor_critic/advantage-function',
+  '/en/chapter15_rlhf/intro': '/en/chapter15_rlhf/base-model-to-assistant',
+  '/en/chapter26_vlm/intro': '/en/chapter26_vlm/vlm-challenges',
+  '/en/chapter32_selfplay/intro': '/en/chapter32_selfplay/self-play-outlook',
+  '/en/appendix_common_pitfalls/intro':
+    '/en/appendix_industrial_training/intro',
+  '/en/appendix_code_cheatsheet/intro': '/en/appendix_code_cheatsheet/sft-kl',
+  '/en/appendix_math/intro': '/en/appendix_math/linear-algebra-basics'
+}
+
 const fontSize = ref(DEFAULT_FONT_SIZE)
 const lineHeight = ref(DEFAULT_LINE_HEIGHT)
 const docWidth = ref(DEFAULT_DOC_WIDTH)
@@ -444,6 +508,15 @@ function normalizeNavigationPath(path) {
   const withoutHash = path.split(/[?#]/, 1)[0]
   const withoutHtml = withoutHash.replace(/\.html$/, '')
   return withoutHtml === '/' ? '/' : withoutHtml.replace(/\/$/, '')
+}
+
+function redirectLegacyIntroRoute() {
+  const target =
+    LEGACY_INTRO_REDIRECTS[normalizeNavigationPath(mobileRoutePath.value)]
+  if (!target) return false
+
+  void router.go(withBase(target))
+  return true
 }
 
 function isPrimaryNavigationRoute(path) {
@@ -871,6 +944,57 @@ function scrollSidebarToActiveItem(activeItem) {
   }
 }
 
+function setActiveSidebarGroup(targetGroup) {
+  document
+    .querySelectorAll('.VPSidebar > .nav > .group.ct-nav-group-active')
+    .forEach((group) => {
+      group.classList.remove('ct-nav-group-active')
+      group.removeAttribute('aria-current')
+    })
+
+  if (!targetGroup) return
+  targetGroup.classList.add('ct-nav-group-active')
+  targetGroup.setAttribute('aria-current', 'location')
+}
+
+function getSidebarNavigationGroup(path) {
+  const sidebarContainer = getSidebarScrollContainer()
+  const prefix = SIDEBAR_NAV_GROUP_PREFIXES[normalizeNavigationPath(path)]
+  if (!sidebarContainer || !prefix) return null
+
+  const targetGroup = Array.from(
+    sidebarContainer.querySelectorAll(':scope > .group')
+  ).find((group) => {
+    const title = group.querySelector(
+      '.group-title, .VPSidebarItem.level-0 > .item .text'
+    )
+    return title?.textContent?.trim().startsWith(prefix)
+  })
+  if (!targetGroup) return null
+
+  return { sidebarContainer, targetGroup }
+}
+
+function scrollSidebarToNavigationGroup(path) {
+  const target = getSidebarNavigationGroup(path)
+  if (!target) return false
+
+  const { sidebarContainer, targetGroup } = target
+
+  setActiveSidebarGroup(targetGroup)
+
+  const containerRect = sidebarContainer.getBoundingClientRect()
+  const groupRect = targetGroup.getBoundingClientRect()
+  const targetScrollTop =
+    groupRect.top - containerRect.top + sidebarContainer.scrollTop - 8
+
+  sidebarContainer.scrollTo({
+    top: Math.max(0, targetScrollTop),
+    behavior: 'smooth'
+  })
+  return true
+}
+
 function cleanupNavigationSync() {
   outlineObserver?.disconnect()
   sidebarObserver?.disconnect()
@@ -955,18 +1079,34 @@ function initNavigationSync() {
           }
         }
 
+        if (
+          !sidebarContainer.querySelector(':scope > .group.ct-nav-group-active')
+        ) {
+          const navigationGroup = getSidebarNavigationGroup(
+            mobileRoutePath.value
+          )
+          setActiveSidebarGroup(navigationGroup?.targetGroup)
+        }
+
         syncSidebarGroupsExpanded()
       })
 
       sidebarObserver.observe(sidebarContainer, {
         attributes: true,
+        childList: true,
         subtree: true,
         attributeFilter: ['class']
       })
 
+      const syncedToNavigationGroup = scrollSidebarToNavigationGroup(
+        mobileRoutePath.value
+      )
       const currentSidebarActive = sidebarContainer.querySelector('.is-active')
-      if (currentSidebarActive) {
+      if (!syncedToNavigationGroup && currentSidebarActive) {
+        setActiveSidebarGroup(currentSidebarActive.closest('.group'))
         scrollSidebarToActiveItem(currentSidebarActive)
+      } else if (!syncedToNavigationGroup) {
+        setActiveSidebarGroup(null)
       }
 
       syncSidebarGroupsExpanded()
@@ -1022,10 +1162,13 @@ onMounted(() => {
 
   router.onAfterRouteChange = () => {
     hideRouteLoading()
+    if (redirectLegacyIntroRoute()) return
     scheduleRouteRecovery()
   }
 
-  scheduleRouteRecovery()
+  if (!redirectLegacyIntroRoute()) {
+    scheduleRouteRecovery()
+  }
 })
 
 onBeforeUnmount(() => {
@@ -1108,31 +1251,21 @@ watch(
 </script>
 
 <template>
-  <DefaultTheme.Layout>
-    <template v-if="showDocChrome" #nav-bar-content-after>
-      <div class="ct-nav-tools">
-        <a
-          class="ct-nav-tool-button ct-language-toggle"
-          :href="alternateLanguageLink"
-          :aria-label="alternateLanguageAriaLabel"
-          :title="alternateLanguageAriaLabel"
-          :aria-current="languageToggleAriaCurrent"
-        >
-          <span class="ct-language-toggle-text">
-            {{ alternateLanguageShort }}
-          </span>
-        </a>
-
-        <PopoverRoot v-model:open="readingToolsOpen">
-          <PopoverTrigger as-child>
-            <button
-              class="ct-nav-tool-button"
-              type="button"
-              :aria-label="settingsButtonLabel"
-            >
-              <Settings :size="18" :stroke-width="2" aria-hidden="true" />
-            </button>
-          </PopoverTrigger>
+  <PopoverRoot v-model:open="readingToolsOpen">
+    <DefaultTheme.Layout>
+      <template v-if="showDocChrome" #nav-bar-content-after>
+        <div class="ct-nav-tools">
+          <a
+            class="ct-nav-tool-button ct-language-toggle"
+            :href="alternateLanguageLink"
+            :aria-label="alternateLanguageAriaLabel"
+            :title="alternateLanguageAriaLabel"
+            :aria-current="languageToggleAriaCurrent"
+          >
+            <span class="ct-language-toggle-text">
+              {{ alternateLanguageShort }}
+            </span>
+          </a>
 
           <PopoverPortal>
             <Transition name="ct-reading-tools-fade">
@@ -1267,345 +1400,361 @@ watch(
                       @input="updateLineHeightFromRange"
                     />
                   </div>
-                </div>
-
-                <div class="ct-reading-tools-group">
-                  <div class="ct-reading-tools-header">
-                    <div class="ct-reading-tools-title">
-                      {{ readingToolsCopy.docWidth }}
+                  <div class="ct-reading-tools-group">
+                    <div class="ct-reading-tools-header">
+                      <div class="ct-reading-tools-title">
+                        {{ readingToolsCopy.docWidth }}
+                      </div>
+                      <div class="ct-reading-tools-value">{{ docWidth }}px</div>
                     </div>
-                    <div class="ct-reading-tools-value">{{ docWidth }}px</div>
+                    <div class="ct-reading-tools-actions">
+                      <button
+                        class="ct-reading-tools-action"
+                        type="button"
+                        @click="narrowDocWidth"
+                      >
+                        {{ readingToolsCopy.narrower }}
+                      </button>
+                      <button
+                        class="ct-reading-tools-action"
+                        type="button"
+                        @click="resetDocWidth"
+                      >
+                        {{ readingToolsCopy.default }}
+                      </button>
+                      <button
+                        class="ct-reading-tools-action"
+                        type="button"
+                        @click="widenDocWidth"
+                      >
+                        {{ readingToolsCopy.wider }}
+                      </button>
+                    </div>
+                    <input
+                      v-model.number="docWidth"
+                      class="ct-reading-tools-range"
+                      type="range"
+                      :min="MIN_DOC_WIDTH"
+                      :max="MAX_DOC_WIDTH"
+                      step="20"
+                    />
                   </div>
-                  <div class="ct-reading-tools-actions">
-                    <button
-                      class="ct-reading-tools-action"
-                      type="button"
-                      @click="narrowDocWidth"
-                    >
-                      {{ readingToolsCopy.narrower }}
-                    </button>
-                    <button
-                      class="ct-reading-tools-action"
-                      type="button"
-                      @click="resetDocWidth"
-                    >
-                      {{ readingToolsCopy.default }}
-                    </button>
-                    <button
-                      class="ct-reading-tools-action"
-                      type="button"
-                      @click="widenDocWidth"
-                    >
-                      {{ readingToolsCopy.wider }}
-                    </button>
-                  </div>
-                  <input
-                    v-model.number="docWidth"
-                    class="ct-reading-tools-range"
-                    type="range"
-                    :min="MIN_DOC_WIDTH"
-                    :max="MAX_DOC_WIDTH"
-                    step="20"
-                  />
                 </div>
               </PopoverContent>
             </Transition>
           </PopoverPortal>
-        </PopoverRoot>
 
-        <PopoverRoot v-model:open="supportOpen">
-          <PopoverTrigger as-child>
-            <button
-              class="ct-nav-tool-button"
-              type="button"
-              :aria-label="supportButtonLabel"
-              :title="supportButtonLabel"
-            >
-              <HandHeart :size="18" :stroke-width="2" aria-hidden="true" />
-            </button>
-          </PopoverTrigger>
-
-          <PopoverPortal>
-            <Transition name="ct-reading-tools-fade">
-              <PopoverContent
-                class="ct-popover-content"
-                :side-offset="10"
-                align="end"
-                side="bottom"
+          <PopoverRoot v-model:open="supportOpen">
+            <PopoverTrigger as-child>
+              <button
+                class="ct-nav-tool-button"
+                type="button"
+                :aria-label="supportButtonLabel"
+                :title="supportButtonLabel"
               >
-                <div
-                  class="ct-popover-surface ct-support-panel"
-                  :class="{ 'has-wide-qr': supportQrWide }"
+                <HandHeart :size="18" :stroke-width="2" aria-hidden="true" />
+              </button>
+            </PopoverTrigger>
+
+            <PopoverPortal>
+              <Transition name="ct-reading-tools-fade">
+                <PopoverContent
+                  class="ct-popover-content"
+                  :side-offset="10"
+                  align="end"
+                  side="bottom"
                 >
-                  <a
-                    class="ct-support-link"
-                    href="https://github.com/walkinglabs"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <div
+                    class="ct-popover-surface ct-support-panel"
+                    :class="{ 'has-wide-qr': supportQrWide }"
                   >
-                    <span>WalkingLab</span>
-                    <span>GitHub</span>
-                  </a>
-                  <a
-                    class="ct-support-link"
-                    :href="DISCORD_URL"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span class="ct-support-link-main">
-                      <MessageCircle
-                        :size="15"
+                    <a
+                      class="ct-support-link"
+                      href="https://github.com/walkinglabs"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <span>WalkingLab</span>
+                      <span>GitHub</span>
+                    </a>
+                    <a
+                      class="ct-support-link"
+                      :href="DISCORD_URL"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <span class="ct-support-link-main">
+                        <MessageCircle
+                          :size="15"
+                          :stroke-width="2"
+                          aria-hidden="true"
+                        />
+                        <span>{{ discordLinkLabel }}</span>
+                      </span>
+                      <span>{{ discordLinkMeta }}</span>
+                    </a>
+                    <div
+                      class="ct-support-qr-card"
+                      :class="{ 'is-wide': supportQrWide }"
+                    >
+                      <button
+                        class="ct-support-qr-zoom-button"
+                        type="button"
+                        :aria-label="supportQrZoomLabel"
+                        :title="supportQrZoomLabel"
+                        @click="openSupportQrViewer"
+                      >
+                        <img
+                          src="https://github.com/walkinglabs/.github/raw/main/profile/wechat.png"
+                          :alt="
+                            isEnglishRoute
+                              ? 'WalkingLab community QR code'
+                              : 'WalkingLab 微信二维码'
+                          "
+                          loading="lazy"
+                          decoding="async"
+                          @load="updateSupportQrRatio"
+                        />
+                      </button>
+                      <div>{{ supportQrLabel }}</div>
+                    </div>
+                    <p class="ct-support-note">
+                      {{ supportNote }}
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Transition>
+            </PopoverPortal>
+          </PopoverRoot>
+        </div>
+      </template>
+
+      <template v-if="showDocChrome" #sidebar-nav-before>
+        <Teleport defer to=".VPSidebar">
+          <div
+            class="ct-sidebar-groups-toolbar"
+            role="group"
+            :aria-label="isEnglishRoute ? 'Sidebar controls' : '侧边栏分组控制'"
+          >
+            <div class="ct-sidebar-toolbar-row">
+              <div class="ct-sidebar-groups-control">
+                <button
+                  class="ct-sidebar-groups-button"
+                  :class="{ 'is-collapse-action': allSidebarGroupsExpanded }"
+                  type="button"
+                  :title="sidebarGroupsToggleLabel"
+                  :aria-label="sidebarGroupsToggleLabel"
+                  :aria-expanded="allSidebarGroupsExpanded"
+                  @click="toggleAllSidebarGroups"
+                >
+                  <ChevronsUp
+                    v-if="allSidebarGroupsExpanded"
+                    :size="12"
+                    :stroke-width="1.8"
+                    aria-hidden="true"
+                  />
+                  <ChevronsDown
+                    v-else
+                    :size="12"
+                    :stroke-width="1.8"
+                    aria-hidden="true"
+                  />
+                  <span>{{ sidebarGroupsToggleLabel }}</span>
+                </button>
+              </div>
+              <SidebarFooter class="ct-sidebar-toolbar-actions">
+                <template #settings>
+                  <PopoverTrigger as-child>
+                    <button
+                      class="ct-sidebar-footer-btn"
+                      type="button"
+                      :title="settingsButtonLabel"
+                      :aria-label="settingsButtonLabel"
+                    >
+                      <Settings
+                        :size="16"
                         :stroke-width="2"
                         aria-hidden="true"
                       />
-                      <span>{{ discordLinkLabel }}</span>
-                    </span>
-                    <span>{{ discordLinkMeta }}</span>
-                  </a>
-                  <div
-                    class="ct-support-qr-card"
-                    :class="{ 'is-wide': supportQrWide }"
-                  >
-                    <button
-                      class="ct-support-qr-zoom-button"
-                      type="button"
-                      :aria-label="supportQrZoomLabel"
-                      :title="supportQrZoomLabel"
-                      @click="openSupportQrViewer"
-                    >
-                      <img
-                        src="https://github.com/walkinglabs/.github/raw/main/profile/wechat.png"
-                        :alt="
-                          isEnglishRoute
-                            ? 'WalkingLab community QR code'
-                            : 'WalkingLab 微信二维码'
-                        "
-                        loading="lazy"
-                        decoding="async"
-                        @load="updateSupportQrRatio"
-                      />
                     </button>
-                    <div>{{ supportQrLabel }}</div>
-                  </div>
-                  <p class="ct-support-note">
-                    {{ supportNote }}
-                  </p>
-                </div>
-              </PopoverContent>
-            </Transition>
-          </PopoverPortal>
-        </PopoverRoot>
-      </div>
-    </template>
+                  </PopoverTrigger>
+                </template>
+              </SidebarFooter>
+            </div>
+          </div>
+        </Teleport>
+      </template>
 
-    <template v-if="showDocChrome" #sidebar-nav-before>
-      <Teleport defer to=".VPSidebar">
+      <template v-if="isHomePage && homeTypingText" #home-hero-info-after>
+        <div class="ct-home-typed-tagline">
+          <ClientOnly>
+            <TextType :text="homeTypingText" v-bind="homeTaglineTyping" />
+          </ClientOnly>
+        </div>
+      </template>
+
+      <template #nav-screen-content-after>
+        <div class="ct-mobile-language-switcher">
+          <div class="ct-mobile-language-title">
+            {{ isEnglishRoute ? 'Change language' : '切换语言' }}
+          </div>
+          <div class="ct-mobile-language-options">
+            <span class="ct-mobile-language-current">
+              {{ currentLanguage }}
+            </span>
+            <a class="ct-mobile-language-link" :href="alternateLanguageLink">
+              {{ alternateLanguage }}
+            </a>
+          </div>
+        </div>
+      </template>
+    </DefaultTheme.Layout>
+
+    <ClientOnly>
+      <div
+        v-if="showDocChrome"
+        class="ct-sidebar-hover-area"
+        :class="{ collapsed: sidebarCollapsed, resizing: sidebarResizing }"
+      >
         <div
-          class="ct-sidebar-groups-toolbar"
-          role="group"
-          :aria-label="isEnglishRoute ? 'Sidebar controls' : '侧边栏分组控制'"
+          v-if="!sidebarCollapsed"
+          class="ct-sidebar-resizer"
+          role="separator"
+          aria-orientation="vertical"
+          @pointerdown="startSidebarResize"
+        />
+
+        <button
+          class="ct-sidebar-toggle-btn"
+          :class="{ collapsed: sidebarCollapsed }"
+          type="button"
+          :aria-label="
+            isEnglishRoute
+              ? sidebarCollapsed
+                ? 'Expand sidebar'
+                : 'Collapse sidebar'
+              : sidebarCollapsed
+                ? '展开目录'
+                : '收起目录'
+          "
+          @click="toggleSidebar"
         >
-          <div class="ct-sidebar-toolbar-row">
-            <div class="ct-sidebar-groups-control">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path
+              v-if="!sidebarCollapsed"
+              d="M8 1L3 6l5 5"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+            />
+            <path
+              v-else
+              d="M4 1l5 5-5 5"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+            />
+          </svg>
+        </button>
+      </div>
+    </ClientOnly>
+
+    <ClientOnly>
+      <ReadingProgress v-if="showDocChrome" />
+    </ClientOnly>
+
+    <ClientOnly>
+      <Transition name="ct-route-loading-fade">
+        <div
+          v-if="routeLoading"
+          class="ct-route-loading"
+          :aria-label="isEnglishRoute ? 'Loading page' : '页面加载中'"
+          aria-live="polite"
+        >
+          <span class="ct-route-loading-spinner" aria-hidden="true"></span>
+        </div>
+      </Transition>
+    </ClientOnly>
+
+    <ClientOnly>
+      <Teleport to="body">
+        <div
+          v-if="mermaidViewerOpen"
+          class="ct-mermaid-viewer"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="isEnglishRoute ? 'View diagram' : '查看图表'"
+          @click.self="closeMermaidViewer"
+        >
+          <div class="ct-mermaid-viewer-toolbar">
+            <div class="ct-mermaid-viewer-help">
+              <strong>{{ mermaidViewerScaleLabel }}</strong>
+              <span>
+                {{
+                  isEnglishRoute
+                    ? 'Wheel to zoom · Drag to pan · + / - to zoom · 0 to reset · Esc to close'
+                    : '滚轮缩放 · 拖拽移动 · + / - 缩放 · 0 重置 · Esc 关闭'
+                }}
+              </span>
+            </div>
+            <div class="ct-mermaid-viewer-actions">
               <button
-                class="ct-sidebar-groups-button"
-                :class="{ 'is-collapse-action': allSidebarGroupsExpanded }"
                 type="button"
-                :title="sidebarGroupsToggleLabel"
-                :aria-label="sidebarGroupsToggleLabel"
-                :aria-expanded="allSidebarGroupsExpanded"
-                @click="toggleAllSidebarGroups"
+                :aria-label="isEnglishRoute ? 'Zoom out' : '缩小图表'"
+                @click="zoomMermaidViewer(-MERMAID_VIEWER_SCALE_STEP)"
               >
-                <ChevronsUp
-                  v-if="allSidebarGroupsExpanded"
-                  :size="12"
-                  :stroke-width="1.8"
-                  aria-hidden="true"
-                />
-                <ChevronsDown
-                  v-else
-                  :size="12"
-                  :stroke-width="1.8"
-                  aria-hidden="true"
-                />
-                <span>{{ sidebarGroupsToggleLabel }}</span>
+                -
+              </button>
+              <button type="button" @click="resetMermaidViewerZoom">
+                {{ isEnglishRoute ? 'Reset' : '重置' }}
+              </button>
+              <button
+                type="button"
+                :aria-label="isEnglishRoute ? 'Zoom in' : '放大图表'"
+                @click="zoomMermaidViewer(MERMAID_VIEWER_SCALE_STEP)"
+              >
+                +
+              </button>
+              <button
+                type="button"
+                :aria-label="isEnglishRoute ? 'Close diagram' : '关闭图表'"
+                @click="closeMermaidViewer"
+              >
+                {{ isEnglishRoute ? 'Close' : '关闭' }}
               </button>
             </div>
-            <SidebarFooter
-              class="ct-sidebar-toolbar-actions"
-              @open-settings="readingToolsOpen = true"
-            />
+          </div>
+          <div
+            ref="mermaidViewerScroll"
+            class="ct-mermaid-viewer-scroll"
+            :class="{ 'is-dragging': mermaidViewerDragging }"
+            @pointerdown="handleMermaidViewerPointerDown"
+            @pointermove="handleMermaidViewerPointerMove"
+            @pointerup="stopMermaidViewerDrag"
+            @pointercancel="stopMermaidViewerDrag"
+            @pointerleave="stopMermaidViewerDrag"
+            @wheel="handleMermaidViewerWheel"
+          >
+            <div
+              class="ct-mermaid-viewer-stage"
+              :style="mermaidViewerStageStyle"
+            >
+              <img
+                class="ct-mermaid-viewer-image"
+                :src="mermaidViewerSrc"
+                :alt="mermaidViewerAlt"
+                :style="mermaidViewerImageStyle"
+                @load="handleMermaidViewerImageLoad"
+                @dragstart.prevent
+              />
+            </div>
           </div>
         </div>
       </Teleport>
-    </template>
-
-    <template v-if="isHomePage && homeTypingText" #home-hero-info-after>
-      <div class="ct-home-typed-tagline">
-        <ClientOnly>
-          <TextType :text="homeTypingText" v-bind="homeTaglineTyping" />
-        </ClientOnly>
-      </div>
-    </template>
-
-    <template #nav-screen-content-after>
-      <div class="ct-mobile-language-switcher">
-        <div class="ct-mobile-language-title">
-          {{ isEnglishRoute ? 'Change language' : '切换语言' }}
-        </div>
-        <div class="ct-mobile-language-options">
-          <span class="ct-mobile-language-current">
-            {{ currentLanguage }}
-          </span>
-          <a class="ct-mobile-language-link" :href="alternateLanguageLink">
-            {{ alternateLanguage }}
-          </a>
-        </div>
-      </div>
-    </template>
-  </DefaultTheme.Layout>
-
-  <ClientOnly>
-    <div
-      v-if="showDocChrome"
-      class="ct-sidebar-hover-area"
-      :class="{ collapsed: sidebarCollapsed, resizing: sidebarResizing }"
-    >
-      <div
-        v-if="!sidebarCollapsed"
-        class="ct-sidebar-resizer"
-        role="separator"
-        aria-orientation="vertical"
-        @pointerdown="startSidebarResize"
-      />
-
-      <button
-        class="ct-sidebar-toggle-btn"
-        :class="{ collapsed: sidebarCollapsed }"
-        type="button"
-        :aria-label="
-          isEnglishRoute
-            ? sidebarCollapsed
-              ? 'Expand sidebar'
-              : 'Collapse sidebar'
-            : sidebarCollapsed
-              ? '展开目录'
-              : '收起目录'
-        "
-        @click="toggleSidebar"
-      >
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-          <path
-            v-if="!sidebarCollapsed"
-            d="M8 1L3 6l5 5"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-          />
-          <path
-            v-else
-            d="M4 1l5 5-5 5"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-          />
-        </svg>
-      </button>
-    </div>
-  </ClientOnly>
-
-  <ClientOnly>
-    <ReadingProgress v-if="showDocChrome" />
-  </ClientOnly>
-
-  <ClientOnly>
-    <Transition name="ct-route-loading-fade">
-      <div
-        v-if="routeLoading"
-        class="ct-route-loading"
-        :aria-label="isEnglishRoute ? 'Loading page' : '页面加载中'"
-        aria-live="polite"
-      >
-        <span class="ct-route-loading-spinner" aria-hidden="true"></span>
-      </div>
-    </Transition>
-  </ClientOnly>
-
-  <ClientOnly>
-    <Teleport to="body">
-      <div
-        v-if="mermaidViewerOpen"
-        class="ct-mermaid-viewer"
-        role="dialog"
-        aria-modal="true"
-        :aria-label="isEnglishRoute ? 'View diagram' : '查看图表'"
-        @click.self="closeMermaidViewer"
-      >
-        <div class="ct-mermaid-viewer-toolbar">
-          <div class="ct-mermaid-viewer-help">
-            <strong>{{ mermaidViewerScaleLabel }}</strong>
-            <span>
-              {{
-                isEnglishRoute
-                  ? 'Wheel to zoom · Drag to pan · + / - to zoom · 0 to reset · Esc to close'
-                  : '滚轮缩放 · 拖拽移动 · + / - 缩放 · 0 重置 · Esc 关闭'
-              }}
-            </span>
-          </div>
-          <div class="ct-mermaid-viewer-actions">
-            <button
-              type="button"
-              :aria-label="isEnglishRoute ? 'Zoom out' : '缩小图表'"
-              @click="zoomMermaidViewer(-MERMAID_VIEWER_SCALE_STEP)"
-            >
-              -
-            </button>
-            <button type="button" @click="resetMermaidViewerZoom">
-              {{ isEnglishRoute ? 'Reset' : '重置' }}
-            </button>
-            <button
-              type="button"
-              :aria-label="isEnglishRoute ? 'Zoom in' : '放大图表'"
-              @click="zoomMermaidViewer(MERMAID_VIEWER_SCALE_STEP)"
-            >
-              +
-            </button>
-            <button
-              type="button"
-              :aria-label="isEnglishRoute ? 'Close diagram' : '关闭图表'"
-              @click="closeMermaidViewer"
-            >
-              {{ isEnglishRoute ? 'Close' : '关闭' }}
-            </button>
-          </div>
-        </div>
-        <div
-          ref="mermaidViewerScroll"
-          class="ct-mermaid-viewer-scroll"
-          :class="{ 'is-dragging': mermaidViewerDragging }"
-          @pointerdown="handleMermaidViewerPointerDown"
-          @pointermove="handleMermaidViewerPointerMove"
-          @pointerup="stopMermaidViewerDrag"
-          @pointercancel="stopMermaidViewerDrag"
-          @pointerleave="stopMermaidViewerDrag"
-          @wheel="handleMermaidViewerWheel"
-        >
-          <div class="ct-mermaid-viewer-stage" :style="mermaidViewerStageStyle">
-            <img
-              class="ct-mermaid-viewer-image"
-              :src="mermaidViewerSrc"
-              :alt="mermaidViewerAlt"
-              :style="mermaidViewerImageStyle"
-              @load="handleMermaidViewerImageLoad"
-              @dragstart.prevent
-            />
-          </div>
-        </div>
-      </div>
-    </Teleport>
-  </ClientOnly>
+    </ClientOnly>
+  </PopoverRoot>
 </template>
 
 <style>
@@ -1688,8 +1837,12 @@ watch(
 }
 
 .ct-popover-content {
-  z-index: 40;
+  z-index: 80;
   outline: none;
+}
+
+[data-reka-popper-content-wrapper]:has(> .ct-popover-content) {
+  z-index: 80 !important;
 }
 
 .ct-popover-surface {

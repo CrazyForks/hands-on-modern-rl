@@ -1,10 +1,12 @@
-# 第 10 章 · 离线强化学习与决策 Transformer
+# 10.1 离线 RL 的挑战与经典方法
+
+Part II 依靠智能体持续与环境交互来收集经验。许多真实系统只能使用已有日志，新的试错可能昂贵、缓慢或存在安全风险。Part III 从离线强化学习开始，随后把固定数据学习推进到模仿学习、逆向强化学习、元强化学习、探索、多智能体与分层决策。
 
 > [第 9 章](../chapter11_continuous_control/intro) 解决了连续动作与样本效率问题——DDPG/TD3/SAC 通过 replay buffer 复用历史数据，model-based RL 通过环境模型减少真实交互。但所有这些算法仍然允许智能体**继续与环境交互**：replay buffer 里的数据是旧策略采的，新策略采到的新数据会持续加入。本章处理一个更严苛的设定——**当智能体完全不能交互，只能从一个固定的历史数据集学习时，如何训出可靠策略？** 这就是 **Offline RL（离线强化学习）**，也称作 batch RL。它是 LLM 后训练、推荐系统、医疗决策、工业机器人等真实场景的核心范式，并且通过 **Decision Transformer** 这一分支，与现代序列建模（GPT）建立了直接联系。
 
-## 10.1 离线 RL 的核心挑战 与 分布偏移
+## 离线 RL 的核心挑战：分布偏移
 
-[第 5 章 DQN](../chapter07_dqn/intro) 和 [第 9 章 SAC](../chapter11_continuous_control/intro) 都依赖同一个机制：Bellman 备份。无论 on-policy 还是 off-policy，价值函数的更新都写成：
+[第 5 章 DQN](../chapter07_dqn/from-q-to-dqn) 和 [第 9 章 SAC](../chapter11_continuous_control/intro) 都依赖同一个机制：Bellman 备份。无论 on-policy 还是 off-policy，价值函数的更新都写成：
 
 $$y = r + \gamma \cdot \mathbb{E}_{s' \sim P(\cdot \mid s, a)}\left[V(s')\right]$$
 
@@ -42,7 +44,7 @@ $$\max_\theta \; \mathbb{E}_{s \sim \mathcal{D}}\left[Q^\pi(s, \pi_\theta(s))\ri
 
 接下来三节按"如何实现这个约束"分三条路线展开。
 
-## 悲观主义路线 与 CQL / IQL / BCQ
+## 悲观主义路线：CQL、IQL 与 BCQ
 
 最直接的思路：**让 Q 函数对 OOD 动作悲观**。如果 $Q(s, a)$ 在没见过的 $a$ 上给低值，$\max_a Q(s, a)$ 自然不会选到幻想动作。三大经典算法——BCQ、CQL、IQL——从不同角度实现这一原则。
 
@@ -125,11 +127,11 @@ $\exp(\beta A)$ 给数据中表现好的动作更大权重，让 $\pi_\theta$ �
 
 **实战建议**：从 IQL 开始（最稳定、最少调参）；若 baseline 偏低再换 CQL（更激进）；BCQ 已较少作为新 baseline。
 
-## AWAC 与 TD3+BC 与 保守约束 + 行为克隆正则化
+## AWAC 与 TD3+BC：保守约束和行为克隆正则化
 
 另一条路线更工程化——**保留 on-policy / off-policy actor-critic 主循环，在策略损失里直接加行为克隆（BC）正则**。这类方法的优势是与 [第 9 章](../chapter11_continuous_control/intro) 的 PPO/SAC 框架兼容，工程改造量极小。
 
-### TD3+BC 与 BC 正则化的最简形式
+### TD3+BC：BC 正则化的最简形式
 
 Fujimoto & Gu 2021 提出的 TD3+BC 把思想推到极致：在 TD3 的 actor loss 上加一个 BC 项，权重 $\lambda$ 自适应调节：
 
@@ -149,7 +151,7 @@ $$\mathcal{L}_\pi^{\text{AWAC}} = -\mathbb{E}_{(s, a) \sim \mathcal{D}}\left[\un
 
 AWAC 的工程亮点是**支持离线到在线的平滑过渡**：先纯离线预训练，再少量在线交互微调。这一点对真实机器人、推荐系统等场景非常实用。
 
-### AWAC 与 IQL 的策略损失同源性
+### AWAC 与 IQL：同源的策略损失
 
 仔细比较两个公式：
 

@@ -1,10 +1,79 @@
 # 21.1 SWE-RL 基础实验
 
-<!--@include: ./intro.md{3,}-->
+[第 20 章 Agentic RL](../chapter22_agentic/overview) 介绍了智能体在工具调用、多轮交互上的 RL 训练。这一章我们聚焦一个最有工业价值的细分领域：**RL-based SWE（Software Engineering）**——用 RL 训练模型自动修复 bug、实现 feature、写测试。
+
+为什么单独成章？三个原因：
+
+1. **SWE 是 RLVR 的天然战场**——单元测试是完美的"零噪声 verifier"，与 [第 18 章 PRM 的形式化路线](../chapter20_prm_search/formal-prm) 同源
+2. **2025 年这个领域出现了多个工业级突破**——Meta SWE-RL、字节 DeepSWE、清华 SSR、阿里 CWM，每个都把 SWE-bench 准确率推向新高度
+3. **SWE-RL 是 Agentic RL 的"算法实验室"**——它的很多发现（长 horizon credit assignment、self-play、world model）可以推广到其他领域
+
+## 本章要回答的问题
+
+- **SWE-bench 是什么**？为什么它是 SWE-RL 的核心 benchmark？
+- **Meta SWE-RL** 怎么用开源数据 + 简单 GRPO 达到 SOTA？
+- **Code World Model（CWM）** 怎么把代码执行建模为 MDP？
+- **DeepSWE** 怎么用 verifiable reward 训练长 horizon agent？
+- **Self-play SWE-RL（SSR）** 怎么让模型自己生成训练数据？
+- **SWE-RL 的未来**——多语言、多仓库、多 agent 的扩展方向
+
+## 章节地图
+
+```text
+SWE-bench 与 RL-based SWE 范式
+     ├── SWE-bench 任务定义
+     ├── 为什么 SWE 是 RLVR 的理想战场
+     └── 数据制造：SWE-smith 与 SWE-gym
+Meta SWE-RL：开源 SOTA 的代表
+     ├── 数据规模与构成
+     ├── 算法选择：GRPO + rule-based reward
+     ├── 工程细节：context 管理、test sampling
+     └── SWE-bench Verified 41.0%
+Code World Model（CWM）
+     ├── 把代码执行建模为 MDP
+     ├── World model 训练
+     ├── 基于 CWM 的 RL
+     └── 与 model-based RL 的关系
+DeepSWE：长时程 Agent RL
+     ├── 16 步以上 trajectory 的挑战
+     ├── Step-level reward shaping
+     ├── Test-time search 集成
+     └── 字节 Seed 的工业实践
+Self-Play SWE-RL（SSR）
+     ├── 模型自己生成 bug + 修复
+     ├── Curriculum learning
+     ├── 清华 SSR 工作
+     └── 数据 flywheel 的形成
+RL-based SWE 的工业落地
+     ├── Cursor、Cognition Devin、字节 Trae
+     ├── 商业模式与成本结构
+     └── 多语言、多仓库扩展
+```
+
+## 与其他章的关系
+
+这一章假定你已经读过：
+
+- [第 16 章 GRPO 改进家族](../chapter18_grpo/grpo-family)——基础 RL 算法
+- [第 20 章 Agentic RL](../chapter22_agentic/overview)——agent 的多轮交互基础
+- [第 18 章 PRM](../chapter20_prm_search/outcome-vs-process)——形式化 verifier 思想
+
+本章后续会指向：
+
+- [第 20.10 节 agent 训练系统](../chapter22_agentic/build-agentic-training-system)——SWE-RL 的工程实现
+- [第 13.6 节对齐评测](../chapter15_rlhf/evaluation)——SWE-RL 特有的 hacking
+
+## 一个直觉性的开场
+
+**直觉：SWE-RL 是把 PRM 形式化思想用到代码领域**。Lean4 是数学的形式化 verifier；单元测试是代码的形式化 verifier。两者的核心思想一致：**用零误判的外部验证替代人工或 LLM 的主观判断**。
+
+但 SWE 有 Lean4 没有的优势——**工业实践极其丰富**。GitHub 上有数亿行代码、数百万 PR、数千万 commit——这是数学界无法比拟的训练数据规模。
+
+下面从 SWE-bench 的任务定义开始。
 
 这一节我们建立 SWE-RL 的基础概念——什么是 SWE-bench、为什么 SWE 是 RLVR 的理想战场、SWE-RL 与传统 code generation 的本质区别。
 
-## 12.1.1 SWE-bench 任务定义
+## SWE-bench 任务定义
 
 [SWE-bench](https://arxiv.org/abs/2310.06770)（Jimenez et al. 2023）是 SWE-RL 的核心 benchmark。它的任务定义是：
 
@@ -70,7 +139,7 @@ SWE-bench Verified（高质量子集，500 题）的 SOTA 表现：
 - 2025 年底：约 53%（NVIDIA 等）
 - 2026 年初：约 65%（Claude Opus 4.7 + 工具调用）
 
-## 12.1.2 为什么 SWE 是 RLVR 的理想战场
+## 为什么 SWE 是 RLVR 的理想战场
 
 回顾 [第 16 章 RLVR](../chapter18_grpo/rlvr)——RLVR 的核心思想是**用规则验证替代 RM**。RLVR 需要三个条件：
 
@@ -96,7 +165,7 @@ SWE 完美满足这三个条件：
 
 这三个条件让 SWE-RL 成为 RLVR 在工业上**最成功的应用**之一。Meta、字节、Cognition、阿里、清华都在这个方向投入了大量资源。
 
-## 12.1.3 SWE-RL vs 传统 Code Generation
+## SWE-RL vs 传统 Code Generation
 
 传统 code generation（如 HumanEval、MBPP）的任务是：
 
@@ -121,7 +190,7 @@ SWE-RL 的任务是：
 - **延迟反馈**：测试结果是延迟 reward，与 RL 的优势估计天然匹配
 - **多步决策**：read → think → edit → test → fix → submit 是典型 agent trajectory
 
-## 12.1.4 SWE-bench 的数据制造
+## SWE-bench 的数据制造
 
 SWE-RL 训练需要大量 (Issue, patch, tests) 三元组。来源有三个：
 
@@ -164,7 +233,7 @@ SWE-RL 训练需要大量 (Issue, patch, tests) 三元组。来源有三个：
 
 这是 [21.3 节 SSR](./self-play-ssr-and-summary) 的核心思想——**模型自己生成训练数据**。
 
-## 12.1.5 SWE-RL 的奖励函数
+## SWE-RL 的奖励函数
 
 SWE-RL 的 reward 通常极其简单：
 
@@ -220,7 +289,7 @@ reward += 0.05 * context_efficiency
 
 这与 [R1-Zero 的发现](../chapter18_grpo/deepseek-dapo) 一致：**简单 reward + 大规模 RL > 复杂 reward + 小规模 RL**。
 
-## 12.1.6 SWE-RL 的训练流程
+## SWE-RL 的训练流程
 
 一个完整的 SWE-RL 训练流程：
 

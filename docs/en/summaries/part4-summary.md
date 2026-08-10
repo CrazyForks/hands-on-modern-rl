@@ -97,4 +97,4 @@ Your current knowledge is enough to understand most frontier work in RL in 2025-
 
 The RL story is still unfolding. We do not know what will happen next, and that is what makes the field exciting. Welcome to the journey.
 
-> Return to the [Preface](/preface/intro) or continue with the [Appendix](/appendix_common_pitfalls/intro).
+> Return to the [Preface](/preface/intro) or continue with the [Appendix](/en/appendix_industrial_training/intro).

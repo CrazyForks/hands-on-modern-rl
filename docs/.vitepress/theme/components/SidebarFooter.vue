@@ -1,11 +1,9 @@
 <script setup>
 import { useData } from 'vitepress'
 import { computed } from 'vue'
-import { Github, MessageCircle, Moon, Settings, Sun } from 'lucide-vue-next'
+import { Github, MessageCircle, Moon, Sun } from 'lucide-vue-next'
 
 const { isDark, lang, theme } = useData()
-
-const emit = defineEmits(['open-settings'])
 
 const isEnglish = computed(() => lang.value.startsWith('en'))
 const appearanceLabel = computed(() => {
@@ -14,9 +12,6 @@ const appearanceLabel = computed(() => {
   }
   return isDark.value ? '切换到浅色' : '切换到深色'
 })
-const settingsLabel = computed(() =>
-  isEnglish.value ? 'Reading and appearance settings' : '阅读与外观设置'
-)
 
 function toggleAppearance() {
   isDark.value = !isDark.value
@@ -46,15 +41,7 @@ const discordUrl = 'https://discord.gg/XU7DQmpqk'
           <Sun v-if="isDark" :size="16" :stroke-width="2" aria-hidden="true" />
           <Moon v-else :size="16" :stroke-width="2" aria-hidden="true" />
         </button>
-        <button
-          class="ct-sidebar-footer-btn"
-          type="button"
-          :title="settingsLabel"
-          :aria-label="settingsLabel"
-          @click="emit('open-settings')"
-        >
-          <Settings :size="16" :stroke-width="2" aria-hidden="true" />
-        </button>
+        <slot name="settings" />
       </div>
       <a
         class="ct-sidebar-footer-link"

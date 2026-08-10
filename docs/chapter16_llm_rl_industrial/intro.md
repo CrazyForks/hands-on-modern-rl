@@ -1,14 +1,14 @@
 # 第 14 章 · 大模型 RL 工业实战
 
-[第 13 章 RLHF](../chapter15_rlhf/intro) 给出了对齐训练的完整闭环：Reward Model 训练、PPO 主循环、KL 约束、评测方法。那里的实验跑在 7B 模型、单机 8 卡上。但当训练对象换成 671B 的 MoE、上下文拉到 128K、rollout 跑在千卡集群上时，每一处工程细节都会决定训练能否收敛。本章把视角从"算法层面"提升到"工业系统层面"——讲清训练框架选型、奖励信号设计、训练成本核算和工业面试里反复出现的核心推导。
+[第 13 章 RLHF](../chapter15_rlhf/base-model-to-assistant) 给出了对齐训练的完整闭环：Reward Model 训练、PPO 主循环、KL 约束、评测方法。那里的实验跑在 7B 模型、单机 8 卡上。但当训练对象换成 671B 的 MoE、上下文拉到 128K、rollout 跑在千卡集群上时，每一处工程细节都会决定训练能否收敛。本章把视角从"算法层面"提升到"工业系统层面"——讲清训练框架选型、奖励信号设计、训练成本核算和工业面试里反复出现的核心推导。
 
 为了保持章节连贯，本章把同一主题的不同侧面分散到四个文件，本文件覆盖 17.1、17.3、17.5、17.7 四节。其余三节按下表跳转：
 
-| 小节                                                                   | 主题                       | 文件                                          |
-| ---------------------------------------------------------------------- | -------------------------- | --------------------------------------------- |
-| [14.2 现代后训练流水线范式](./industrial-post-training) | 国内外大厂后训练全景       | `chapter17_dpo/industrial-post-training.md`   |
-| [14.3 优化器与训练稳定性](./modern-industrial-practice) | GLM-4.6、Llama 4、MuonClip | `chapter17_dpo/modern-industrial-practice.md` |
-| [16.8 动手 veRL 代码生成 RL](../chapter18_grpo/verl-code-sandbox)      | 代码题 verifier + PPO 实战 | `chapter18_grpo/verl-code-sandbox.md`         |
+| 小节                                                              | 主题                       | 文件                                          |
+| ----------------------------------------------------------------- | -------------------------- | --------------------------------------------- |
+| [14.2 现代后训练流水线范式](./industrial-post-training)           | 国内外大厂后训练全景       | `chapter17_dpo/industrial-post-training.md`   |
+| [14.3 优化器与训练稳定性](./modern-industrial-practice)           | GLM-4.6、Llama 4、MuonClip | `chapter17_dpo/modern-industrial-practice.md` |
+| [16.8 动手 veRL 代码生成 RL](../chapter18_grpo/verl-code-sandbox) | 代码题 verifier + PPO 实战 | `chapter18_grpo/verl-code-sandbox.md`         |
 
 ## 14.1 训练框架对比
 

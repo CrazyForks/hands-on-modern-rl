@@ -291,6 +291,6 @@ RLHF 让大模型变得更 sycophantic——这与 [GPT-4o rollback](./modern-in
 
 **接下来的章节**：
 
-- [第 20 章 Agentic RL](../chapter22_agentic/intro)——agent 的对齐挑战
+- [第 20 章 Agentic RL](../chapter22_agentic/overview)——agent 的对齐挑战
 - [第 14 章工业实战](../chapter16_llm_rl_industrial/industrial-post-training)——对齐的工程实践
-- [附录 安全清单](../appendix_common_pitfalls/intro)——对齐的工程清单
+- [附录 安全清单](../appendix_industrial_training/training-debugging)——对齐的工程清单

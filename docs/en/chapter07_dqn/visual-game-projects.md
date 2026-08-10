@@ -4,6 +4,7 @@ outline:
 ---
 
 # 5.5 Hands-on: Visual Game Projects
+
 The previous sections have discussed DQN's three core components separately: the Q-network estimates action values, experience replay breaks sample correlation, and the target network stabilizes TD targets. Section 5.4 placed these components into a LunarLander experiment: observing real training, evaluation returns, replay animations, training curves, Q-values, and ablation studies. By this point, low-dimensional state tasks have served their pedagogical purpose: they let us see clearly how DQN learns action values between 8 numbers and 4 discrete actions.
 
 This section addresses the next question: when the state is no longer a clean set of numbers but raw game frames, what else does DQN need to change?
@@ -557,7 +558,7 @@ So DQN can train constrained discrete subtasks in Minecraft; if the goal is obta
 - Pokemon reminds us: DQN can train neural-network Q-policies in real emulators, but full completion requires task decomposition, reward engineering, and longer-term memory.
 - Minecraft reminds us: open-world tasks not only have sparse rewards, but also contain hierarchical goals, inventory states, crafting chains, and more complex action spaces.
 
-With this, Chapter 4 completes the transition from tabular Q-learning to deep Q-networks to pixel game experiments. The next chapter turns to a different path: instead of first learning action-value tables, directly optimizing the policy itself. [Policy Gradient and REINFORCE](../chapter08_policy_gradient/intro)
+With this, Chapter 4 completes the transition from tabular Q-learning to deep Q-networks to pixel game experiments. The next chapter turns to a different path: instead of first learning action-value tables, directly optimizing the policy itself. [Policy Gradient and REINFORCE](../chapter08_policy_gradient/policy-gradient)
 
 ## References
 

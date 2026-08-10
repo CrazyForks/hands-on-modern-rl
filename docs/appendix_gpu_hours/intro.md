@@ -292,6 +292,6 @@ Qwen3 tech report 描述了复杂的 4 阶段后训练（含冷启动、RL、合
 
 下一步建议：
 
-- **做入门实验**：参考 [附录 D 代码速查](../appendix_code_cheatsheet/intro) 中的 GRPO/DPO 代码，在单卡上跑一遍。
-- **规划中型实验**：参考 [附录 B 工程实践](../appendix_industrial_training/intro) 中的分布式训练与监控章节。
+- **做入门实验**：参考 [附录 D 代码速查](../appendix_code_cheatsheet/sft-kl) 中的 GRPO/DPO 代码，在单卡上跑一遍。
+- **规划中型实验**：参考 [附录 B 工程实践](../appendix_industrial_training/training-debugging) 中的分布式训练与监控章节。
 - **阅读前沿论文的成本披露**：在 [附录 F](../appendix_paper_reading/intro) 的 tech report 中寻找训练细节。

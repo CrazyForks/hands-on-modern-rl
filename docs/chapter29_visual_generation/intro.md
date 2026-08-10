@@ -955,7 +955,7 @@ RL 微调后的模型可能更符合偏好，但它也可能更慢、更贵，�
 3. **Reward model 是生成 RL 的瓶颈**：人类偏好、文本对齐和视觉质量都重要，但必须防止 reward hacking。
 4. **训练和推理都可以用 reward**：reranking 更安全，RL fine-tuning 更能固化能力，视频生成则进一步放大了时序和计算问题。
 
-到这里，我们覆盖了 VLM 的理解和生成两个方向的 RL 训练。下一章，我们将进入更广阔的前沿趋势：[具身智能、自博弈与离线 RL](../chapter32_selfplay/intro)。
+到这里，我们覆盖了 VLM 的理解和生成两个方向的 RL 训练。下一章，我们将进入更广阔的前沿趋势：[具身智能、自博弈与离线 RL](../chapter32_selfplay/self-play-outlook/)。
 
 ## 参考资料
 

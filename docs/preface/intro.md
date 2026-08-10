@@ -27,7 +27,7 @@ CartPole 是强化学习教学中的经典入门示例：一根杆子通过关�
 在进入正文之前，建议先通过下列任一方式完成一次训练：
 
 - **浏览器一键体验**（部署中）：无需本地环境，直接在网页中启动训练。主源 ModelScope 创空间、副源 HuggingFace Space（链接即将上线）。
-- **本地跑通训练**：使用 CPU 在 30 秒内完成训练，完整流程（含 `pip install`、运行脚本、看板查看方法）见 [第 1 章 · CartPole 入门](../chapter01_cartpole/intro)。
+- **本地跑通训练**：使用 CPU 在 30 秒内完成训练，完整流程（含 `pip install`、运行脚本、看板查看方法）见 [第 1 章 · CartPole 入门](../chapter01_cartpole/principles)。
 - **视觉预览**：上图为 CartPole 的运行画面，"小车左右移动 → 杆子保持竖直"即为训练目标；训练初期 reward 通常在 20 附近震荡，约 30 秒后稳定上升至 500 满分。
 
 本节的目标仅在于跑通训练、观察学习现象；具体的代码实现与算法原理将在第 1 章中展开。
@@ -38,8 +38,8 @@ CartPole 是 1990 年代起的经典控制任务，代表了强化学习的过�
 
 - **DPO 与大模型对齐**：用户要求模型协助编写恶意代码时，对齐前的模型照单全收，对齐后的模型能够识别风险并拒绝。[第 15 章 DPO 家族](../chapter17_dpo/dpo-theory-and-family)用约 200 行代码复现这一微调。
 - **GRPO 与推理涌现**：未经推理数据训练的基座模型，仅靠强化学习即可自发产生反思、验证、纠错的长思维链，对应 DeepSeek-R1 的核心范式。[第 16 章 GRPO 家族](../chapter18_grpo/grpo-practice-and-mechanism)讨论其实现机制，[第 17 章 Reasoning Models](../chapter19_reasoning/intro)展开 Test-time Scaling 的全景。
-- **Computer Use 与 GUI 智能体**：模型读取屏幕像素、点击按钮、填写表单，完成多步图形界面任务。[第 23 章 Computer Use 与 GUI Agent](../chapter25_computer_use/intro)分析 UI-TARS-2、AutoGLM 等代表性工作的训练原理。
-- **SWE-Agent 与自主 Bug 修复**：智能体读取代码仓库、定位缺陷、修改代码、运行测试，通过 SWE-bench 评测。[第 21 章代码智能体强化学习](../chapter23_rl_based_swe/intro)基于 Meta 的 SWE-RL 算法、Code World Model 与 Self-play SSR 训练开源版本。
+- **Computer Use 与 GUI 智能体**：模型读取屏幕像素、点击按钮、填写表单，完成多步图形界面任务。[第 23 章 Computer Use 与 GUI Agent](../chapter25_computer_use/training)分析 UI-TARS-2、AutoGLM 等代表性工作的训练原理。
+- **SWE-Agent 与自主 Bug 修复**：智能体读取代码仓库、定位缺陷、修改代码、运行测试，通过 SWE-bench 评测。[第 21 章代码智能体强化学习](../chapter23_rl_based_swe/swe-bench-and-rlvr)基于 Meta 的 SWE-RL 算法、Code World Model 与 Self-play SSR 训练开源版本。
 
 ## 强化学习的应用价值
 

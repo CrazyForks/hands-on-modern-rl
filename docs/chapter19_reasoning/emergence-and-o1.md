@@ -34,7 +34,7 @@ o3 还引入了一个工程参数：**推理努力（reasoning effort）**——
 - 工具调用的结果反过来影响下一步推理
 - 形成"思考 → 调工具 → 再思考 → 再调工具"的循环
 
-这种范式后来被定义为 **agentic reasoning**——推理不再是单次前向的 CoT，而是与外部环境交互的多步过程。这与 [第 20 章 Agentic RL](../chapter22_agentic/intro) 的内容深度交叉。
+这种范式后来被定义为 **agentic reasoning**——推理不再是单次前向的 CoT，而是与外部环境交互的多步过程。这与 [第 20 章 Agentic RL](../chapter22_agentic/overview) 的内容深度交叉。
 
 ## 10.1.2 Competitive Programming 论文 与 涌现的关键证据
 

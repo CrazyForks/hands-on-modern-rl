@@ -311,6 +311,6 @@ Reviewer Agent: 检查代码质量
 
 **接下来的章节**：
 
-- [第 11 章 PRM 与搜索](../chapter20_prm_search/intro)——SWE-RL 中的 step-level reward
+- [第 11 章 PRM 与搜索](../chapter20_prm_search/outcome-vs-process)——SWE-RL 中的 step-level reward
 - [第 13 章奖励黑客](../chapter15_rlhf/evaluation)——SWE 任务的 hacking（如"删除测试让 reward 变高"）
 - [第 20.10 节 Agentic RL 训练系统](../chapter22_agentic/build-agentic-training-system)——SWE-RL 的工程实现

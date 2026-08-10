@@ -315,7 +315,7 @@ Perez et al. 2022（[arXiv:2212.09251](https://arxiv.org/abs/2212.09251)）设�
 
 ## 长程任务评估的挑战
 
-[第 23 章 Computer Use](../chapter25_computer_use/intro)、[第 21 章 SWE-Agent](../chapter23_rl_based_swe/intro) 这些 agentic 任务，评估比单轮问答难得多——任务可能持续几小时、涉及几百步决策。
+[第 23 章 Computer Use](../chapter25_computer_use/training)、[第 21 章 SWE-Agent](../chapter23_rl_based_swe/swe-bench-and-rlvr) 这些 agentic 任务，评估比单轮问答难得多——任务可能持续几小时、涉及几百步决策。
 
 ### 长程任务的特性
 
@@ -444,7 +444,7 @@ Opus 4.6 Eval Suite 揭示了一个新现象——**模型已经能做初级 AI 
 2. **人类角色转变**：从"做研究"转向"指导 AI 做研究"
 3. **评估的元问题**：模型做的研究如何评估？需要更高维度的 benchmark
 
-这一发现也直接推动了对齐研究——如果模型能自己做研究，对齐问题会更紧迫（[第 28 章 Scalable Oversight](../chapter30_alignment_failures/intro)）。
+这一发现也直接推动了对齐研究——如果模型能自己做研究，对齐问题会更紧迫（[第 28 章 Scalable Oversight](../chapter30_alignment_failures/classical-failures)）。
 
 ## 标准化评测 harness
 

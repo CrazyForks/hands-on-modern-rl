@@ -1646,4 +1646,4 @@ These works address the final mile of Deep Research: transforming retrieved rese
 
 [^memento]: Zhou H, et al. "Memento: Fine-tuning LLM Agents without Fine-tuning LLMs." [arXiv:2508.16153](https://arxiv.org/abs/2508.16153), 2025. **Why it is not grouped above**: Memento follows a completely different route. It **does not modify model parameters**, but uses external episodic memory so that the agent can retrieve similar cases at inference time to guide behavior. It ranks first on the GAIA validation set, with 87.88% Pass@3, strongly showing that sometimes "better retrieval" is more effective than "better training." This work reminds us that RL is not the only path to stronger agents; external memory and inference-time strategy are equally worth attention.
 
-This completes all of Chapter 9. In the next chapter, we look further ahead to the frontier: [future trends](../chapter32_selfplay/intro), and what is changing in the field of RL.
+This completes all of Chapter 9. In the next chapter, we look further ahead to the frontier: [future trends](../chapter32_selfplay/self-play-outlook/), and what is changing in the field of RL.

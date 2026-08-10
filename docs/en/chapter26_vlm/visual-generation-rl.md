@@ -955,7 +955,7 @@ This section's four most important conclusions:
 3. **Reward models are the bottleneck of generation RL**: human preferences, text alignment, and visual quality are all important, but reward hacking must be prevented.
 4. **Rewards can be used at both training and inference time**: reranking is safer, RL fine-tuning better internalizes capabilities, and video generation further amplifies temporal and computational challenges.
 
-With this, we have covered both understanding and generation directions of VLM RL training. The next chapter enters broader frontier trends: [Embodied Intelligence, Self-Play, and Offline RL](../chapter32_selfplay/intro).
+With this, we have covered both understanding and generation directions of VLM RL training. The next chapter enters broader frontier trends: [Embodied Intelligence, Self-Play, and Offline RL](../chapter32_selfplay/self-play-outlook/).
 
 ## References
 

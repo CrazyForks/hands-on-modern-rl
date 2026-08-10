@@ -119,7 +119,7 @@ $$z_t = \text{LatentAction}(x_t, x_{t+1}),\quad x_{t+1} = \text{Decoder}(x_t, z_
 2. **多智能体非平稳 → CTDE**：MADDPG 给每个智能体配集中 critic，MAPPO 共享 critic + on-policy clip，是 SMAC、Hanabi 的事实标准
 3. **长 horizon → 分层**：Options 框架、FeUdal Networks 的端到端 manager-worker、HIRO 的 off-policy 目标转移，让高层只关心子目标序列
 
-这三条路线在 LLM 时代再次汇合：agentic RL 的工具调用本质是 option、多 agent 协作本质是 CTDE、LLM 内嵌的世界知识本质是 Genie 式生成环境。下一章 [第 13 章 RLHF 训练流水线](../chapter15_rlhf/intro) 进入大模型对齐主线，那里的"环境"是 LLM 自身，但本章的探索、多智能体、分层思想将贯穿后续所有 LLM RL 章节。
+这三条路线在 LLM 时代再次汇合：agentic RL 的工具调用本质是 option、多 agent 协作本质是 CTDE、LLM 内嵌的世界知识本质是 Genie 式生成环境。下一章 [第 13 章 RLHF 训练流水线](../chapter15_rlhf/base-model-to-assistant) 进入大模型对齐主线，那里的"环境"是 LLM 自身，但本章的探索、多智能体、分层思想将贯穿后续所有 LLM RL 章节。
 
 ## 延伸阅读
 

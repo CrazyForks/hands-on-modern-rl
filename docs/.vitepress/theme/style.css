@@ -859,6 +859,32 @@ aside.VPSidebar {
   color: var(--sidebar-text-primary) !important;
 }
 
+:where(html)
+  .VPSidebar
+  > .nav
+  > .group.ct-nav-group-active
+  > .VPSidebarItem.level-0
+  > .item {
+  background: var(--sidebar-active-bg);
+}
+
+:where(html)
+  .VPSidebar
+  > .nav
+  > .group.ct-nav-group-active
+  > .VPSidebarItem.level-0
+  > .item
+  > .text,
+:where(html)
+  .VPSidebar
+  > .nav
+  > .group.ct-nav-group-active
+  > .VPSidebarItem.level-0
+  > .item
+  > .caret {
+  color: var(--vp-c-brand-1) !important;
+}
+
 :where(html) .VPSidebarItem.level-0 .text,
 :where(html) .VPSidebarItem.level-0[data-v-d81de50c] .text {
   line-height: 1.35 !important;

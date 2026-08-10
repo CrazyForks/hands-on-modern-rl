@@ -1,6 +1,6 @@
 # 29.4 进化式 LLM 搜索与科学发现
 
-[本章前面几节](../intro)讨论了 RL 的传统前沿——self-play、multi-agent 与 scaling。这一节转向一个新的方向：**LLM 驱动的科学发现**。
+[本章前面几节](../self-play-outlook/)讨论了 RL 的传统前沿——self-play、multi-agent 与 scaling。这一节转向一个新的方向：**LLM 驱动的科学发现**。
 
 这个方向的特点是：
 
@@ -300,7 +300,7 @@ M-GRPO 解决多智能体 RL 训练的三个难点：
 
 **挑战 3：安全风险**
 
-如果模型可以无限改进自己，可能突破人类控制——这是 [AI safety](../../chapter30_alignment_failures/intro) 的核心担忧。
+如果模型可以无限改进自己，可能突破人类控制——这是 [AI safety](../../chapter30_alignment_failures/classical-failures) 的核心担忧。
 
 ### RSI 的部分实现
 

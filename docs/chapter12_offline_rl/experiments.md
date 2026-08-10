@@ -72,7 +72,7 @@ graph LR
 ```
 
 ::: tip 一句话总结
-**离线 RL 是 LLM 后训练的母学科**。CQL/IQL 处理外推误差的智慧，DPO 用 KL 约束 + 偏好学习继承了下来；Decision Transformer 把 RL 重写为序列建模的洞察，让 RL 训练栈和 LLM 训练栈合二为一。理解本章，是理解 [第 11 章 模仿学习与反向 RL](../chapter13_imitation_meta_rl/intro)、[第 18 章 PRM 搜索](../chapter20_prm_search/inference-time-search)、以及 [第 21 章 Code World Model](../chapter23_rl_based_swe/world-model-and-deep-swe) 的前提。
+**离线 RL 是 LLM 后训练的母学科**。CQL/IQL 处理外推误差的智慧，DPO 用 KL 约束 + 偏好学习继承了下来；Decision Transformer 把 RL 重写为序列建模的洞察，让 RL 训练栈和 LLM 训练栈合二为一。理解本章，是理解 [第 11 章 模仿学习与反向 RL](../chapter13_imitation_meta_rl/bc-dagger)、[第 18 章 PRM 搜索](../chapter20_prm_search/inference-time-search)、以及 [第 21 章 Code World Model](../chapter23_rl_based_swe/world-model-and-deep-swe) 的前提。
 :::
 
 ## 本章总结
@@ -83,7 +83,7 @@ graph LR
 4. **Trajectory Transformer + Diffuser** 进一步把"序列建模"推到联合轨迹分布建模与扩散生成
 5. **DPO 本质上是离线 RL**：偏好数据集 = 离线轨迹数据集，KL 约束 = 行为策略约束，隐式 Q-Learning = DPO 损失
 
-下一章 [第 11 章 模仿学习、反向 RL 与元 RL](../chapter13_imitation_meta_rl/intro) 我们处理另一类"无 reward signal" 的设定——只能观察专家行为，如何反推 reward 或策略；这与本章的离线 RL、以及 LLM 的 SFT/模仿学习有深厚联系。
+下一章 [第 11 章 模仿学习、反向 RL 与元 RL](../chapter13_imitation_meta_rl/bc-dagger) 我们处理另一类"无 reward signal" 的设定——只能观察专家行为，如何反推 reward 或策略；这与本章的离线 RL、以及 LLM 的 SFT/模仿学习有深厚联系。
 
 ## 延伸阅读
 

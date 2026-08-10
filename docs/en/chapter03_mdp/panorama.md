@@ -3,6 +3,7 @@ title: '2.4 Chapter Summary: MDP, Value, and Policy'
 ---
 
 # 2.4 Chapter Summary: MDP, Value, and Policy
+
 ## Overview
 
 This chapter develops the core language of reinforcement learning around sequential decision-making: how we model an environment, how we define return, how we evaluate states and actions via value functions, how Bellman equations provide the recursive structure, how we estimate values from data (DP/MC/TD), how tabular Q-Learning works, how we optimize parameterized policies, and why reward design matters.
@@ -580,4 +581,4 @@ Chapter 3 establishes the basic structure of reinforcement learning theory:
 7. Distinguish algorithm families by how data is collected (on/off-policy, online/offline).
 8. Use reward design to explain where the objective comes from and why the objective definition itself shapes learning outcomes.
 
-The next chapter starts from $Q(s,a)$ and introduces the first complete algorithm family: [Chapter 4: Deep Q-Networks](../chapter07_dqn/intro).
+The next chapter starts from $Q(s,a)$ and introduces the first complete algorithm family: [Chapter 4: Deep Q-Networks](../chapter07_dqn/from-q-to-dqn).
