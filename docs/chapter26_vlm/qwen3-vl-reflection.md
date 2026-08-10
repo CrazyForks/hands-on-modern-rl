@@ -1,4 +1,4 @@
-# 24.2 视觉反思 RL
+# 23.2 视觉反思 RL
 
 这一节讨论两个 2025 年的多模态 RL 进展：
 
@@ -7,7 +7,7 @@
 
 这两个工作代表了多模态 RL 从"简单 alignment"到"复杂推理"的演化。
 
-## 24.2.1 Qwen3-VL 的反思机制
+## 23.2.1 Qwen3-VL 的反思机制
 
 [Qwen3-VL](https://arxiv.org/abs/2511.21631)（阿里, 2025.05，与 Qwen3 同期发布）是 Qwen3 系列的视觉语言版本。
 
@@ -94,7 +94,7 @@ Qwen3-VL 在多项视觉推理 benchmark 上显著超越 Qwen2.5-VL——反思�
 2. **反思是 RL 学到的**：不是 prompt engineering，是 RL 训练让模型内化了反思行为
 3. **多模态推理 RL 的成熟**：从"学会看图"到"学会反思看图"
 
-## 24.2.2 音频 RL 与 Step-Audio-R1 的 MGRD
+## 23.2.2 音频 RL 与 Step-Audio-R1 的 MGRD
 
 [Step-Audio-R1](https://arxiv.org/abs/2511.15848)（StepFun, 2025.11）是音频领域的 RL 突破——**Multimodal Generative Reasoning with Direct Preference Optimization (MGRD)**。
 
@@ -171,7 +171,7 @@ Step-Audio-R1 的工业能力：
 2. **多模态联合**：音频 RL 不只是音频——是音频 + 文本 + 视觉的联合
 3. **中国厂商领先**：StepFun、字节、阿里都在音频 RL 上投入
 
-## 24.2.3 多模态 RL 的工业格局
+## 23.2.3 多模态 RL 的工业格局
 
 到 2026 年中，多模态 RL 的工业格局：
 
@@ -187,7 +187,7 @@ Step-Audio-R1 的工业能力：
 
 ### 视觉生成 RL
 
-（参考 [27.2 节现代视频生成 RL](../chapter29_visual_generation/video-generation-modern)）
+（参考 [24.5 节现代视频生成 RL](../chapter29_visual_generation/video-generation-modern)）
 
 ### 音频 RL
 
@@ -208,7 +208,7 @@ Step-Audio-R1 的工业能力：
 | 字节                  | RoboBrain           | 中国 SOTA         |
 | Skild AI              | Skild Brain         | 重工业机器人      |
 
-## 24.2.4 多模态 RL 的共同挑战
+## 23.2.4 多模态 RL 的共同挑战
 
 尽管具体任务不同，多模态 RL 有几个共同挑战：
 
@@ -232,7 +232,7 @@ Step-Audio-R1 的工业能力：
 
 这些挑战指向同一个方向——**需要更强的算法、更精细的 reward、更长的 context**。
 
-## 24.2.5 未来的多模态 RL 方向
+## 23.2.5 未来的多模态 RL 方向
 
 ### 原生多模态 RL
 
@@ -248,7 +248,7 @@ Step-Audio-R1 的工业能力：
 
 ### Embodied AI 的成熟
 
-VLA + world model + RL = 真正的通用机器人。这是 [第 26 章 embodied intelligence](../chapter28_vla/embodied-intelligence/) 的核心议题。
+VLA + world model + RL = 真正的通用机器人。这是 [第 24 章 embodied intelligence](../chapter28_vla/embodied-intelligence/) 的核心议题。
 
 ## 小结
 

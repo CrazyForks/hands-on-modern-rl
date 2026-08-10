@@ -171,6 +171,6 @@ Hidden CoT vs Visible CoT 的选择，本质上是几个价值的权衡：
 
 CoT 可见性问题不是一个产品决策，而是关于"AI 系统应该如何与人类交互"的深层问题。Hidden CoT 把推理当作"黑盒"——高效但不可信；Visible CoT 把推理当作"透明"——可信但暴露内部状态。
 
-工业实践的趋势是：**Visible CoT 占据主流，但对齐研究开始关注推理过程的内部对齐**——不只是 CoT 文本对齐，更是模型内部状态的对齐。这与 [第 28 章奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures) 的内容紧密相关。
+工业实践的趋势是：**Visible CoT 占据主流，但对齐研究开始关注推理过程的内部对齐**——不只是 CoT 文本对齐，更是模型内部状态的对齐。这与 [第 25 章奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures) 的内容紧密相关。
 
 下一节我们看 Claude Opus 4.6 的自适应思考——这是把 Hybrid Thinking 推向"模型自己决定推理深度"的旗舰案例。

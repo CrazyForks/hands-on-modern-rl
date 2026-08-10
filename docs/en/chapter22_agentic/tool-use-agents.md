@@ -2,7 +2,7 @@
 search: false
 ---
 
-# 20.5 Search-Augmented RL: Web and Code Agents
+# 19.5 Search-Augmented RL: Web and Code Agents
 
 In the previous section, we unpacked the credit assignment problem in multi-turn RL: if a seven-turn interaction fails, which step should we blame? Now we turn to another key question: how does a model learn to "use tools"? Supervised fine-tuning (SFT) can teach a model what the JSON format of a tool call looks like, but it cannot reliably teach the model when to call a tool, which tool to call, or how to combine several tools. Those are strategic decisions, and this is exactly where RL is strong.
 
@@ -200,7 +200,7 @@ This method reaches 93% accuracy on real-world patch verification. Its core valu
 
 ### Scaling Laws from Code Bootstrapping[^zeroscaling]
 
-Chapter 29 discusses RL scaling laws in detail: more training steps often lead to stronger reasoning ability. Agentic RL has its own scaling laws as well. ZeroTIR lets a model spontaneously learn to generate and execute code to support reasoning **without supervised examples**. Researchers found a predictable relationship: there is a **power-law relationship** between training steps, code execution frequency, and final accuracy. This means you can predict final model performance early in training. If code execution frequency is still rising after 100 steps, the model is still learning and training should continue. If the frequency has plateaued, learning is close to saturation and training can stop early.
+Chapter 26 discusses RL scaling laws in detail: more training steps often lead to stronger reasoning ability. Agentic RL has its own scaling laws as well. ZeroTIR lets a model spontaneously learn to generate and execute code to support reasoning **without supervised examples**. Researchers found a predictable relationship: there is a **power-law relationship** between training steps, code execution frequency, and final accuracy. This means you can predict final model performance early in training. If code execution frequency is still rising after 100 steps, the model is still learning and training should continue. If the frequency has plateaued, learning is close to saturation and training can stop early.
 
 This finding is important for engineering practice. It gives you a **free training-progress indicator**: without running the entire training process, you can monitor code execution frequency to decide whether training should continue. ZeroTIR was accepted by NeurIPS 2025.
 
@@ -655,7 +655,7 @@ Allen AI's DR Tulu proposed **RLER[^rler_eng]** (Reinforcement Learning with Evo
 - **Middle training**: the model becomes more reliable, so tighten the criteria. Now the answer should be mostly correct and citations should be at least partially verifiable.
 - **Late training**: the model is already strong, so use strict criteria for refinement. Require precise correctness, verifiable citations, and an efficient process.
 
-RLER is implemented by maintaining a versioned library of scoring criteria. Every $N$ training steps, the strictness of the criteria is adjusted according to the model's current performance. This resembles the curriculum-learning strategy from [Section 20.4](./tool-use-and-trajectory), but in RLER, the **scoring criteria evolve**, rather than the task difficulty increasing.
+RLER is implemented by maintaining a versioned library of scoring criteria. Every $N$ training steps, the strictness of the criteria is adjusted according to the model's current performance. This resembles the curriculum-learning strategy from [Section 19.4](./tool-use-and-trajectory), but in RLER, the **scoring criteria evolve**, rather than the task difficulty increasing.
 
 ### Tool-Aware Reward Design: ToolRL
 

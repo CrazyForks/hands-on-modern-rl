@@ -172,7 +172,7 @@ test-time compute scaling 让模型越来越强，但也让对齐越来越难—
 
 ### 推理与 agentic 的融合
 
-Opus 4.6 的 AI Research Eval Suite 已经展示了这个趋势——推理模型不只是"思考"，还能"执行"（写代码、跑实验、分析结果）。这与 [第 20 章 Agentic RL](../chapter22_agentic/overview) 深度融合。未来推理模型将变成"能思考 + 能行动"的完整 agent。
+Opus 4.6 的 AI Research Eval Suite 已经展示了这个趋势——推理模型不只是"思考"，还能"执行"（写代码、跑实验、分析结果）。这与 [第 19 章 Agentic RL](../chapter22_agentic/overview) 深度融合。未来推理模型将变成"能思考 + 能行动"的完整 agent。
 
 ## 本章总结
 
@@ -195,5 +195,5 @@ Opus 4.6 的 AI Research Eval Suite 已经展示了这个趋势——推理模�
 **接下来的章节**：
 
 - [第 18 章 PRM 与推理时搜索](../chapter20_prm_search/outcome-vs-process)——怎么用过程奖励引导推理
-- [第 20 章 Agentic RL](../chapter22_agentic/overview)——推理模型如何与工具调用结合
-- [第 28 章奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures)——推理模型特有的对齐挑战
+- [第 19 章 Agentic RL](../chapter22_agentic/overview)——推理模型如何与工具调用结合
+- [第 25 章奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures)——推理模型特有的对齐挑战

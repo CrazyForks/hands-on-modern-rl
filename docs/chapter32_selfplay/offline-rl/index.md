@@ -548,7 +548,7 @@ Offline RL 提供的是一种从历史数据中学习决策策略的框架，但
 | DPO 的 reference model（第 15 章） | reference model 扮演了和 BCQ/TD3+BC 中行为约束相同的角色          |
 | GRPO 的组内 advantage（第 16 章）  | IQL 的 advantage-weighted BC 与 GRPO 的 advantage 计算异曲同工    |
 | RLVR 的规则验证（第 16 章）        | 离线 RL 的 reward 信号只能来自已有数据，不能在线验证              |
-| [自博弈的对手池（29.1 节）](../self-play-outlook/)         | 离线 RL 的数据集 = 历史策略产生的轨迹，和对手池中的旧策略数据同源 |
+| [自博弈的对手池（26.1 节）](../self-play-outlook/)         | 离线 RL 的数据集 = 历史策略产生的轨迹，和对手池中的旧策略数据同源 |
 
 最深刻的联系可能是：**DPO 就是 LLM 版本的离线 RL**。DPO 用固定偏好数据集优化语言模型策略，不需要在线采样。它的 reference model 扮演了和 BCQ/TD3+BC 中行为约束相同的角色——防止策略跑出训练分布。而 IQL 的 advantage-weighted behavior cloning 则和第 16 章的 GRPO 异曲同工：都是在已有数据中"挑出比平均更好的动作"来优化策略，只是 GRPO 的数据来自当前策略的在线采样，IQL 的数据来自固定的历史轨迹。
 

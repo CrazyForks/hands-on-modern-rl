@@ -18,7 +18,7 @@ The later chapters cover frontier directions of reinforcement learning in the mo
 
 Now let us review the chapters.
 
-## Chapter 24: VLM Reinforcement Learning - Teaching Vision Models to Reason
+## Chapter 23: VLM Reinforcement Learning - Teaching Vision Models to Reason
 
 Once a model gains "eyes," RL becomes harder again. VLM (vision-language model) RL faces differential learning rates (a smaller learning rate for the vision encoder), difficult reward attribution (are visual tokens or text tokens responsible for the mistake?), and penalties for visual hallucinations. We showed how fine-grained reward design can teach a VLM not only to "see" images, but also to perform multi-step logical reasoning grounded in those images.
 
@@ -61,7 +61,7 @@ By this point, we have completed the journey of the book. From CartPole in Chapt
 - **Efficient RL training**: reduce sample requirements, lower memory usage, speed up training. This is a core bottleneck for real-world deployment.
 - **Safety RL**: constrained optimization, red-teaming, alignment tax; ensure RL-trained models do not exhibit harmful behaviors.
 - **Multi-agent collaboration with LLMs**: combining MARL with LLM roles; how multiple roles learn to collaborate efficiently via RL.
-- **Agentic RL**: the direction discussed in Chapter 20; one of the most active research directions in 2025-2026.
+- **Agentic RL**: the direction discussed in Chapter 19; one of the most active research directions in 2025-2026.
 - **Self-play and self-evolution**: can models keep breaking limits through self-play?
 
 | Stage    | Goal                                       | Suggested Resources                                      | Time Estimate |

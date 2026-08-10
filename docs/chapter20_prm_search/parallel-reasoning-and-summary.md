@@ -221,6 +221,6 @@ ORM-only → PRM-only → PRM + ORM + 形式化 + LLM-as-Judge 混合——趋�
 
 **接下来的章节**：
 
-- [第 20 章 Agentic RL](../chapter22_agentic/overview)——多步 trajectory 中的 PRM
-- [第 28 章奖励黑客](../chapter30_alignment_failures/classical-failures)——PRM 的 reward hacking 问题
+- [第 19 章 Agentic RL](../chapter22_agentic/overview)——多步 trajectory 中的 PRM
+- [第 25 章奖励黑客](../chapter30_alignment_failures/classical-failures)——PRM 的 reward hacking 问题
 - [第 14 章工业实战](../chapter16_llm_rl_industrial/industrial-post-training)——PRM 在工业训练中的使用

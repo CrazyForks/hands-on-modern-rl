@@ -5,7 +5,7 @@ title: 'Legacy Project Collection'
 
 # Legacy Page: Project Practice (Split into Two Project Pages)
 
-> This page is kept as an entry point for legacy links. The core content has been moved to [20.8 rLLM DeepCoder Lab](./rllm-deepcoder-lab) and [Deep Research Agent](./deep-research-agent). The original material is preserved below so readers arriving through old links can compare it with the newer pages.
+> This page is kept as an entry point for legacy links. The core content has been moved to [19.8 rLLM DeepCoder Lab](./rllm-deepcoder-lab) and [Deep Research Agent](./deep-research-agent). The original material is preserved below so readers arriving through old links can compare it with the newer pages.
 
 # Project 1: Multi-Tool Agentic RL: Search Documentation, Write Code, Run Tests
 
@@ -1244,7 +1244,7 @@ def report_reward(report, task, verified_facts=None):
     )
 ```
 
-For training, use **curriculum learning from short to long**: first train on 500-word short reports, then gradually increase to full 5,000-word reports. This matches HardGen's difficulty-adaptive idea in [Section 20.4](./tool-use-and-trajectory).[^hardgen]
+For training, use **curriculum learning from short to long**: first train on 500-word short reports, then gradually increase to full 5,000-word reports. This matches HardGen's difficulty-adaptive idea in [Section 19.4](./tool-use-and-trajectory).[^hardgen]
 
 ### Two-Stage RL for Deep Research
 
@@ -1575,7 +1575,7 @@ The minimal implementation above can verify that the whole training flow works. 
 1. **Real search API**: connect Tavily or Serper API and replace simulated search results.
 2. **More refined reward**: add citation-quality scoring and step-efficiency penalties, following [the reward-function design in this section](#how-to-design-reward-functions-from-simple-to-frontier).
 3. **Async concurrency**: use the async concurrent architecture from [Agentic engineering practice](./tool-use-agents) to accelerate rollout.
-4. **Trajectory synthesis**: pre-synthesize training data using the method from [Section 20.4](./tool-use-and-trajectory).
+4. **Trajectory synthesis**: pre-synthesize training data using the method from [Section 19.4](./tool-use-and-trajectory).
 5. **Full framework**: migrate to the DeepResearcher or rStar2-Agent framework for large-scale training.
 
 <details>
@@ -1646,4 +1646,4 @@ These works address the final mile of Deep Research: transforming retrieved rese
 
 [^memento]: Zhou H, et al. "Memento: Fine-tuning LLM Agents without Fine-tuning LLMs." [arXiv:2508.16153](https://arxiv.org/abs/2508.16153), 2025. **Why it is not grouped above**: Memento follows a completely different route. It **does not modify model parameters**, but uses external episodic memory so that the agent can retrieve similar cases at inference time to guide behavior. It ranks first on the GAIA validation set, with 87.88% Pass@3, strongly showing that sometimes "better retrieval" is more effective than "better training." This work reminds us that RL is not the only path to stronger agents; external memory and inference-time strategy are equally worth attention.
 
-This concludes the legacy project material on this page. For scaling and research frontiers, continue to [Chapter 29](../chapter32_selfplay/self-play-outlook/).
+This concludes the legacy project material on this page. For scaling and research frontiers, continue to [Chapter 26](../chapter32_selfplay/self-play-outlook/).

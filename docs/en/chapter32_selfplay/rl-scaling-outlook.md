@@ -1,8 +1,8 @@
 ---
-title: 29.2 RL Scaling and Future Outlook
+title: 26.2 RL Scaling and Future Outlook
 ---
 
-# 29.2 RL Scaling and Future Outlook: Where Is the Ceiling?
+# 26.2 RL Scaling and Future Outlook: Where Is the Ceiling?
 In the previous three sections, we traced the evolution of RL training from PPO to GRPO to DAPO/RLVR. On the strategy side, the Critic was removed; on the reward side, the RM was removed; training costs decreased step by step. But a more fundamental question remains unanswered: **Is there a ceiling to the benefits of RL training? Can we continue improving by investing more compute?**
 
 One of the most exciting discoveries of 2025 is that **the returns from RL training have not yet saturated**. Continuing to increase RL training scale still yields steady improvements in reasoning ability. This section discusses the future of RL from three dimensions: training paradigm choice (Online vs. Offline), three directions of RL Scaling, and Test-time Scaling with process reward models.
@@ -210,7 +210,7 @@ The key prerequisite is sufficiently diverse prompt data. If the training data t
 
 ### Agentic RL Scaling Laws
 
-The three dimensions above focus on standard RL scaling. When RL enters Agentic scenarios (discussed in detail in Chapter 20), scaling takes new forms. The ZeroTIR method enables models to spontaneously learn to generate and execute code to assist reasoning **without supervised examples**, and discovers a predictable relationship: there is a **power-law relationship** between training steps, code execution frequency, and final accuracy. This means you can predict final performance early in training — if code execution frequency is still rising after 100 training steps, the model is still learning; if the frequency stabilizes, learning is approaching saturation. This finding gives practitioners a **free training progress indicator**: just monitor code execution frequency to determine "whether to continue training." ZeroTIR was accepted at NeurIPS 2025 and will be discussed in more detail in the Code Agent section of Chapter 20.
+The three dimensions above focus on standard RL scaling. When RL enters Agentic scenarios (discussed in detail in Chapter 19), scaling takes new forms. The ZeroTIR method enables models to spontaneously learn to generate and execute code to assist reasoning **without supervised examples**, and discovers a predictable relationship: there is a **power-law relationship** between training steps, code execution frequency, and final accuracy. This means you can predict final performance early in training — if code execution frequency is still rising after 100 training steps, the model is still learning; if the frequency stabilizes, learning is approaching saturation. This finding gives practitioners a **free training progress indicator**: just monitor code execution frequency to determine "whether to continue training." ZeroTIR was accepted at NeurIPS 2025 and will be discussed in more detail in the Code Agent section of Chapter 19.
 
 ## Test-time Scaling: More Compute at Inference Time Too
 

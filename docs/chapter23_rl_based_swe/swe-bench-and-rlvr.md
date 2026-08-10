@@ -1,6 +1,6 @@
-# 21.1 SWE-RL 基础实验
+# 20.1 SWE-RL 基础实验
 
-[第 20 章 Agentic RL](../chapter22_agentic/overview) 介绍了智能体在工具调用、多轮交互上的 RL 训练。这一章我们聚焦一个最有工业价值的细分领域：**RL-based SWE（Software Engineering）**——用 RL 训练模型自动修复 bug、实现 feature、写测试。
+[第 19 章 Agentic RL](../chapter22_agentic/overview) 介绍了智能体在工具调用、多轮交互上的 RL 训练。这一章我们聚焦一个最有工业价值的细分领域：**RL-based SWE（Software Engineering）**——用 RL 训练模型自动修复 bug、实现 feature、写测试。
 
 为什么单独成章？三个原因：
 
@@ -55,12 +55,12 @@ RL-based SWE 的工业落地
 这一章假定你已经读过：
 
 - [第 16 章 GRPO 改进家族](../chapter18_grpo/grpo-family)——基础 RL 算法
-- [第 20 章 Agentic RL](../chapter22_agentic/overview)——agent 的多轮交互基础
+- [第 19 章 Agentic RL](../chapter22_agentic/overview)——agent 的多轮交互基础
 - [第 18 章 PRM](../chapter20_prm_search/outcome-vs-process)——形式化 verifier 思想
 
 本章后续会指向：
 
-- [第 20.10 节 agent 训练系统](../chapter22_agentic/build-agentic-training-system)——SWE-RL 的工程实现
+- [第 19.10 节 agent 训练系统](../chapter22_agentic/build-agentic-training-system)——SWE-RL 的工程实现
 - [第 13.6 节对齐评测](../chapter15_rlhf/evaluation)——SWE-RL 特有的 hacking
 
 ## 一个直觉性的开场
@@ -231,7 +231,7 @@ SWE-RL 训练需要大量 (Issue, patch, tests) 三元组。来源有三个：
 3. 跑测试看是否通过
 4. 通过的（issue, patch, test）三元组作为训练数据
 
-这是 [21.3 节 SSR](./self-play-ssr-and-summary) 的核心思想——**模型自己生成训练数据**。
+这是 [20.3 节 SSR](./self-play-ssr-and-summary) 的核心思想——**模型自己生成训练数据**。
 
 ## SWE-RL 的奖励函数
 
@@ -331,4 +331,4 @@ SWE-bench 是 SWE-RL 的核心 benchmark，定义了 (issue, patch, tests) 的�
 
 SWE-RL 与传统 code generation 有本质区别——长上下文、多文件、有测试反馈、多步决策。这让它与 Agentic RL 高度一致，是 RL 在工业上最有价值的应用之一。
 
-接下来先通过[补充阅读：Meta SWE-RL](./meta-swe-rl)观察 GRPO 与简单奖励如何落到真实仓库，再进入 [21.2 Code World Model 与 DeepSWE](./world-model-and-deep-swe)，处理长轨迹训练不稳定的问题。
+接下来先通过[补充阅读：Meta SWE-RL](./meta-swe-rl)观察 GRPO 与简单奖励如何落到真实仓库，再进入 [20.2 Code World Model 与 DeepSWE](./world-model-and-deep-swe)，处理长轨迹训练不稳定的问题。

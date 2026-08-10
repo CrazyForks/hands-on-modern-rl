@@ -2,7 +2,7 @@
 search: false
 ---
 
-# 20.6 Industrial Practice: Common Problems and Solutions in Agentic RL Training
+# 19.6 Industrial Practice: Common Problems and Solutions in Agentic RL Training
 
 The previous sections introduced the general engineering principles and framework design of Agentic RL. In real training, however, researchers often run into a series of engineering problems: unstable training, uncontrolled output length, reward metrics that drift away from actual quality, and so on. These issues are usually not discussed in detail in academic papers, but they are crucial in engineering practice.
 

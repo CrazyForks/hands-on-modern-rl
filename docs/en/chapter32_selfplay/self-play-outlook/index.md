@@ -1,8 +1,8 @@
 ---
-title: 29.1 Self-Play Basics and LLM Self-Play
+title: 26.1 Self-Play Basics and LLM Self-Play
 ---
 
-# 29.1 Self-Play Basics and LLM Self-Play
+# 26.1 Self-Play Basics and LLM Self-Play
 
 The preceding parts focused on building stronger policies and broader agent capabilities. Part VII turns to the conditions under which those systems fail, how they should be evaluated, and which research directions may change their limits. Its currently translated material begins with self-play, where the policy's opponents and training data evolve together.
 
@@ -20,12 +20,12 @@ This chapter does not attempt to cover every frontier direction. That is not rea
 
 | Section                                                                                   | Core question                                                                   |
 | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| [29.1 Self-Play and Self-Evolution](/en/chapter32_selfplay/self-play-outlook/)            | Can models improve beyond human data by competing with themselves?              |
-| [29.2 RL Scaling Outlook](/en/chapter32_selfplay/rl-scaling-outlook)                      | How do training-time and inference-time scaling change the capability ceiling?  |
-| [29.3 LLM Multi-Agent Reinforcement Learning](/en/chapter32_selfplay/llm-multi-agent-rl/) | How do role-specialized agents learn to collaborate, compete, and share credit? |
-| 29.4 Evolutionary LLM Search and Scientific Discovery                                     | How can language models and evolutionary search discover new solutions?         |
+| [26.1 Self-Play and Self-Evolution](/en/chapter32_selfplay/self-play-outlook/)            | Can models improve beyond human data by competing with themselves?              |
+| [26.2 RL Scaling Outlook](/en/chapter32_selfplay/rl-scaling-outlook)                      | How do training-time and inference-time scaling change the capability ceiling?  |
+| [26.3 LLM Multi-Agent Reinforcement Learning](/en/chapter32_selfplay/llm-multi-agent-rl/) | How do role-specialized agents learn to collaborate, compete, and share credit? |
+| 26.4 Evolutionary LLM Search and Scientific Discovery                                     | How can language models and evolutionary search discover new solutions?         |
 
-We begin with the self-play loop: [29.1 Self-Play and Self-Evolution](/en/chapter32_selfplay/self-play-outlook/).
+We begin with the self-play loop: [26.1 Self-Play and Self-Evolution](/en/chapter32_selfplay/self-play-outlook/).
 
 AlphaGo learned Go from scratch through self-play — no human game records, no expert demonstrations, just a board and a loop of self-competition. This "from zero to superhuman" story is one of RL's most legendary chapters. In 2025–2026, the same idea is being transferred to large language models: **can models continuously evolve through self-play, eventually breaking through the ceiling of human data?**
 
@@ -240,7 +240,7 @@ The ideas of self-play and self-evolution thread through the core themes of the 
 | Experience replay (Chapter 5)             | "Experience distillation" in self-evolution — from raw replay to summarized distillation         |
 | PPO (Chapter 8)                           | Policy optimization algorithm for self-play training                                             |
 | RLVR (Chapter 16)                         | Self-play rewards can use verifiable signals, no RM needed                                       |
-| Agentic RL (Chapter 20)                   | Self-play can train tool-use policies — model generates its own tool-call scenarios              |
+| Agentic RL (Chapter 19)                   | Self-play can train tool-use policies — model generates its own tool-call scenarios              |
 | Test-time search                          | Reasoning strategies learned through self-play can be used at inference time                     |
 
 Perhaps the deepest connection: **GRPO is a simplified version of self-play**. GRPO has the same model generate multiple answers, then compares them within the group — this is equivalent to multiple instances of the same model "competing." Self-play extends this competition to more complex scenarios: not just comparing final answers, but competing in multi-turn interactions, even playing different roles (Generator vs Judge, Debater A vs Debater B).
@@ -249,7 +249,7 @@ From this perspective, the path from Chapter 16's GRPO to this chapter's self-pl
 
 ---
 
-Next we discuss [29.3 LLM Multi-Agent Reinforcement Learning](../llm-multi-agent-rl/) — from multi-agent cooperation to model-based RL, with a hands-on experiment using PettingZoo.
+Next we discuss [26.3 LLM Multi-Agent Reinforcement Learning](../llm-multi-agent-rl/) — from multi-agent cooperation to model-based RL, with a hands-on experiment using PettingZoo.
 
 ---
 

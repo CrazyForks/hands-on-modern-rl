@@ -13,7 +13,7 @@
 - **Reward 设计思路**：把模型生成的代码当独立程序，跑 stdin/stdout 测试算通过率（详见下文 Reward 函数设计）。
 - **评测方法与数据**：使用 EvalScope 在 GSM8K、HumanEval、LiveCodeBench 上的评测流程，以及 RL 训练前后的对比数据。
 
-火山引擎原始教程使用 VKE 集群 + SandboxFusion 云沙箱做大规模分布式训练。本节把这些方案适配到**本地 GPU 环境**：用子进程隔离代替云沙箱，用单卡/多卡脚本代替集群部署，保留相同的算法逻辑和参数配置。完整的工业级代码 Agent 实验放在 [20.8 用 rLLM 训练 DeepCoder Agent](../chapter22_agentic/rllm-deepcoder-lab)，那里更关注 AgentFlow 和 sandbox cookbook；本节更关注如何把代码 verifier 接进 veRL 训练框架。
+火山引擎原始教程使用 VKE 集群 + SandboxFusion 云沙箱做大规模分布式训练。本节把这些方案适配到**本地 GPU 环境**：用子进程隔离代替云沙箱，用单卡/多卡脚本代替集群部署，保留相同的算法逻辑和参数配置。完整的工业级代码 Agent 实验放在 [19.8 用 rLLM 训练 DeepCoder Agent](../chapter22_agentic/rllm-deepcoder-lab)，那里更关注 AgentFlow 和 sandbox cookbook；本节更关注如何把代码 verifier 接进 veRL 训练框架。
 
 ```mermaid
 flowchart LR
@@ -492,7 +492,7 @@ evalscope eval \
 
 ## 和 10.5 DeepCoder 实验的关系
 
-本节和 [20.8](../chapter22_agentic/rllm-deepcoder-lab) 讲的是同一个大方向：用 sandbox reward 训练代码模型。区别在于关注点不同：
+本节和 [19.8](../chapter22_agentic/rllm-deepcoder-lab) 讲的是同一个大方向：用 sandbox reward 训练代码模型。区别在于关注点不同：
 
 | 小节     | 框架 | 重点                                      |
 | -------- | ---- | ----------------------------------------- |

@@ -67,8 +67,8 @@ GenRM 与 Verifier 模型
 
 本章后续会指向：
 
-- [第 20 章 Agentic RL](../chapter22_agentic/overview)——多步 trajectory 的过程奖励
-- [第 28 章奖励黑客](../chapter30_alignment_failures/classical-failures)——PRM 的 reward hacking 问题
+- [第 19 章 Agentic RL](../chapter22_agentic/overview)——多步 trajectory 的过程奖励
+- [第 25 章奖励黑客](../chapter30_alignment_failures/classical-failures)——PRM 的 reward hacking 问题
 
 ## 一个直觉性的开场
 

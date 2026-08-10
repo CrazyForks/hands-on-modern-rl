@@ -266,7 +266,7 @@ This section ran a long experiment configured along the validated pipeline. A fu
 
 | Training Steps | Mean Eval Return | Std Dev | Mean Episode Length | Interpretation                                                           |
 | -------------- | ---------------- | ------- | ------------------- | ------------------------------------------------------------------------ |
-| `250k`         | `-21.0`          | `0.0`   | `3056`              | Deterministic policy still loses nearly every game                       |
+| `250k`         | `-20.0`          | `0.0`   | `3056`              | Deterministic policy still loses nearly every game                       |
 | `500k`         | `-17.0`          | `1.10`  | `10550`             | Starting to extend rallies, but still clearly weak                       |
 | `750k`         | `-2.6`           | `3.88`  | `11297`             | Near break-even; policy is developing effective defense                  |
 | `1M`           | `-4.2`           | `3.43`  | `15637`             | Evaluation still fluctuates, but no longer a total-loss policy           |

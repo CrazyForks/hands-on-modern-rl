@@ -1,6 +1,6 @@
-# 22.2 评测基准与开源项目
+# 21.2 评测基准与开源项目
 
-> [22.1](./browser-rl-harness) 搭建了训练 harness。但训出来的 Deep Research Agent 到底好不好？这需要**评测基准**。本节覆盖两件事：(1) 主流 Deep Research 评测基准（BrowseComp、xbench-DeepSearch、GAIA）的设计哲学与陷阱；(2) 可复现的开源项目（GPT-Researcher、STORM、OpenResearcher），让你不用从零造轮子。
+> [21.1](./browser-rl-harness) 搭建了训练 harness。但训出来的 Deep Research Agent 到底好不好？这需要**评测基准**。本节覆盖两件事：(1) 主流 Deep Research 评测基准（BrowseComp、xbench-DeepSearch、GAIA）的设计哲学与陷阱；(2) 可复现的开源项目（GPT-Researcher、STORM、OpenResearcher），让你不用从零造轮子。
 
 ## 为什么 Deep Research 评测特别难
 
@@ -45,7 +45,7 @@
 | Tongyi DeepResearch | 51.4%      | 阿里 2026.03           |
 | 人类专家            | 87.5%      | 单人 30 分钟限制       |
 
-注意 Kimi K2.5 Swarm 比单 agent 高出 30+ 个百分点——这是 [20.7 多智能体协作](../chapter22_agentic/multi-agent-swarm) 的实战证据。
+注意 Kimi K2.5 Swarm 比单 agent 高出 30+ 个百分点——这是 [19.7 多智能体协作](../chapter22_agentic/multi-agent-swarm) 的实战证据。
 
 ### xbench-DeepSearch（清华大学，2025）
 
@@ -121,7 +121,7 @@ agent 可能不实际浏览，而是直接生成看似合理的答案（hallucin
 
 ### 成本污染
 
-不同 agent 的 token 成本差 10-30 倍（[20.7](../chapter22_agentic/multi-agent-swarm) 提到 Kimi K2.5 Swarm 是单 agent 的 15×）。简单比较准确率会偏向昂贵系统。
+不同 agent 的 token 成本差 10-30 倍（[19.7](../chapter22_agentic/multi-agent-swarm) 提到 Kimi K2.5 Swarm 是单 agent 的 15×）。简单比较准确率会偏向昂贵系统。
 
 **对策**：
 
@@ -263,4 +263,4 @@ Deep Research 评测的四大基准（BrowseComp / xbench-DeepSearch / GAIA / �
 
 开源复现上，**GPT-Researcher 适合做产品，OpenResearcher 适合做研究**。前者工程成熟，后者训练透明。如果你是研究 / 学习目的，从 OpenResearcher 入手；如果是产品落地，从 GPT-Researcher 入手。
 
-下一章 [第 23 章 Computer Use 与 GUI Agent](../chapter25_computer_use/training) 从浏览器转移到整个桌面——agent 不再只是查网页，而是操作任意 GUI 应用（Excel、PS、内部 OA）。
+下一章 [第 22 章 Computer Use 与 GUI Agent](../chapter25_computer_use/training) 从浏览器转移到整个桌面——agent 不再只是查网页，而是操作任意 GUI 应用（Excel、PS、内部 OA）。

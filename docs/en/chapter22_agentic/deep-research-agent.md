@@ -428,7 +428,7 @@ def report_reward(report, task, verified_facts=None):
     )
 ```
 
-During training, it is recommended to use **short-to-long curriculum learning** — first train on 500-word short reports, then gradually increase to 5,000-word complete reports. This is consistent with [Section 20.4](./tool-use-and-trajectory), where HardGen's[^hardgen] difficulty-adaptive approach.
+During training, it is recommended to use **short-to-long curriculum learning** — first train on 500-word short reports, then gradually increase to 5,000-word complete reports. This is consistent with [Section 19.4](./tool-use-and-trajectory), where HardGen's[^hardgen] difficulty-adaptive approach.
 
 ### Two-Stage RL for Deep Research
 
@@ -747,7 +747,7 @@ flowchart TD
 
 Search-returned tokens (the `<information>` part) are **masked out** when computing RL loss — only model-generated tokens participate in gradient updates. The reason is intuitive: search result quality is not controlled by the model, so the model should not be penalized for low-quality search engine results.
 
-This is consistent with the Agent Loop design principles discussed in [Section 20.1](./intro): **environment feedback doesn't change policy; only the policy's own decisions change policy.**
+This is consistent with the Agent Loop design principles discussed in [Section 19.1](./intro): **environment feedback doesn't change policy; only the policy's own decisions change policy.**
 
 #### Reward Function
 
@@ -882,7 +882,7 @@ def rollout(model, question, retriever, max_turns=10):
 # - Tokens between <answer>...</answer> -> mask=1 (model output)
 ```
 
-This is consistent with the Agent Loop discussed in [Section 20.1](./intro): environment-returned observations should not affect policy gradients.
+This is consistent with the Agent Loop discussed in [Section 19.1](./intro): environment-returned observations should not affect policy gradients.
 
 ### Reproduction Results Report Template
 
@@ -935,7 +935,7 @@ Search-R1 is the concrete implementation of all RL knowledge from previous chapt
 - **RLVR (Chapter 16)**: Search-R1's reward is purely "is the answer correct," requiring no Reward Model — this is exactly RLVR's core idea.
 - **GRPO (Chapter 16)**: Search-R1 defaults to GRPO, with group sampling + relative comparison replacing PPO's Critic network.
 - **Agent Loop ([chapter overview](./intro))**: Search-R1's Rollout is the concrete implementation of the Agent Loop — the model alternates between reasoning and tool calls.
-- **ORM vs PRM ([Section 20.3](./multi-turn-rl))**: Search-R1 only uses ORM (terminal reward). Atom-Searcher[^atom_searcher] and Web-Shepherd[^web_shepherd] add PRM (process rewards) on top.
+- **ORM vs PRM ([Section 19.3](./multi-turn-rl))**: Search-R1 only uses ORM (terminal reward). Atom-Searcher[^atom_searcher] and Web-Shepherd[^web_shepherd] add PRM (process rewards) on top.
 - **Retrieved Token Masking**: Consistent with the idea of masking prompt tokens in PPO — only do gradient updates on policy-controllable parts.
 
 </details>

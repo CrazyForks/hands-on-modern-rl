@@ -937,9 +937,9 @@ Visual generation RL may seem far from VLM QA, but it reuses several main thread
 | Earlier Chapter           | Correspondence in Visual Generation RL                                                                  |
 | ------------------------- | ------------------------------------------------------------------------------------------------------- |
 | Chapter 6 REINFORCE       | DDPO treats denoising chains as policy trajectories, updating each step's sampling with terminal reward |
-| Chapter 28 Reward Hacking  | Generation models may please the reward model while sacrificing real user intent                        |
+| Chapter 25 Reward Hacking  | Generation models may please the reward model while sacrificing real user intent                        |
 | Chapter 16 RLVR            | Fine-grained attributes, counts, relationships can become locally verifiable signals                    |
-| Chapter 20 Agentic RL     | Long-horizon credit assignment, multi-component rewards, and KL constraints reappear                    |
+| Chapter 19 Agentic RL     | Long-horizon credit assignment, multi-component rewards, and KL constraints reappear                    |
 | Sections 11.1-11.3 VLM RL | VLMs can in turn serve as judges, captioners, and reward models for generation models                   |
 
 The last point is especially important. Understanding models and generation models are not two completely separate threads. After VLMs learn to see images better, they can check whether generated images match prompts; generation models can synthesize richer data to train VLMs in turn. In the multimodal post-training stage, "seeing" and "generating" will increasingly form a closed loop.
@@ -955,7 +955,7 @@ This section's four most important conclusions:
 3. **Reward models are the bottleneck of generation RL**: human preferences, text alignment, and visual quality are all important, but reward hacking must be prevented.
 4. **Rewards can be used at both training and inference time**: reranking is safer, RL fine-tuning better internalizes capabilities, and video generation further amplifies temporal and computational challenges.
 
-With this, we have covered both visual understanding and visual generation in RL training. Chapter 28 next turns to reward hacking, alignment failures, and evaluation.
+With this, we have covered both visual understanding and visual generation in RL training. Chapter 25 next turns to reward hacking, alignment failures, and evaluation.
 
 ## References
 

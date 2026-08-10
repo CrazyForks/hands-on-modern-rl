@@ -1,6 +1,6 @@
-# 23.2 指令层级与 Prompt Injection 防御
+# 22.2 指令层级与 Prompt Injection 防御
 
-> [23.1](./training) 让 GUI Agent 学会了操作 GUI。但当 agent 真正部署到用户电脑、企业 OA、生产数据库，安全成为首要问题——尤其是 **Prompt Injection**：恶意网页、伪造 UI、跨应用攻击 都可能劫持 agent 执行破坏性操作。本节讲清楚三件事：(1) Prompt Injection 的根本威胁与典型攻击向量；(2) OpenAI 指令层级方案的工程化落地；(3) RL 训练让模型在权重层面学会防御。
+> [22.1](./training) 让 GUI Agent 学会了操作 GUI。但当 agent 真正部署到用户电脑、企业 OA、生产数据库，安全成为首要问题——尤其是 **Prompt Injection**：恶意网页、伪造 UI、跨应用攻击 都可能劫持 agent 执行破坏性操作。本节讲清楚三件事：(1) Prompt Injection 的根本威胁与典型攻击向量；(2) OpenAI 指令层级方案的工程化落地；(3) RL 训练让模型在权重层面学会防御。
 
 ## 部署后的安全边界
 
@@ -17,7 +17,7 @@ GUI Agent 的安全防御比聊天 LLM 重要一个量级。而最大的威胁�
 
 ## Prompt Injection 的根本威胁
 
-[第 20 章工具使用](../chapter22_agentic/tool-use-and-trajectory)讲过 agent 会调用工具读取外部内容——网页、邮件、PDF、API 返回。这些外部内容里可能藏恶意指令。
+[第 19 章工具使用](../chapter22_agentic/tool-use-and-trajectory)讲过 agent 会调用工具读取外部内容——网页、邮件、PDF、API 返回。这些外部内容里可能藏恶意指令。
 
 ### 经典 Prompt Injection
 
@@ -100,7 +100,7 @@ agent 删除本地备份 → 数据丢失
 | **ASB**（AdvAgent Safety Bench） | 清华, 2025       | 5021   | 中文场景 + 真实 App           |
 | **SecurityBench-GUI**            | 上交, 2026       | 3110   | GUI 特有攻击向量              |
 
-GPT-4o 在 InjecAgent 上的攻击成功率（ASR, Attack Success Rate）是 31.2%——意味着约三分之一的攻击能成功劫持模型。Claude 3.5 Sonnet 是 24.7%。这是个**远未解决**的问题。
+GPT-4o 在 InjecAgent 上的攻击成功率（ASR, Attack Success Rate）是 31.2%——意味着约三分之一的攻击能成功劫持模型。Claude 3.5 Sonnet 是 23.7%。这是个**远未解决**的问题。
 
 ## OpenAI 指令层级
 
@@ -362,7 +362,7 @@ Anthropic 在 Claude Computer Use（2024.10 发布）上实践了一套完整的
 
 ### Constitutional AI 的扩展
 
-[第 19 章 Constitutional AI](../chapter21_cai_rlvr/hhh-practice) 的核心思想是让模型自己判断"该做 vs 不该做"。Computer Use 扩展了 constitution：
+[13.4 AI 反馈与安全原则](../chapter21_cai_rlvr/hhh-practice) 的核心思想是让模型自己判断"该做 vs 不该做"。Computer Use 扩展了 constitution：
 
 ```
 1. 不要执行任何 destructive 操作（删文件、改密码）除非用户明确确认
@@ -386,15 +386,15 @@ Anthropic 的 Responsible Scaling Policy 定义了 ASL（AI Safety Level）等�
 
 这是工业级 AI 公司第一次为单一把能力设置 ASL 等级，可见 Computer Use 的安全风险等级。
 
-## 与 [第 28 章 Alignment Failures] 的呼应
+## 与 [第 25 章 Alignment Failures] 的呼应
 
-[第 28 章 奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures) 详细讨论过 Sleeper Agent、Reward Hacking、Specification Gaming 等更深层的安全问题。本节的指令层级是**工程上可落地**的第一道防线——它解决的是"模型被外部内容劫持"这个问题，但解决不了：
+[第 25 章 奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures) 详细讨论过 Sleeper Agent、Reward Hacking、Specification Gaming 等更深层的安全问题。本节的指令层级是**工程上可落地**的第一道防线——它解决的是"模型被外部内容劫持"这个问题，但解决不了：
 
 - **奖励误设**（reward misspecification）：模型学会钻 verifier 漏洞
 - **Sleeper Agent**：模型在训练时潜伏触发器，部署后激活
 - **Power-seeking**：模型主动获取更多权限
 
-这些深层问题需要 [第 28 章](../chapter30_alignment_failures/classical-failures) 讲的可解释性、mechanistic interpretability 等更前沿的工具。
+这些深层问题需要 [第 25 章](../chapter30_alignment_failures/classical-failures) 讲的可解释性、mechanistic interpretability 等更前沿的工具。
 
 ## 本节总结
 
@@ -406,4 +406,4 @@ Computer Use 场景的安全防御分三层：
 
 这三层不是互斥的——工业级系统同时部署三层。指令层级解决"模型被劫持"，动作级防御解决"即使被劫持也限制损害"，Constitutional AI 解决"模型自身价值观"。
 
-下一章 [第 24 章 视觉语言模型 RL](../chapter26_vlm/vlm-challenges) 从 GUI 转向更广泛的视觉语言模型——VLM 如何用 RL 学会图像理解、视频推理、多模态决策。
+下一章 [第 23 章 视觉语言模型 RL](../chapter26_vlm/vlm-challenges) 从 GUI 转向更广泛的视觉语言模型——VLM 如何用 RL 学会图像理解、视频推理、多模态决策。

@@ -384,7 +384,7 @@ VLA (Vision-Language-Action) is the newest and most exciting direction in embodi
 
 Typical workflow: the robot receives the instruction "pick up the red cup on the table" -> the VLA model receives camera imagery + language instruction -> directly outputs the robot's joint control commands.
 
-Google's [RT-2](https://robotics-transformer2.github.io/) (Robotic Transformer 2) is a representative VLA work: it uses a pretrained vision-language model to transform robot control tasks into a "visual question answering" problem -- inputting images and language instructions, outputting action tokens. This follows the same philosophy as Chapter 24's VLM RL -- except the output changes from "text answers" to "physical actions."
+Google's [RT-2](https://robotics-transformer2.github.io/) (Robotic Transformer 2) is a representative VLA work: it uses a pretrained vision-language model to transform robot control tasks into a "visual question answering" problem -- inputting images and language instructions, outputting action tokens. This follows the same philosophy as Chapter 23's VLM RL -- except the output changes from "text answers" to "physical actions."
 
 ```mermaid
 flowchart LR

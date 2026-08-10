@@ -1,8 +1,8 @@
 ---
-title: 20.4 Tool Use, Trajectory Synthesis, and Agentic Engineering
+title: 19.4 Tool Use, Trajectory Synthesis, and Agentic Engineering
 ---
 
-# 20.4 Tool Use, Trajectory Synthesis, and Agentic Engineering
+# 19.4 Tool Use, Trajectory Synthesis, and Agentic Engineering
 This section merges the original topics of "trajectory synthesis and data engineering" and "tool use and Agentic engineering" into one engineering storyline. We first ask where the training data comes from, then discuss how a model learns tool-use policies, and finally land on the environment, sandboxing, asynchronous rollout, and reward-design problems that real training systems must solve.
 
 ## Trajectory Synthesis: Where Does the Training Data Come From?
@@ -588,7 +588,7 @@ This method achieved 93% accuracy on real-world patch verification. Its core val
 
 #### The Scaling Law of Code Bootstrapping[^zeroscaling]
 
-Chapter 29 discusses RL scaling laws in detail: more training steps often produce stronger reasoning ability. Agentic RL has its own scaling law. ZeroTIR lets the model spontaneously learn to generate and execute code to assist reasoning **without supervised examples**. Researchers found a predictable relationship: training steps, code-execution frequency, and final accuracy follow a **power-law relationship**. This means you can predict final model performance early in training. If after 100 training steps the code-execution frequency is still rising, the model is still learning and training can continue. If the frequency has plateaued, learning is close to saturation and training can be stopped early.
+Chapter 26 discusses RL scaling laws in detail: more training steps often produce stronger reasoning ability. Agentic RL has its own scaling law. ZeroTIR lets the model spontaneously learn to generate and execute code to assist reasoning **without supervised examples**. Researchers found a predictable relationship: training steps, code-execution frequency, and final accuracy follow a **power-law relationship**. This means you can predict final model performance early in training. If after 100 training steps the code-execution frequency is still rising, the model is still learning and training can continue. If the frequency has plateaued, learning is close to saturation and training can be stopped early.
 
 This finding is very important for engineering practice. It gives you a **free training-progress indicator**. You do not need to run the whole training job; by monitoring code-execution frequency, you can judge whether to keep training. ZeroTIR was accepted by NeurIPS 2025.
 

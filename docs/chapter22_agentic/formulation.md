@@ -1,6 +1,6 @@
-# 20.2 多轮 RL 形式化
+# 19.2 多轮 RL 形式化
 
-[20.1 总览](./overview) 用订机票的例子说明了 Agentic RL 与单轮 RL 的根本差异。本节把这些差异写成精确的数学对象——采用 [AppWorld](https://arxiv.org/abs/2407.18901) 论文中的 POMDP 形式化，它把"模型生成的 token"与"环境返回的 token"显式区分开，是后续讨论 action mask、step-level advantage、credit assignment 的基础。
+[19.1 总览](./overview) 用订机票的例子说明了 Agentic RL 与单轮 RL 的根本差异。本节把这些差异写成精确的数学对象——采用 [AppWorld](https://arxiv.org/abs/2407.18901) 论文中的 POMDP 形式化，它把"模型生成的 token"与"环境返回的 token"显式区分开，是后续讨论 action mask、step-level advantage、credit assignment 的基础。
 
 ## 单轮 RL 的简化视角
 
@@ -152,4 +152,4 @@ class Step:
 
 本节建立了 Agentic RL 的形式化骨架。采用 AppWorld 论文的 POMDP 形式化，把状态拆成 $[s_0, c, x_{1:t}]$ 三部分，是后续讨论的数学基础。轨迹概率的链式分解 $\rho_\theta(x | s_0, c) = \mathbb{I}(s_0, x) \prod_{t \in a(x)} p_\theta(x_t | \cdot)$ 直接推出 action mask——只有模型生成的 action token 参与 policy gradient。Step-level 轨迹结构（Agent-R1）解决了工业实现中的 retokenization drift 和 context 管理问题。
 
-接下来的核心问题是：**轨迹概率公式里 $R(x)$ 是 trajectory-level 标量，它怎么回拆到每一步的 advantage？** 形式化告诉我们"应该只在 action token 上算梯度"，但没告诉我们"每个 action token 应该乘以多大的 advantage"。这就是信用分配——[20.3 轨迹信用分配](./credit-assignment)。
+接下来的核心问题是：**轨迹概率公式里 $R(x)$ 是 trajectory-level 标量，它怎么回拆到每一步的 advantage？** 形式化告诉我们"应该只在 action token 上算梯度"，但没告诉我们"每个 action token 应该乘以多大的 advantage"。这就是信用分配——[19.3 轨迹信用分配](./credit-assignment)。

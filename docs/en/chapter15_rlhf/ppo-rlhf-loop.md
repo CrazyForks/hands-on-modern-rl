@@ -147,7 +147,7 @@ This distinction is not obvious in CartPole (every action directly affects the c
 | Learning efficiency | low: many tokens updated equally            | high: key tokens get stronger gradient signals |
 | Typical methods     | REINFORCE                                   | PPO, GRPO                                      |
 
-**The finer the granularity, the more the model can distinguish which decisions truly matter, and the higher the learning efficiency.** Later, GRPO (Chapter 16) and Agentic RL (Chapter 20) will further exploit this property on longer, more complex trajectories.
+**The finer the granularity, the more the model can distinguish which decisions truly matter, and the higher the learning efficiency.** Later, GRPO (Chapter 16) and Agentic RL (Chapter 19) will further exploit this property on longer, more complex trajectories.
 
 #### Current research consensus
 

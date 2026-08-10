@@ -1,8 +1,8 @@
 ---
-title: '24.1 Visual Reward Design'
+title: '23.1 Visual Reward Design'
 ---
 
-# 24.1 Visual Reward Design
+# 23.1 Visual Reward Design
 
 Part V extended the policy to multi-turn tool interaction. Multimodal tasks add images, audio, and video to observations and actions, so rewards must account for semantic, perceptual, and temporal consistency together. Part VI begins with visual reward design and then connects vision-language models, audio agents, embodied intelligence, and visual generation.
 
@@ -56,11 +56,11 @@ This chapter is organized as: run something minimal -> see the new problems -> u
 
 | Section                                              | Question it answers                                                                       |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [24.3 Hands-On: GRPO for a VLM](./vlm-grpo-hands-on) | How do we train a VLM to "look then reason" under verifiable rewards?                     |
-| [24.1 Challenges](./vlm-challenges)                  | How do we assign reward across vision vs language? How do we reduce visual hallucination? |
+| [23.3 Hands-On: GRPO for a VLM](./vlm-grpo-hands-on) | How do we train a VLM to "look then reason" under verifiable rewards?                     |
+| [23.1 Challenges](./vlm-challenges)                  | How do we assign reward across vision vs language? How do we reduce visual hallucination? |
 | [VLM RL Frameworks](./vlm-frameworks)                | What systems bridge experiments to applications (tools, environments, self-play)?         |
 | [Visual Generation RL](./visual-generation-rl)       | How does RL apply to diffusion/video generation, and what does "policy" mean there?       |
-| [24.4 Hands-On: EasyR1 GeoQA](./easyr1-geoqa)        | How do we run an industrial-style VLM GRPO training loop on a real dataset?               |
+| [23.4 Hands-On: EasyR1 GeoQA](./easyr1-geoqa)        | How do we run an industrial-style VLM GRPO training loop on a real dataset?               |
 
 ## Learning Goals
 
@@ -140,7 +140,7 @@ Visual hallucination is one of the most troublesome problems for VLMs. It refers
 
 Visual hallucination does not exist in text-only RL — because a text-only model does not "see" anything; all its outputs are generated from text input. But a VLM's input includes an image, and the model must make judgments about the image's content, and those judgments can be wrong.
 
-In RL training, visual hallucination can appear in a particularly insidious way. If one of the model's hallucinations happens to receive a high reward (e.g., it "fabricated" the correct number of figures), RL will reinforce this behavior — the model learns that "guessing" is more cost-effective than "looking." This is essentially the same as the reward hacking discussed in Chapter 28, but with an additional dimension: the model can cheat not only in text generation but also in visual understanding.
+In RL training, visual hallucination can appear in a particularly insidious way. If one of the model's hallucinations happens to receive a high reward (e.g., it "fabricated" the correct number of figures), RL will reinforce this behavior — the model learns that "guessing" is more cost-effective than "looking." This is essentially the same as the reward hacking discussed in Chapter 25, but with an additional dimension: the model can cheat not only in text generation but also in visual understanding.
 
 Several strategies for addressing visual hallucination:
 
@@ -229,7 +229,7 @@ def driving_reward(scene_description, action, telemetry):
     return reward
 ```
 
-A unique challenge in autonomous driving VLM-RL is the **contradiction between safety and exploration**. RL needs to explore new strategies to find better driving approaches, but exploration itself may produce unsafe driving behaviors. You cannot let the model "trial-and-error" on real roads — one mistake could cause an accident. Therefore, autonomous driving VLM-RL is trained almost entirely in simulation environments before transferring to the real world. This is the same Sim-to-Real problem discussed in Section 26.1 on embodied intelligence.
+A unique challenge in autonomous driving VLM-RL is the **contradiction between safety and exploration**. RL needs to explore new strategies to find better driving approaches, but exploration itself may produce unsafe driving behaviors. You cannot let the model "trial-and-error" on real roads — one mistake could cause an accident. Therefore, autonomous driving VLM-RL is trained almost entirely in simulation environments before transferring to the real world. This is the same Sim-to-Real problem discussed in Section 24.3 on embodied intelligence.
 
 Another challenge is **latency constraints**. In text-only scenarios, a model taking 2 seconds to generate a response is perfectly acceptable. But in autonomous driving, a 2-second delay means the vehicle travels 60 meters blind on a highway. VLM inference must complete in milliseconds — requiring the model to be small enough and fast enough, creating a tension with the large models typically used in RL training.
 

@@ -1,10 +1,10 @@
-# 23.1 GUI Agent 训练
+# 22.1 GUI Agent 训练
 
-> [第 20 章 Agentic RL](../chapter22_agentic/overview) 让 LLM 学会调用工具、阅读工具返回、在多轮交互中纠错——这是单 agent 的形态。但当任务从"写一段函数"升级到"在我电脑里订一张下周三去上海的机票"，agent 必须跨过的鸿沟是：**像人一样看屏幕、点鼠标、敲键盘**。本章解决两件事：(1) Computer Use 范式下，agent 如何把 GUI 像素流映射为原子动作并用 RL 优化（25.1–25.2）；(2) GUI Agent 的训练实践（[23.1](./training)）与安全防御（[23.2](./safety-swarm)）。
+> [第 19 章 Agentic RL](../chapter22_agentic/overview) 让 LLM 学会调用工具、阅读工具返回、在多轮交互中纠错——这是单 agent 的形态。但当任务从"写一段函数"升级到"在我电脑里订一张下周三去上海的机票"，agent 必须跨过的鸿沟是：**像人一样看屏幕、点鼠标、敲键盘**。本章解决两件事：(1) Computer Use 范式下，agent 如何把 GUI 像素流映射为原子动作并用 RL 优化；(2) GUI Agent 的训练实践（[22.1](./training)）与安全防御（[22.2](./safety-swarm)）。
 
 ## Computer Use 范式
 
-[第 20 章工具使用](../chapter22_agentic/tool-use-and-trajectory)中的工具是**结构化 API**——`def search(query): return results`，输入输出都是字符串。但真实世界里大量软件只有一种接口：**GUI**。浏览器、Excel、企业内部 OA、Photoshop、游戏——它们没有公开 API，只有屏幕和鼠标键盘事件。
+[第 19 章工具使用](../chapter22_agentic/tool-use-and-trajectory)中的工具是**结构化 API**——`def search(query): return results`，输入输出都是字符串。但真实世界里大量软件只有一种接口：**GUI**。浏览器、Excel、企业内部 OA、Photoshop、游戏——它们没有公开 API，只有屏幕和鼠标键盘事件。
 
 **Computer Use** 范式把整个操作系统当作 agent 的环境：
 
@@ -153,7 +153,7 @@ class GUIEnv:
 
 Computer Use 把 GUI 像素流当作 RL 状态空间，把鼠标键盘事件当作动作空间，这让传统 RL 的所有难题（稀疏奖励、长时序、高维观察）同时放大。**Set-of-Mark** 与**视觉 Grounding** 是解决"定位"问题的两条主流路线：前者依赖外部检测器简化动作空间，后者用 VLM 端到端输出坐标。
 
-下一节 [23.1 GUI Agent 训练实践](./training) 走进工业实战——你会看到 UI-TARS-2、AutoGLM、MobileRL、ComputerRL 等系统如何把这套理论变成可复现的训练 pipeline。
+下一节 [22.1 GUI Agent 训练实践](./training) 走进工业实战——你会看到 UI-TARS-2、AutoGLM、MobileRL、ComputerRL 等系统如何把这套理论变成可复现的训练 pipeline。
 
 前文讲清楚了 Computer Use 的 MDP 建模和 GUI Grounding 的视觉对齐。本节回答下一个工程问题：**如何把 VLM 训练成 GUI Agent？** 这涉及数据合成、课程设计、奖励工程和虚拟环境等完整的工业训练流水线。下面以 2025—2026 年中国实验室的代表性工作为线索，对比 UI-TARS-2、AutoGLM、MobileRL、ComputerRL 和 CogAgent 的技术路线。
 
@@ -398,7 +398,7 @@ ComputerRL 论文报告了对比实验：
 | 方法                    | OSLevel-3 成功率 | 平均步数 | 训练成本 |
 | ----------------------- | ---------------- | -------- | -------- |
 | 正向课程 + 终态奖励     | 12.3%            | 47       | 1×       |
-| 正向课程 + 进度奖励     | 28.7%            | 35       | 2.3×     |
+| 正向课程 + 进度奖励     | 27.7%            | 35       | 2.3×     |
 | **反向课程 + 进度奖励** | **51.2%**        | **28**   | 2.8×     |
 
 反向课程把成功率从 12% 拉到 51%，但训练成本也增加 2.8 倍——主要是进度评估器 LLM 的调用开销。
@@ -480,7 +480,7 @@ GUI Agent 能执行破坏性操作——删文件、转账、发邮件。生产�
 - **二次确认**：高风险操作前弹窗让用户确认
 - **审计日志**：所有操作记录可回溯
 
-详见 [23.2 指令层级与 Prompt Injection 防御](./safety-swarm)。
+详见 [22.2 指令层级与 Prompt Injection 防御](./safety-swarm)。
 
 ## 本节总结
 
@@ -494,4 +494,4 @@ GUI Agent 能执行破坏性操作——删文件、转账、发邮件。生产�
 
 四条路线不是互斥的——UI-TARS-2 后期也加入了反思课程（类 MobileRL 思想），Open-AutoGLM 也用了反向课程（类 ComputerRL 思想）。**工业级系统往往是多种思想的组合**。
 
-下一节 [23.2 指令层级与 Prompt Injection 防御](./safety-swarm) 转向安全——agent 真正部署到用户电脑后，怎么防止恶意网页、伪造 UI、跨应用攻击劫持。
+下一节 [22.2 指令层级与 Prompt Injection 防御](./safety-swarm) 转向安全——agent 真正部署到用户电脑后，怎么防止恶意网页、伪造 UI、跨应用攻击劫持。

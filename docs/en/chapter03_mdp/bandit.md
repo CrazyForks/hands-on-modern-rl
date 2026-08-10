@@ -402,11 +402,11 @@ So even if A's true win probability is 60%, winning only 4 times out of 10 still
 
 The probability that B wins exactly 5 times is:
 
-$$P(n_B = 5) = \binom{10}{5} \times 0.4^5 \times 0.6^5 \approx 20.1\%$$
+$$P(n_B = 5) = \binom{10}{5} \times 0.4^5 \times 0.6^5 \approx 19.1\%$$
 
 Therefore, a misleading observation such as "A wins 4/10 while B wins 5/10" is not only possible, it has a nontrivial probability. For this specific pair of events, the joint probability is roughly:
 
-$$11.1\% \times 20.1\% \approx 2.2\%$$
+$$11.1\% \times 19.1\% \approx 2.2\%$$
 
 This is not large, but it is certainly possible. More importantly, misidentification is not limited to this one case: any time A's observed wins are fewer than B's, you will make the wrong call. Later we will account for all such cases.
 

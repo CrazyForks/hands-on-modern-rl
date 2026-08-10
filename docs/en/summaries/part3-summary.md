@@ -82,7 +82,7 @@ This matches PPO's logic of "how much better than baseline" (PPO uses $A=Q-V$ fr
 
 GRPO/DAPO no longer rely on a reward model. As long as something can produce a score, training can proceed. For objective tasks like math reasoning and code generation, that scorer can be a rule-based verifier: for math, match the final answer; for code, run unit tests. Experiments such as DeepSeek-R1-Zero suggest that a base model can exhibit emergent chain-of-thought reasoning after RLVR-only training, even without any SFT.
 
-## Chapter 20: Agentic RL - Teaching Models to Use Tools
+## Chapter 19: Agentic RL - Teaching Models to Use Tools
 
 ### Multi-Turn Interaction and Credit Assignment
 

@@ -552,7 +552,7 @@ The commonality is: both update policies on fixed data, and both must prevent th
 | DPO's reference model (Chapter 15)         | The reference model plays the same role as the behavior constraint in BCQ/TD3+BC                         |
 | GRPO's within-group advantage (Chapter 16) | IQL's advantage-weighted BC shares the same philosophy as GRPO's advantage computation                   |
 | RLVR's rule verification (Chapter 16)      | Offline RL's reward signal can only come from existing data; no online verification                      |
-| [Self-play's opponent pool (Section 29.1)](../self-play-outlook/)  | Offline RL's dataset = trajectories produced by historical policies, same source as opponent pool data   |
+| [Self-play's opponent pool (Section 26.1)](../self-play-outlook/)  | Offline RL's dataset = trajectories produced by historical policies, same source as opponent pool data   |
 
 Perhaps the deepest connection is: **DPO is the LLM version of Offline RL.** DPO optimizes a language model policy with a fixed preference dataset without online sampling. Its reference model plays the same role as the behavior constraint in BCQ/TD3+BC -- preventing the policy from drifting beyond the training distribution. Meanwhile, IQL's advantage-weighted behavior cloning shares the same philosophy as Chapter 16's GRPO: both "pick out better-than-average actions" from existing data to optimize policy, except GRPO's data comes from the current policy's online sampling while IQL's data comes from fixed historical trajectories.
 

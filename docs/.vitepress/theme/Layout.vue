@@ -80,6 +80,8 @@ const LEGACY_INTRO_REDIRECTS = {
   '/chapter09_actor_critic/intro': '/chapter09_actor_critic/advantage-function',
   '/chapter15_rlhf/intro': '/chapter15_rlhf/base-model-to-assistant',
   '/chapter21_cai_rlvr/intro': '/chapter21_cai_rlvr/hhh-practice',
+  '/chapter21_cai_rlvr/rlaif-engineering':
+    '/chapter21_cai_rlvr/hhh-practice',
   '/chapter20_prm_search/intro': '/chapter20_prm_search/outcome-vs-process',
   '/chapter22_agentic/intro': '/chapter22_agentic/overview',
   '/chapter23_rl_based_swe/intro': '/chapter23_rl_based_swe/swe-bench-and-rlvr',

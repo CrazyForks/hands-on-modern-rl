@@ -1,6 +1,6 @@
-# 19.1 HHH 原则与 Claude 实践
+# 13.4 AI 反馈与安全原则
 
-> [第 13 章 RLHF](../chapter15_rlhf/base-model-to-assistant) 把"人类标注偏好 → 奖励模型 → PPO"这条流水线讲通了；[第 15 章 DPO](../chapter17_dpo/intro) 和[第 16 章 GRPO](../chapter18_grpo/grpo-practice-and-mechanism) 分别省去了显式 RM 或 Critic。但所有这些方法都默认一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，这个前提就崩了——人类既标不动（成本和速度），也标不准（在数学、代码、长上下文上判断力不够）。本章回答一个问题：**当人类标注成为对齐瓶颈时，训练信号从哪来？** Anthropic 2022 年的答案是 _Constitutional AI: Harmlessness from AI Feedback_——让 AI 自己当裁判、自己改作文、自己生成偏好对。
+> 前面的 [13.1 从基座模型到指令对齐](../chapter15_rlhf/base-model-to-assistant)、13.2 SFT 和 [13.3 奖励模型](../chapter15_rlhf/reward-function-design) 已经把“人类标注偏好 → 奖励模型”这条路线讲清楚了。这条路线依赖一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，人类标注会同时遇到成本、速度和专业判断力的瓶颈。本节由此引出一个问题：**训练信号还能从哪里来？** Anthropic 2022 年提出 Constitutional AI，让 AI 按明确的安全原则评价回答、修订回答并生成偏好对；这也为后面的 RL 微调建立了另一种反馈来源。
 
 ## Constitutional AI 框架
 
@@ -133,7 +133,7 @@ $$
 | 不适合的能力域 | 超出标注员水平的推理                      | "模型本身也不知道答案"的开放问题               |
 
 ::: warning RLAIF 的能力上限
-RLAIF 的质量受限于 judge 模型本身。在 Claude 2 阶段，让 Claude 2 judge Claude 2 会出现 **self-preference bias**——judge 倾向于选风格上更像自己的回答。当被 judge 的能力超出 judge 时，RLAIF 反而会强化错误答案。这正是 [第 28 章 Reward Hacking](../chapter30_alignment_failures/classical-failures) 重点讨论的"sycophancy"（谄媚）与"reward model over-optimization"问题。
+RLAIF 的质量受限于 judge 模型本身。在 Claude 2 阶段，让 Claude 2 judge Claude 2 会出现 **self-preference bias**——judge 倾向于选风格上更像自己的回答。当被 judge 的能力超出 judge 时，RLAIF 反而会强化错误答案。这正是 [第 25 章 Reward Hacking](../chapter30_alignment_failures/classical-failures) 重点讨论的"sycophancy"（谄媚）与"reward model over-optimization"问题。
 :::
 
 ### 成本对比的粗算
@@ -222,13 +222,7 @@ Meta 用 Llama 2-70B 做了三轮 self-rewarding（M1 → M2 → M3），结果�
 更深层的理论分析（Yuan et al. 2024 follow-up）显示：当 judge 能力 ≥ generator 能力时迭代有效，反之会"reward hacking"自我强化。这是为什么 self-rewarding 必须配合**外部验证信号**（如 RLVR）一起用。
 :::
 
-## 本节总结
-
-Constitutional AI（CAI）的核心是用 AI 反馈替代人类标注——让模型自己评判、自己改写、自己生成偏好对。RLAIF 把 CAI 生成的偏好对喂给标准 RLHF pipeline。Self-Correction 和 Self-Rewarding 进一步把"AI 评判 AI" 推到极致。
-
-下一节 [19.1 HHH 原则与 Claude 实践](./hhh-practice) 讲解 Anthropic 实际在 Claude 训练中如何落地 HHH（Helpful, Harmless, Honest）三原则。
-
-前文建立了 Constitutional AI 的理论与 RLAIF 框架。接下来回答工程问题：**Anthropic 如何在 Claude 训练中落地 CAI？** 核心是 HHH 三项原则——Helpful、Harmless、Honest——以及相应的对抗训练方法。
+AI 已经可以生成偏好数据、批评回答并完成修订。接下来要解决的是判断标准：模型依据哪些原则区分有用、安全与诚实的回答？Anthropic 将这三个目标概括为 HHH——Helpful、Harmless、Honest。
 
 ## HHH 对齐原则
 
@@ -341,8 +335,104 @@ $$
 4. **安全训练和能力训练必须解耦**：否则 KL 约束会拖慢能力提升。
    :::
 
+HHH 给出了目标，但几十条并列原则仍可能互相冲突。Claude 4 系列的 Constitution 进一步把原则组织成层级化价值框架，并用情境训练与审计机制把这些原则落实到工程系统中。
+
+## 从原则清单到情境化价值观
+
+Anthropic 2026 年公开发布了一份 80 页的 Claude 4 系列 Constitution 文档。它将宪法式对齐从“列举规则”推进到“社会化”（socialization）：模型需要在具体情境中理解价值冲突，并依据上层目标作出判断。
+
+### 从规则列表到价值观框架
+
+旧版 Constitution 主要由并列原则组成。新版引入层级结构：
+
+```
+顶层：北极星价值（North Star）
+  ├── Helpful 子树
+  │     ├── 真正解决问题
+  │     ├── 区分请求与行动
+  │     └── 主动澄清歧义
+  ├── Harmless 子树
+  │     ├── 不协助严重伤害
+  │     ├── 比例原则（拒绝强度匹配风险）
+  │     └── 保护弱势群体
+  └── Honest 子树
+        ├── 表达不确定性
+        ├── 区分事实与推测
+        └── 承认错误
+```
+
+每个叶子节点对应一条具体原则，冲突时由上层优先级仲裁。例如“Helpful 解决问题”和“Harmless 比例原则”发生冲突时，系统按照风险等级加权：低风险任务更强调提供帮助，高风险任务更强调控制伤害。
+
+这种层级结构让 AI judge 获得明确的判断顺序，减少几十条并列原则互相冲突的问题。
+
+### Socialization：让模型内化价值
+
+Socialization 借用了社会学中的“社会化”概念。价值判断依靠在具体情境中观察、模仿和修正形成，无法只靠背诵规则获得。
+
+工程实现上，Claude 4 训练引入了**情境化对齐（contextual alignment）**：
+
+1. 不再让模型单独背诵原则 $c_k$，而是构造大量**情境—行为对**（scenario-action pairs），让模型在情境中体现价值。
+2. Judge prompt 从“按原则 $c_k$ 评估”改成“在该情境下，一个理想助手应当怎么做”。
+3. 训练损失从单一偏好损失扩展为偏好损失与情境一致性正则：
+
+$$
+\mathcal{L} = \mathcal{L}_{\text{pref}} + \lambda_{\text{ctx}} \cdot \mathcal{L}_{\text{context-consistency}}
+$$
+
+其中 $\mathcal{L}_{\text{context-consistency}}$ 衡量模型在不同情境下的回答是否与 Constitution 框架一致。
+
+::: details 为什么 Socialization 比规则列表更鲁棒
+规则无法穷尽真实部署中的情境。Socialization 训练的是价值判断能力，使模型能够处理训练数据没有覆盖的新情况。Anthropic 报告 Claude 4 在分布外安全情境上的鲁棒性高于规则列表版本。这与 [Computer Use](../chapter25_computer_use/training) 中模型需要在新环境中泛化的要求直接对应。
+:::
+
+### 可审计性
+
+层级化 Constitution 还要求模型决策能够追溯到具体原则。这需要三个环节共同支持：
+
+1. **Judge 决策可解释**：judge 除了给出分数，还要说明判断依据。
+2. **训练数据可追溯**：每个偏好对标注触发了 Constitution 中的哪些节点。
+3. **部署日志可审计**：记录模型作出价值判断时使用的依据，支持事后检查。
+
+形式化地，模型输出 $y$ 附带归因 $a(y) \in \mathcal{P}(\text{Constitution})$，表示该回答依据的原则分布。Judge 的偏好损失可以写成：
+
+$$
+\mathcal{L}_{\text{audit}} = -\mathbb{E} \big[\log \sigma\big(r_\phi(x, y_w, a_w) - r_\phi(x, y_l, a_l)\big)\big] + \lambda_{\text{attr}} \cdot \text{Entropy}(a_w)
+$$
+
+熵项避免归因总是坍缩到同一条原则；当多条原则共同影响决策时，系统需要显式保留这些依据。
+
+### Claude Constitution 的工程演进
+
+| 维度       | Claude 2/3 Constitution | Claude 4 Constitution      |
+| ---------- | ----------------------- | -------------------------- |
+| 结构       | 并列原则列表            | 层级化价值树               |
+| 学习方式   | 规则匹配 + AI judge     | 情境化 socialization       |
+| 冲突处理   | 由 judge 隐式决定       | 按价值层级显式仲裁         |
+| 可解释性   | 隐式奖励                | 原则归因与判断说明         |
+| 分布外泛化 | 较弱                    | 通过情境训练提高泛化       |
+| 审计能力   | 难以追溯                | 决策可以追溯到对应原则节点 |
+
+这条路线和 [第 25 章的 AI 监督与失准研究](../chapter30_alignment_failures/classical-failures)、[附录 A.2 训练系统底座](../appendix_industrial_training/rl-infrastructure)共同构成工业级对齐系统。
+
 ## 本节总结
 
-HHH（Helpful, Harmless, Honest）是 Anthropic 在 Claude 训练中实际使用的三原则。Helpful 要求模型尽力完成任务；Harmless 要求模型拒绝有害请求；Honest 要求模型不编造。这三者经常冲突——例如对一个敏感但合理的问题，过于 Harmless 会变成 evasiveness（回避），失去 Helpful 和 Honest。CAI 通过宪法让模型学会在冲突中找平衡。
+从人类反馈转向 AI 反馈，改变了偏好数据的生产方式，也引入了新的可靠性问题：
 
-下一节 [19.2 RLAIF 工程化与宪法扩展](./rlaif-engineering) 讲解 Anthropic 2026 年发布的 80 页 Constitution——这是目前工业界最详尽的 AI 宪法工程实践。
+1. **Constitutional AI** 让模型依据自然语言原则自我批评和修订，SL-CAI 与 RL-CAI 分别通过 SFT 和 PPO 使用这些数据。
+2. **RLAIF** 用 AI judge 扩展偏好标注，但 judge 的能力与偏差决定了数据质量，因此仍需要高质量人类反馈校准。
+3. **自我修正与自我奖励**让模型同时承担生成者、评判者和学习者，外部验证信号用于限制自我强化错误。
+4. **HHH** 将 Helpful、Harmless、Honest 组织成三个可优化目标，并通过多目标奖励处理它们之间的冲突。
+5. **层级化 Constitution** 用情境训练和原则归因取代简单的规则罗列，使模型能够处理新情境并支持审计。
+
+[第 16 章 RL Environments 与 Verifiers](../chapter18_grpo/rl-environments)继续讨论奖励信号的另一部分：如何用可执行环境和验证器判断数学答案、代码与工具调用是否正确，从而把软偏好与硬规则结合起来。
+
+## 延伸阅读
+
+- [Bai et al. 2022 “Constitutional AI: Harmlessness from AI Feedback”](https://arxiv.org/abs/2212.08073)
+- [Lee et al. 2023 “RLAIF: Scaling Reinforcement Learning from Human Feedback with AI Feedback”](https://arxiv.org/abs/2309.00267)
+- [Yuan et al. 2024 “Self-Rewarding Language Models”](https://arxiv.org/abs/2401.10020)
+- [Askell et al. 2021 “A General Language Assistant as a Laboratory for Alignment”](https://arxiv.org/abs/2112.00861)
+- [Anthropic 2024 “Collective Constitutional AI: Aligning a Language Model with Public Input”](https://www.anthropic.com/research/collective-constitutional-ai-aligning-a-language-model-with-public-input)
+- [Anthropic 2026 “Claude 4 Constitution”](https://www.anthropic.com/research/claudes-constitution)
+- [Sharma et al. 2023 “Towards Understanding Sycophancy in Language Models”](https://arxiv.org/abs/2310.13548)
+- [Gao et al. 2022 “Scaling Laws for Reward Model Overoptimization”](https://arxiv.org/abs/2210.10760)

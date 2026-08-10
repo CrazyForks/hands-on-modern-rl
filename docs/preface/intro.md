@@ -38,8 +38,8 @@ CartPole 是 1990 年代起的经典控制任务，代表了强化学习的过�
 
 - **DPO 与大模型对齐**：用户要求模型协助编写恶意代码时，对齐前的模型照单全收，对齐后的模型能够识别风险并拒绝。[第 15 章 DPO 家族](../chapter17_dpo/dpo-theory-and-family)用约 200 行代码复现这一微调。
 - **GRPO 与推理涌现**：未经推理数据训练的基座模型，仅靠强化学习即可自发产生反思、验证、纠错的长思维链，对应 DeepSeek-R1 的核心范式。[第 16 章 GRPO 家族](../chapter18_grpo/grpo-practice-and-mechanism)讨论其实现机制，[第 17 章 Reasoning Models](../chapter19_reasoning/intro)展开 Test-time Scaling 的全景。
-- **Computer Use 与 GUI 智能体**：模型读取屏幕像素、点击按钮、填写表单，完成多步图形界面任务。[第 23 章 Computer Use 与 GUI Agent](../chapter25_computer_use/training)分析 UI-TARS-2、AutoGLM 等代表性工作的训练原理。
-- **SWE-Agent 与自主 Bug 修复**：智能体读取代码仓库、定位缺陷、修改代码、运行测试，通过 SWE-bench 评测。[第 21 章代码智能体强化学习](../chapter23_rl_based_swe/swe-bench-and-rlvr)基于 Meta 的 SWE-RL 算法、Code World Model 与 Self-play SSR 训练开源版本。
+- **Computer Use 与 GUI 智能体**：模型读取屏幕像素、点击按钮、填写表单，完成多步图形界面任务。[第 22 章 Computer Use 与 GUI Agent](../chapter25_computer_use/training)分析 UI-TARS-2、AutoGLM 等代表性工作的训练原理。
+- **SWE-Agent 与自主 Bug 修复**：智能体读取代码仓库、定位缺陷、修改代码、运行测试，通过 SWE-bench 评测。[第 20 章代码智能体强化学习](../chapter23_rl_based_swe/swe-bench-and-rlvr)基于 Meta 的 SWE-RL 算法、Code World Model 与 Self-play SSR 训练开源版本。
 
 ## 强化学习的应用价值
 
@@ -334,20 +334,20 @@ graph TD
         J --> K["探索、多智能体与分层 RL"]
     end
 
-    subgraph P4["Part IV · 大语言模型对齐与后训练（第 13-19 章）"]
-        L["RLHF 与工业训练<br/>（第 13-14 章）"] --> M["DPO、GRPO 与 RLVR<br/>（第 15-16 章）"]
-        M --> N["推理、PRM 与 RLAIF<br/>（第 17-19 章）"]
+    subgraph P4["Part IV · 大语言模型对齐与后训练（第 13-18 章）"]
+        L["RLHF、RLAIF 与工业训练<br/>（第 13-14 章）"] --> M["DPO、GRPO 与 RLVR<br/>（第 15-16 章）"]
+        M --> N["推理模型与 PRM<br/>（第 17-18 章）"]
     end
 
-    subgraph P5["Part V · Agentic 强化学习（第 20-23 章）"]
+    subgraph P5["Part V · Agentic 强化学习（第 19-22 章）"]
         O["工具调用与多轮 RL"] --> P["代码、浏览器与 GUI Agent"]
     end
 
-    subgraph P6["Part VI · 多模态强化学习（第 24-27 章）"]
-        R["VLM 与音频 RL"] --> S["VLA 与视觉生成 RL"]
+    subgraph P6["Part VI · 多模态强化学习（第 23-24 章）"]
+        R["视觉语言模型 RL<br/>（第 23 章）"] --> S["前沿多模态 RL<br/>（第 24 章）"]
     end
 
-    subgraph P7["Part VII · 安全、评估与研究前沿（第 28-29 章）"]
+    subgraph P7["Part VII · 安全、评估与研究前沿（第 25-26 章）"]
         T["奖励黑客与 RL 评估"] --> U["Self-Play、Scaling 与研究前沿"]
     end
 
@@ -390,7 +390,7 @@ graph TD
 
 </div>
 
-上图按七个部分串起全书。第 1 至 4 章建立经典强化学习的语言；第 5 至 9 章把价值方法和策略方法推进到深度强化学习，并在 Actor-Critic 与 PPO 处汇合。第 10 至 12 章补充离线学习、模仿学习和多智能体等高级方法。具备这些基础后，第 13 至 19 章进入大模型对齐与后训练，第 20 至 23 章转向可调用工具并持续行动的智能体，第 24 至 27 章扩展到多模态与具身系统，最后在第 28 至 29 章讨论安全、评估和研究前沿。
+上图按七个部分串起全书。第 1 至 4 章建立经典强化学习的语言；第 5 至 9 章把价值方法和策略方法推进到深度强化学习，并在 Actor-Critic 与 PPO 处汇合。第 10 至 12 章补充离线学习、模仿学习和多智能体等高级方法。具备这些基础后，第 13 至 18 章进入大模型对齐与后训练，第 19 至 22 章转向可调用工具并持续行动的智能体，第 23 至 24 章扩展到视觉理解、音频、VLA 与视觉生成，最后在第 25 至 26 章讨论安全、评估和研究前沿。
 
 以下是各章内容的详细介绍。
 
@@ -400,13 +400,13 @@ graph TD
 
 **Part III（第 10 至 12 章）**讨论离线 RL、模仿学习、逆向 RL、元 RL、探索、多智能体与分层 RL，为更复杂的数据和环境设定补齐方法工具。
 
-**Part IV（第 13 至 19 章）**覆盖 RLHF 工程流水线、工业训练、DPO、GRPO、RLVR、推理模型、过程奖励模型和 RLAIF，形成完整的大模型后训练路线。
+**Part IV（第 13 至 18 章）**覆盖 RLHF、RLAIF、工业训练、DPO、GRPO、RLVR、推理模型和过程奖励模型，形成完整的大模型后训练路线。
 
-**Part V（第 20 至 23 章）**把训练对象从单段回答扩展到完整轨迹，依次讨论工具调用、多轮交互、代码智能体、浏览器智能体与 GUI Agent。
+**Part V（第 19 至 22 章）**把训练对象从单段回答扩展到完整轨迹，依次讨论工具调用、多轮交互、代码智能体、浏览器智能体与 GUI Agent。
 
-**Part VI（第 24 至 27 章）**把奖励学习和策略优化扩展到视觉、音频、VLA 与视觉生成任务。
+**Part VI（第 23 至 24 章）**先讨论视觉语言模型 RL，再把音频、VLA 与视觉生成收进“前沿多模态 RL”，形成从多模态理解到交互与生成的连续路线。
 
-**Part VII（第 28 至 29 章）**集中讨论奖励黑客、对齐评估、Self-Play、Scaling Laws、多智能体协作和研究前沿。
+**Part VII（第 25 至 26 章）**集中讨论奖励黑客、对齐评估、Self-Play、Scaling Laws、多智能体协作和研究前沿。
 
 ### 目标读者
 

@@ -1,6 +1,6 @@
-# 28.5 评估原则与现代评估 Harness
+# 25.5 评估原则与现代评估 Harness
 
-> [第 28 章](../chapter30_alignment_failures/modern-incidents) 讲了 Qwen3 数据污染——benchmark 分数虚高 15-25 个百分点。这暴露的不只是数据问题，而是 **整个 RL 评估方法论的脆弱**。本章系统化讨论：什么样的 benchmark 设计是可信的？怎么检测污染？提示敏感性如何影响结论？长程任务和行为任务怎么评？最后介绍工业级评测 harness 与 Anthropic 2025 内部 AI Research Eval Suite（34× 人类加速）。
+> [第 25 章](../chapter30_alignment_failures/modern-incidents) 讲了 Qwen3 数据污染——benchmark 分数虚高 15-25 个百分点。这暴露的不只是数据问题，而是 **整个 RL 评估方法论的脆弱**。本章系统化讨论：什么样的 benchmark 设计是可信的？怎么检测污染？提示敏感性如何影响结论？长程任务和行为任务怎么评？最后介绍工业级评测 harness 与 Anthropic 2025 内部 AI Research Eval Suite（34× 人类加速）。
 
 ## 评估基准设计原则
 
@@ -57,7 +57,7 @@ LLM 评测论文长期忽视统计显著性，2024 年后才被广泛接受（[B
 
 ## 污染与泄漏检测
 
-[第 28 章 RLVR 假性收益](../chapter30_alignment_failures/modern-incidents) 详细讲了 Qwen3 数据污染事件。这一节给出系统化的检测方法。
+[第 25 章 RLVR 假性收益](../chapter30_alignment_failures/modern-incidents) 详细讲了 Qwen3 数据污染事件。这一节给出系统化的检测方法。
 
 ### 污染的三种类型
 
@@ -315,7 +315,7 @@ Perez et al. 2022（[arXiv:2212.09251](https://arxiv.org/abs/2212.09251)）设�
 
 ## 长程任务评估的挑战
 
-[第 23 章 Computer Use](../chapter25_computer_use/training)、[第 21 章 SWE-Agent](../chapter23_rl_based_swe/swe-bench-and-rlvr) 这些 agentic 任务，评估比单轮问答难得多——任务可能持续几小时、涉及几百步决策。
+[第 22 章 Computer Use](../chapter25_computer_use/training)、[第 20 章 SWE-Agent](../chapter23_rl_based_swe/swe-bench-and-rlvr) 这些 agentic 任务，评估比单轮问答难得多——任务可能持续几小时、涉及几百步决策。
 
 ### 长程任务的特性
 
@@ -444,7 +444,7 @@ Opus 4.6 Eval Suite 揭示了一个新现象——**模型已经能做初级 AI 
 2. **人类角色转变**：从"做研究"转向"指导 AI 做研究"
 3. **评估的元问题**：模型做的研究如何评估？需要更高维度的 benchmark
 
-这一发现也直接推动了对齐研究——如果模型能自己做研究，对齐问题会更紧迫（[第 28 章 Scalable Oversight](../chapter30_alignment_failures/classical-failures)）。
+这一发现也直接推动了对齐研究——如果模型能自己做研究，对齐问题会更紧迫（[第 25 章 Scalable Oversight](../chapter30_alignment_failures/classical-failures)）。
 
 ## 标准化评测 harness
 

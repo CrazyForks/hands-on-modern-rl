@@ -993,19 +993,23 @@ const zhSidebar = {
               link: '/chapter15_rlhf/reward-function-design'
             },
             {
-              text: '13.4 强化学习微调流程',
+              text: '13.4 AI 反馈与安全原则',
+              link: '/chapter21_cai_rlvr/hhh-practice'
+            },
+            {
+              text: '13.5 强化学习微调流程',
               link: '/chapter15_rlhf/standard-rlhf-pipeline'
             },
             {
-              text: '13.5 大规模训练工程',
+              text: '13.6 大规模训练工程',
               link: '/chapter15_rlhf/extended-practice'
             },
             {
-              text: '13.6 对齐评测方法',
+              text: '13.7 对齐评测方法',
               link: '/chapter15_rlhf/evaluation'
             },
             {
-              text: '13.7 动手：使用 veRL 和 PPO 训练 GSM8K',
+              text: '13.8 动手：使用 veRL 和 PPO 训练 GSM8K',
               link: '/chapter15_rlhf/verl-ppo-gsm8k'
             }
           ]
@@ -1152,20 +1156,6 @@ const zhSidebar = {
             }
           ]
         },
-        {
-          text: '19. Constitutional AI 与 RLAIF',
-          collapsed: false,
-          items: [
-            {
-              text: '19.1 HHH 原则与 Claude 实践',
-              link: '/chapter21_cai_rlvr/hhh-practice'
-            },
-            {
-              text: '19.2 RLAIF 工程化与宪法扩展',
-              link: '/chapter21_cai_rlvr/rlaif-engineering'
-            }
-          ]
-        }
       ]
     },
     {
@@ -1173,93 +1163,93 @@ const zhSidebar = {
       collapsed: false,
       items: [
         {
-          text: '20. 工具调用、多轮交互与多智能体 RL',
+          text: '19. 工具调用、多轮交互与多智能体 RL',
           collapsed: false,
           items: [
             {
-              text: '20.1 Agentic RL 总览',
+              text: '19.1 Agentic RL 总览',
               link: '/chapter22_agentic/overview'
             },
             {
-              text: '20.2 多轮 RL 形式化',
+              text: '19.2 多轮 RL 形式化',
               link: '/chapter22_agentic/formulation'
             },
             {
-              text: '20.3 轨迹信用分配',
+              text: '19.3 轨迹信用分配',
               link: '/chapter22_agentic/credit-assignment'
             },
             {
-              text: '20.4 工具调用 RL',
+              text: '19.4 工具调用 RL',
               link: '/chapter22_agentic/tool-use-and-trajectory'
             },
             {
-              text: '20.5 Search-Augmented RL 与 Web、Code Agent',
+              text: '19.5 Search-Augmented RL 与 Web、Code Agent',
               link: '/chapter22_agentic/tool-use-agents'
             },
             {
-              text: '20.6 Code Interpreter RL 工业实践',
+              text: '19.6 Code Interpreter RL 工业实践',
               link: '/chapter22_agentic/industrial-practice'
             },
             {
-              text: '20.7 多智能体协作与 Agent Swarm',
+              text: '19.7 多智能体协作与 Agent Swarm',
               link: '/chapter22_agentic/multi-agent-swarm'
             },
             {
-              text: '20.8 动手：使用 rLLM 训练 DeepCoder Agent',
+              text: '19.8 动手：使用 rLLM 训练 DeepCoder Agent',
               link: '/chapter22_agentic/rllm-deepcoder-lab'
             },
             {
-              text: '20.9 动手：使用 rLLM 训练金融分析 Agent',
+              text: '19.9 动手：使用 rLLM 训练金融分析 Agent',
               link: '/chapter22_agentic/rllm-finqa-lab'
             },
             {
-              text: '20.10 动手：从零实现 Agentic RL 训练系统',
+              text: '19.10 动手：从零实现 Agentic RL 训练系统',
               link: '/chapter22_agentic/build-agentic-training-system'
             }
           ]
         },
         {
-          text: '21. 代码智能体强化学习',
+          text: '20. 代码智能体强化学习',
           collapsed: false,
           items: [
             {
-              text: '21.1 SWE-RL 基础实验',
+              text: '20.1 SWE-RL 基础实验',
               link: '/chapter23_rl_based_swe/swe-bench-and-rlvr'
             },
             {
-              text: '21.2 Code World Model 与 DeepSWE',
+              text: '20.2 Code World Model 与 DeepSWE',
               link: '/chapter23_rl_based_swe/world-model-and-deep-swe'
             },
             {
-              text: '21.3 Self-Play SWE-RL',
+              text: '20.3 Self-Play SWE-RL',
               link: '/chapter23_rl_based_swe/self-play-ssr-and-summary'
             }
           ]
         },
         {
-          text: '22. Deep Research 与浏览器智能体',
+          text: '21. Deep Research 与浏览器智能体',
           collapsed: false,
           items: [
             {
-              text: '22.1 浏览器 RL Harness 工程',
+              text: '21.1 浏览器 RL Harness 工程',
               link: '/chapter24_deep_research/browser-rl-harness'
             },
             {
-              text: '22.2 评测基准与开源项目',
+              text: '21.2 评测基准与开源项目',
               link: '/chapter24_deep_research/deep-research-eval'
             }
           ]
         },
         {
-          text: '23. Computer Use 与 GUI Agent',
+          text: '22. Computer Use 与 GUI Agent',
           collapsed: false,
           items: [
             {
-              text: '23.1 GUI Agent 训练',
+              text: '22.1 GUI Agent 训练',
               link: '/chapter25_computer_use/training'
             },
             {
-              text: '23.2 指令层级与 Prompt Injection 防御',
+              text: '22.2 指令层级与 Prompt Injection 防御',
               link: '/chapter25_computer_use/safety-swarm'
             }
           ]
@@ -1271,61 +1261,49 @@ const zhSidebar = {
       collapsed: false,
       items: [
         {
-          text: '24. 视觉语言模型 RL',
+          text: '23. 视觉语言模型 RL',
           collapsed: false,
           items: [
             {
-              text: '24.1 视觉奖励设计',
+              text: '23.1 视觉奖励设计',
               link: '/chapter26_vlm/vlm-challenges'
             },
             {
-              text: '24.2 视觉反思 RL',
+              text: '23.2 视觉反思 RL',
               link: '/chapter26_vlm/qwen3-vl-reflection'
             },
             {
-              text: '24.3 动手：中国多模态前沿',
+              text: '23.3 动手：中国多模态前沿',
               link: '/chapter26_vlm/vlm-grpo-hands-on'
             },
             {
-              text: '24.4 动手：GeoQA 几何推理',
+              text: '23.4 动手：GeoQA 几何推理',
               link: '/chapter26_vlm/easyr1-geoqa'
             }
           ]
         },
         {
-          text: '25. 音频与语音 RL',
+          text: '24. 前沿多模态 RL',
           collapsed: false,
           items: [
             {
-              text: '25.1 从 RLVR 到 RLHF 的音频奖励设计',
+              text: '24.1 从 RLVR 到 RLHF 的音频奖励设计',
               link: '/chapter27_audio_rl/reward-design'
             },
             {
-              text: '25.2 多模态音频 Agent',
+              text: '24.2 多模态音频 Agent',
               link: '/chapter27_audio_rl/future'
-            }
-          ]
-        },
-        {
-          text: '26. 具身智能与 VLA 模型',
-          collapsed: false,
-          items: [
+            },
             {
-              text: '26.1 VLA 模型基础',
+              text: '24.3 VLA 模型基础',
               link: '/chapter28_vla/embodied-intelligence/'
-            }
-          ]
-        },
-        {
-          text: '27. 视觉生成 RL',
-          collapsed: false,
-          items: [
+            },
             {
-              text: '27.1 视觉生成与 DanceGRPO',
+              text: '24.4 视觉生成与 DanceGRPO',
               link: '/chapter29_visual_generation/intro'
             },
             {
-              text: '27.2 多奖励视频 RLHF 与物理感知生成',
+              text: '24.5 多奖励视频 RLHF 与物理感知生成',
               link: '/chapter29_visual_generation/video-generation-modern'
             }
           ]
@@ -1337,49 +1315,49 @@ const zhSidebar = {
       collapsed: false,
       items: [
         {
-          text: '28. 奖励黑客与 RL 评估',
+          text: '25. 奖励黑客与 RL 评估',
           collapsed: false,
           items: [
             {
-              text: '28.1 经典对齐失败模式',
+              text: '25.1 经典对齐失败模式',
               link: '/chapter30_alignment_failures/classical-failures'
             },
             {
-              text: '28.2 RLVR 假性收益与工业失败案例',
+              text: '25.2 RLVR 假性收益与工业失败案例',
               link: '/chapter30_alignment_failures/modern-incidents'
             },
             {
-              text: '28.3 Anthropic 失准研究',
+              text: '25.3 Anthropic 失准研究',
               link: '/chapter30_alignment_failures/sleeper-and-faking'
             },
             {
-              text: '28.4 防御机制',
+              text: '25.4 防御机制',
               link: '/chapter30_alignment_failures/scaling-and-defenses'
             },
             {
-              text: '28.5 现代评估原则与 Harness',
+              text: '25.5 现代评估原则与 Harness',
               link: '/chapter30_alignment_failures/rl-evaluation'
             }
           ]
         },
         {
-          text: '29. 自博弈、规模化与研究前沿',
+          text: '26. 自博弈、规模化与研究前沿',
           collapsed: false,
           items: [
             {
-              text: '29.1 自博弈基础与 LLM 自博弈',
+              text: '26.1 自博弈基础与 LLM 自博弈',
               link: '/chapter32_selfplay/self-play-outlook/'
             },
             {
-              text: '29.2 RL Scaling Laws 与 Foundation Model RL',
+              text: '26.2 RL Scaling Laws 与 Foundation Model RL',
               link: '/chapter32_selfplay/rl-scaling-outlook'
             },
             {
-              text: '29.3 LLM 多智能体强化学习',
+              text: '26.3 LLM 多智能体强化学习',
               link: '/chapter32_selfplay/llm-multi-agent-rl/'
             },
             {
-              text: '29.4 进化式 LLM 搜索与科学发现',
+              text: '26.4 进化式 LLM 搜索与科学发现',
               link: '/chapter32_selfplay/alphaevolve/'
             }
           ]
@@ -1905,19 +1883,22 @@ const enSidebar = {
               link: '/en/chapter15_rlhf/reward-function-design'
             },
             {
-              text: '13.4 RL Fine-Tuning Pipeline',
+              text: '13.4 AI Feedback and Safety Principles'
+            },
+            {
+              text: '13.5 RL Fine-Tuning Pipeline',
               link: '/en/chapter15_rlhf/standard-rlhf-pipeline'
             },
             {
-              text: '13.5 Large-Scale Training Engineering',
+              text: '13.6 Large-Scale Training Engineering',
               link: '/en/chapter15_rlhf/extended-practice'
             },
             {
-              text: '13.6 Evaluation Methods',
+              text: '13.7 Evaluation Methods',
               link: '/en/chapter15_rlhf/evaluation'
             },
             {
-              text: '13.7 Hands-on: veRL PPO on GSM8K',
+              text: '13.8 Hands-on: veRL PPO on GSM8K',
               link: '/en/chapter15_rlhf/verl-ppo-gsm8k'
             }
           ]
@@ -2046,18 +2027,6 @@ const enSidebar = {
             }
           ]
         },
-        {
-          text: '19. Constitutional AI and RLAIF',
-          collapsed: false,
-          items: [
-            {
-              text: '19.1 HHH Principles and Claude Practice'
-            },
-            {
-              text: '19.2 RLAIF Engineering and Constitution Extensions'
-            }
-          ]
-        }
       ]
     },
     {
@@ -2065,84 +2034,84 @@ const enSidebar = {
       collapsed: false,
       items: [
         {
-          text: '20. Tool Use, Multi-Turn & Multi-Agent RL',
+          text: '19. Tool Use, Multi-Turn & Multi-Agent RL',
           collapsed: false,
           items: [
             {
-              text: '20.1 Agentic RL Overview',
+              text: '19.1 Agentic RL Overview',
               link: '/en/chapter22_agentic/intro'
             },
             {
-              text: '20.2 Multi-Turn RL Formulation'
+              text: '19.2 Multi-Turn RL Formulation'
             },
             {
-              text: '20.3 Trajectory Credit Assignment'
+              text: '19.3 Trajectory Credit Assignment'
             },
             {
-              text: '20.4 Tool-Use RL',
+              text: '19.4 Tool-Use RL',
               link: '/en/chapter22_agentic/tool-use-and-trajectory'
             },
             {
-              text: '20.5 Search-Augmented RL: Web and Code Agents',
+              text: '19.5 Search-Augmented RL: Web and Code Agents',
               link: '/en/chapter22_agentic/tool-use-agents'
             },
             {
-              text: '20.6 Code Interpreter RL Industrial Practice',
+              text: '19.6 Code Interpreter RL Industrial Practice',
               link: '/en/chapter22_agentic/industrial-practice'
             },
             {
-              text: '20.7 Multi-Agent Collaboration and Agent Swarm'
+              text: '19.7 Multi-Agent Collaboration and Agent Swarm'
             },
             {
-              text: '20.8 Hands-on: Training a DeepCoder Agent with rLLM',
+              text: '19.8 Hands-on: Training a DeepCoder Agent with rLLM',
               link: '/en/chapter22_agentic/rllm-deepcoder-lab'
             },
             {
-              text: '20.9 Hands-on: Training a Financial Analysis Agent with rLLM',
+              text: '19.9 Hands-on: Training a Financial Analysis Agent with rLLM',
               link: '/en/chapter22_agentic/rllm-finqa-lab'
             },
             {
-              text: '20.10 Hands-on: Building an Agentic RL Training System from Scratch',
+              text: '19.10 Hands-on: Building an Agentic RL Training System from Scratch',
               link: '/en/chapter22_agentic/build-agentic-training-system'
             }
           ]
         },
         {
-          text: '21. RL for Code Agents',
+          text: '20. RL for Code Agents',
           collapsed: false,
           items: [
             {
-              text: '21.1 SWE-RL Basics'
+              text: '20.1 SWE-RL Basics'
             },
             {
-              text: '21.2 Code World Model and DeepSWE'
+              text: '20.2 Code World Model and DeepSWE'
             },
             {
-              text: '21.3 Self-Play SWE-RL'
+              text: '20.3 Self-Play SWE-RL'
             }
           ]
         },
         {
-          text: '22. Deep Research and Browser Agents',
+          text: '21. Deep Research and Browser Agents',
           collapsed: false,
           items: [
             {
-              text: '22.1 Browser RL Harness Engineering'
+              text: '21.1 Browser RL Harness Engineering'
             },
             {
-              text: '22.2 Evaluation Benchmarks and Open-Source Projects'
+              text: '21.2 Evaluation Benchmarks and Open-Source Projects'
             }
           ]
         },
         {
-          text: '23. Computer Use and GUI Agents',
+          text: '22. Computer Use and GUI Agents',
           collapsed: false,
           items: [
             {
-              text: '23.1 GUI Agent Training'
+              text: '22.1 GUI Agent Training'
             },
             {
-              text: '23.2 Instruction Hierarchy and Prompt Injection Defense'
+              text: '22.2 Instruction Hierarchy and Prompt Injection Defense'
             }
           ]
         }
@@ -2153,56 +2122,44 @@ const enSidebar = {
       collapsed: false,
       items: [
         {
-          text: '24. Vision-Language Model RL',
+          text: '23. Vision-Language Model RL',
           collapsed: false,
           items: [
             {
-              text: '24.1 Visual Reward Design',
+              text: '23.1 Visual Reward Design',
               link: '/en/chapter26_vlm/vlm-challenges'
             },
             {
-              text: '24.2 Visual Reflection RL'
+              text: '23.2 Visual Reflection RL'
             },
             {
-              text: '24.3 Hands-on: Multimodal Frontiers',
+              text: '23.3 Hands-on: Multimodal Frontiers',
               link: '/en/chapter26_vlm/vlm-grpo-hands-on'
             },
             {
-              text: '24.4 Hands-on: GeoQA Geometric Reasoning',
+              text: '23.4 Hands-on: GeoQA Geometric Reasoning',
               link: '/en/chapter26_vlm/easyr1-geoqa'
             }
           ]
         },
         {
-          text: '25. Audio and Speech RL',
+          text: '24. Frontier Multimodal RL',
           collapsed: false,
           items: [
             {
-              text: '25.1 Audio Reward Design from RLVR to RLHF'
+              text: '24.1 Audio Reward Design from RLVR to RLHF'
             },
             {
-              text: '25.2 Multimodal Audio Agents'
-            }
-          ]
-        },
-        {
-          text: '26. Embodied Intelligence and VLA Models',
-          collapsed: false,
-          items: [
-            {
-              text: '26.1 VLA Model Foundations'
-            }
-          ]
-        },
-        {
-          text: '27. Visual Generation RL',
-          collapsed: false,
-          items: [
-            {
-              text: '27.1 Visual Generation and DanceGRPO'
+              text: '24.2 Multimodal Audio Agents'
             },
             {
-              text: '27.2 Multi-Reward Video RLHF and Physics-Aware Generation'
+              text: '24.3 VLA Model Foundations'
+            },
+            {
+              text: '24.4 Visual Generation and DanceGRPO'
+            },
+            {
+              text: '24.5 Multi-Reward Video RLHF and Physics-Aware Generation'
             }
           ]
         }
@@ -2213,44 +2170,44 @@ const enSidebar = {
       collapsed: false,
       items: [
         {
-          text: '28. Reward Hacking and RL Evaluation',
+          text: '25. Reward Hacking and RL Evaluation',
           collapsed: false,
           items: [
             {
-              text: '28.1 Classical Alignment Failure Modes'
+              text: '25.1 Classical Alignment Failure Modes'
             },
             {
-              text: '28.2 RLVR False Gains and Industrial Failure Cases'
+              text: '25.2 RLVR False Gains and Industrial Failure Cases'
             },
             {
-              text: '28.3 Anthropic Misalignment Research'
+              text: '25.3 Anthropic Misalignment Research'
             },
             {
-              text: '28.4 Defense Mechanisms'
+              text: '25.4 Defense Mechanisms'
             },
             {
-              text: '28.5 Modern Evaluation Principles and Harnesses'
+              text: '25.5 Modern Evaluation Principles and Harnesses'
             }
           ]
         },
         {
-          text: '29. Self-Play, Scaling and Research Frontiers',
+          text: '26. Self-Play, Scaling and Research Frontiers',
           collapsed: false,
           items: [
             {
-              text: '29.1 Self-Play Basics & LLM Self-Play',
+              text: '26.1 Self-Play Basics & LLM Self-Play',
               link: '/en/chapter32_selfplay/self-play-outlook/'
             },
             {
-              text: '29.2 RL Scaling Laws & Foundation Model RL',
+              text: '26.2 RL Scaling Laws & Foundation Model RL',
               link: '/en/chapter32_selfplay/rl-scaling-outlook'
             },
             {
-              text: '29.3 LLM Multi-Agent Reinforcement Learning',
+              text: '26.3 LLM Multi-Agent Reinforcement Learning',
               link: '/en/chapter32_selfplay/llm-multi-agent-rl/'
             },
             {
-              text: '29.4 Evolutionary LLM Search and Scientific Discovery'
+              text: '26.4 Evolutionary LLM Search and Scientific Discovery'
             }
           ]
         }

@@ -359,4 +359,4 @@ RLVR 不是万能的，它有几个重要的局限：
 
 ---
 
-GRPO 在策略端省掉了 Critic，RLVR 在奖励端省掉了 RM。这两者结合，把 RL 训练的复杂度压缩到了极致。但 RL 的故事并没有结束——更激动人心的方向是 RL Scaling 和 Test-time Scaling。让我们在[第 29 章](../chapter32_selfplay/rl-scaling-outlook)看看这些前沿方向——RL Scaling 与未来展望。
+GRPO 在策略端省掉了 Critic，RLVR 在奖励端省掉了 RM。这两者结合，把 RL 训练的复杂度压缩到了极致。但 RL 的故事并没有结束——更激动人心的方向是 RL Scaling 和 Test-time Scaling。让我们在[第 26 章](../chapter32_selfplay/rl-scaling-outlook)看看这些前沿方向——RL Scaling 与未来展望。

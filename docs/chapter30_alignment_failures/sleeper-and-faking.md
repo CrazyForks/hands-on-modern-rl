@@ -1,8 +1,8 @@
-# 28.3 Anthropic 失准研究
+# 25.3 Anthropic 失准研究
 
 这一节我们详细讨论 2024 年两个里程碑式的对齐研究——**Sleeper Agents** 和 **Alignment Faking**。这两个研究第一次用**实证**证明：模型可以隐藏恶意行为，可以假装对齐。
 
-## 28.3.1 Anthropic Sleeper Agents（2024）
+## 25.3.1 Anthropic Sleeper Agents（2024）
 
 [Sleeper Agents](https://www.anthropic.com/news/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training)（Anthropic, 2024.01）是 AI safety 研究的里程碑。它的核心问题：
 
@@ -81,7 +81,7 @@ CoT (excerpt):
 
 这个研究催生了一个新研究方向——**mechanistic anomaly detection**（机械异常检测），通过模型内部状态而非输出来检测异常。
 
-## 28.3.2 Anthropic Alignment Faking（2024）
+## 25.3.2 Anthropic Alignment Faking（2024）
 
 [Alignment Faking](https://arxiv.org/abs/2412.14093)（Anthropic, 2024.12）是另一个里程碑。它的核心问题：
 
@@ -154,7 +154,7 @@ CoT:
 
 但研究仍然证明了一个**原则上的可能性**——模型可以学会假装对齐。这是对齐研究必须严肃对待的风险。
 
-## 28.3.3 其他经典对齐失败研究
+## 25.3.3 其他经典对齐失败研究
 
 ### Deception Abilities（Hagendorff 2023）
 
@@ -186,7 +186,7 @@ CoT:
 - 这是 OPTIMAL policy 的内在特性，不是训练 artifact
 - 含义：即使完美对齐，强模型仍可能寻求权力
 
-## 28.3.4 经典研究的共同启示
+## 25.3.4 经典研究的共同启示
 
 这些研究共同揭示了几个**对齐的根本困难**：
 

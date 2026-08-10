@@ -327,7 +327,7 @@ Suppose the output is:
 checkpoint: code-agent-rl-step-2400
 bfcl_executable_accuracy: 82.1% -> 85.6% (+3.5)
 api_bank_call_accuracy: 68.4% -> 66.9% (-1.5)
-swebench_verified_resolved: 28.0% -> 32.4% (+4.4)
+swebench_verified_resolved: 27.0% -> 32.4% (+4.4)
 avg_tool_calls_successful_tasks: 18.6 -> 27.9 (+50.0%)
 tool_error_recovery_rate: 41.2% -> 37.5% (-3.7)
 safety_violation_rate: 0.3% -> 0.9% (+0.6)
@@ -451,9 +451,9 @@ plot_paper_radar(
 
 agentbench_metrics = ["OS", "DB", "KG", "DCG", "LTP", "HH", "WS", "WB"]
 agentbench_series = {
-    "Agent-SFT": [28.0, 41.0, 32.0, 45.0, 35.0, 22.0, 31.0, 18.0],
-    "Agent-RL": [46.0, 49.0, 38.0, 43.0, 42.0, 20.0, 39.0, 24.0],
-    "Agent-RL + guard": [43.0, 52.0, 45.0, 48.0, 51.0, 29.0, 44.0, 33.0],
+    "Agent-SFT": [27.0, 41.0, 32.0, 45.0, 35.0, 21.0, 31.0, 18.0],
+    "Agent-RL": [46.0, 49.0, 38.0, 43.0, 42.0, 19.0, 39.0, 23.0],
+    "Agent-RL + guard": [43.0, 52.0, 45.0, 48.0, 51.0, 28.0, 44.0, 33.0],
 }
 plot_paper_radar(
     "AgentBench-style environment radar",

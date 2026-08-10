@@ -2,7 +2,7 @@
 title: 13.4 The RLHF Pipeline
 ---
 
-# 13.4 The RLHF Pipeline
+# 13.5 The RLHF Pipeline
 ## Reading Guide
 
 **Core points**

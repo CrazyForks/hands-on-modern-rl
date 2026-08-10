@@ -317,20 +317,20 @@ graph TD
         J --> K["Exploration, multi-agent and hierarchical RL"]
     end
 
-    subgraph P4["LLM Alignment and Post-Training (Chapters 13-19)"]
-        L["RLHF and industrial training<br/>(Chapters 13-14)"] --> M["DPO, GRPO and RLVR<br/>(Chapters 15-16)"]
-        M --> N["Reasoning, PRMs and RLAIF<br/>(Chapters 17-19)"]
+    subgraph P4["LLM Alignment and Post-Training (Chapters 13-18)"]
+        L["RLHF, RLAIF and industrial training<br/>(Chapters 13-14)"] --> M["DPO, GRPO and RLVR<br/>(Chapters 15-16)"]
+        M --> N["Reasoning models and PRMs<br/>(Chapters 17-18)"]
     end
 
-    subgraph P5["Agentic Reinforcement Learning (Chapters 20-23)"]
+    subgraph P5["Agentic Reinforcement Learning (Chapters 19-22)"]
         O["Tool use and multi-turn RL"] --> P["Code, browser and GUI agents"]
     end
 
-    subgraph P6["Multimodal Reinforcement Learning (Chapters 24-27)"]
-        R["VLM and audio RL"] --> S["VLA and visual-generation RL"]
+    subgraph P6["Multimodal Reinforcement Learning (Chapters 23-24)"]
+        R["Vision-Language Model RL<br/>(Chapter 23)"] --> S["Frontier Multimodal RL<br/>(Chapter 24)"]
     end
 
-    subgraph P7["Safety, Evaluation and Research Frontiers (Chapters 28-29)"]
+    subgraph P7["Safety, Evaluation and Research Frontiers (Chapters 25-26)"]
         T["Reward hacking and RL evaluation"] --> U["Self-play, scaling and frontiers"]
     end
 
@@ -373,7 +373,7 @@ graph TD
 
 </div>
 
-The diagram follows the book's seven-stage learning path. Chapters 1-4 establish the language of classical RL. Chapters 5-9 develop value-based and policy-based deep RL, bringing them together through Actor-Critic and PPO. Chapters 10-12 cover advanced settings. Chapters 13-19 then introduce LLM alignment and post-training, Chapters 20-23 move to agents that use tools and act over complete trajectories, Chapters 24-27 extend RL to multimodal and embodied systems, and Chapters 28-29 close with safety, evaluation, and research frontiers.
+The diagram follows the book's seven-stage learning path. Chapters 1-4 establish the language of classical RL. Chapters 5-9 develop value-based and policy-based deep RL, bringing them together through Actor-Critic and PPO. Chapters 10-12 cover advanced settings. Chapters 13-18 then introduce LLM alignment and post-training, Chapters 19-22 move to agents that use tools and act over complete trajectories, Chapters 23-24 extend RL to vision, audio, VLA, and visual generation, and Chapters 25-26 close with safety, evaluation, and research frontiers.
 
 Here is a detailed introduction to each chapter's content.
 
@@ -383,13 +383,13 @@ Here is a detailed introduction to each chapter's content.
 
 **Chapters 10-12** cover offline RL, imitation and inverse RL, meta-RL, exploration, multi-agent learning, and hierarchical RL.
 
-**Chapters 13-19** form the LLM post-training path, from RLHF pipelines and industrial training to DPO, GRPO, RLVR, reasoning models, process reward models, and RLAIF.
+**Chapters 13-18** form the LLM post-training path, from RLHF, RLAIF, and industrial training to DPO, GRPO, RLVR, reasoning models, and process reward models.
 
-**Chapters 20-23** shift the training object from a single response to a complete trajectory, covering tool use, multi-turn interaction, code agents, browser agents, and GUI agents.
+**Chapters 19-22** shift the training object from a single response to a complete trajectory, covering tool use, multi-turn interaction, code agents, browser agents, and GUI agents.
 
-**Chapters 24-27** extend reward learning and policy optimization to vision, audio, VLA, and visual-generation tasks.
+**Chapters 23-24** first cover Vision-Language Model RL, then combine audio, VLA, and visual generation in Frontier Multimodal RL, creating a continuous path from multimodal understanding to interaction and generation.
 
-**Chapters 28-29** focus on reward hacking, alignment evaluation, self-play, scaling laws, multi-agent cooperation, and research frontiers.
+**Chapters 25-26** focus on reward hacking, alignment evaluation, self-play, scaling laws, multi-agent cooperation, and research frontiers.
 
 ### Target Audience
 

@@ -1,6 +1,6 @@
-# 25.2 多模态音频 Agent 未来方向
+# 24.2 多模态音频 Agent 未来方向
 
-> [25.1](./reward-design) 讲了音频奖励设计。本节看音频 RL 的前沿——多模态音频 Agent（Step-Audio-Chat、Qwen2-Audio）、实时语音对话（GPT-4o Voice）、以及未来方向。
+> [24.1](./reward-design) 讲了音频奖励设计。本节看音频 RL 的前沿——多模态音频 Agent（Step-Audio-Chat、Qwen2-Audio）、实时语音对话（GPT-4o Voice）、以及未来方向。
 
 ## 简单语音对话 RL
 
@@ -60,7 +60,7 @@ class AudioDialoguePolicy(nn.Module):
 
 ### 奖励函数
 
-实现 25.1 节描述的三类奖励：
+实现 24.1 节描述的三类奖励：
 
 ```python
 class AudioReward:
@@ -200,9 +200,9 @@ def self_cognition_correction(policy):
 
 DPO 的精准对齐把错误率压到接近零。这一步看似琐碎，但部署时至关重要——用户期待模型自信地处理音频输入，而不是道歉式地说"我听不了"。
 
-## 本章总结
+## 音频方向总结
 
-音频 RL 是 2025-2026 年 RL 在 LLM 时代的最后一块拼图。本章覆盖了三个核心进展：
+音频 RL 把推理与偏好优化扩展到连续声学信号。本节与 24.1 串起三个核心进展：
 
 1. **Step-Audio-R1 的 MGRD**：解决了音频域的 inverted scaling 问题——根因是文本替代推理，解法是迭代蒸馏把推理基底从文本迁移到声学。R1 首次让音频模型从 test-time compute scaling 中受益
 2. **Step-Audio-R1.5 的 RLHF 范式迁移**：识别并破解了"可验证奖励陷阱"——RLVR 优化"说什么"，用户关心"怎么说"，必须用 RLHF 的多维偏好建模补全韵律、情感、连贯性
@@ -214,7 +214,7 @@ DPO 的精准对齐把错误率压到接近零。这一步看似琐碎，但部�
 - **数据质量 >> 数据数量**：pass@8 ∈ [3, 6] 的精选 5K 样本优于 200K 无筛选
 - **奖励设计是 RL 的灵魂**：单一可验证奖励会塌缩模型行为，多维 rubric 是对齐真实体验的关键
 
-多智能体协作 RL 的训练方法见[第 20 章的多智能体协作与 Agent Swarm](../chapter22_agentic/multi-agent-swarm)：当多个 LLM agent 协同完成任务时，需要同时处理信用分配和奖励分配。
+下一节 [24.3 VLA 模型基础](../chapter28_vla/embodied-intelligence/) 将多模态感知接到物理动作：策略不仅要理解声音和图像，还要在连续控制、真实成本与物理约束下行动。多智能体协作 RL 的训练方法则见[第 19 章的多智能体协作与 Agent Swarm](../chapter22_agentic/multi-agent-swarm)。
 
 ## 延伸阅读
 

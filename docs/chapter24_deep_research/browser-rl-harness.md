@@ -1,4 +1,4 @@
-# 22.1 浏览器 RL Harness 工程
+# 21.1 浏览器 RL Harness 工程
 
 前面几节我们讨论了多轮 RL 的信用分配、轨迹合成、以及 Web Agent / Code Agent 的工具调用训练。现在我们来看一个把这些技术**全部整合在一起**的前沿应用——Deep Research Agent（深度研究智能体）。它的目标是让 AI 像人类研究员一样，自主进行长程、多步的信息搜索、分析和综合，最终输出一份可信赖的研究报告。
 
@@ -424,7 +424,7 @@ def report_reward(report, task, verified_facts=None):
     )
 ```
 
-训练时建议采用**从短到长的课程学习**——先训 500 字短报告，逐步增加到 5000 字完整报告。这和 20.4 节 HardGen[^hardgen] 的难度自适应思路一致。
+训练时建议采用**从短到长的课程学习**——先训 500 字短报告，逐步增加到 5000 字完整报告。这和 19.4 节 HardGen[^hardgen] 的难度自适应思路一致。
 
 ### Deep Research 的两阶段 RL
 
@@ -952,8 +952,8 @@ Search-R1 是本书前面所有 RL 知识在搜索 Agent 场景的具体落地�
 
 - **RLVR（第 16 章）**：Search-R1 的 reward 是纯粹的"答案对不对"，不需要 Reward Model——这正是 RLVR 的核心思想。
 - **GRPO（第 16 章）**：Search-R1 默认使用 GRPO，组采样 + 相对比较替代了 PPO 的 Critic 网络。
-- **Agent Loop（20.1 节）**：Search-R1 的 Rollout 就是 Agent Loop 的具体实现——模型在推理和工具调用之间交替。
-- **ORM vs PRM（20.3 节）**：Search-R1 只用 ORM（终态 reward）。Atom-Searcher[^atom_searcher] 和 Web-Shepherd[^web_shepherd] 在此基础上加了 PRM（过程奖励）。
+- **Agent Loop（19.1 节）**：Search-R1 的 Rollout 就是 Agent Loop 的具体实现——模型在推理和工具调用之间交替。
+- **ORM vs PRM（19.3 节）**：Search-R1 只用 ORM（终态 reward）。Atom-Searcher[^atom_searcher] 和 Web-Shepherd[^web_shepherd] 在此基础上加了 PRM（过程奖励）。
 - **Retrieved Token Masking**：与 PPO 中 mask prompt token 的思路一致——只对策略可控的部分做梯度更新。
 
 </details>
@@ -1049,7 +1049,7 @@ $$\mathcal{M}_{\text{browser}} = (\mathcal{S}, \mathcal{A}, P, R, \gamma, T)$$
 - $\gamma$：折扣因子，Deep Research 任务 $T = 20-100$ 步，$\gamma = 1$（无折扣）
 - $T$：最大步数（budget），通常 30-50
 
-与 [第 23 章 Computer Use](../chapter25_computer_use/training) 的 GUI MDP 相比，Deep Research 的关键差异：
+与 [第 22 章 Computer Use](../chapter25_computer_use/training) 的 GUI MDP 相比，Deep Research 的关键差异：
 
 | 维度             | Deep Research                         | Computer Use              |
 | ---------------- | ------------------------------------- | ------------------------- |
@@ -1120,7 +1120,7 @@ ACTIONS = {
 
 ### Set-of-Mark 混合
 
-借鉴 [第 23 章 GUI Grounding](../chapter25_computer_use/training) 的 SoM 思路：每步把页面所有可交互元素编号，agent 只需输出编号：
+借鉴 [第 22 章 GUI Grounding](../chapter25_computer_use/training) 的 SoM 思路：每步把页面所有可交互元素编号，agent 只需输出编号：
 
 ```
 Agent observes:
@@ -1246,7 +1246,7 @@ class RewardVerifier:
 [2026-06-25 10:23:25] → Page loaded, 15KB text
 [2026-06-25 10:23:29] Step 3: extract("main table")
 [2026-06-25 10:23:32] → Extracted table: 4 rows × 3 cols
-[2026-06-25 10:23:36] Step 4: answer("2024 US GDP was $28.5T")
+[2026-06-25 10:23:36] Step 4: answer("2024 US GDP was $25.5T")
 [2026-06-25 10:23:38] → Reward: 1.0 (correct)
 ```
 
@@ -1328,4 +1328,4 @@ Deep Research 的 RL 训练流水线和 [第 16 章](../chapter18_grpo/grpo-prac
 
 Deep Research 的 harness 工程核心是**五个模块**：环境封装、动作解析、奖励计算、进度跟踪、并行 rollout。其中**环境封装**和**奖励计算**是最难复现的——前者需要真实浏览器工程经验，后者需要任务特定的 verifier 设计。
 
-下一节 [22.2 评测基准与开源项目](./deep-research-eval) 介绍如何衡量 Deep Research Agent 的好坏——你会发现，评测本身比训练更难。
+下一节 [21.2 评测基准与开源项目](./deep-research-eval) 介绍如何衡量 Deep Research Agent 的好坏——你会发现，评测本身比训练更难。

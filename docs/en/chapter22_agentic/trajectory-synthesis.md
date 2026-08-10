@@ -2,9 +2,9 @@
 search: false
 ---
 
-# Legacy Page: Trajectory Synthesis and Data Engineering (Merged into 20.4)
+# Legacy Page: Trajectory Synthesis and Data Engineering (Merged into 19.4)
 
-> This page is kept as an entry point for old links. The core content has already been merged into [20.4 Tool Use, Trajectory Synthesis, and Agentic Engineering](./tool-use-and-trajectory). The original content is preserved below for readers who arrive through legacy links and want a point of comparison.
+> This page is kept as an entry point for old links. The core content has already been merged into [19.4 Tool Use, Trajectory Synthesis, and Agentic Engineering](./tool-use-and-trajectory). The original content is preserved below for readers who arrive through legacy links and want a point of comparison.
 
 # Trajectory Synthesis: Where Training Data Comes From
 

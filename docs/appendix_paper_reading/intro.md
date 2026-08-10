@@ -111,11 +111,11 @@ RLHF / RLVR 在让模型变强的同时打开了**奖励黑客、欺骗、对齐
 
 | 优先级 | 论文                                                                                                                         | 核心贡献                                                                                                                                            |
 | ------ | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ★      | Pan et al. _SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution_ (arXiv:2502.18449, 2025)  | Meta 在 SWE-bench 上规模化 RL 训练，定义"代码-执行-反馈-学习"的 Agent RLVR 范式。详见[第 21 章](../chapter23_rl_based_swe/swe-bench-and-rlvr)。     |
+| ★      | Pan et al. _SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution_ (arXiv:2502.18449, 2025)  | Meta 在 SWE-bench 上规模化 RL 训练，定义"代码-执行-反馈-学习"的 Agent RLVR 范式。详见[第 20 章](../chapter23_rl_based_swe/swe-bench-and-rlvr)。     |
 | ★      | FAIR CodeGen team. _CWM: An Open-Weights LLM for Research on Code Generation with World Models_ (arXiv:2510.02387, 2025)     | Meta FAIR 的 32B 开放权重模型：在 Python 解释器与 agentic Docker 轨迹上中训练世界模型，把代码执行预测融入 RL 推理。                                 |
 | ★      | Wei et al. _Toward Training Superintelligent Software Agents through Self-Play SWE-RL_ (arXiv:2512.18552, 2025)              | Meta/CMU 的自我博弈 SWE-RL：单一 agent 在沙盒代码库上迭代注入与修复 bug，无需人工标注 issue/test 即可持续自我改进。                                 |
-| ★      | ByteDance. _UI-TARS-2 Technical Report: Advancing GUI Agent with Multi-Turn Reinforcement Learning_ (arXiv:2509.02544, 2025) | GUI 操作 Agent：截图 → 动作（鼠标点击/键盘），端到端视觉 RL。详见[第 23 章](../chapter25_computer_use/training)。                                   |
-| ★      | StepFun. _Step-Audio-R1 Technical Report_ (arXiv:2511.15848, 2025)                                                           | 第一个解锁音频推理能力的模型：MGRD 蒸馏让推理链锚定真实声学特征，音频理解超越 Gemini 2.5 Pro。详见[第 25 章](../chapter27_audio_rl/reward-design)。 |
+| ★      | ByteDance. _UI-TARS-2 Technical Report: Advancing GUI Agent with Multi-Turn Reinforcement Learning_ (arXiv:2509.02544, 2025) | GUI 操作 Agent：截图 → 动作（鼠标点击/键盘），端到端视觉 RL。详见[第 22 章](../chapter25_computer_use/training)。                                   |
+| ★      | StepFun. _Step-Audio-R1 Technical Report_ (arXiv:2511.15848, 2025)                                                           | 第一个解锁音频推理能力的模型：MGRD 蒸馏让推理链锚定真实声学特征，音频理解超越 Gemini 2.5 Pro。详见[第 24 章](../chapter27_audio_rl/reward-design)。 |
 | ◆      | Tongyi. _Tongyi DeepResearch_ (2025)                                                                                         | PRM 引导的长 horizon research agent。                                                                                                               |
 | ◇      | Google. _AlphaEvolve_ (2025)                                                                                                 | 进化 + LLM 自动发现新算法，应用于芯片设计与组合优化。                                                                                               |
 
@@ -163,7 +163,7 @@ RLHF / RLVR 在让模型变强的同时打开了**奖励黑客、欺骗、对齐
 - [第 13 章 RLHF](../chapter15_rlhf/base-model-to-assistant) → C.1.3 InstructGPT
 - [第 16 章 GRPO/RLVR](../chapter18_grpo/grpo-practice-and-mechanism) → C.1.3 R1、Shao et al.
 - [第 9 章 连续控制](../chapter11_continuous_control/intro) → C.1.2 DDPG/TD3/SAC/Dreamer V3
-- [第 28 章 对齐失败](../chapter30_alignment_failures/classical-failures) → C.1.4 全部
+- [第 25 章 对齐失败](../chapter30_alignment_failures/classical-failures) → C.1.4 全部
 - [第 14 章 工业级 LLM RL](../chapter16_llm_rl_industrial/intro) → C.1.5.3 全部
   :::
 

@@ -52,8 +52,8 @@
 本章后续会指向：
 
 - [第 18 章 PRM 与推理时搜索](../chapter20_prm_search/outcome-vs-process)——过程奖励与树搜索
-- [第 28 章奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures)——推理模型特有的 reward hacking
-- [第 20 章 Agentic RL](../chapter22_agentic/overview)——推理模型作为智能体的"大脑"
+- [第 25 章奖励黑客与对齐失败](../chapter30_alignment_failures/classical-failures)——推理模型特有的 reward hacking
+- [第 19 章 Agentic RL](../chapter22_agentic/overview)——推理模型作为智能体的"大脑"
 
 ## 一个直觉性的开场
 

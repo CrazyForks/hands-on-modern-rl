@@ -428,4 +428,4 @@ $$
 
 - [第 17 章 Reasoning Models](../chapter19_reasoning/intro)——推理模型的详细讨论
 - [第 18 章 PRM](../chapter20_prm_search/outcome-vs-process)——过程奖励的工业实践
-- [第 21 章 RL-based SWE](../chapter23_rl_based_swe/swe-bench-and-rlvr)——代码 agent 的训练
+- [第 20 章 RL-based SWE](../chapter23_rl_based_swe/swe-bench-and-rlvr)——代码 agent 的训练

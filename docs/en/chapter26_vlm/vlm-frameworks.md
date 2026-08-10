@@ -8,7 +8,7 @@ In the previous two sections we ran VLM GRPO experiments and analyzed the unique
 
 ## VisPlay: Co-Evolution of Questioner and Reasoner
 
-VisPlay is a creative VLM RL framework whose core idea is to let two models **play against each other and co-evolve** through RL — one generates questions (Questioner), the other answers them (Reasoner). This follows the Self-Play idea discussed in Chapter 29, but is specifically designed for visual scenarios.
+VisPlay is a creative VLM RL framework whose core idea is to let two models **play against each other and co-evolve** through RL — one generates questions (Questioner), the other answers them (Reasoner). This follows the Self-Play idea discussed in Chapter 26, but is specifically designed for visual scenarios.
 
 ![VisPlay Framework](../../chapter26_vlm/images/ref-visplay-framework.png)
 
@@ -92,7 +92,7 @@ VeRL-Omni targets RL post-training for three families of generative models:
 
 Its relationship to other material in this chapter:
 
-| | VLM GRPO (24.3 hands-on) | EasyR1 (24.4 GeoQA) | VisPlay / VISTA-Gym | VeRL-Omni |
+| | VLM GRPO (23.3 hands-on) | EasyR1 (23.4 GeoQA) | VisPlay / VISTA-Gym | VeRL-Omni |
 | --- | --- | --- | --- | --- |
 | **Level** | Teaching / demo | VLM **understanding** RL framework | Research algorithms / environments | Multimodal **generation** RL framework |
 | **Optimized object** | Text answer tokens | Text answer tokens | Dual-model game / tool trajectories | Diffusion denoising trajectories / generation latents |
@@ -127,7 +127,7 @@ Moving from 2D images to 3D scenes, VLMs need to understand depth, occlusion, an
 
 ### Robotic VLM-RL
 
-VLM-RL has the broadest application prospects in robotics. Robots need to understand the environment from camera input, then make manipulation decisions. Unlike the continuous control discussed in Section 26.1 on embodied intelligence, the core of VLM-RL is "using visual understanding to guide actions" — not directly from pixels to torques, but first understanding "what object is in front" and then deciding "how to manipulate it."
+VLM-RL has the broadest application prospects in robotics. Robots need to understand the environment from camera input, then make manipulation decisions. Unlike the continuous control discussed in Section 24.3 on embodied intelligence, the core of VLM-RL is "using visual understanding to guide actions" — not directly from pixels to torques, but first understanding "what object is in front" and then deciding "how to manipulate it."
 
 | Approach            | How Input Enters Policy                                        | Strengths                                             | Risks                                                          |
 | ------------------- | -------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------- |
@@ -143,7 +143,7 @@ Robotic VLM-RL training typically follows a "sim pretraining → sim fine-tuning
 
 In the **sim pretraining** phase, RL trains the VLM's visual understanding and decision-making across many simulated scenarios. Simulation environments can quickly generate large amounts of training data (including various edge cases), and the training process is absolutely safe.
 
-In the **sim fine-tuning** phase, targeted fine-tuning is done for the target robot's specific scenarios. This step introduces domain randomization (recall Section 26.1 on embodied intelligence) — randomizing lighting, textures, object positions, and other parameters so the policy works across varied conditions.
+In the **sim fine-tuning** phase, targeted fine-tuning is done for the target robot's specific scenarios. This step introduces domain randomization (recall Section 24.3 on embodied intelligence) — randomizing lighting, textures, object positions, and other parameters so the policy works across varied conditions.
 
 In the **real-world transfer** phase, the simulation-trained model is deployed on a real robot and fine-tuned with small amounts of real data. This step is the hardest — because there is always an unavoidable gap between simulation and reality (imprecise physical parameters, sensor noise, control latency, etc.).
 
@@ -236,7 +236,7 @@ VLM RL produces "models that can understand images." But in real scenarios, user
 
 ### Special Challenges in Multimodal Agent RL
 
-Combining this chapter's VLM RL with [Chapter 20's](../chapter22_agentic/intro) Agent RL introduces three additional challenges:
+Combining this chapter's VLM RL with [Chapter 19's](../chapter22_agentic/intro) Agent RL introduces three additional challenges:
 
 **1. Error misattribution.** When a multimodal Agent produces wrong results, the error may come from visual understanding ("misread" a value in the chart) or tool calling ("made a mistake" passing wrong parameters). These two types of errors require completely different fixes — the former needs more VLM RL training (this chapter's methods), the latter needs more [Agent RL training](../chapter22_agentic/tool-use-and-trajectory). In practice, **staged verification** is needed: first check if visual understanding is correct, then check if tool calls are reasonable.
 
@@ -251,7 +251,7 @@ def multimodal_agent_reward(trajectory, task):
     return 0.2 * visual_reward + 0.3 * tool_reward + 0.5 * outcome_reward
 ```
 
-**3. Cross-modal credit assignment.** In a 10-turn trajectory, a visual understanding error at turn 2 may cause a tool-call failure at turn 5. This is harder than credit assignment in text-only Agents, because the cross-modal error propagation chain is longer and more subtle. The ORM vs PRM tradeoff discussed in [Chapter 20](../chapter22_agentic/multi-turn-rl) is even more prominent here.
+**3. Cross-modal credit assignment.** In a 10-turn trajectory, a visual understanding error at turn 2 may cause a tool-call failure at turn 5. This is harder than credit assignment in text-only Agents, because the cross-modal error propagation chain is longer and more subtle. The ORM vs PRM tradeoff discussed in [Chapter 19](../chapter22_agentic/multi-turn-rl) is even more prominent here.
 
 ### Representative Work
 
@@ -266,7 +266,7 @@ def multimodal_agent_reward(trajectory, task):
 If you want to train multimodal Agents, the recommended path is:
 
 1. **Train visual understanding first**: Use this chapter's VLM GRPO to build basic visual ability.
-2. **Then train tool use**: Use [Chapter 20's tool-use RL](../chapter22_agentic/tool-use-and-trajectory) to establish basic tool-use patterns.
+2. **Then train tool use**: Use [Chapter 19's tool-use RL](../chapter22_agentic/tool-use-and-trajectory) to establish basic tool-use patterns.
 3. **Finally, joint training**: Do end-to-end RL on multimodal Agent tasks, with reward design following the composite reward function above.
 
 Key principle: **verify that visual understanding and tool use each meet baseline independently before attempting end-to-end joint training.** If the underlying components have problems, joint training will not rescue them.

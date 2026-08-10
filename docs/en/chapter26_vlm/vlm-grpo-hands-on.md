@@ -1,8 +1,8 @@
 ---
-title: '24.3 Hands-On: Train a VLM with GRPO'
+title: '23.3 Hands-On: Train a VLM with GRPO'
 ---
 
-# 24.3 Hands-on: Train a VLM to Answer Visual Questions with GRPO
+# 23.3 Hands-on: Train a VLM to Answer Visual Questions with GRPO
 In Chapter 16 we ran GRPO training on a text-only model for math reasoning -- give the model a math problem, let it generate multiple reasoning paths, use rule rewards (whether the answer is correct) to compute group-relative advantages, then update the policy. Now we are going to do something even more interesting: give the model an image and a question about the image, and have it "look", "think", then "answer."
 
 The core difference in this experiment is the input: pure-text GRPO input is a sequence of tokens, while VLM GRPO input is **visual tokens (image encoding) + text tokens (question)**. The reward function and optimization algorithm itself have not changed -- GRPO's core code is exactly the same, except the model input now has an additional image dimension.
@@ -15,7 +15,7 @@ The core difference in this experiment is the input: pure-text GRPO input is a s
 
 The value of this figure is not in how pretty the curve looks, but in reminding us that VLM RL is not simply "adding a few tokens to an image." As long as the reward can capture visual grounding quality, GRPO can turn "looking at the right places" into an optimizable training signal. The geometric shape counting experiment below is the minimal version of this idea.
 
-## 24.3.1 Dataset: Geometric Shape Counting
+## 23.3.1 Dataset: Geometric Shape Counting
 
 We chose a simple visual question-answering task: geometric shape counting. The advantage of this task is that it has objectively correct answers that can be evaluated with rule rewards, requiring no additional RM training.
 
@@ -100,7 +100,7 @@ train_dataset = generate_dataset(500)
 val_dataset = generate_dataset(100)
 ```
 
-## 24.3.2 Reward Design: Three-Dimensional Evaluation
+## 23.3.2 Reward Design: Three-Dimensional Evaluation
 
 The reward function for this task has three dimensions, each with clear scoring criteria:
 
@@ -153,7 +153,7 @@ def compute_reward(response, ground_truth, target_shape):
     return reward
 ```
 
-## 24.3.3 Before-and-After Training Comparison
+## 23.3.3 Before-and-After Training Comparison
 
 Before training, the model's typical response is "guessing" -- because it has not learned the "look first, then reason" strategy. After training, the model learns to describe image content first, then derive the answer from the description. Let us see how the GRPO training process achieves this transition.
 
@@ -230,7 +230,7 @@ After training, the model's answer becomes:
 
 The model has learned to describe visual content first, then derive the answer from the description. This is exactly the behavior we guided through the reasoning quality reward (+0.5) and format compliance reward (+0.2).
 
-## 24.3.4 Training Metric Analysis
+## 23.3.4 Training Metric Analysis
 
 When training a VLM, in addition to the standard metrics mentioned in Chapter 13 (reward, KL divergence, response length), there are several multimodal-specific metrics worth monitoring:
 

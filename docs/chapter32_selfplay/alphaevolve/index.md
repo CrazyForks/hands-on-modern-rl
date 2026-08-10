@@ -1,4 +1,4 @@
-# 29.4 进化式 LLM 搜索与科学发现
+# 26.4 进化式 LLM 搜索与科学发现
 
 [本章前面几节](../self-play-outlook/)讨论了 RL 的传统前沿——self-play、multi-agent 与 scaling。这一节转向一个新的方向：**LLM 驱动的科学发现**。
 
@@ -17,7 +17,7 @@
 
 这些工作代表了 RL 与 LLM 结合的"下一代范式"——从"训练一个 policy"到"训练一个研究系统"。
 
-## 29.4.1 AlphaEvolve 与 LLM + 进化的数学发现
+## 26.4.1 AlphaEvolve 与 LLM + 进化的数学发现
 
 [AlphaEvolve](https://deepmind.google/discover/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/)（DeepMind, 2024.05 公开，2025 完整版）是 LLM 驱动科学发现的旗舰案例。
 
@@ -87,7 +87,7 @@ AlphaEvolve 证明了：
 2. **进化 + LLM 是强大的组合**——LLM 提供智能，进化提供探索
 3. **自动评估是关键**——只有可自动评估的领域才适合这种范式
 
-## 29.4.2 Genie 3 与 生成式 World Model
+## 26.4.2 Genie 3 与 生成式 World Model
 
 [Genie 3](https://deepmind.google/models/genie/)（DeepMind, 2025.08）是生成式 world model 的代表作。
 
@@ -164,7 +164,7 @@ World model 是一个能**预测环境动态**的模型：
 - **泛化**：训练分布外的环境难以模拟
 - **计算成本**：高质量 world model 推理成本高
 
-## 29.4.3 Titans 与 长期记忆架构
+## 26.4.3 Titans 与 长期记忆架构
 
 [Titans](https://arxiv.org/abs/2501.00663)（Google, 2024.12 公开，2025 修改版）是 LLM 架构的新方向——**长期记忆**。
 
@@ -215,7 +215,7 @@ Titans 用**惊喜度（surprise）**作为内部 reward——当输入"令人�
 
 Titans 证明了**长期记忆是 scaling 的下一个方向**——不只是"更宽、更深"，还要"更记得"。
 
-## 29.4.4 M-GRPO 与多智能体搜索训练
+## 26.4.4 M-GRPO 与多智能体搜索训练
 
 [Multi-Agent Deep Research: Training Multi-Agent Systems with M-GRPO](https://arxiv.org/abs/2511.13288)（字节 Seed, 2025.11）用 M-GRPO——Group Relative Policy Optimization 的多智能体扩展——训练多智能体搜索系统。
 
@@ -259,7 +259,7 @@ M-GRPO 解决多智能体 RL 训练的三个难点：
 
 它们是 LLM-driven discovery 的两个互补范式。
 
-## 29.4.5 递归自我改进
+## 26.4.5 递归自我改进
 
 **递归自我改进（Recursive Self-Improvement, RSI）** 是 LLM-driven discovery 的终极形态——**模型自己改进自己**。
 
@@ -313,7 +313,7 @@ M-GRPO 解决多智能体 RL 训练的三个难点：
 
 这些是 RSI 的早期形态——证明了部分可行性，但离真正的"递归自我改进"还很远。
 
-## 29.4.6 LLM-driven Discovery 的共同模式
+## 26.4.6 LLM-driven Discovery 的共同模式
 
 这些工作（AlphaEvolve、Genie 3、Titans、MIRAS、RSI）的共同模式：
 
@@ -338,7 +338,7 @@ AlphaEvolve 之所以能发现新算法，是因为**算法的效果可以自动
 
 传统 RL 训一个 policy。LLM-driven discovery 训一个**完整的研究系统**——多个 agent + memory + search + tools。
 
-## 29.4.7 未来方向
+## 26.4.7 未来方向
 
 ### 科学发现
 
