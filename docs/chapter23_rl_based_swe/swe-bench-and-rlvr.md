@@ -1,4 +1,6 @@
-# 21.1 SWE-bench 与 RL-based SWE 范式
+# 21.1 SWE-RL 基础实验
+
+<!--@include: ./intro.md{3,}-->
 
 这一节我们建立 SWE-RL 的基础概念——什么是 SWE-bench、为什么 SWE 是 RLVR 的理想战场、SWE-RL 与传统 code generation 的本质区别。
 

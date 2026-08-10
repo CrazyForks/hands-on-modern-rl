@@ -1,4 +1,6 @@
-# B.1 SFT Loss 与 KL 散度
+# B.1 SFT 与 KL 散度
+
+<!--@include: ./intro.md{3,}-->
 
 ## SFT Loss（自回归交叉熵）
 

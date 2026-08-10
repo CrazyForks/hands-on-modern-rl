@@ -1,8 +1,10 @@
 ---
-title: 29.1 Self-Play
+title: 29.1 Self-Play Basics and LLM Self-Play
 ---
 
-# 29.1 Self-Play, Self-Evolution, and a Learning Roadmap
+# 29.1 Self-Play Basics and LLM Self-Play
+
+<!--@include: ../intro.md{7,}-->
 
 AlphaGo learned Go from scratch through self-play — no human game records, no expert demonstrations, just a board and a loop of self-competition. This "from zero to superhuman" story is one of RL's most legendary chapters. In 2025–2026, the same idea is being transferred to large language models: **can models continuously evolve through self-play, eventually breaking through the ceiling of human data?**
 
@@ -210,15 +212,15 @@ Self-evolution systems sound wonderful, but they still face several fundamental 
 
 The ideas of self-play and self-evolution thread through the core themes of the entire book. Let us trace these connections:
 
-| Concept from Previous Chapters           | Correspondence in Self-Play/Self-Evolution                                                       |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| AlphaGo self-play (Chapter 7)            | Direct predecessor of self-play — from Go to language                                            |
+| Concept from Previous Chapters            | Correspondence in Self-Play/Self-Evolution                                                       |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| AlphaGo self-play (Chapter 7)             | Direct predecessor of self-play — from Go to language                                            |
 | GRPO within-group comparison (Chapter 16) | Within-group comparison is "simplified self-play" — multiple answers from the same model compete |
-| Experience replay (Chapter 5)            | "Experience distillation" in self-evolution — from raw replay to summarized distillation         |
-| PPO (Chapter 8)                          | Policy optimization algorithm for self-play training                                             |
+| Experience replay (Chapter 5)             | "Experience distillation" in self-evolution — from raw replay to summarized distillation         |
+| PPO (Chapter 8)                           | Policy optimization algorithm for self-play training                                             |
 | RLVR (Chapter 16)                         | Self-play rewards can use verifiable signals, no RM needed                                       |
 | Agentic RL (Chapter 20)                   | Self-play can train tool-use policies — model generates its own tool-call scenarios              |
-| Test-time search                         | Reasoning strategies learned through self-play can be used at inference time                     |
+| Test-time search                          | Reasoning strategies learned through self-play can be used at inference time                     |
 
 Perhaps the deepest connection: **GRPO is a simplified version of self-play**. GRPO has the same model generate multiple answers, then compares them within the group — this is equivalent to multiple instances of the same model "competing." Self-play extends this competition to more complex scenarios: not just comparing final answers, but competing in multi-turn interactions, even playing different roles (Generator vs Judge, Debater A vs Debater B).
 

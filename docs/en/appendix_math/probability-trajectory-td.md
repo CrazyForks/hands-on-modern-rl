@@ -1,10 +1,10 @@
 ---
-title: E.2.4 Trajectory Probability, Baselines, and GAE
+title: D.2.4 Trajectory Probability, Baselines, and GAE
 ---
 
-# E.2.4 Trajectory Probability, Baselines, and GAE
+# D.2.4 Trajectory Probability, Baselines, and GAE
 
-> **Prerequisites**: [E.2.1 Probability Basics](./probability-basics) and [E.2.2 State Values](./probability-value) -- you should know conditional probability, expectation, and variance.
+> **Prerequisites**: [D.2.1 Probability Basics](./probability-basics) and [D.2.2 State Values](./probability-value) -- you should know conditional probability, expectation, and variance.
 
 ---
 
@@ -241,4 +241,4 @@ This article assembled local probability tools into the full probabilistic frame
 
 Trajectory probability lets us average over "all possible futures." A baseline addresses the variance problem where two policies can have the same average return but very different training stability. GAE provides a tunable balance between bias and variance. PPO combines importance sampling, advantage estimation, and clipping into a stable objective function. These tools build on one another and eventually form one of the most widely used policy optimization methods in modern RL.
 
-> **Next**: [E.2.5 Bellman Expectation Equation and Action Values](./probability-bellman-advanced) -- expanding value functions into Bellman equations, then introducing action values and advantage functions.
+> **Next**: [D.2.5 Bellman Expectation Equation and Action Values](./probability-bellman-advanced) -- expanding value functions into Bellman equations, then introducing action values and advantage functions.

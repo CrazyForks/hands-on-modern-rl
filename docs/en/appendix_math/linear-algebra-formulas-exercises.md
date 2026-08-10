@@ -1,10 +1,10 @@
 ---
-title: E.1.5 Formula Review and Exercises
+title: D.1.5 Formula Review and Exercises
 ---
 
-# E.1.5 Formula Review and Exercises
+# D.1.5 Formula Review and Exercises
 
-> **Prerequisites**: This page summarizes all formulas in module E.1. It is best read after [E.1.1](./linear-algebra-basics) through [E.1.4](./linear-algebra-advanced). If this is your first pass, read the main articles first.
+> **Prerequisites**: This page summarizes all formulas in module D.1. It is best read after [D.1.1](./linear-algebra-basics) through [D.1.4](./linear-algebra-advanced). If this is your first pass, read the main articles first.
 
 ---
 
@@ -42,7 +42,7 @@ $$
 \boldsymbol{v} \leftarrow \boldsymbol{v} + \alpha \cdot \boldsymbol{e}_s \cdot \delta,
 $$
 
-where $\boldsymbol{e}_s$ is the one-hot vector for state $s$, with only the $s$-th position equal to $1$, and $\delta = r + \gamma V(s') - V(s)$ is the TD Error. This and the Bellman matrix form $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$ from E.1.2 are two expressions of the same object: the former is an incremental update that changes one component at a time, while the latter is a global equation that all components satisfy simultaneously.
+where $\boldsymbol{e}_s$ is the one-hot vector for state $s$, with only the $s$-th position equal to $1$, and $\delta = r + \gamma V(s') - V(s)$ is the TD Error. This and the Bellman matrix form $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$ from D.1.2 are two expressions of the same object: the former is an incremental update that changes one component at a time, while the latter is a global equation that all components satisfy simultaneously.
 
 ### Tabular Q-Learning: A Special Case of One-Hot plus Dot Product
 
@@ -56,7 +56,7 @@ The second route in Chapter 3 defined a policy objective $J(\theta)$. When updat
 
 ## Concept Map
 
-The table below organizes all concepts in module E.1 by dependency. You can read down the dependency chain or use it as an index to jump to a concept.
+The table below organizes all concepts in module D.1 by dependency. You can read down the dependency chain or use it as an index to jump to a concept.
 
 | Concept                         | Core formula                                         | Depends on            | Role in RL                            |
 | ------------------------------- | ---------------------------------------------------- | --------------------- | ------------------------------------- |
@@ -78,7 +78,7 @@ Reading from top to bottom, each concept adds a new capability on top of the pre
 
 ## From Difficulties to Tools
 
-The central thread of module E.1 is moving from "cannot compute it" to "can compute it safely."
+The central thread of module D.1 is moving from "cannot compute it" to "can compute it safely."
 
 | Stage        | Difficulty                              | Mathematical tool                   | Key formula                                                        |
 | ------------ | --------------------------------------- | ----------------------------------- | ------------------------------------------------------------------ |

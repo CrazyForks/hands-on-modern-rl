@@ -1,12 +1,12 @@
 ---
-title: B.3 Evaluation Benchmarks
+title: A.4 Evaluation Benchmarks
 ---
 
-# B.3 RL Post-Training and Agentic RL Benchmarks
+# A.4 RL Post-Training and Agentic RL Benchmarks
 
 > Training curves tell you the optimizer is moving. Benchmarks tell you whether the model's capabilities actually improved.
 >
-> In RL post-training, rising reward does not necessarily mean task success. In Agentic RL, a single successful episode does not mean the agent reliably learned the task. This section focuses on one engineering question: once you have built [B.1 RL Training Systems](./rl-infrastructure) and [B.2 Agentic RL Infrastructure](./agentic-rl-infra), how should you design benchmarks to decide whether a checkpoint can continue training, can be deployed, and where the next round of data should be supplemented.
+> In RL post-training, rising reward does not necessarily mean task success. In Agentic RL, a single successful episode does not mean the agent reliably learned the task. This section focuses on one engineering question: once you have built [A.2 RL Training Systems](./rl-infrastructure) and [A.3 Agentic RL Infrastructure](./agentic-rl-infra), how should you design benchmarks to decide whether a checkpoint can continue training, can be deployed, and where the next round of data should be supplemented.
 
 ## Benchmarks Are Not Just Leaderboards
 

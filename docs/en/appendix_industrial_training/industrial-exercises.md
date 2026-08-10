@@ -1,8 +1,8 @@
 ---
-title: B.5 Industrial Practice Exercises
+title: C.4 Industrial Practice Exercises
 ---
 
-# B.5 Industrial Practice Exercises
+# C.4 Industrial Practice Exercises
 
 This page does not present exercises as abstract algorithm puzzles. Instead, it works backwards from real job requirements: what post-training and RL roles actually do day to day, and what kind of projects convincingly demonstrate competence.
 

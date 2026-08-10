@@ -1,14 +1,14 @@
 ---
-title: E.4.6 Formulas and Exercises
+title: D.4.6 Formulas and Exercises
 ---
 
-# E.4.6 Information Theory Formula Reference and Exercises
+# D.4.6 Information Theory Formula Reference and Exercises
 
-> **Prerequisites**: This page summarizes all formulas in module E.4. It is best reviewed after reading [E.4.1](./information-basics) through [E.4.5](./information-advanced-formulas). If this is your first pass, skip to the main articles first.
+> **Prerequisites**: This page summarizes all formulas in module D.4. It is best reviewed after reading [D.4.1](./information-basics) through [D.4.5](./information-advanced-formulas). If this is your first pass, skip to the main articles first.
 
 ---
 
-This page collects all formulas used in module E.4 for review. It is recommended that you read the previous articles first and then use this page as a reference table.
+This page collects all formulas used in module D.4 for review. It is recommended that you read the previous articles first and then use this page as a reference table.
 
 ## Information Theory Formulas You Will Meet in This Book
 

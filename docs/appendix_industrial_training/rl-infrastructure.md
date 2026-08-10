@@ -10,11 +10,11 @@
 
 这就是 RL 采样基础设施要解决的问题。
 
-本节把原来的“采样基础设施”“异步训练架构”“分布式并行策略”合并到同一条主线里：首先建立“生产者、缓冲区、消费者、权重回流”的数据流水线；然后进入 LLM RL，按推理/rollout 层、训练/编排层依次讨论 vLLM/SGLang 与 OpenRLHF、veRL、slime；再以非 LLM RL 作对照，说明 Gymnasium、IMPALA、Sample Factory、Isaac Gym 所处的层级；最后讨论异步训练和多卡并行如何把这条流水线真正跑起来。这里讨论的是所有后续 RL 工程都会复用的**训练系统底座**；当模型开始执行工具、读写文件、运行代码或进行多轮环境交互时，新增的沙箱、轨迹存储和工具调度问题放到 **[B.2 Agentic RL 基础设施](./agentic-rl-infra)**。
+本节把原来的“采样基础设施”“异步训练架构”“分布式并行策略”合并到同一条主线里：首先建立“生产者、缓冲区、消费者、权重回流”的数据流水线；然后进入 LLM RL，按推理/rollout 层、训练/编排层依次讨论 vLLM/SGLang 与 OpenRLHF、veRL、slime；再以非 LLM RL 作对照，说明 Gymnasium、IMPALA、Sample Factory、Isaac Gym 所处的层级；最后讨论异步训练和多卡并行如何把这条流水线真正跑起来。这里讨论的是所有后续 RL 工程都会复用的**训练系统底座**；当模型开始执行工具、读写文件、运行代码或进行多轮环境交互时，新增的沙箱、轨迹存储和工具调度问题放到 **[A.3 Agentic RL 基础设施](./agentic-rl-infra)**。
 
 ## 先讲训练底座
 
-B.1 关心的是：样本如何被生产、排队、消费，权重如何回流，模型如何切到多张 GPU 上。它默认采样端主要是文本生成引擎、仿真环境或 Actor worker。
+A.2 关心的是：样本如何被生产、排队、消费，权重如何回流，模型如何切到多张 GPU 上。它默认采样端主要是文本生成引擎、仿真环境或 Actor worker。
 
 | 本页展开                                                 | 本页只点到为止                                |
 | -------------------------------------------------------- | --------------------------------------------- |
@@ -23,7 +23,7 @@ B.1 关心的是：样本如何被生产、排队、消费，权重如何回流�
 | rollout/training 异步、buffer、policy version、staleness | 单条 Agent 轨迹内部的工具等待和批内流水线调度 |
 | FSDP、ZeRO、TP、PP、EP 等分布式训练和显存优化            | Web/代码/多模态 Agent 的环境接口与可复现性    |
 
-一个简单判断是：如果任务还是“模型生成 completion，然后 verifier 或 reward 给分”，主要看 B.1；如果模型的 action 会离开 GPU，去调用工具、改文件、跑测试、查网页或跨多轮维护环境状态，就进入 B.2。
+一个简单判断是：如果任务还是“模型生成 completion，然后 verifier 或 reward 给分”，主要看 A.2；如果模型的 action 会离开 GPU，去调用工具、改文件、跑测试、查网页或跨多轮维护环境状态，就进入 A.3。
 
 ## RL 训练的数据流水线
 
@@ -307,7 +307,7 @@ slime 的系统结构相对明确：
 
 与 OpenRLHF / veRL 相比，slime 更明确地把 SGLang 作为原生推理层，而非一般可替换插件。slime 文档强调：内部以 server 模式启动 SGLang，SGLang 参数可以通过 `--sglang-*` 直接传递，并提供 `--debug-rollout-only` 用于单独调试 rollout 性能 [^slime_intro]。训练侧同样支持 Megatron 参数透传，覆盖 TP/PP/EP/CP 等模型并行策略，并提供 `--debug-train-only` 调试训练部分 [^slime_intro]。
 
-slime README 里列出的下游项目也能说明它的定位：APRIL 专门优化 rollout 长尾；TritonForge、RLVE、P1 等则把 slime 用到代码生成、可验证环境和物理推理等任务上 [^slime_readme]。这些项目复用的仍是本页讨论的底座：rollout engine、training backend、data buffer、权重同步和并行训练。至于 Agentic RL 框架如何在这层底座之上增加沙箱、多轮轨迹和工具调度，放到 B.2 再展开。
+slime README 里列出的下游项目也能说明它的定位：APRIL 专门优化 rollout 长尾；TritonForge、RLVE、P1 等则把 slime 用到代码生成、可验证环境和物理推理等任务上 [^slime_readme]。这些项目复用的仍是本页讨论的底座：rollout engine、training backend、data buffer、权重同步和并行训练。至于 Agentic RL 框架如何在这层底座之上增加沙箱、多轮轨迹和工具调度，放到 A.3 再展开。
 
 slime 的 release note 还讨论了典型系统工程问题：RL 推理延迟不能仅通过增加 GPU 解决，因为训练仍然要等待最长样本 decode 完成；过大的 inference batch 又会带来 off-policy 问题 [^slime_release]。因此，slime 关注 KV cache 空间、MoE fp8 rollout、DeepEP、Megatron offload、NCCL group 重建等底层优化。这些问题已经超越单机 PPO loop 的范畴，属于工业 RL 训练系统的基础设施问题。
 
@@ -557,7 +557,7 @@ MoE 和 PRM 会进一步放大系统复杂度。MoE 需要处理专家负载均�
 
 选型时首先判断任务是否属于 LLM RL。LLM RL 优先评估推理/rollout 吞吐，再评估 reward、training、buffer、weight sync 的编排方式；非 LLM RL 主要优化环境交互和仿真吞吐。在每个大类内部，再根据具体瓶颈选择对应系统。
 
-如果你只记一个判断顺序：先判断任务属于 LLM RL 还是非 LLM RL；再找采样瓶颈在哪里；然后决定同步、共置还是分离；最后根据模型规模选择 FSDP、ZeRO、TP、PP、EP 等并行策略。若任务进入多轮交互、工具调用、代码执行、网页访问或多模态环境状态管理，就不要继续把问题理解成“更复杂的 rollout batch”，而应转到 **[B.2 Agentic RL 基础设施](./agentic-rl-infra)**。
+如果你只记一个判断顺序：先判断任务属于 LLM RL 还是非 LLM RL；再找采样瓶颈在哪里；然后决定同步、共置还是分离；最后根据模型规模选择 FSDP、ZeRO、TP、PP、EP 等并行策略。若任务进入多轮交互、工具调用、代码执行、网页访问或多模态环境状态管理，就不要继续把问题理解成“更复杂的 rollout batch”，而应转到 **[A.3 Agentic RL 基础设施](./agentic-rl-infra)**。
 
 ## 参考文献
 

@@ -22,24 +22,24 @@ The whole appendix can be summarized as one line:
 
 | Section                                                                             | Topic                                                                                   | Main question                                                         |
 | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| [E.1 Mathematical objects and linear algebra](./linear-algebra)                     | scalars, vectors, matrices, dot products, norms, linear equations                       | How do we write states, values, and parameters as computable objects? |
-| [E.2 Probability, expectation, and stochastic estimation](./probability-statistics) | probability, conditional probability, random variables, expectation, variance, sampling | How do random trajectories become average value?                      |
-| [E.3 Calculus and optimization](./calculus-optimization)                            | derivatives, gradients, chain rule, Taylor expansion, optimization algorithms           | Which direction should parameters move?                               |
-| [E.4 Information theory and distribution distance](./information-theory)            | self-information, entropy, cross-entropy, KL, mutual information                        | How do we measure policy randomness and policy change?                |
+| [D.1 Mathematical objects and linear algebra](./linear-algebra)                     | scalars, vectors, matrices, dot products, norms, linear equations                       | How do we write states, values, and parameters as computable objects? |
+| [D.2 Probability, expectation, and stochastic estimation](./probability-statistics) | probability, conditional probability, random variables, expectation, variance, sampling | How do random trajectories become average value?                      |
+| [D.3 Calculus and optimization](./calculus-optimization)                            | derivatives, gradients, chain rule, Taylor expansion, optimization algorithms           | Which direction should parameters move?                               |
+| [D.4 Information theory and distribution distance](./information-theory)            | self-information, entropy, cross-entropy, KL, mutual information                        | How do we measure policy randomness and policy change?                |
 
 ## Suggested Reading Order
 
 If you want to rebuild the mathematical foundations systematically, read in this order:
 
-1. [E.1.1 Vector and matrix basics](./linear-algebra-basics): understand scalars, vectors, matrices, and matrix multiplication.
-2. [E.1.2 Bellman equations in matrix form](./linear-algebra-bellman): see how value recursion becomes a linear system.
-3. [E.2.1 Probability, conditional probability, and expectation](./probability-basics): learn random variables and expectation.
-4. [E.2.2 Random trajectories and state value](./probability-value): connect expectation to returns and value functions.
-5. [E.2.3 Monte Carlo and importance sampling](./probability-sampling): estimate values from samples when the environment model is unknown.
-6. [E.3.1 Derivatives, gradients, and the chain rule](./calculus-basics): understand parameter changes and backpropagation.
-7. [E.3.2 Policy gradients and advantage functions](./calculus-policy-gradient): apply gradients to policy optimization.
-8. [E.4.1 Self-information, entropy, and exploration](./information-basics): understand policy randomness.
-9. [E.4.2 Cross-entropy and KL divergence](./information-cross-entropy-kl): understand distances between distributions.
+1. [D.1.1 Vector and matrix basics](./linear-algebra-basics): understand scalars, vectors, matrices, and matrix multiplication.
+2. [D.1.2 Bellman equations in matrix form](./linear-algebra-bellman): see how value recursion becomes a linear system.
+3. [D.2.1 Probability, conditional probability, and expectation](./probability-basics): learn random variables and expectation.
+4. [D.2.2 Random trajectories and state value](./probability-value): connect expectation to returns and value functions.
+5. [D.2.3 Monte Carlo and importance sampling](./probability-sampling): estimate values from samples when the environment model is unknown.
+6. [D.3.1 Derivatives, gradients, and the chain rule](./calculus-basics): understand parameter changes and backpropagation.
+7. [D.3.2 Policy gradients and advantage functions](./calculus-policy-gradient): apply gradients to policy optimization.
+8. [D.4.1 Self-information, entropy, and exploration](./information-basics): understand policy randomness.
+9. [D.4.2 Cross-entropy and KL divergence](./information-cross-entropy-kl): understand distances between distributions.
 10. Finally, return to each module's formula summary and exercises.
 
 If you only need one concept, it is completely fine to jump directly to the relevant page.
@@ -75,15 +75,15 @@ If you can translate a complicated formula back into this two-state example, mat
 
 The sidebar divides the content into four math modules. You do not need to read everything at once. There are three useful modes:
 
-1. **Systematic catch-up**: start from E.1.1 and read in order.
-2. **Just-in-time lookup**: if Bellman matrix form is confusing, read E.1.2; if GAE is confusing, read the probability and calculus sections; if KL constraints are confusing, read E.4.2.
+1. **Systematic catch-up**: start from D.1.1 and read in order.
+2. **Just-in-time lookup**: if Bellman matrix form is confusing, read D.1.2; if GAE is confusing, read the probability and calculus sections; if KL constraints are confusing, read D.4.2.
 3. **Quick review**: use each module's formula summary and exercises after finishing the corresponding topic.
 
 If the sidebar feels too large, read only the first page of each module first:
 
-- [E.1.1 Scalars, vectors, and matrices](./linear-algebra-basics)
-- [E.2.1 Probability, conditional probability, and expectation](./probability-basics)
-- [E.3.1 Derivatives, gradients, and the chain rule](./calculus-basics)
-- [E.4.1 Self-information, entropy, and exploration](./information-basics)
+- [D.1.1 Scalars, vectors, and matrices](./linear-algebra-basics)
+- [D.2.1 Probability, conditional probability, and expectation](./probability-basics)
+- [D.3.1 Derivatives, gradients, and the chain rule](./calculus-basics)
+- [D.4.1 Self-information, entropy, and exploration](./information-basics)
 
 After these four pages, return to the detailed topics whenever a formula in the main text needs support.

@@ -1,12 +1,12 @@
 # A.3 Agentic RL 基础设施 与 沙箱、多轮轨迹与工具调度
 
-> B.1 讨论的是 RL 训练系统底座：rollout、buffer、trainer、权重同步和分布式并行。本页从另一个边界开始：模型的 action 不再只是生成 token，而是会调用工具、运行代码、读写文件、访问网页，或在多轮环境中改变外部状态。
+> A.2 讨论的是 RL 训练系统底座：rollout、buffer、trainer、权重同步和分布式并行。本页从另一个边界开始：模型的 action 不再只是生成 token，而是会调用工具、运行代码、读写文件、访问网页，或在多轮环境中改变外部状态。
 
-## 与 B.1 的分工
+## 与 A.2 的分工
 
-B.2 不重复讲 vLLM/SGLang 如何做高吞吐生成，也不重复讲 FSDP、ZeRO、TP、PP、EP 如何把模型切到多张卡上。这些都是 B.1 的内容。B.2 只讨论 Agentic RL 比普通 LLM RL 多出来的工程问题。
+A.3 不重复讲 vLLM/SGLang 如何做高吞吐生成，也不重复讲 FSDP、ZeRO、TP、PP、EP 如何把模型切到多张卡上。这些都是 A.2 的内容。A.3 只讨论 Agentic RL 比普通 LLM RL 多出来的工程问题。
 
-| 问题           | B.1 训练系统底座                                            | B.2 Agentic RL 基础设施                                             |
+| 问题           | A.2 训练系统底座                                            | A.3 Agentic RL 基础设施                                             |
 | -------------- | ----------------------------------------------------------- | ------------------------------------------------------------------- |
 | rollout 的含义 | prompt 进入模型，生成 completion 或一段轨迹                 | 模型多轮行动，每步可能调用工具、执行代码或改变环境                  |
 | 样本结构       | token、mask、logprob、reward、policy version、rollout batch | episode、tool call、tool result、环境快照、步骤级 reward、loss mask |
@@ -14,7 +14,7 @@ B.2 不重复讲 vLLM/SGLang 如何做高吞吐生成，也不重复讲 FSDP、Z
 | 系统重点       | buffer 深度、异步训练、staleness、权重同步、模型并行        | 沙箱隔离、多轮轨迹存储、批内流水线、环境接口、可复现性              |
 | 代表框架       | OpenRLHF、veRL、slime                                       | Relax、AReaL、Agent-R1、NeMo Gym                                    |
 
-一句话区分：B.1 解决“训练系统怎么把样本喂给模型”；B.2 解决“Agent 的动作真的发生在外部世界时，训练系统怎么安全、可复现、高吞吐地收集这些动作”。
+一句话区分：A.2 解决“训练系统怎么把样本喂给模型”；A.3 解决“Agent 的动作真的发生在外部世界时，训练系统怎么安全、可复现、高吞吐地收集这些动作”。
 
 ## 从单轮生成到多轮行动
 
@@ -93,13 +93,13 @@ container = client.containers.run(
 
 ### LLM RL vs. Agentic RL 的数据结构差异
 
-B.1 中的 LLM RL 样本并不只是原始文本。真实系统会记录 token ids、attention mask、response mask、old logprob、policy version、reward 等字段。但从结构上看，它仍然接近一条线性序列：`prompt -> completion -> reward`。
+A.2 中的 LLM RL 样本并不只是原始文本。真实系统会记录 token ids、attention mask、response mask、old logprob、policy version、reward 等字段。但从结构上看，它仍然接近一条线性序列：`prompt -> completion -> reward`。
 
 Agentic RL 的训练数据则更像一棵带状态的对话树。一个 episode 可能包含七八轮交互，每轮包含模型输出、工具调用参数、工具返回、环境状态变化和步骤级奖励。以"修复 Python bug"任务为例：模型先读代码，然后修改，跑测试发现失败，继续修改，再跑测试通过——这些交互过程都需要完整记录。
 
 ### 存储需求
 
-与 B.1 的线性 rollout batch 相比，Agentic RL 的存储系统还需要支持三项额外能力：
+与 A.2 的线性 rollout batch 相比，Agentic RL 的存储系统还需要支持三项额外能力：
 
 - **按任务类型检索**：如分析"数学做得好但代码做得差"的模式
 - **按步骤切片**：定位具体哪一步决策出错
@@ -113,17 +113,17 @@ Agentic RL 的训练数据则更像一棵带状态的对话树。一个 episode 
 
 ### 问题量化
 
-B.1 讨论过 LLM RL 的 GPU 空等问题：生成和训练串行执行，训练 GPU 有大量时间在等待生成完成。Agentic RL 将这一问题进一步加剧，而且等待位置发生变化。
+A.2 讨论过 LLM RL 的 GPU 空等问题：生成和训练串行执行，训练 GPU 有大量时间在等待生成完成。Agentic RL 将这一问题进一步加剧，而且等待位置发生变化。
 
 以单条 Agentic 轨迹的时间线为例：GPU 生成一个动作约需 3 毫秒，随后 CPU 执行工具约需 500 毫秒。在这 500 毫秒内 GPU 处于空闲状态。下一轮类似：GPU 3 毫秒，CPU 300 毫秒。几轮交互后，GPU 实际工作时间不到 1%。与 LLM RL 相比，LLM RL 的空等发生在 rollout 和 training 之间，而 Agentic RL 的空等发生在每一轮交互内部。
 
 ### 批次内并发 与 流水线调度
 
-解法与 B.1 的异步训练思路一脉相承：并发运行多条轨迹。轨迹 A 等待工具返回时，GPU 为轨迹 B 生成动作；轨迹 B 等待工具时，GPU 为轨迹 C 生成动作。通过流水线调度，GPU 持续保持工作状态。这种设计可将 GPU 利用率从约 1% 提升至 70-80%，吞吐量提升 50-100 倍。
+解法与 A.2 的异步训练思路一脉相承：并发运行多条轨迹。轨迹 A 等待工具返回时，GPU 为轨迹 B 生成动作；轨迹 B 等待工具时，GPU 为轨迹 C 生成动作。通过流水线调度，GPU 持续保持工作状态。这种设计可将 GPU 利用率从约 1% 提升至 70-80%，吞吐量提升 50-100 倍。
 
 ### 两级异步
 
-上述方案解决的是"批次内"的并发问题。批次之间仍存在 B.1 讨论的 Rollout 和 Training 串行问题。完整方案采用两级异步：批次内多条轨迹并发（GPU 和工具交替工作），批次间 Rollout 和 Training 通过数据队列解耦（Rollout 持续生成，Training 持续训练）。第一层异步是 Agentic RL 特有的，第二层异步复用 B.1 的训练系统底座。
+上述方案解决的是"批次内"的并发问题。批次之间仍存在 A.2 讨论的 Rollout 和 Training 串行问题。完整方案采用两级异步：批次内多条轨迹并发（GPU 和工具交替工作），批次间 Rollout 和 Training 通过数据队列解耦（Rollout 持续生成，Training 持续训练）。第一层异步是 Agentic RL 特有的，第二层异步复用 A.2 的训练系统底座。
 
 至此，Agentic RL 的三个基础工程问题——安全执行、数据存储、GPU 调度——已逐一讨论。这些解决方案在真实的工业系统中如何组织？下面的 Relax 案例提供了一个完整的参考实现。
 
@@ -151,11 +151,11 @@ Relax 的核心设计选择是将训练流程中的每个角色部署为独立�
 └───────────────────────────────────────────────────────────────┘
 ```
 
-训练后端采用 Megatron-LM，支持 B.1 介绍过的 TP/PP/CP/EP 全套并行策略。推理后端采用 SGLang，两者之间通过 Megatron Bridge 自动完成权重格式转换。
+训练后端采用 Megatron-LM，支持 A.2 介绍过的 TP/PP/CP/EP 全套并行策略。推理后端采用 SGLang，两者之间通过 Megatron Bridge 自动完成权重格式转换。
 
 ### TransferQueue 与 流式数据通道
 
-回顾 B.1 的异步训练机制：Rollout 生成数据写入 Buffer，Training 从 Buffer 读取数据训练。传统 Buffer 是批量的——Rollout 生成完整个 batch 才写入，Training 等有数据后才读取。这导致一侧始终在等待：Rollout 写入过快时 Buffer 溢出，Training 读取过快时 Buffer 为空导致 GPU 空闲。在 Agentic RL 中，这个问题还叠加了工具执行等待，所以队列最好能承接更细粒度的样本流。
+回顾 A.2 的异步训练机制：Rollout 生成数据写入 Buffer，Training 从 Buffer 读取数据训练。传统 Buffer 是批量的——Rollout 生成完整个 batch 才写入，Training 等有数据后才读取。这导致一侧始终在等待：Rollout 写入过快时 Buffer 溢出，Training 读取过快时 Buffer 为空导致 GPU 空闲。在 Agentic RL 中，这个问题还叠加了工具执行等待，所以队列最好能承接更细粒度的样本流。
 
 TransferQueue 将这一交互改为流式：Rollout 每生成一个样本即写入队列，Training 端每拿到一个样本即开始处理，无需等待整个 batch 生成完毕。对 Agentic RL 来说，样本不只是 completion，还可能是一条包含多轮工具结果的 episode。配合 DCS（Distributed Checkpoint Service）做权重同步——Training 每更新一步参数，DCS 通过 NCCL 广播给 Rollout 等组件，与下一次训练计算重叠进行，不占额外时间。
 
@@ -167,7 +167,7 @@ Relax 提供两种模式以适应不同的硬件条件。
 
 *Collocate 模式*下，Actor 和 Rollout 共享同一组 GPU，轮替使用。Rollout 生成完一个 batch，让出 GPU 给 Training。这适合 GPU 数量有限的情况，而且可以做到严格的 on-policy——模型参数没有任何延迟，Training 永远在用最新版本的模型生成的数据。
 
-*Fully Async 模式*下，各角色跑在独立的 GPU 集群上，通过 TransferQueue 交换数据，通过 DCS 异步同步权重。参数 `--max-staleness` 控制允许多"旧"的数据参与训练——设 0 即为严格 on-policy，设大则允许更多异步以换取吞吐。这和 B.1 讨论的"旧数据怎么处理"是同一个底层问题；区别在于 Agentic RL 的"旧"还可能来自环境状态变化、工具版本变化或外部数据变化，因此更需要记录环境快照和可复现信息。
+*Fully Async 模式*下，各角色跑在独立的 GPU 集群上，通过 TransferQueue 交换数据，通过 DCS 异步同步权重。参数 `--max-staleness` 控制允许多"旧"的数据参与训练——设 0 即为严格 on-policy，设大则允许更多异步以换取吞吐。这和 A.2 讨论的"旧数据怎么处理"是同一个底层问题；区别在于 Agentic RL 的"旧"还可能来自环境状态变化、工具版本变化或外部数据变化，因此更需要记录环境快照和可复现信息。
 
 ### 工程细节
 
@@ -222,7 +222,7 @@ Relax 是目前唯一同时支持全模态和全异步弹性扩展的 Agentic RL
 
 前面的框架分析都是站在使用者视角：每个组件做什么，数据怎么流，GPU 怎么调度。但要真正理解一个 RL 训练框架的内部结构，最好的办法是自己写一个。[hyunwoongko/nanoRLHF](https://github.com/hyunwoongko/nanoRLHF)（181 stars）正是这样一个项目——它用纯 PyTorch + Triton 从零实现了 LLM RLHF 训练所需的全部组件，包括训练引擎、推理引擎、分布式调度和 RL 编排。
 
-nanoRLHF 的定位类似 nanoGPT：把一个生产系统剥离到只保留承重结构。它的目录结构直接对应了 B.1 讨论的系统层级：
+nanoRLHF 的定位类似 nanoGPT：把一个生产系统剥离到只保留承重结构。它的目录结构直接对应了 A.2 讨论的系统层级：
 
 ```
 nanorlhf/
@@ -237,7 +237,7 @@ nanorlhf/
 
 ### nanotron
 
-nanotron 对应 B.1 中的"训练/编排层"的底层——它负责把大模型拆到多张 GPU 上训练。核心实现了 3D parallelism（数据并行 + 流水并行 + 张量并行）、gradient accumulation、mixed precision training 和 checkpoint 管理。
+nanotron 对应 A.2 中的"训练/编排层"的底层——它负责把大模型拆到多张 GPU 上训练。核心实现了 3D parallelism（数据并行 + 流水并行 + 张量并行）、gradient accumulation、mixed precision training 和 checkpoint 管理。
 
 阅读入口：`nanotron/` 目录。重点关注：
 
@@ -247,7 +247,7 @@ nanotron 对应 B.1 中的"训练/编排层"的底层——它负责把大模型
 
 ### nanovllm
 
-nanovllm 对应 B.1 中的"推理/rollout 层"——它负责高吞吐生成 token。核心实现了 PagedAttention（vLLM 的关键技术）、KV cache 管理和 continuous batching。
+nanovllm 对应 A.2 中的"推理/rollout 层"——它负责高吞吐生成 token。核心实现了 PagedAttention（vLLM 的关键技术）、KV cache 管理和 continuous batching。
 
 阅读入口：`nanovllm/` 目录。重点关注：
 
@@ -257,7 +257,7 @@ nanovllm 对应 B.1 中的"推理/rollout 层"——它负责高吞吐生成 tok
 
 ### RL 编排 与 nanoverl
 
-nanoverl 是把前面两个引擎串起来的编排层，对应 B.1 中 OpenRLHF/veRL 的角色。它实现了 PPO 训练循环：rollout（用 nanovllm 生成）→ reward 计算 → advantage 估计 → PPO clipped loss → 梯度更新（用 nanotron 训练）。
+nanoverl 是把前面两个引擎串起来的编排层，对应 A.2 中 OpenRLHF/veRL 的角色。它实现了 PPO 训练循环：rollout（用 nanovllm 生成）→ reward 计算 → advantage 估计 → PPO clipped loss → 梯度更新（用 nanotron 训练）。
 
 阅读入口：`nanoverl/trainer/` 目录。重点关注：
 
@@ -289,10 +289,10 @@ pip install -e .
 
 1. **跑通 SFT 训练**：`bash ./scripts/train_sft.sh`，观察训练日志中的 loss、lr、throughput 指标
 2. **阅读 PPO trainer**：打开 `nanoverl/trainer/`，画出 rollout → reward → advantage → train 的数据流图
-3. **对比 B.1 的框架表**：把 nanoRLHF 的每个模块对应到 OpenRLHF / veRL / slime 的等价组件，理解抽象边界的异同
+3. **对比 A.2 的框架表**：把 nanoRLHF 的每个模块对应到 OpenRLHF / veRL / slime 的等价组件，理解抽象边界的异同
 4. **修改 reward 函数**：在 `nanoverl/reward/` 中替换为自己的 reward 逻辑（例如字符串匹配、正则提取），跑通一个自定义 reward 的 RL 训练循环
 
-nanoRLHF 的价值不在于生产使用，而在于它用可读的代码把 B.1 讨论的"rollout engine、training backend、weight sync、policy version"这些概念变成了具体实现。读完之后再看 veRL 或 OpenRLHF 的源码，会快得多。
+nanoRLHF 的价值不在于生产使用，而在于它用可读的代码把 A.2 讨论的"rollout engine、training backend、weight sync、policy version"这些概念变成了具体实现。读完之后再看 veRL 或 OpenRLHF 的源码，会快得多。
 
 ## 参考文献
 

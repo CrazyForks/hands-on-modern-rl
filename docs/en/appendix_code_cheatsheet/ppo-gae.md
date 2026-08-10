@@ -1,8 +1,8 @@
 ---
-title: C.2 PPO and GAE
+title: B.2 PPO and GAE
 ---
 
-# C.2 PPO and GAE
+# B.2 PPO and GAE
 
 PPO is the most frequently tested algorithm in LLM RL interviews. Interviewers typically ask you to write the **clipped policy loss**, and may follow up with the value loss and GAE.
 

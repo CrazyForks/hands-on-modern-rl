@@ -1,10 +1,10 @@
 ---
-title: E.1.2 Matrix Form of the Bellman Equation
+title: D.1.2 Matrix Form of the Bellman Equation
 ---
 
-# E.1.2 Matrix Form of the Bellman Equation
+# D.1.2 Matrix Form of the Bellman Equation
 
-> **Prerequisites**: [E.1.1 Vectors and Matrices](./linear-algebra-basics), especially vectors, matrices, and matrix multiplication. It is also helpful to first read the Chapter 3 discussion of the [Bellman equation](../chapter03_mdp/value-bellman), so the single-state form is familiar.
+> **Prerequisites**: [D.1.1 Vectors and Matrices](./linear-algebra-basics), especially vectors, matrices, and matrix multiplication. It is also helpful to first read the Chapter 3 discussion of the [Bellman equation](../chapter03_mdp/value-bellman), so the single-state form is familiar.
 
 ---
 
@@ -231,7 +231,7 @@ With three states, $P$ is $3\times3$, and $\boldsymbol{v}$ and $\boldsymbol{r}$ 
 
 The key requirement for solving is that $I - \gamma P$ must be invertible. Intuitively, this means the Bellman update must not diverge. When $0 < \gamma < 1$ and $P$ is a valid transition matrix whose rows sum to $1$, $I - \gamma P$ is essentially always invertible.
 
-More precisely, the spectral radius of $\gamma P$, meaning the largest absolute eigenvalue, satisfies $\rho(\gamma P) \leq \gamma < 1$. Therefore all eigenvalues of $I - \gamma P$ stay away from $0$, so the matrix is invertible. E.1.4 explains this in detail.
+More precisely, the spectral radius of $\gamma P$, meaning the largest absolute eigenvalue, satisfies $\rho(\gamma P) \leq \gamma < 1$. Therefore all eigenvalues of $I - \gamma P$ stay away from $0$, so the matrix is invertible. D.1.4 explains this in detail.
 
 ---
 
@@ -400,4 +400,4 @@ Once the number of states becomes large, not only is matrix inversion infeasible
 
 The solution is to avoid storing one value for every state. Instead, use a function to **approximate** value: extract features from the state, then compute value from the dot product of features and weights. The next article develops this idea.
 
-> **Next**: [E.1.3 Dot Products, Norms, and Function Approximation](./linear-algebra-function-approx) explains how feature vectors and dot products approximate value when there are too many states to store.
+> **Next**: [D.1.3 Dot Products, Norms, and Function Approximation](./linear-algebra-function-approx) explains how feature vectors and dot products approximate value when there are too many states to store.

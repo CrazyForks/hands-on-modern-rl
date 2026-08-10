@@ -1,14 +1,14 @@
 ---
-title: E.2.6 Probability and Statistics Formula Reference and Exercises
+title: D.2.6 Probability and Statistics Formula Reference and Exercises
 ---
 
-# E.2.6 Probability and Statistics Formula Reference and Exercises
+# D.2.6 Probability and Statistics Formula Reference and Exercises
 
-> **Prerequisites**: This page summarizes all formulas from module E.2. It is best reviewed after reading [E.2.1](./probability-basics) through [E.2.5](./probability-bellman-advanced). If this is your first pass, start with the main articles first.
+> **Prerequisites**: This page summarizes all formulas from module D.2. It is best reviewed after reading [D.2.1](./probability-basics) through [D.2.5](./probability-bellman-advanced). If this is your first pass, start with the main articles first.
 
 ---
 
-This page collects all formulas used in module E.2 for review. It is meant as a reference after you have read the preceding articles.
+This page collects all formulas used in module D.2 for review. It is meant as a reference after you have read the preceding articles.
 
 ## Probability Formulas Used in This Book
 

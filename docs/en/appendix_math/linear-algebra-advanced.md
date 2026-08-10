@@ -1,10 +1,10 @@
 ---
-title: E.1.4 Convergence, Eigenvalues, and Trust Regions
+title: D.1.4 Convergence, Eigenvalues, and Trust Regions
 ---
 
-# E.1.4 Convergence, Eigenvalues, and Trust Regions
+# D.1.4 Convergence, Eigenvalues, and Trust Regions
 
-> **Prerequisites**: [E.1.2 Bellman Matrix Form](./linear-algebra-bellman), especially $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$. [E.1.3 Dot Products and Norms](./linear-algebra-function-approx), especially the definition of the L2 norm.
+> **Prerequisites**: [D.1.2 Bellman Matrix Form](./linear-algebra-bellman), especially $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$. [D.1.3 Dot Products and Norms](./linear-algebra-function-approx), especially the definition of the L2 norm.
 
 ---
 
@@ -181,7 +181,7 @@ The full theorem statement is not necessary here. The core conclusion is: **$\ga
 
 ---
 
-Eigenvalues guarantee convergence from a long-term perspective, but convergence only says that repeated iteration eventually reaches a fixed point. It does not guarantee that each individual update has controlled magnitude. The gradient clipping introduced in E.1.3 uses the L2 norm to limit the maximum step length and already prevents many training instabilities. But it has a blind spot: **parameter changes in different directions can affect the policy distribution very differently**, while the L2 norm treats all directions equally. To address this, we need to upgrade "uniform length" into "weighted length."
+Eigenvalues guarantee convergence from a long-term perspective, but convergence only says that repeated iteration eventually reaches a fixed point. It does not guarantee that each individual update has controlled magnitude. The gradient clipping introduced in D.1.3 uses the L2 norm to limit the maximum step length and already prevents many training instabilities. But it has a blind spot: **parameter changes in different directions can affect the policy distribution very differently**, while the L2 norm treats all directions equally. To address this, we need to upgrade "uniform length" into "weighted length."
 
 ---
 
@@ -288,25 +288,25 @@ The progression is: eigenvalues guarantee convergence from the **long-term** per
 
 ---
 
-## E.1 Module Overview: The Logical Chain Across Four Articles
+## D.1 Module Overview: The Logical Chain Across Four Articles
 
-This is the last main article in module E.1. The four articles revolve around one core question: **Can the Bellman equation $V(s) = R(s) + \gamma\sum P V(s')$ actually be solved?** Solving it faces three obstacles in sequence, and each obstacle introduces a new group of mathematical tools:
+This is the last main article in module D.1. The four articles revolve around one core question: **Can the Bellman equation $V(s) = R(s) + \gamma\sum P V(s')$ actually be solved?** Solving it faces three obstacles in sequence, and each obstacle introduces a new group of mathematical tools:
 
 ```text
 Bellman equation in Chapter 3
   |
   v  Obstacle 1: too many equations to write one by one
-E.1.1 + E.1.2  vectors, matrices, linear systems
+D.1.1 + D.1.2  vectors, matrices, linear systems
   |  -> v = r + gamma P v  writes all equations at once
   |  -> v = (I-gamma P)^-1 r  solves in one step
   |  But when there are too many states, the matrix cannot be stored
   v  Obstacle 2: too many states, matrix cannot be stored
-E.1.3  dot products, norms, function approximation
+D.1.3  dot products, norms, function approximation
   |  -> v_hat(s) = w^T x(s)  approximate with a dot product
   |  -> ||g||_2 <= c  use a norm to limit updates
   |  But with approximation plus iteration, is training stable?
   v  Obstacle 3: training stability under approximation and iteration
-E.1.4  eigenvalues, weighted norms, trust regions
+D.1.4  eigenvalues, weighted norms, trust regions
      -> three levels: convergence guarantee + gradient clipping + trust region
 ```
 
@@ -314,10 +314,10 @@ Mapped to the core problems in RL:
 
 | Question                                            | Mathematical tool                 | RL meaning                                 | Article |
 | --------------------------------------------------- | --------------------------------- | ------------------------------------------ | ------- |
-| How do we represent states and values?              | Vectors, matrices                 | Basis of tabular methods                   | E.1.1   |
-| How do we compress Bellman equations?               | Linear systems                    | Theoretical basis of policy evaluation     | E.1.2   |
-| How do we approximate values that cannot be tabled? | Dot products, norms               | Function approximation and neural networks | E.1.3   |
-| Why can training be stable?                         | Eigenvalues, contraction mappings | Convergence guarantee                      | E.1.4   |
-| How can policies be updated safely?                 | Weighted norms, trust regions     | Mathematical basis of TRPO/PPO             | E.1.4   |
+| How do we represent states and values?              | Vectors, matrices                 | Basis of tabular methods                   | D.1.1   |
+| How do we compress Bellman equations?               | Linear systems                    | Theoretical basis of policy evaluation     | D.1.2   |
+| How do we approximate values that cannot be tabled? | Dot products, norms               | Function approximation and neural networks | D.1.3   |
+| Why can training be stable?                         | Eigenvalues, contraction mappings | Convergence guarantee                      | D.1.4   |
+| How can policies be updated safely?                 | Weighted norms, trust regions     | Mathematical basis of TRPO/PPO             | D.1.4   |
 
-> **Next**: [E.1.5 Formula Review and Exercises](./linear-algebra-formulas-exercises) revisits the RL concepts from Chapter 3 through the lens of linear algebra.
+> **Next**: [D.1.5 Formula Review and Exercises](./linear-algebra-formulas-exercises) revisits the RL concepts from Chapter 3 through the lens of linear algebra.

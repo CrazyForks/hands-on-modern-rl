@@ -1,8 +1,10 @@
 ---
-title: 1.1 State, Action, Reward, and Policy
+title: 1.1 CartPole Control Principles
 ---
 
-# 1.1 State, Action, Reward, and Policy
+# 1.1 CartPole Control Principles
+
+<!--@include: ./intro.md{7,}-->
 
 > 📁 **Chapter code**: [1-ppo_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/1-ppo_cartpole.py) · [2-pytorch_ppo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/2-pytorch_ppo.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/requirements.txt)
 

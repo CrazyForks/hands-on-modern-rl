@@ -1,10 +1,10 @@
 ---
-title: E.2.2 Random Variables, Returns, and State Values
+title: D.2.2 Random Variables, Returns, and State Values
 ---
 
-# E.2.2 From Random Trajectories to State Values
+# D.2.2 From Random Trajectories to State Values
 
-> **Prerequisites**: [E.2.1 Probability, Conditional Probability, and Expectation](./probability-basics) -- you should know the definition of expectation.
+> **Prerequisites**: [D.2.1 Probability, Conditional Probability, and Expectation](./probability-basics) -- you should know the definition of expectation.
 
 ---
 
@@ -112,4 +112,4 @@ This article applied the basic tools of probability theory to core RL concepts:
 
 State value is the conditional expectation of return: it compresses the returns of many random trajectories into one representative number. The discount factor controls how far this compression looks: a small $\gamma$ focuses on the present, while a large $\gamma$ values the future but is harder to estimate. Variance tells us how stable the gradient signal is. Two policies may have the same average return, but the one with larger variance is harder to train. Later methods such as Monte Carlo estimation, baselines, and GAE all try to reduce variance while keeping the expectation as unchanged as possible.
 
-> **Next**: [E.2.3 Monte Carlo, Incremental Averages, and Importance Sampling](./probability-sampling) -- approximating expectations with sample averages when transition probabilities are unknown.
+> **Next**: [D.2.3 Monte Carlo, Incremental Averages, and Importance Sampling](./probability-sampling) -- approximating expectations with sample averages when transition probabilities are unknown.

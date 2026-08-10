@@ -1,8 +1,11 @@
 ---
-title: '24.1 Special Challenges in VLM RL'
+title: '24.1 Visual Reward Design'
 ---
 
-# 24.1 Special Challenges in VLM RL: When Vision Meets Reinforcement Learning
+# 24.1 Visual Reward Design
+
+<!--@include: ./intro.md{7,}-->
+
 In the previous section we ran the VLM GRPO experiment and saw the model evolve from "guessing answers" to "describing the image first, then reasoning." The experiment itself went smoothly — swap in a different multimodal model, adjust the input format, and the core GRPO code barely changes. But when you push VLM RL toward more complex scenarios (medical image analysis, autonomous driving decisions, robotic visual navigation), you encounter three problems that simply do not exist in text-only RL: should the reward be attributed to visual understanding or text reasoning? Should the visual encoder be updated along with RL? Will the model "see" things that are not in the image?
 
 These three questions are not independent minor annoyances — they are the core theoretical challenges of VLM RL. How well they are solved directly determines whether the system can work in real scenarios.

@@ -1,8 +1,11 @@
 ---
-title: 13.1 From Base Model to Aligned Assistant
+title: 13.1 Base Model to Instruction Alignment
 ---
 
-# 13.1 From Base Model to Aligned Assistant
+# 13.1 Base Model to Instruction Alignment
+
+<!--@include: ./intro.md{9,}-->
+
 ## Reading Guide
 
 **Core points**

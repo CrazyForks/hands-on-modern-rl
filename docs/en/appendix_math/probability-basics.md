@@ -1,10 +1,12 @@
 ---
-title: E.2.1 Probability Basics
+title: D.2.1 Probability Basics
 ---
 
-# E.2.1 Probability Basics: Probability, Conditional Probability, and Expectation
+# D.2.1 Probability Basics: Probability, Conditional Probability, and Expectation
 
-> **Prerequisites**: This article does not require prior probability theory, but it is useful to read the two-state running example in the [appendix introduction](./intro) first.
+<!--@include: ./probability-statistics.md{7,}-->
+
+> **Prerequisites**: This article does not require prior probability theory. Read the two-state running example above first.
 
 ---
 
@@ -191,4 +193,4 @@ This article built five basic concepts from probability theory:
 
 Probability describes randomness, conditional probability describes randomness under a known condition, and expectation compresses randomness into a representative number. Together, these three tools form the mathematical foundation of value functions.
 
-> **Next**: [E.2.2 Random Variables, Returns, and State Values](./probability-value) -- applying expectation to returns and value functions.
+> **Next**: [D.2.2 Random Variables, Returns, and State Values](./probability-value) -- applying expectation to returns and value functions.

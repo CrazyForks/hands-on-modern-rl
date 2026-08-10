@@ -1,8 +1,8 @@
 ---
-title: 20. Agentic RL
+title: 20.1 Agentic RL Overview
 ---
 
-# Chapter 20: Agentic RL
+# 20.1 Agentic RL Overview
 
 The RL problems covered in earlier chapters are essentially **single-turn decision-making**: the model receives a prompt, emits a complete response, a reward model scores it, and the policy is updated once. Whether the underlying algorithm is PPO or GRPO, the skeleton of "one prompt, one response, one score" never changes.
 
@@ -349,16 +349,16 @@ This chapter uses the following concepts frequently; review them first:
 - [PPO and Reward Models](../chapter10_ppo/intro)—the foundational policy optimization framework
   :::
 
-| Section                                                                                  | Core question                                                                                                   |
-| ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [Multi-Turn RL and Credit Assignment](./multi-turn-rl)                                   | After 7 turns the task failed—whom do we blame? ORM vs PRM; planning ability; hands-on labs                     |
-| [Tool Calling, Trajectory Synthesis, and Agentic Engineering](./tool-use-and-trajectory) | Where does training data come from? When should the model use tools? Sandbox, async rollout, reward design      |
-| [Industrial Practice, Evaluation, and Bad Cases](../chapter22_agentic/industrial-evaluation)                | How does real training go unstable? How to localize problems via benchmarks, eval pipelines, and bad-case loops |
-| [Agent Data Fabrication—SWE-smith](./agent-data-swe-smith)                               | Auto-generate 50k+ code agent training data: inject bugs, run tests, filter useful samples                      |
-| [Hands-on Lab: Training a DeepCoder Agent with rLLM](./rllm-deepcoder-lab)               | rLLM in practice: AgentFlow + sandbox verification + GRPO RL training                                           |
-| [Project 2: Deep Research Agent](./projects)                                             | Long-horizon search, citation verification, report generation, and Deep Research RL schemes                     |
-| [Hands-on: Building an Agentic Training System](./build-agentic-training-system)         | Build Environment + Policy + RolloutWorker + Trainer from scratch; understand the framework skeleton            |
-| [Further Reading Index](./extended-readings)                                             | 13 topic clusters, 120+ papers—an open index for going deeper                                                   |
+| Section                                                                                      | Core question                                                                                                   |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [Multi-Turn RL and Credit Assignment](./multi-turn-rl)                                       | After 7 turns the task failed—whom do we blame? ORM vs PRM; planning ability; hands-on labs                     |
+| [Tool Calling, Trajectory Synthesis, and Agentic Engineering](./tool-use-and-trajectory)     | Where does training data come from? When should the model use tools? Sandbox, async rollout, reward design      |
+| [Industrial Practice, Evaluation, and Bad Cases](../chapter22_agentic/industrial-evaluation) | How does real training go unstable? How to localize problems via benchmarks, eval pipelines, and bad-case loops |
+| [Agent Data Fabrication—SWE-smith](./agent-data-swe-smith)                                   | Auto-generate 50k+ code agent training data: inject bugs, run tests, filter useful samples                      |
+| [Hands-on Lab: Training a DeepCoder Agent with rLLM](./rllm-deepcoder-lab)                   | rLLM in practice: AgentFlow + sandbox verification + GRPO RL training                                           |
+| [Project 2: Deep Research Agent](./projects)                                                 | Long-horizon search, citation verification, report generation, and Deep Research RL schemes                     |
+| [Hands-on: Building an Agentic Training System](./build-agentic-training-system)             | Build Environment + Policy + RolloutWorker + Trainer from scratch; understand the framework skeleton            |
+| [Further Reading Index](./extended-readings)                                                 | 13 topic clusters, 120+ papers—an open index for going deeper                                                   |
 
 ---
 

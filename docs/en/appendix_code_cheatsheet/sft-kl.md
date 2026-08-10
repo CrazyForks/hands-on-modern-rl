@@ -1,8 +1,10 @@
 ---
-title: C.1 SFT and KL
+title: B.1 SFT and KL Divergence
 ---
 
-# C.1 SFT Loss and KL Divergence
+# B.1 SFT and KL Divergence
+
+<!--@include: ./intro.md{7,}-->
 
 ## SFT Loss (Autoregressive Cross-Entropy)
 

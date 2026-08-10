@@ -346,7 +346,7 @@ model.learn(total_timesteps=100000)
 | FoodCollector | 收集食物       | 中等 | 多目标 + 导航             |
 | HideAndSeek   | 多智能体捉迷藏 | 高级 | 多智能体涌现行为          |
 
-安装和环境获取方式参见[环境安装指南](../preface/env-setup)。
+安装和环境获取方式参见[环境安装指南](/preface/env-setup)。
 
 #### 经典里程碑项目参考
 

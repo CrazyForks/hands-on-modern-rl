@@ -1,8 +1,8 @@
 ---
-title: C.4 GRPO and Reward Models
+title: B.4 GRPO and Reward Models
 ---
 
-# C.4 GRPO and Reward Models
+# B.4 GRPO and Reward Models
 
 ---
 

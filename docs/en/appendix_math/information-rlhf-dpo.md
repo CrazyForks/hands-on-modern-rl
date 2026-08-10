@@ -1,10 +1,10 @@
 ---
-title: E.4.3 RLHF and DPO
+title: D.4.3 RLHF and DPO
 ---
 
-# E.4.3 Information Theory in PPO, RLHF, and DPO
+# D.4.3 Information Theory in PPO, RLHF, and DPO
 
-> **Prerequisites**: [E.4.1 Entropy](./information-basics) and [E.4.2 Cross-Entropy and KL](./information-cross-entropy-kl). You need to know the definitions of entropy, cross-entropy, and KL divergence.
+> **Prerequisites**: [D.4.1 Entropy](./information-basics) and [D.4.2 Cross-Entropy and KL](./information-cross-entropy-kl). You need to know the definitions of entropy, cross-entropy, and KL divergence.
 
 ---
 
@@ -141,4 +141,4 @@ This article applied information-theoretic tools to practical alignment training
 
 The three ideas form one narrative line: KL divergence limits policy drift -> the identity between cross-entropy and KL gives the training loss a theoretical basis -> DPO uses log probability ratios to implement KL regularization implicitly and skips the reward model.
 
-> **Next**: [E.4.4 Mutual Information and Representation Learning](./information-mutual-info) -- using information theory to measure representation quality.
+> **Next**: [D.4.4 Mutual Information and Representation Learning](./information-mutual-info) -- using information theory to measure representation quality.

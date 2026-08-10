@@ -1,10 +1,10 @@
 ---
-title: E.3.6 Formulas and Exercises
+title: D.3.6 Formulas and Exercises
 ---
 
-# E.3.6 Calculus and Optimization Formula Reference and Exercises
+# D.3.6 Calculus and Optimization Formula Reference and Exercises
 
-> **Prerequisite**: This page summarizes all formulas in module E.3. It is best reviewed after reading [E.3.1](./calculus-basics) through [E.3.5](./calculus-advanced-formulas). If this is your first time through the material, read the main sections first.
+> **Prerequisite**: This page summarizes all formulas in module D.3. It is best reviewed after reading [D.3.1](./calculus-basics) through [D.3.5](./calculus-advanced-formulas). If this is your first time through the material, read the main sections first.
 
 The previous pages moved from one-dimensional derivatives all the way to PPO clipping and GRPO normalization, introducing many formulas along the way. This page collects them for reference, points out several common misunderstandings, and ends with a few exercises to check your understanding.
 

@@ -1,6 +1,8 @@
-# 19.1 HHH 原则 Claude 实践
+# 19.1 HHH 原则与 Claude 实践
 
-> [第 19 章](./intro) 讲了 Constitutional AI 的理论与 RLAIF 框架。本节回答工程问题：**Anthropic 实际在 Claude 训练中怎么落地 CAI？** 答案是 HHH 三原则——Helpful、Harmless、Honest——以及一系列对抗训练 trick。
+<!--@include: ./intro.md{3,}-->
+
+前文建立了 Constitutional AI 的理论与 RLAIF 框架。接下来回答工程问题：**Anthropic 如何在 Claude 训练中落地 CAI？** 核心是 HHH 三项原则——Helpful、Harmless、Honest——以及相应的对抗训练方法。
 
 ## HHH 对齐原则
 

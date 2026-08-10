@@ -1,10 +1,10 @@
 ---
-title: E.3.2 Policy Gradient
+title: D.3.2 Policy Gradient
 ---
 
-# E.3.2 Policy Gradients and Advantage Functions
+# D.3.2 Policy Gradients and Advantage Functions
 
-> **Prerequisite**: [E.3.1 Derivatives, Gradients, and the Chain Rule](./calculus-basics). You need to know what a gradient is.
+> **Prerequisite**: [D.3.1 Derivatives, Gradients, and the Chain Rule](./calculus-basics). You need to know what a gradient is.
 
 ---
 
@@ -79,4 +79,4 @@ This page applied gradient tools to policy optimization:
 
 Policy gradients provide the direction, and advantage functions make the signal more precise. But one unresolved question remains: how large should each update step be? The next page discusses how PPO clipping and the Adam optimizer control update size.
 
-> **Next**: [E.3.3 PPO Clipping and Adam](./calculus-ppo), which controls policy update size and gradient noise.
+> **Next**: [D.3.3 PPO Clipping and Adam](./calculus-ppo), which controls policy update size and gradient noise.

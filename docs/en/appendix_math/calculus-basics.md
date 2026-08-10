@@ -1,10 +1,12 @@
 ---
-title: E.3.1 Derivatives and Gradients
+title: D.3.1 Derivatives and Gradients
 ---
 
-# E.3.1 Calculus Basics: Derivatives, Gradients, and the Chain Rule
+# D.3.1 Calculus Basics: Derivatives, Gradients, and the Chain Rule
 
-> **Prerequisite**: This page does not require prior calculus knowledge, but you should first read the "two-state running example" in the [appendix introduction](./intro) and [E.1.1 Vectors and Matrices](./linear-algebra-basics).
+<!--@include: ./calculus-optimization.md{7,}-->
+
+> **Prerequisite**: This page does not require prior calculus knowledge. Read the two-state running example above and [D.1.1 Vectors and Matrices](./linear-algebra-basics) first.
 
 ---
 
@@ -332,4 +334,4 @@ This page introduced five core calculus tools:
 
 Together, these tools form the complete loop of "compute a gradient, then take one step". The next page applies these mathematical tools directly to policy optimization and derives policy gradients from the intuition that the probabilities of good actions should increase.
 
-> **Next**: [E.3.2 Policy Gradients and Advantage Functions](./calculus-policy-gradient), which applies gradients to policy optimization.
+> **Next**: [D.3.2 Policy Gradients and Advantage Functions](./calculus-policy-gradient), which applies gradients to policy optimization.

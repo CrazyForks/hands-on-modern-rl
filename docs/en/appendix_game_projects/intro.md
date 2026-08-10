@@ -1,8 +1,8 @@
 ---
-title: D. Learning Resources and Reproduction Projects
+title: C.1 Learning Resources and Project Roadmap
 ---
 
-# Appendix D: Learning Resources and Reproduction Projects
+# C.1 Learning Resources and Project Roadmap
 
 > **Goal of this appendix**: provide clear navigation for your continued advancement. The first half organizes textbooks and courses with solid theory and clear exposition to help you systematically build foundations or explore frontiers. The second half surveys classic milestones and common environments in RL's game and simulation ecosystem, giving you inspiration and coordinates for your next hands-on reproduction project.
 

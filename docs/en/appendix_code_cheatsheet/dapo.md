@@ -1,8 +1,8 @@
 ---
-title: C.8 DAPO
+title: B.8 DAPO
 ---
 
-# C.8 DAPO
+# B.8 DAPO
 
 DAPO (Decoupled Clip and Dynamic sAmpling Policy Optimization), proposed by ByteDance in 2025, improves GRPO for long-chain reasoning RL with four orthogonal tricks: decoupled clipping, dynamic sampling, token-level loss, and soft overlong punishment. Frequently asked in interviews.
 

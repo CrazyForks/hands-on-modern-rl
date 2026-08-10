@@ -1,10 +1,10 @@
 ---
-title: E.4.2 Cross-Entropy and KL
+title: D.4.2 Cross-Entropy and KL
 ---
 
-# E.4.2 Cross-Entropy and KL Divergence
+# D.4.2 Cross-Entropy and KL Divergence
 
-> **Prerequisites**: [E.4.1 Self-Information, Entropy, and Exploration](./information-basics). You need to know the definition of entropy.
+> **Prerequisites**: [D.4.1 Self-Information, Entropy, and Exploration](./information-basics). You need to know the definition of entropy.
 
 ---
 
@@ -120,4 +120,4 @@ This article introduced two tools for measuring distance between distributions:
 
 The relationship between cross-entropy and KL divergence, $D_{KL}(P\|Q)=H(P,Q)-H(P)$, is the key bridge for understanding PPO, RLHF, and DPO in the next article.
 
-> **Next**: [E.4.3 Information Theory in PPO, RLHF, and DPO](./information-rlhf-dpo) -- applying cross-entropy and KL to alignment training.
+> **Next**: [D.4.3 Information Theory in PPO, RLHF, and DPO](./information-rlhf-dpo) -- applying cross-entropy and KL to alignment training.

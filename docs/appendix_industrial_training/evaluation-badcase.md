@@ -2,7 +2,7 @@
 
 > 训练曲线告诉你 optimizer 正在移动，benchmark 才告诉你模型能力有没有变好。
 >
-> 在 RL 后训练里，reward 上升不等于任务成功；在 Agentic RL 里，一次成功也不等于 agent 学会了稳定完成任务。本节只讨论一个工程问题：当你已经搭好 [B.1 RL 训练系统](./rl-infrastructure) 和 [B.2 Agentic RL 基础设施](./agentic-rl-infra) 后，应该怎样设计 benchmark 来判断 checkpoint 能否继续训练、能否上线，以及下一轮数据该补哪里。
+> 在 RL 后训练里，reward 上升不等于任务成功；在 Agentic RL 里，一次成功也不等于 agent 学会了稳定完成任务。本节只讨论一个工程问题：当你已经搭好 [A.2 RL 训练系统](./rl-infrastructure) 和 [A.3 Agentic RL 基础设施](./agentic-rl-infra) 后，应该怎样设计 benchmark 来判断 checkpoint 能否继续训练、能否上线，以及下一轮数据该补哪里。
 
 ## Benchmark 不是榜单
 

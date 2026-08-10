@@ -1,8 +1,8 @@
 ---
-title: B.4 Training Metrics Glossary
+title: C.3 Training Metrics Glossary
 ---
 
-# B.4 Training Metrics Glossary
+# C.3 Training Metrics Glossary
 
 The first time you open an RL training log or monitoring dashboard, the number of metrics can be intimidating:
 `actor/pg_clipfrac`, `critic/advantages/mean`, `timing_s/gen`, `perf/mfu/actor` ...

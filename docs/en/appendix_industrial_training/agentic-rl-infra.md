@@ -1,16 +1,16 @@
 ---
-title: B.2 Agentic RL Infrastructure
+title: A.3 Agentic RL Infrastructure
 ---
 
-# B.2 Agentic RL Infrastructure: Sandboxes, Multi-Turn Trajectories, and Tool Scheduling
+# A.3 Agentic RL Infrastructure: Sandboxes, Multi-Turn Trajectories, and Tool Scheduling
 
-> B.1 focuses on the RL training-system substrate: rollout, buffers, trainers, weight synchronization, and distributed parallelism. This page draws a different boundary: an agent's "action" is no longer just token generation. It may call tools, run code, read and write files, browse the web, or change external state over multiple turns.
+> A.2 focuses on the RL training-system substrate: rollout, buffers, trainers, weight synchronization, and distributed parallelism. This page draws a different boundary: an agent's "action" is no longer just token generation. It may call tools, run code, read and write files, browse the web, or change external state over multiple turns.
 
-## Division of Labor with B.1
+## Division of Labor with A.2
 
-B.2 will not repeat how vLLM/SGLang achieve high-throughput generation, nor how FSDP, ZeRO, TP, PP, and EP split a model across multiple GPUs. Those are B.1 topics. B.2 only covers the additional engineering problems introduced by Agentic RL beyond ordinary LLM RL.
+A.3 will not repeat how vLLM/SGLang achieve high-throughput generation, nor how FSDP, ZeRO, TP, PP, and EP split a model across multiple GPUs. Those are A.2 topics. A.3 only covers the additional engineering problems introduced by Agentic RL beyond ordinary LLM RL.
 
-| Question                  | B.1 Training Infrastructure                                                               | B.2 Agentic RL Infrastructure                                                                                     |
+| Question                  | A.2 Training Infrastructure                                                               | A.3 Agentic RL Infrastructure                                                                                     |
 | ------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | Meaning of rollout        | prompts enter the model, producing a completion or trajectory                             | the model acts across multiple turns; each step may call tools, execute code, or change the environment           |
 | Sample structure          | token, mask, logprob, reward, policy version, rollout batch                               | episode, tool call, tool result, environment snapshot, step-level reward, loss mask                               |
@@ -18,7 +18,7 @@ B.2 will not repeat how vLLM/SGLang achieve high-throughput generation, nor how 
 | System focus              | buffer depth, async training, staleness, weight sync, model parallelism                   | sandbox isolation, multi-turn trajectory storage, intra-batch pipelining, environment interfaces, reproducibility |
 | Representative frameworks | OpenRLHF, veRL, slime                                                                     | Relax, AReaL, Agent-R1, NeMo Gym                                                                                  |
 
-One-sentence distinction: B.1 answers "how does the system feed samples into the model for training"; B.2 answers "when an agent's actions actually happen in the external world, how do we collect them safely, reproducibly, and with high throughput."
+One-sentence distinction: A.2 answers "how does the system feed samples into the model for training"; A.3 answers "when an agent's actions actually happen in the external world, how do we collect them safely, reproducibly, and with high throughput."
 
 ## From Single-Turn Generation to Multi-Turn Action
 
@@ -101,7 +101,7 @@ Sandboxes solve the problem of "agents can execute actions safely." Next, multi-
 
 ### Data Structure Differences: LLM RL vs Agentic RL
 
-In B.1, an LLM RL sample is not just raw text. Real systems record token ids, attention masks, response masks, old logprobs, policy version, reward, and more. But structurally, it is still close to a linear sequence:
+In A.2, an LLM RL sample is not just raw text. Real systems record token ids, attention masks, response masks, old logprobs, policy version, reward, and more. But structurally, it is still close to a linear sequence:
 
 `prompt -> completion -> reward`
 
@@ -123,7 +123,7 @@ Once storage is handled, the next bottleneck appears in training: multi-turn int
 
 ### Quantifying the Problem
 
-B.1 discussed GPU idling in LLM RL: generation and training run serially, and training GPUs spend large fractions of time waiting for rollout to finish. Agentic RL makes the problem worse, and the waiting moves inside the trajectory.
+A.2 discussed GPU idling in LLM RL: generation and training run serially, and training GPUs spend large fractions of time waiting for rollout to finish. Agentic RL makes the problem worse, and the waiting moves inside the trajectory.
 
 Consider a single agentic trajectory timeline: generating an action on the GPU might take ~3 ms, but executing a tool on CPU might take ~500 ms. During those 500 ms, the GPU is idle. The next turn is similar: GPU ~3 ms, CPU ~300 ms. After multiple turns, the GPU may be doing useful work less than 1% of the time. In LLM RL, idling is primarily between rollout and training; in Agentic RL, idling happens within each turn.
 
@@ -133,7 +133,7 @@ A practical approach is to run multiple trajectories concurrently. While traject
 
 ### Two-Level Asynchrony
 
-The approach above fixes concurrency _within a batch_. But across batches, you still have the B.1 problem: rollout and training can be serialized. A complete solution uses two levels of asynchrony: intra-batch concurrency across trajectories (GPU and tools alternate), and inter-batch decoupling of rollout and training via a data queue (rollout continuously produces, training continuously consumes). The first level is specific to Agentic RL; the second level reuses the training-system substrate discussed in B.1.
+The approach above fixes concurrency _within a batch_. But across batches, you still have the A.2 problem: rollout and training can be serialized. A complete solution uses two levels of asynchrony: intra-batch concurrency across trajectories (GPU and tools alternate), and inter-batch decoupling of rollout and training via a data queue (rollout continuously produces, training continuously consumes). The first level is specific to Agentic RL; the second level reuses the training-system substrate discussed in A.2.
 
 At this point, we have covered the three core engineering problems for Agentic RL: safe execution, data storage, and GPU scheduling. How are these solutions organized in real industrial systems? The Relax case study below provides a concrete reference implementation.
 
@@ -161,11 +161,11 @@ Relax's central design choice is to deploy each role in the training pipeline as
 └───────────────────────────────────────────────────────────────┘
 ```
 
-The training backend is Megatron-LM, supporting the full set of parallelism strategies introduced in B.1 (TP/PP/CP/EP). The inference backend is SGLang. A Megatron Bridge handles weight-format conversion between the two.
+The training backend is Megatron-LM, supporting the full set of parallelism strategies introduced in A.2 (TP/PP/CP/EP). The inference backend is SGLang. A Megatron Bridge handles weight-format conversion between the two.
 
 ### TransferQueue: A Streaming Data Channel
 
-Recall the asynchronous mechanism in B.1: rollout writes data into a buffer; training reads from the buffer to update parameters. Traditional buffers are batch-based: rollout writes after generating an entire batch; training reads only when the batch is available. This creates waiting: if rollout writes too fast the buffer overflows; if training reads too fast the buffer runs empty and GPUs idle. In Agentic RL, this is compounded by tool-execution waits, so it is better to support finer-grained streaming.
+Recall the asynchronous mechanism in A.2: rollout writes data into a buffer; training reads from the buffer to update parameters. Traditional buffers are batch-based: rollout writes after generating an entire batch; training reads only when the batch is available. This creates waiting: if rollout writes too fast the buffer overflows; if training reads too fast the buffer runs empty and GPUs idle. In Agentic RL, this is compounded by tool-execution waits, so it is better to support finer-grained streaming.
 
 TransferQueue makes the pipeline streaming: rollout pushes each sample as soon as it is produced, and the training side begins processing as soon as it receives a sample, without waiting for a full batch. In Agentic RL, a "sample" may be a multi-turn episode including tool results, not just a completion. Weight synchronization is handled by DCS (Distributed Checkpoint Service): after each training step, DCS broadcasts weights (via NCCL) to rollout and other components, overlapping with subsequent computation so it does not add extra wall time.
 
@@ -177,7 +177,7 @@ Relax provides two modes to match different hardware constraints.
 
 In **Collocate mode**, Actor and Rollout share the same GPU group and alternate. After Rollout finishes a batch, it yields GPUs to Training. This is suitable when GPU capacity is limited, and it can achieve strict on-policy behavior: there is no parameter lag, and training always consumes data generated by the latest policy.
 
-In **Fully Async mode**, each role runs on an independent GPU cluster. Data is exchanged via TransferQueue, and weights are synchronized asynchronously via DCS. The parameter `--max-staleness` controls how much "old" data is allowed to participate in training: `0` means strict on-policy, and higher values allow more asynchrony for higher throughput. This is the same underlying issue as B.1's "how to handle old data," but in Agentic RL, "staleness" can also come from environment state changes, tool-version changes, or external data changes. That makes environment snapshots and reproducibility metadata even more important.
+In **Fully Async mode**, each role runs on an independent GPU cluster. Data is exchanged via TransferQueue, and weights are synchronized asynchronously via DCS. The parameter `--max-staleness` controls how much "old" data is allowed to participate in training: `0` means strict on-policy, and higher values allow more asynchrony for higher throughput. This is the same underlying issue as A.2's "how to handle old data," but in Agentic RL, "staleness" can also come from environment state changes, tool-version changes, or external data changes. That makes environment snapshots and reproducibility metadata even more important.
 
 ### Engineering Details
 
@@ -232,7 +232,7 @@ A good principle is progressive architecture evolution: validate feasibility fir
 
 The framework analysis above is from a user's perspective: what each component does, how data flows, and how GPUs are scheduled. To truly understand the internal structure of an RL training framework, the fastest way is to build one. [hyunwoongko/nanoRLHF](https://github.com/hyunwoongko/nanoRLHF) is exactly such a project: it implements all essential LLM RLHF components from scratch using pure PyTorch and Triton, including a training engine, an inference engine, distributed scheduling, and RL orchestration.
 
-nanoRLHF plays a role similar to nanoGPT: it strips a production system down to its load-bearing structure. Its directory structure maps directly onto the system layers discussed in B.1:
+nanoRLHF plays a role similar to nanoGPT: it strips a production system down to its load-bearing structure. Its directory structure maps directly onto the system layers discussed in A.2:
 
 ```
 nanorlhf/
@@ -247,7 +247,7 @@ nanorlhf/
 
 ### Training Engine: nanotron
 
-nanotron corresponds to the lower layer under B.1's "training/orchestration layer": it is responsible for training large models across multiple GPUs. It implements 3D parallelism (data + pipeline + tensor), gradient accumulation, mixed-precision training, and checkpoint management.
+nanotron corresponds to the lower layer under A.2's "training/orchestration layer": it is responsible for training large models across multiple GPUs. It implements 3D parallelism (data + pipeline + tensor), gradient accumulation, mixed-precision training, and checkpoint management.
 
 Entry point: the `nanotron/` directory. Focus on:
 
@@ -257,7 +257,7 @@ Entry point: the `nanotron/` directory. Focus on:
 
 ### Inference Engine: nanovllm
 
-nanovllm corresponds to the "inference/rollout layer" in B.1: it generates tokens with high throughput. It implements PagedAttention (vLLM's key technique), KV cache management, and continuous batching.
+nanovllm corresponds to the "inference/rollout layer" in A.2: it generates tokens with high throughput. It implements PagedAttention (vLLM's key technique), KV cache management, and continuous batching.
 
 Entry point: the `nanovllm/` directory. Focus on:
 
@@ -267,7 +267,7 @@ Entry point: the `nanovllm/` directory. Focus on:
 
 ### RL Orchestration: nanoverl
 
-nanoverl is the orchestration layer that connects the two engines, analogous to the role OpenRLHF/veRL play in B.1. It implements a PPO training loop:
+nanoverl is the orchestration layer that connects the two engines, analogous to the role OpenRLHF/veRL play in A.2. It implements a PPO training loop:
 
 rollout (via nanovllm) → reward computation → advantage estimation → PPO clipped loss → gradient updates (via nanotron)
 
@@ -301,7 +301,7 @@ Recommended exercises:
 
 1. Run SFT training: `bash ./scripts/train_sft.sh`, and inspect loss/lr/throughput metrics.
 2. Read the PPO trainer: open `nanoverl/trainer/` and draw the dataflow graph: rollout → reward → advantage → train.
-3. Compare against the B.1 framework table: map nanoRLHF modules to equivalent components in OpenRLHF / veRL / slime.
+3. Compare against the A.2 framework table: map nanoRLHF modules to equivalent components in OpenRLHF / veRL / slime.
 4. Modify the reward function: replace logic under `nanoverl/reward/` (for example, string matching or regex extraction), and run a custom-reward RL loop end-to-end.
 
 nanoRLHF is not meant for production use. Its value is that it turns concepts like "rollout engine," "training backend," "weight sync," and "policy version" into readable code. After reading it, the source code of veRL or OpenRLHF becomes much easier to navigate.

@@ -1,8 +1,8 @@
 ---
-title: B.1 Training Infrastructure
+title: A.2 Training Infrastructure
 ---
 
-# B.1 RL Training Infrastructure: Rollout, Buffers, and Distributed Systems
+# A.2 RL Training Infrastructure: Rollout, Buffers, and Distributed Systems
 
 Earlier chapters emphasized algorithms: how to write policy gradients, how PPO/GRPO update, and where rewards come from. Once you move into industrial training, there is an additional layer: **your training samples are not a fixed dataset sitting on disk. They are produced continuously by the current policy during training.**
 
@@ -14,11 +14,11 @@ In LLM RL, a language model generates multiple candidate answers for a math prob
 
 That is exactly what RL sampling infrastructure must solve.
 
-This page merges "sampling infrastructure," "asynchronous training architecture," and "distributed parallelism" into one storyline: first we build a producer-buffer-consumer pipeline with weight feedback; then we enter LLM RL and discuss vLLM/SGLang and OpenRLHF/veRL/slime across the inference/rollout layer and training/orchestration layer; then we use non-LLM RL as a contrast for Gymnasium, IMPALA, Sample Factory, and Isaac Gym; finally we discuss how async training and multi-GPU parallelism make this pipeline run at scale. This is the **training-system substrate** that most later RL engineering reuses. When the model starts calling tools, reading/writing files, running code, or maintaining multi-turn environment state, the additional sandbox, trajectory storage, and tool-scheduling problems are covered in **[B.2 Agentic RL Infrastructure](./agentic-rl-infra)**.
+This page merges "sampling infrastructure," "asynchronous training architecture," and "distributed parallelism" into one storyline: first we build a producer-buffer-consumer pipeline with weight feedback; then we enter LLM RL and discuss vLLM/SGLang and OpenRLHF/veRL/slime across the inference/rollout layer and training/orchestration layer; then we use non-LLM RL as a contrast for Gymnasium, IMPALA, Sample Factory, and Isaac Gym; finally we discuss how async training and multi-GPU parallelism make this pipeline run at scale. This is the **training-system substrate** that most later RL engineering reuses. When the model starts calling tools, reading/writing files, running code, or maintaining multi-turn environment state, the additional sandbox, trajectory storage, and tool-scheduling problems are covered in **[A.3 Agentic RL Infrastructure](./agentic-rl-infra)**.
 
 ## Scope of This Page: The Training Substrate First
 
-B.1 focuses on how samples are produced, queued, consumed, and how weights flow back, and on how to split models across GPUs. It assumes the sampling side is primarily a text-generation engine, a simulator, or actor workers.
+A.2 focuses on how samples are produced, queued, consumed, and how weights flow back, and on how to split models across GPUs. It assumes the sampling side is primarily a text-generation engine, a simulator, or actor workers.
 
 | Expanded Here                                                     | Only Touched Briefly                                                      |
 | ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
@@ -27,7 +27,7 @@ B.1 focuses on how samples are produced, queued, consumed, and how weights flow 
 | async rollout/training, buffers, policy versioning, staleness     | intra-trajectory tool waits and within-batch pipelining                   |
 | distributed training and memory optimizations: FSDP/ZeRO/TP/PP/EP | environment interfaces and reproducibility for web/code/multimodal agents |
 
-A simple rule of thumb: if the task is still "generate a completion, then score it with a verifier/reward", focus on B.1. If actions leave the GPU to call tools, modify files, run tests, browse the web, or maintain multi-turn state, that is B.2.
+A simple rule of thumb: if the task is still "generate a completion, then score it with a verifier/reward", focus on A.2. If actions leave the GPU to call tools, modify files, run tests, browse the web, or maintain multi-turn state, that is A.3.
 
 ## The Data Pipeline of RL Training
 
@@ -311,7 +311,7 @@ slime's system structure is relatively clear:
 
 Compared to OpenRLHF/veRL, slime more explicitly uses SGLang as the native inference layer rather than a general-purpose replaceable plugin. slime documentation emphasizes: SGLang is launched internally in server mode, SGLang parameters can be passed directly via `--sglang-*`, and `--debug-rollout-only` is provided for debugging rollout performance alone [^slime_intro]. The training side also supports Megatron parameter passthrough covering TP/PP/EP/CP model parallelism strategies, with `--debug-train-only` for debugging the training portion [^slime_intro].
 
-The downstream projects listed in slime's README also indicate its positioning: APRIL specifically optimizes rollout tail latency; TritonForge, RLVE, P1, and others use slime for code generation, verifiable environments, and physics reasoning tasks [^slime_readme]. These projects reuse the same substrate discussed on this page: rollout engine, training backend, data buffer, weight sync, and parallel training. How Agentic RL frameworks add sandboxing, multi-turn trajectories, and tool scheduling on top of this substrate is covered in B.2.
+The downstream projects listed in slime's README also indicate its positioning: APRIL specifically optimizes rollout tail latency; TritonForge, RLVE, P1, and others use slime for code generation, verifiable environments, and physics reasoning tasks [^slime_readme]. These projects reuse the same substrate discussed on this page: rollout engine, training backend, data buffer, weight sync, and parallel training. How Agentic RL frameworks add sandboxing, multi-turn trajectories, and tool scheduling on top of this substrate is covered in A.3.
 
 slime's release notes also discuss typical systems engineering problems: RL inference latency cannot be solved simply by adding GPUs, because training still waits for the longest completion to finish decoding; oversized inference batches introduce off-policy issues [^slime_release]. Therefore, slime focuses on KV cache space, MoE fp8 rollout, DeepEP, Megatron offload, NCCL group rebuild, and other low-level optimizations. These problems go beyond single-machine PPO loops and are fundamental infrastructure issues for industrial RL training systems.
 
@@ -561,7 +561,7 @@ MoE and PRM further amplify system complexity. MoE needs expert load balancing a
 
 When selecting, first determine whether the task falls under LLM RL. For LLM RL, prioritize evaluating inference/rollout throughput, then evaluate how reward, training, buffer, and weight sync are orchestrated. For non-LLM RL, primarily optimize environment interaction and simulation throughput. Within each category, choose the corresponding system based on the specific bottleneck.
 
-If you only remember one decision sequence: first determine LLM RL vs non-LLM RL; then find the sampling bottleneck; then decide synchronous, colocated, or decoupled; finally choose parallelism strategies like FSDP, ZeRO, TP, PP, or EP based on model size. If the task involves multi-turn interaction, tool calling, code execution, web browsing, or multimodal environment state management, stop treating it as "a more complex rollout batch" and move to **[B.2 Agentic RL Infrastructure](./agentic-rl-infra)**.
+If you only remember one decision sequence: first determine LLM RL vs non-LLM RL; then find the sampling bottleneck; then decide synchronous, colocated, or decoupled; finally choose parallelism strategies like FSDP, ZeRO, TP, PP, or EP based on model size. If the task involves multi-turn interaction, tool calling, code execution, web browsing, or multimodal environment state management, stop treating it as "a more complex rollout batch" and move to **[A.3 Agentic RL Infrastructure](./agentic-rl-infra)**.
 
 ## References
 

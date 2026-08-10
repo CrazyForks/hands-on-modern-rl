@@ -696,11 +696,7 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '1.0 本章导读',
-              link: '/chapter01_cartpole/intro'
-            },
-            {
-              text: '1.1 CartPole 原理',
+              text: '1.1 CartPole 控制原理',
               link: '/chapter01_cartpole/principles'
             },
             {
@@ -714,11 +710,11 @@ const zhSidebar = {
           ]
         },
         {
-          text: '2. 强化学习过程的基本定义',
+          text: '2. 强化学习问题与基本定义',
           collapsed: true,
           items: [
             {
-              text: '2.1 探索和利用问题',
+              text: '2.1 探索与利用',
               link: '/chapter03_mdp/bandit'
             },
             {
@@ -740,11 +736,11 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '3.1 V/Q 函数与贝尔曼期望方程',
+              text: '3.1 状态价值、动作价值与贝尔曼期望方程',
               link: '/chapter03_mdp/value-bellman'
             },
             {
-              text: '3.2 贝尔曼最优、压缩映射与最优策略',
+              text: '3.2 贝尔曼最优方程、压缩映射与最优策略',
               link: '/chapter03_mdp/value-q'
             },
             {
@@ -754,15 +750,15 @@ const zhSidebar = {
           ]
         },
         {
-          text: '4. 动态规划、蒙特卡洛与时序差分',
+          text: '4. 经典强化学习方法',
           collapsed: true,
           items: [
             {
-              text: '4.1 动态规划、蒙特卡洛、时序差分',
+              text: '4.1 动态规划、蒙特卡洛与时序差分',
               link: '/chapter03_mdp/dp-mc-td'
             },
             {
-              text: '4.2 算法分类：on/off-policy 与 online/offline',
+              text: '4.2 On-Policy、Off-Policy、Online 与 Offline',
               link: '/chapter03_mdp/algorithm-taxonomy'
             },
             {
@@ -786,7 +782,7 @@ const zhSidebar = {
               link: '/chapter07_dqn/from-q-to-dqn'
             },
             {
-              text: '5.2 DQN 改进家族',
+              text: '5.2 DQN 改进方法',
               link: '/chapter07_dqn/dqn-family'
             },
             {
@@ -794,7 +790,7 @@ const zhSidebar = {
               link: '/chapter07_dqn/dqn-components'
             },
             {
-              text: '5.4 动手：LunarLander / Atari 实验',
+              text: '5.4 动手：LunarLander 与 Atari',
               link: '/chapter07_dqn/lunar-lander'
             },
             {
@@ -808,19 +804,15 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '6.0 本章导读',
-              link: '/chapter08_policy_gradient/intro'
-            },
-            {
               text: '6.1 策略梯度定理',
               link: '/chapter08_policy_gradient/policy-gradient'
             },
             {
-              text: '6.2 REINFORCE 基线',
+              text: '6.2 REINFORCE 与价值基线',
               link: '/chapter08_policy_gradient/reinforce'
             },
             {
-              text: '6.3 策略梯度改进',
+              text: '6.3 策略梯度改进方法',
               link: '/chapter08_policy_gradient/pg-improvements'
             },
             {
@@ -828,21 +820,21 @@ const zhSidebar = {
               link: '/chapter08_policy_gradient/dice-game'
             },
             {
-              text: '6.5 动手：策略梯度实战 CartPole',
+              text: '6.5 动手：REINFORCE 控制 CartPole',
               link: '/chapter08_policy_gradient/cartpole'
             },
             {
-              text: '6.6 动手：Value Baseline 平衡小车挑战',
+              text: '6.6 动手：价值基线控制 CartPole',
               link: '/chapter08_policy_gradient/baseline-experiment'
             },
             {
-              text: '6.7 动手：带基线的策略梯度',
+              text: '6.7 动手：带价值基线的策略梯度',
               link: '/chapter08_policy_gradient/cartpole-baseline'
             }
           ]
         },
         {
-          text: '7. Actor-Critic 架构',
+          text: '7. Actor-Critic 方法',
           collapsed: true,
           items: [
             {
@@ -854,7 +846,7 @@ const zhSidebar = {
               link: '/chapter09_actor_critic/actor-critic'
             },
             {
-              text: '7.3 动手：Pendulum 实验',
+              text: '7.3 动手：Pendulum 连续控制',
               link: '/chapter09_actor_critic/pendulum'
             },
             {
@@ -868,45 +860,45 @@ const zhSidebar = {
           ]
         },
         {
-          text: '8. PPO 信任域方法',
+          text: '8. TRPO 与 PPO 信任域优化',
           collapsed: true,
           items: [
             {
-              text: '8.1 TRPO 信任域',
+              text: '8.1 TRPO 与信任域约束',
               link: '/chapter10_ppo/trust-region-clipping'
             },
             {
-              text: '8.2 PPO-Clip 工程实现',
+              text: '8.2 PPO-Clip 裁剪目标',
               link: '/chapter10_ppo/intro'
             },
             {
-              text: '8.3 GAE 奖励模型',
+              text: '8.3 GAE 优势估计',
               link: '/chapter10_ppo/gae-reward-model'
             },
             {
-              text: '8.4 长程任务实验',
+              text: '8.4 长程任务',
               link: '/chapter10_ppo/rl-long-horizon-planning'
             },
             {
-              text: '8.5 动手：BipedalWalker 连续控制',
+              text: '8.5 动手：PPO 控制 BipedalWalker',
               link: '/chapter10_ppo/ppo-bipedal-walker'
             }
           ]
         },
         {
-          text: '9. 连续控制与基于模型 RL',
+          text: '9. 连续控制与基于模型的强化学习',
           collapsed: true,
           items: [
             {
-              text: '9.1 确定性策略梯度 DDPG',
+              text: '9.1 DDPG 与确定性策略梯度',
               link: '/chapter11_continuous_control/intro'
             },
             {
-              text: '9.2 TD3 / SAC',
+              text: '9.2 TD3 与 SAC',
               link: '/chapter11_continuous_control/td3-sac'
             },
             {
-              text: '9.3 Model-Based RL 与 Dyna/PETS/MBPO',
+              text: '9.3 Model-Based RL：Dyna、PETS 与 MBPO',
               link: '/chapter11_continuous_control/model-based'
             },
             {
@@ -934,7 +926,7 @@ const zhSidebar = {
               link: '/chapter12_offline_rl/sequence-modeling'
             },
             {
-              text: '10.3 离线 RL 实验与 LLM 视角',
+              text: '10.3 离线 RL 与 LLM 数据',
               link: '/chapter12_offline_rl/experiments'
             }
           ]
@@ -952,7 +944,7 @@ const zhSidebar = {
               link: '/chapter13_imitation_meta_rl/irl-gail'
             },
             {
-              text: '11.3 元 RL 与 MAML/RL²/PEARL/In-Context RL',
+              text: '11.3 元 RL：MAML、RL²、PEARL 与 In-Context RL',
               link: '/chapter13_imitation_meta_rl/meta-rl'
             }
           ]
@@ -962,15 +954,15 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '12.1 内在动机探索与 ICM/RND/NGU/Agent57',
+              text: '12.1 内在动机探索：ICM、RND、NGU 与 Agent57',
               link: '/chapter14_exploration_marl_hierarchical/intro'
             },
             {
-              text: '12.2 多智能体 RL 与 CTDE/MADDPG/MAPPO',
+              text: '12.2 多智能体 RL：CTDE、MADDPG 与 MAPPO',
               link: '/chapter14_exploration_marl_hierarchical/marl'
             },
             {
-              text: '12.3 分层 RL 生成式世界模型',
+              text: '12.3 分层 RL 与生成式世界模型',
               link: '/chapter14_exploration_marl_hierarchical/hierarchical'
             }
           ]
@@ -986,11 +978,7 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '13.0 本章导读',
-              link: '/chapter15_rlhf/intro'
-            },
-            {
-              text: '13.1 基座模型到指令对齐',
+              text: '13.1 从基座模型到指令对齐',
               link: '/chapter15_rlhf/base-model-to-assistant'
             },
             {
@@ -1002,7 +990,7 @@ const zhSidebar = {
               link: '/chapter15_rlhf/reward-function-design'
             },
             {
-              text: '13.4 RL 微调流程',
+              text: '13.4 强化学习微调流程',
               link: '/chapter15_rlhf/standard-rlhf-pipeline'
             },
             {
@@ -1010,25 +998,25 @@ const zhSidebar = {
               link: '/chapter15_rlhf/extended-practice'
             },
             {
-              text: '13.6 评测方法',
+              text: '13.6 对齐评测方法',
               link: '/chapter15_rlhf/evaluation'
             },
             {
-              text: '13.7 动手：veRL PPO 训练 GSM8K',
+              text: '13.7 动手：使用 veRL 和 PPO 训练 GSM8K',
               link: '/chapter15_rlhf/verl-ppo-gsm8k'
             }
           ]
         },
         {
-          text: '14. 大模型 RL 工业实战',
+          text: '14. 大模型 RL 工业实践',
           collapsed: true,
           items: [
             {
-              text: '14.1 训练框架对比与双轨奖励',
+              text: '14.1 训练框架与双轨奖励',
               link: '/chapter16_llm_rl_industrial/intro'
             },
             {
-              text: '14.2 现代后训练流水线范式',
+              text: '14.2 现代后训练流水线',
               link: '/chapter16_llm_rl_industrial/industrial-post-training'
             },
             {
@@ -1046,7 +1034,7 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '15.1 DPO 推导',
+              text: '15.1 DPO 数学推导',
               link: '/chapter17_dpo/intro'
             },
             {
@@ -1054,7 +1042,7 @@ const zhSidebar = {
               link: '/chapter17_dpo/metrics'
             },
             {
-              text: '15.3 DPO 原理、数学与家族选型',
+              text: '15.3 DPO 方法家族与选型',
               link: '/chapter17_dpo/dpo-theory-and-family'
             },
             {
@@ -1072,7 +1060,7 @@ const zhSidebar = {
               link: '/chapter18_grpo/grpo-practice-and-mechanism'
             },
             {
-              text: '16.2 R1-Zero 范式 / DAPO',
+              text: '16.2 R1-Zero 与 DAPO',
               link: '/chapter18_grpo/deepseek-dapo'
             },
             {
@@ -1080,7 +1068,7 @@ const zhSidebar = {
               link: '/chapter18_grpo/rlvr'
             },
             {
-              text: '16.4 GRPO 改进家族',
+              text: '16.4 GRPO 改进方法',
               link: '/chapter18_grpo/grpo-family'
             },
             {
@@ -1088,7 +1076,7 @@ const zhSidebar = {
               link: '/chapter18_grpo/rl-environments'
             },
             {
-              text: '16.6 动手：金融 API 工具调用 GRPO 实验',
+              text: '16.6 动手：GRPO 训练金融工具调用',
               link: '/chapter18_grpo/financial-tool-calling-grpo'
             },
             {
@@ -1096,7 +1084,7 @@ const zhSidebar = {
               link: '/chapter18_grpo/on-policy-distillation'
             },
             {
-              text: '16.8 动手：veRL 代码生成 RL 实验',
+              text: '16.8 动手：使用 veRL 训练代码生成',
               link: '/chapter18_grpo/verl-code-sandbox'
             }
           ]
@@ -1118,7 +1106,7 @@ const zhSidebar = {
               link: '/chapter19_reasoning/test-time-scaling'
             },
             {
-              text: '17.4 Hybrid Thinking 思考预算',
+              text: '17.4 Hybrid Thinking 与思考预算',
               link: '/chapter19_reasoning/hybrid-thinking'
             },
             {
@@ -1126,7 +1114,7 @@ const zhSidebar = {
               link: '/chapter19_reasoning/adaptive-thinking'
             },
             {
-              text: '17.6 推理链的可读性与对齐',
+              text: '17.6 推理链可读性与对齐',
               link: '/chapter19_reasoning/cot-visibility-alignment'
             }
           ]
@@ -1140,11 +1128,11 @@ const zhSidebar = {
               link: '/chapter20_prm_search/outcome-vs-process'
             },
             {
-              text: '18.2 判别式 PRM 路线',
+              text: '18.2 判别式 PRM',
               link: '/chapter20_prm_search/discriminative-prm'
             },
             {
-              text: '18.3 生成式 PRM 路线',
+              text: '18.3 生成式 PRM',
               link: '/chapter20_prm_search/generative-prm'
             },
             {
@@ -1156,7 +1144,7 @@ const zhSidebar = {
               link: '/chapter20_prm_search/inference-time-search'
             },
             {
-              text: '18.6 并行协调推理总结',
+              text: '18.6 并行与协同推理',
               link: '/chapter20_prm_search/parallel-reasoning-and-summary'
             }
           ]
@@ -1166,15 +1154,11 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '19.0 本章导读',
-              link: '/chapter21_cai_rlvr/intro'
-            },
-            {
-              text: '19.1 HHH 原则 Claude 实践',
+              text: '19.1 HHH 原则与 Claude 实践',
               link: '/chapter21_cai_rlvr/hhh-practice'
             },
             {
-              text: '19.2 RLAIF 工程化宪法扩展',
+              text: '19.2 RLAIF 工程化与宪法扩展',
               link: '/chapter21_cai_rlvr/rlaif-engineering'
             }
           ]
@@ -1189,10 +1173,6 @@ const zhSidebar = {
           text: '20. 工具调用、多轮交互与多智能体 RL',
           collapsed: true,
           items: [
-            {
-              text: '20.0 本章导读',
-              link: '/chapter22_agentic/intro'
-            },
             {
               text: '20.1 Agentic RL 总览',
               link: '/chapter22_agentic/overview'
@@ -1210,11 +1190,11 @@ const zhSidebar = {
               link: '/chapter22_agentic/tool-use-and-trajectory'
             },
             {
-              text: '20.5 Search-Augmented RL 与 Web/Code Agent',
+              text: '20.5 Search-Augmented RL 与 Web、Code Agent',
               link: '/chapter22_agentic/tool-use-agents'
             },
             {
-              text: '20.6 Code Interpreter RL 工业实战',
+              text: '20.6 Code Interpreter RL 工业实践',
               link: '/chapter22_agentic/industrial-practice'
             },
             {
@@ -1222,15 +1202,15 @@ const zhSidebar = {
               link: '/chapter22_agentic/multi-agent-swarm'
             },
             {
-              text: '20.8 动手：用 rLLM 训练 DeepCoder Agent',
+              text: '20.8 动手：使用 rLLM 训练 DeepCoder Agent',
               link: '/chapter22_agentic/rllm-deepcoder-lab'
             },
             {
-              text: '20.9 动手：用 rLLM 训练金融分析 Agent',
+              text: '20.9 动手：使用 rLLM 训练金融分析 Agent',
               link: '/chapter22_agentic/rllm-finqa-lab'
             },
             {
-              text: '20.10 动手：从零实现一个 Agentic RL 训练系统',
+              text: '20.10 动手：从零实现 Agentic RL 训练系统',
               link: '/chapter22_agentic/build-agentic-training-system'
             }
           ]
@@ -1240,10 +1220,6 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '21.0 本章导读',
-              link: '/chapter23_rl_based_swe/intro'
-            },
-            {
               text: '21.1 SWE-RL 基础实验',
               link: '/chapter23_rl_based_swe/swe-bench-and-rlvr'
             },
@@ -1252,7 +1228,7 @@ const zhSidebar = {
               link: '/chapter23_rl_based_swe/world-model-and-deep-swe'
             },
             {
-              text: '21.3 Self-Play SWE-RL 总结',
+              text: '21.3 Self-Play SWE-RL',
               link: '/chapter23_rl_based_swe/self-play-ssr-and-summary'
             }
           ]
@@ -1262,11 +1238,7 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '22.0 本章导读',
-              link: '/chapter24_deep_research/intro'
-            },
-            {
-              text: '22.1 浏览器 RL harness 工程',
+              text: '22.1 浏览器 RL Harness 工程',
               link: '/chapter24_deep_research/browser-rl-harness'
             },
             {
@@ -1280,15 +1252,11 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '23.0 本章导读',
-              link: '/chapter25_computer_use/intro'
-            },
-            {
-              text: '23.1 GUI Agent 训练实践',
+              text: '23.1 GUI Agent 训练',
               link: '/chapter25_computer_use/training'
             },
             {
-              text: '23.2 指令层级 Prompt Injection 防御',
+              text: '23.2 指令层级与 Prompt Injection 防御',
               link: '/chapter25_computer_use/safety-swarm'
             }
           ]
@@ -1304,11 +1272,7 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '24.0 本章导读',
-              link: '/chapter26_vlm/intro'
-            },
-            {
-              text: '24.1 视觉奖励挑战',
+              text: '24.1 视觉奖励设计',
               link: '/chapter26_vlm/vlm-challenges'
             },
             {
@@ -1320,25 +1284,21 @@ const zhSidebar = {
               link: '/chapter26_vlm/vlm-grpo-hands-on'
             },
             {
-              text: '24.4 动手：GeoQA 几何推理实验',
+              text: '24.4 动手：GeoQA 几何推理',
               link: '/chapter26_vlm/easyr1-geoqa'
             }
           ]
         },
         {
-          text: '25. 音频语音 RL',
+          text: '25. 音频与语音 RL',
           collapsed: true,
           items: [
             {
-              text: '25.0 本章导读',
-              link: '/chapter27_audio_rl/intro'
-            },
-            {
-              text: '25.1 RLVR → RLHF 音频奖励设计',
+              text: '25.1 从 RLVR 到 RLHF 的音频奖励设计',
               link: '/chapter27_audio_rl/reward-design'
             },
             {
-              text: '25.2 多模态音频 Agent 未来方向',
+              text: '25.2 多模态音频 Agent',
               link: '/chapter27_audio_rl/future'
             }
           ]
@@ -1348,7 +1308,7 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '26.0 本章导读',
+              text: '26.1 VLA 模型基础',
               link: '/chapter28_vla/embodied-intelligence/'
             }
           ]
@@ -1378,11 +1338,7 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: '28.0 本章导读',
-              link: '/chapter30_alignment_failures/intro'
-            },
-            {
-              text: '28.1 经典失败模式',
+              text: '28.1 经典对齐失败模式',
               link: '/chapter30_alignment_failures/classical-failures'
             },
             {
@@ -1394,25 +1350,21 @@ const zhSidebar = {
               link: '/chapter30_alignment_failures/sleeper-and-faking'
             },
             {
-              text: '28.4 防御机制总结',
+              text: '28.4 防御机制',
               link: '/chapter30_alignment_failures/scaling-and-defenses'
             },
             {
-              text: '28.5 评估原则与现代评估 Harness',
+              text: '28.5 现代评估原则与 Harness',
               link: '/chapter30_alignment_failures/rl-evaluation'
             }
           ]
         },
         {
-          text: '29. 自我博弈、规模化与未来方向',
+          text: '29. 自博弈、规模化与研究前沿',
           collapsed: true,
           items: [
             {
-              text: '29.0 本章导读',
-              link: '/chapter32_selfplay/intro'
-            },
-            {
-              text: '29.1 自我博弈基础与 LLM 自我博弈',
+              text: '29.1 自博弈基础与 LLM 自博弈',
               link: '/chapter32_selfplay/self-play-outlook/'
             },
             {
@@ -1439,10 +1391,6 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: 'A.0 附录导读',
-              link: '/appendix_industrial_training/intro'
-            },
-            {
               text: 'A.1 训练调试指南',
               link: '/appendix_industrial_training/training-debugging'
             },
@@ -1465,11 +1413,7 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: 'B.0 附录导读',
-              link: '/appendix_code_cheatsheet/intro'
-            },
-            {
-              text: 'B.1 SFT 与 KL',
+              text: 'B.1 SFT 与 KL 散度',
               link: '/appendix_code_cheatsheet/sft-kl'
             },
             {
@@ -1477,7 +1421,7 @@ const zhSidebar = {
               link: '/appendix_code_cheatsheet/ppo-gae'
             },
             {
-              text: 'B.3 DPO 家族',
+              text: 'B.3 DPO 方法家族',
               link: '/appendix_code_cheatsheet/dpo-family'
             },
             {
@@ -1507,11 +1451,7 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: 'C.0 附录导读',
-              link: '/appendix_game_projects/intro'
-            },
-            {
-              text: 'C.1 论文阅读路线图',
+              text: 'C.1 学习资源与项目路线',
               link: '/appendix_paper_reading/intro'
             },
             {
@@ -1523,7 +1463,7 @@ const zhSidebar = {
               link: '/appendix_industrial_training/metrics-glossary'
             },
             {
-              text: 'C.4 工业实战练习',
+              text: 'C.4 工业实践练习',
               link: '/appendix_industrial_training/industrial-exercises'
             }
           ]
@@ -1533,17 +1473,9 @@ const zhSidebar = {
           collapsed: true,
           items: [
             {
-              text: 'D.0 附录导读',
-              link: '/appendix_math/intro'
-            },
-            {
               text: 'D.1 线性代数',
               collapsed: true,
               items: [
-                {
-                  text: 'D.1.0 概览',
-                  link: '/appendix_math/linear-algebra'
-                },
                 {
                   text: '基础对象',
                   link: '/appendix_math/linear-algebra-basics'
@@ -1570,10 +1502,6 @@ const zhSidebar = {
               text: 'D.2 概率、期望与随机估计',
               collapsed: true,
               items: [
-                {
-                  text: 'D.2.0 概览',
-                  link: '/appendix_math/probability-statistics'
-                },
                 {
                   text: '概率基础',
                   link: '/appendix_math/probability-basics'
@@ -1605,10 +1533,6 @@ const zhSidebar = {
               collapsed: true,
               items: [
                 {
-                  text: 'D.3.0 概览',
-                  link: '/appendix_math/calculus-optimization'
-                },
-                {
                   text: '导数与梯度',
                   link: '/appendix_math/calculus-basics'
                 },
@@ -1639,15 +1563,11 @@ const zhSidebar = {
               collapsed: true,
               items: [
                 {
-                  text: 'D.4.0 概览',
-                  link: '/appendix_math/information-theory'
-                },
-                {
                   text: '熵与探索',
                   link: '/appendix_math/information-basics'
                 },
                 {
-                  text: '交叉熵与 KL',
+                  text: '交叉熵与 KL 散度',
                   link: '/appendix_math/information-cross-entropy-kl'
                 },
                 {
@@ -1704,11 +1624,7 @@ const enSidebar = {
           collapsed: true,
           items: [
             {
-              text: '1.0 Chapter Overview',
-              link: '/en/chapter01_cartpole/intro'
-            },
-            {
-              text: '1.1 CartPole Principles',
+              text: '1.1 CartPole Control Principles',
               link: '/en/chapter01_cartpole/principles'
             },
             {
@@ -1716,12 +1632,12 @@ const enSidebar = {
               link: '/en/chapter01_cartpole/metrics'
             },
             {
-              text: '1.3 Hands-on: PPO Training Visualization (Translation pending)'
+              text: '1.3 Hands-on: PPO Training Visualization'
             }
           ]
         },
         {
-          text: '2. Basic Definitions of the RL Process',
+          text: '2. RL Problems and Basic Definitions',
           collapsed: true,
           items: [
             {
@@ -1733,7 +1649,7 @@ const enSidebar = {
               link: '/en/chapter03_mdp/mdp'
             },
             {
-              text: '2.3 Policy, Value & Return (Translation pending)'
+              text: '2.3 Policy, Value and Return'
             },
             {
               text: '2.4 Discount, Trajectory & POMDP',
@@ -1746,28 +1662,28 @@ const enSidebar = {
           collapsed: true,
           items: [
             {
-              text: '3.1 V/Q Functions & Bellman Expectation',
+              text: '3.1 State Value, Action Value and Bellman Expectation',
               link: '/en/chapter03_mdp/value-bellman'
             },
             {
-              text: '3.2 Bellman Optimality & Contraction Mapping',
+              text: '3.2 Bellman Optimality, Contraction Mapping and Optimal Policies',
               link: '/en/chapter03_mdp/value-q'
             },
             {
-              text: '3.3 Hands-on: Value Function Experiments (Translation pending)'
+              text: '3.3 Hands-on: Value Function Experiments'
             }
           ]
         },
         {
-          text: '4. DP, MC & TD',
+          text: '4. Classical RL Methods',
           collapsed: true,
           items: [
             {
-              text: '4.1 Dynamic Programming, Monte Carlo, Temporal Difference',
+              text: '4.1 Dynamic Programming, Monte Carlo and Temporal Difference',
               link: '/en/chapter03_mdp/dp-mc-td'
             },
             {
-              text: '4.2 Algorithm Taxonomy: On/Off-Policy & Online/Offline',
+              text: '4.2 On-Policy, Off-Policy, Online and Offline',
               link: '/en/chapter03_mdp/algorithm-taxonomy'
             },
             {
@@ -1791,7 +1707,7 @@ const enSidebar = {
               link: '/en/chapter07_dqn/from-q-to-dqn'
             },
             {
-              text: '5.2 DQN Improvement Family',
+              text: '5.2 DQN Improvements',
               link: '/en/chapter07_dqn/dqn-family'
             },
             {
@@ -1799,7 +1715,7 @@ const enSidebar = {
               link: '/en/chapter07_dqn/dqn-components'
             },
             {
-              text: '5.4 Hands-on: LunarLander / Atari Experiments',
+              text: '5.4 Hands-on: LunarLander and Atari',
               link: '/en/chapter07_dqn/lunar-lander'
             },
             {
@@ -1813,10 +1729,6 @@ const enSidebar = {
           collapsed: true,
           items: [
             {
-              text: '6.0 Chapter Overview',
-              link: '/en/chapter08_policy_gradient/intro'
-            },
-            {
               text: '6.1 Policy Gradient Theorem',
               link: '/en/chapter08_policy_gradient/policy-gradient'
             },
@@ -1829,25 +1741,25 @@ const enSidebar = {
               link: '/en/chapter08_policy_gradient/pg-improvements'
             },
             {
-              text: '6.4 Hands-on: A Two-Armed Bandit (Dice-Game Slot Machine)',
+              text: '6.4 Hands-on: Two-Armed Dice-Game Bandit',
               link: '/en/chapter08_policy_gradient/dice-game'
             },
             {
-              text: '6.5 Hands-on: Policy Gradient CartPole',
+              text: '6.5 Hands-on: REINFORCE on CartPole',
               link: '/en/chapter08_policy_gradient/cartpole'
             },
             {
-              text: '6.6 Hands-on: Value Baseline for the CartPole Challenge',
+              text: '6.6 Hands-on: Value Baseline on CartPole',
               link: '/en/chapter08_policy_gradient/baseline-experiment'
             },
             {
-              text: '6.7 Hands-on: Policy Gradient with a Baseline',
+              text: '6.7 Hands-on: Policy Gradient with a Value Baseline',
               link: '/en/chapter08_policy_gradient/cartpole-baseline'
             }
           ]
         },
         {
-          text: '7. Actor-Critic Architecture',
+          text: '7. Actor-Critic Methods',
           collapsed: true,
           items: [
             {
@@ -1859,7 +1771,7 @@ const enSidebar = {
               link: '/en/chapter09_actor_critic/actor-critic'
             },
             {
-              text: '7.3 Hands-on: Pendulum Experiments',
+              text: '7.3 Hands-on: Pendulum Continuous Control',
               link: '/en/chapter09_actor_critic/pendulum'
             },
             {
@@ -1873,46 +1785,46 @@ const enSidebar = {
           ]
         },
         {
-          text: '8. PPO & Trust-Region Methods',
+          text: '8. TRPO and PPO Trust-Region Optimization',
           collapsed: true,
           items: [
             {
-              text: '8.1 TRPO Trust Region',
+              text: '8.1 TRPO and Trust-Region Constraints',
               link: '/en/chapter10_ppo/trust-region-clipping'
             },
             {
-              text: '8.2 PPO-Clip Implementation',
+              text: '8.2 PPO-Clip Objective',
               link: '/en/chapter10_ppo/intro'
             },
             {
-              text: '8.3 GAE & Reward Model',
+              text: '8.3 GAE Advantage Estimation',
               link: '/en/chapter10_ppo/gae-reward-model'
             },
             {
-              text: '8.4 Long-Horizon Task Experiments',
+              text: '8.4 Long-Horizon Tasks',
               link: '/en/chapter10_ppo/rl-long-horizon-planning'
             },
             {
-              text: '8.5 Hands-on: BipedalWalker Continuous Control',
+              text: '8.5 Hands-on: PPO on BipedalWalker',
               link: '/en/chapter10_ppo/ppo-bipedal-walker'
             }
           ]
         },
         {
-          text: '9. Continuous Control & Model-Based RL (Translation pending)',
+          text: '9. Continuous Control and Model-Based RL',
           collapsed: true,
           items: [
             {
-              text: '9.1 DDPG (pending)'
+              text: '9.1 DDPG and Deterministic Policy Gradients'
             },
             {
-              text: '9.2 TD3 / SAC (pending)'
+              text: '9.2 TD3 and SAC'
             },
             {
-              text: '9.3 Model-Based RL: Dyna / PETS / MBPO (pending)'
+              text: '9.3 Model-Based RL: Dyna, PETS and MBPO'
             },
             {
-              text: '9.4 AlphaZero, MuZero & Dreamer V3 (pending)'
+              text: '9.4 AlphaZero, MuZero and Dreamer V3'
             }
           ]
         }
@@ -1923,47 +1835,47 @@ const enSidebar = {
       collapsed: true,
       items: [
         {
-          text: '10. Offline Reinforcement Learning (Translation pending)',
+          text: '10. Offline Reinforcement Learning',
           collapsed: true,
           items: [
             {
-              text: '10.1 Offline RL Challenges & Classical Methods (pending)'
+              text: '10.1 Offline RL Challenges and Classical Methods'
             },
             {
-              text: '10.2 Decision Transformer, Trajectory Transformer & Diffuser (pending)'
+              text: '10.2 Decision Transformer, Trajectory Transformer and Diffuser'
             },
             {
-              text: '10.3 Offline RL Experiments & LLM Perspective (pending)'
+              text: '10.3 Offline RL and LLM Data'
             }
           ]
         },
         {
-          text: '11. Imitation, Inverse RL & Meta-RL (Translation pending)',
+          text: '11. Imitation Learning, Inverse RL and Meta-RL',
           collapsed: true,
           items: [
             {
-              text: '11.1 Behavioral Cloning & DAgger (pending)'
+              text: '11.1 Behavioral Cloning and DAgger'
             },
             {
-              text: '11.2 Inverse RL & GAIL (pending)'
+              text: '11.2 Inverse RL and GAIL'
             },
             {
-              text: '11.3 Meta-RL: MAML / RL² / PEARL / In-Context RL (pending)'
+              text: '11.3 Meta-RL: MAML, RL², PEARL and In-Context RL'
             }
           ]
         },
         {
-          text: '12. Exploration, MARL & Hierarchical RL (Translation pending)',
+          text: '12. Exploration, Multi-Agent RL and Hierarchical RL',
           collapsed: true,
           items: [
             {
-              text: '12.1 Intrinsic Motivation: ICM / RND / NGU / Agent57 (pending)'
+              text: '12.1 Intrinsic Motivation: ICM, RND, NGU and Agent57'
             },
             {
-              text: '12.2 Multi-Agent RL: CTDE / MADDPG / MAPPO (pending)'
+              text: '12.2 Multi-Agent RL: CTDE, MADDPG and MAPPO'
             },
             {
-              text: '12.3 Hierarchical RL & Generative World Models (pending)'
+              text: '12.3 Hierarchical RL and Generative World Models'
             }
           ]
         }
@@ -1977,10 +1889,6 @@ const enSidebar = {
           text: '13. RLHF Pipeline',
           collapsed: true,
           items: [
-            {
-              text: '13.0 Chapter Overview',
-              link: '/en/chapter15_rlhf/intro'
-            },
             {
               text: '13.1 Base Model to Instruction Alignment',
               link: '/en/chapter15_rlhf/base-model-to-assistant'
@@ -2012,26 +1920,26 @@ const enSidebar = {
           ]
         },
         {
-          text: '14. Industrial LLM RL Practice',
+          text: '14. Industrial LLM RL Engineering',
           collapsed: true,
           items: [
             {
-              text: '14.1 Training Frameworks & Dual-Track Rewards (Translation pending)'
+              text: '14.1 Training Frameworks and Dual-Track Rewards'
             },
             {
-              text: '14.2 Modern Post-Training Pipeline Paradigms',
+              text: '14.2 Modern Post-Training Pipelines',
               link: '/en/chapter16_llm_rl_industrial/industrial-post-training'
             },
             {
-              text: '14.3 Optimizers & Training Stability (Translation pending)'
+              text: '14.3 Optimizers and Training Stability'
             },
             {
-              text: '14.4 Distributed Sync/Async & MoE Training (Translation pending)'
+              text: '14.4 Distributed Synchronous, Asynchronous and MoE Training'
             }
           ]
         },
         {
-          text: '15. Preference Alignment & DPO Family',
+          text: '15. Preference Alignment and the DPO Family',
           collapsed: true,
           items: [
             {
@@ -2043,7 +1951,7 @@ const enSidebar = {
               link: '/en/chapter17_dpo/metrics'
             },
             {
-              text: '15.3 DPO Theory, Math & Family Selection',
+              text: '15.3 DPO Methods and Family Selection',
               link: '/en/chapter17_dpo/dpo-theory-and-family'
             },
             {
@@ -2053,7 +1961,7 @@ const enSidebar = {
           ]
         },
         {
-          text: '16. GRPO, RLVR & Verifier Engineering',
+          text: '16. GRPO, RLVR and Verifier Engineering',
           collapsed: true,
           items: [
             {
@@ -2061,21 +1969,21 @@ const enSidebar = {
               link: '/en/chapter18_grpo/grpo-practice-and-mechanism'
             },
             {
-              text: '16.2 R1-Zero Paradigm / DAPO',
+              text: '16.2 R1-Zero and DAPO',
               link: '/en/chapter18_grpo/deepseek-dapo'
             },
             {
-              text: '16.3 RLVR: Verifiable Rewards',
+              text: '16.3 Hands-on: RLVR Verifiable Rewards',
               link: '/en/chapter18_grpo/rlvr'
             },
             {
-              text: '16.4 GRPO Improvement Family (Translation pending)'
+              text: '16.4 GRPO Improvements'
             },
             {
-              text: '16.5 RL Environments & Verifier Engineering (Translation pending)'
+              text: '16.5 RL Environments and Verifier Engineering'
             },
             {
-              text: '16.6 Financial API Tool-Calling GRPO Experiment',
+              text: '16.6 Hands-on: GRPO for Financial Tool Calling',
               link: '/en/chapter18_grpo/financial-tool-calling-grpo'
             },
             {
@@ -2083,67 +1991,67 @@ const enSidebar = {
               link: '/en/chapter18_grpo/on-policy-distillation'
             },
             {
-              text: '16.8 veRL Code Generation RL Experiment (Translation pending)'
+              text: '16.8 Hands-on: Code Generation with veRL'
             }
           ]
         },
         {
-          text: '17. Reasoning Models & Test-Time Scaling (Translation pending)',
+          text: '17. Reasoning Models and Test-Time Scaling',
           collapsed: true,
           items: [
             {
-              text: '17.1 Emergence of Reasoning Models (pending)'
+              text: '17.1 Emergence of Reasoning Models'
             },
             {
-              text: '17.2 R1-Zero Pure RL Training (pending)'
+              text: '17.2 R1-Zero Pure RL Training'
             },
             {
-              text: '17.3 Test-time Compute Scaling (pending)'
+              text: '17.3 Test-Time Compute Scaling'
             },
             {
-              text: '17.4 Hybrid Thinking & Thinking Budget (pending)'
+              text: '17.4 Hybrid Thinking and Thinking Budgets'
             },
             {
-              text: '17.5 Adaptive Thinking (pending)'
+              text: '17.5 Adaptive Thinking'
             },
             {
-              text: '17.6 CoT Readability & Alignment (pending)'
+              text: '17.6 CoT Readability and Alignment'
             }
           ]
         },
         {
-          text: '18. Process Reward Models & Inference-Time Search (Translation pending)',
+          text: '18. Process Reward Models and Inference-Time Search',
           collapsed: true,
           items: [
             {
-              text: '18.1 Outcome vs Process Rewards (pending)'
+              text: '18.1 Outcome and Process Rewards'
             },
             {
-              text: '18.2 Discriminative PRM (pending)'
+              text: '18.2 Discriminative PRM'
             },
             {
-              text: '18.3 Generative PRM (pending)'
+              text: '18.3 Generative PRM'
             },
             {
-              text: '18.4 Formal PRM Verifier (pending)'
+              text: '18.4 Formal PRM Verifier'
             },
             {
-              text: '18.5 Inference-Time Search (pending)'
+              text: '18.5 Inference-Time Search'
             },
             {
-              text: '18.6 Parallel Reasoning Coordination (pending)'
+              text: '18.6 Parallel and Coordinated Reasoning'
             }
           ]
         },
         {
-          text: '19. Constitutional AI & RLAIF (Translation pending)',
+          text: '19. Constitutional AI and RLAIF',
           collapsed: true,
           items: [
             {
-              text: '19.1 HHH Principles & Claude Practice (pending)'
+              text: '19.1 HHH Principles and Claude Practice'
             },
             {
-              text: '19.2 RLAIF Engineering Constitution Extension (pending)'
+              text: '19.2 RLAIF Engineering and Constitution Extensions'
             }
           ]
         }
@@ -2158,17 +2066,14 @@ const enSidebar = {
           collapsed: true,
           items: [
             {
-              text: '20.0 Chapter Overview',
+              text: '20.1 Agentic RL Overview',
               link: '/en/chapter22_agentic/intro'
             },
             {
-              text: '20.1 Agentic RL Overview (Translation pending)'
+              text: '20.2 Multi-Turn RL Formulation'
             },
             {
-              text: '20.2 Multi-Turn RL Formulation (Translation pending)'
-            },
-            {
-              text: '20.3 Trajectory Credit Assignment (Translation pending)'
+              text: '20.3 Trajectory Credit Assignment'
             },
             {
               text: '20.4 Tool-Use RL',
@@ -2183,7 +2088,7 @@ const enSidebar = {
               link: '/en/chapter22_agentic/industrial-practice'
             },
             {
-              text: '20.7 Multi-Agent Collaboration & Agent Swarm (Translation pending)'
+              text: '20.7 Multi-Agent Collaboration and Agent Swarm'
             },
             {
               text: '20.8 Hands-on: Training a DeepCoder Agent with rLLM',
@@ -2200,41 +2105,41 @@ const enSidebar = {
           ]
         },
         {
-          text: '21. RL for Code Agents (Translation pending)',
+          text: '21. RL for Code Agents',
           collapsed: true,
           items: [
             {
-              text: '21.1 SWE-RL Basics (pending)'
+              text: '21.1 SWE-RL Basics'
             },
             {
-              text: '21.2 Code World Model & DeepSWE (pending)'
+              text: '21.2 Code World Model and DeepSWE'
             },
             {
-              text: '21.3 Self-Play SWE-RL Summary (pending)'
+              text: '21.3 Self-Play SWE-RL'
             }
           ]
         },
         {
-          text: '22. Deep Research & Browser Agents (Translation pending)',
+          text: '22. Deep Research and Browser Agents',
           collapsed: true,
           items: [
             {
-              text: '22.1 Browser RL Harness Engineering (pending)'
+              text: '22.1 Browser RL Harness Engineering'
             },
             {
-              text: '22.2 Evaluation Benchmarks & Open-Source Projects (pending)'
+              text: '22.2 Evaluation Benchmarks and Open-Source Projects'
             }
           ]
         },
         {
-          text: '23. Computer Use & GUI Agents (Translation pending)',
+          text: '23. Computer Use and GUI Agents',
           collapsed: true,
           items: [
             {
-              text: '23.1 GUI Agent Training Practice (pending)'
+              text: '23.1 GUI Agent Training'
             },
             {
-              text: '23.2 Instruction Hierarchy & Prompt Injection Defense (pending)'
+              text: '23.2 Instruction Hierarchy and Prompt Injection Defense'
             }
           ]
         }
@@ -2249,11 +2154,7 @@ const enSidebar = {
           collapsed: true,
           items: [
             {
-              text: '24.0 Chapter Overview',
-              link: '/en/chapter26_vlm/intro'
-            },
-            {
-              text: '24.1 Visual Reward Challenges',
+              text: '24.1 Visual Reward Design',
               link: '/en/chapter26_vlm/vlm-challenges'
             },
             {
@@ -2261,44 +2162,44 @@ const enSidebar = {
               link: '/en/chapter26_vlm/vlm-grpo-hands-on'
             },
             {
-              text: '24.3 Hands-on: Multimodal Frontiers (Translation pending)'
+              text: '24.3 Hands-on: Multimodal Frontiers'
             },
             {
-              text: '24.4 Hands-on: GeoQA Geometric Reasoning Experiment',
+              text: '24.4 Hands-on: GeoQA Geometric Reasoning',
               link: '/en/chapter26_vlm/easyr1-geoqa'
             }
           ]
         },
         {
-          text: '25. Audio & Speech RL (Translation pending)',
+          text: '25. Audio and Speech RL',
           collapsed: true,
           items: [
             {
-              text: '25.1 RLVR → RLHF Audio Reward Design (pending)'
+              text: '25.1 Audio Reward Design from RLVR to RLHF'
             },
             {
-              text: '25.2 Multimodal Audio Agent Future Directions (pending)'
+              text: '25.2 Multimodal Audio Agents'
             }
           ]
         },
         {
-          text: '26. Embodied Intelligence & VLA Models (Translation pending)',
+          text: '26. Embodied Intelligence and VLA Models',
           collapsed: true,
           items: [
             {
-              text: '26.1 Embodied Intelligence Overview (pending)'
+              text: '26.1 VLA Model Foundations'
             }
           ]
         },
         {
-          text: '27. Visual Generation RL (Translation pending)',
+          text: '27. Visual Generation RL',
           collapsed: true,
           items: [
             {
-              text: '27.1 Visual Generation & DanceGRPO (pending)'
+              text: '27.1 Visual Generation and DanceGRPO'
             },
             {
-              text: '27.2 Multi-Reward Video RLHF & Physics-Aware Generation (pending)'
+              text: '27.2 Multi-Reward Video RLHF and Physics-Aware Generation'
             }
           ]
         }
@@ -2309,34 +2210,30 @@ const enSidebar = {
       collapsed: true,
       items: [
         {
-          text: '28. Reward Hacking & RL Evaluation (Translation pending)',
+          text: '28. Reward Hacking and RL Evaluation',
           collapsed: true,
           items: [
             {
-              text: '28.1 Classical Failure Modes (pending)'
+              text: '28.1 Classical Alignment Failure Modes'
             },
             {
-              text: '28.2 RLVR Fake Gains & Industrial Failure Cases (pending)'
+              text: '28.2 RLVR False Gains and Industrial Failure Cases'
             },
             {
-              text: '28.3 Anthropic Misalignment Research (pending)'
+              text: '28.3 Anthropic Misalignment Research'
             },
             {
-              text: '28.4 Defense Mechanisms Summary (pending)'
+              text: '28.4 Defense Mechanisms'
             },
             {
-              text: '28.5 Evaluation Principles & Modern Harnesses (pending)'
+              text: '28.5 Modern Evaluation Principles and Harnesses'
             }
           ]
         },
         {
-          text: '29. Self-Play, Scaling & Future Directions',
+          text: '29. Self-Play, Scaling and Research Frontiers',
           collapsed: true,
           items: [
-            {
-              text: '29.0 Chapter Overview',
-              link: '/en/chapter32_selfplay/intro'
-            },
             {
               text: '29.1 Self-Play Basics & LLM Self-Play',
               link: '/en/chapter32_selfplay/self-play-outlook/'
@@ -2350,7 +2247,7 @@ const enSidebar = {
               link: '/en/chapter32_selfplay/llm-multi-agent-rl/'
             },
             {
-              text: '29.4 Evolutionary LLM Search & Scientific Discovery (Translation pending)'
+              text: '29.4 Evolutionary LLM Search and Scientific Discovery'
             }
           ]
         }
@@ -2361,15 +2258,12 @@ const enSidebar = {
       collapsed: true,
       items: [
         {
-          text: 'A. Training Debugging & Engineering Practice',
+          text: 'A. Training Debugging and Engineering Practice',
           collapsed: true,
           items: [
             {
-              text: 'A.0 Appendix Overview',
+              text: 'A.1 Training Debugging Guide',
               link: '/en/appendix_industrial_training/intro'
-            },
-            {
-              text: 'A.1 Training Debugging Guide (Translation pending)'
             },
             {
               text: 'A.2 Training Infrastructure',
@@ -2390,11 +2284,7 @@ const enSidebar = {
           collapsed: true,
           items: [
             {
-              text: 'B.0 Appendix Overview',
-              link: '/en/appendix_code_cheatsheet/intro'
-            },
-            {
-              text: 'B.1 SFT and KL',
+              text: 'B.1 SFT and KL Divergence',
               link: '/en/appendix_code_cheatsheet/sft-kl'
             },
             {
@@ -2402,7 +2292,7 @@ const enSidebar = {
               link: '/en/appendix_code_cheatsheet/ppo-gae'
             },
             {
-              text: 'B.3 DPO Family',
+              text: 'B.3 DPO Methods',
               link: '/en/appendix_code_cheatsheet/dpo-family'
             },
             {
@@ -2410,7 +2300,7 @@ const enSidebar = {
               link: '/en/appendix_code_cheatsheet/grpo-rlvr'
             },
             {
-              text: 'B.5 Softmax & Cross-Entropy',
+              text: 'B.5 Softmax and Cross-Entropy',
               link: '/en/appendix_code_cheatsheet/softmax-ce'
             },
             {
@@ -2428,25 +2318,22 @@ const enSidebar = {
           ]
         },
         {
-          text: 'C. Learning Resources & Reference Materials',
+          text: 'C. Learning Resources and Reference Materials',
           collapsed: true,
           items: [
             {
-              text: 'C.0 Appendix Overview',
+              text: 'C.1 Learning Resources and Project Roadmap',
               link: '/en/appendix_game_projects/intro'
             },
             {
-              text: 'C.1 Paper Reading Roadmap (Translation pending)'
-            },
-            {
-              text: 'C.2 GPU Hours Estimation Table (Translation pending)'
+              text: 'C.2 GPU Hours Estimation Table'
             },
             {
               text: 'C.3 Metrics Glossary',
               link: '/en/appendix_industrial_training/metrics-glossary'
             },
             {
-              text: 'C.4 Industrial Exercises',
+              text: 'C.4 Industrial Practice Exercises',
               link: '/en/appendix_industrial_training/industrial-exercises'
             }
           ]
@@ -2456,17 +2343,9 @@ const enSidebar = {
           collapsed: true,
           items: [
             {
-              text: 'D.0 Appendix Overview',
-              link: '/en/appendix_math/intro'
-            },
-            {
               text: 'D.1 Linear Algebra',
               collapsed: true,
               items: [
-                {
-                  text: 'D.1.0 Overview',
-                  link: '/en/appendix_math/linear-algebra'
-                },
                 {
                   text: 'Basic Objects',
                   link: '/en/appendix_math/linear-algebra-basics'
@@ -2480,23 +2359,19 @@ const enSidebar = {
                   link: '/en/appendix_math/linear-algebra-function-approx'
                 },
                 {
-                  text: 'Convergence & Trust Regions',
+                  text: 'Convergence and Trust Regions',
                   link: '/en/appendix_math/linear-algebra-advanced'
                 },
                 {
-                  text: 'Formulas & Exercises',
+                  text: 'Formulas and Exercises',
                   link: '/en/appendix_math/linear-algebra-formulas-exercises'
                 }
               ]
             },
             {
-              text: 'D.2 Probability & Estimation',
+              text: 'D.2 Probability and Estimation',
               collapsed: true,
               items: [
-                {
-                  text: 'D.2.0 Overview',
-                  link: '/en/appendix_math/probability-statistics'
-                },
                 {
                   text: 'Probability Basics',
                   link: '/en/appendix_math/probability-basics'
@@ -2506,7 +2381,7 @@ const enSidebar = {
                   link: '/en/appendix_math/probability-value'
                 },
                 {
-                  text: 'Sampling & Estimation',
+                  text: 'Sampling and Estimation',
                   link: '/en/appendix_math/probability-sampling'
                 },
                 {
@@ -2518,21 +2393,17 @@ const enSidebar = {
                   link: '/en/appendix_math/probability-bellman-advanced'
                 },
                 {
-                  text: 'Formulas & Exercises',
+                  text: 'Formulas and Exercises',
                   link: '/en/appendix_math/probability-formulas-exercises'
                 }
               ]
             },
             {
-              text: 'D.3 Calculus & Optimization',
+              text: 'D.3 Calculus and Optimization',
               collapsed: true,
               items: [
                 {
-                  text: 'D.3.0 Overview',
-                  link: '/en/appendix_math/calculus-optimization'
-                },
-                {
-                  text: 'Derivatives & Gradients',
+                  text: 'Derivatives and Gradients',
                   link: '/en/appendix_math/calculus-basics'
                 },
                 {
@@ -2552,7 +2423,7 @@ const enSidebar = {
                   link: '/en/appendix_math/calculus-advanced-formulas'
                 },
                 {
-                  text: 'Formulas & Exercises',
+                  text: 'Formulas and Exercises',
                   link: '/en/appendix_math/calculus-formulas-exercises'
                 }
               ]
@@ -2562,15 +2433,11 @@ const enSidebar = {
               collapsed: true,
               items: [
                 {
-                  text: 'D.4.0 Overview',
-                  link: '/en/appendix_math/information-theory'
-                },
-                {
-                  text: 'Entropy & Exploration',
+                  text: 'Entropy and Exploration',
                   link: '/en/appendix_math/information-basics'
                 },
                 {
-                  text: 'Cross-Entropy & KL',
+                  text: 'Cross-Entropy and KL Divergence',
                   link: '/en/appendix_math/information-cross-entropy-kl'
                 },
                 {
@@ -2586,7 +2453,7 @@ const enSidebar = {
                   link: '/en/appendix_math/information-advanced-formulas'
                 },
                 {
-                  text: 'Formulas & Exercises',
+                  text: 'Formulas and Exercises',
                   link: '/en/appendix_math/information-formulas-exercises'
                 }
               ]

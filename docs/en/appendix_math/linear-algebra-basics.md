@@ -1,10 +1,14 @@
 ---
-title: 'E.1.1 Linear Algebra Basics: Vectors and Matrices'
+title: 'D.1.1 Linear Algebra Basics: Vectors and Matrices'
 ---
 
-# E.1.1 Linear Algebra Basics: Vectors and Matrices
+# D.1.1 Linear Algebra Basics: Vectors and Matrices
 
-> **Prerequisites**: This article does not require prior linear algebra, but it is helpful to first read the two-state running example in the [appendix introduction](./intro).
+<!--@include: ./intro.md{7,}-->
+
+<!--@include: ./linear-algebra.md{7,}-->
+
+> **Prerequisites**: This article does not require prior linear algebra. Read the two-state running example above first.
 
 ---
 
@@ -383,4 +387,4 @@ This article established five basic objects in linear algebra:
 
 Their relationships are: scalars form vectors, vectors form matrices, and matrix-vector multiplication implements probability weighting. The next article combines these objects into a full system of equations: the matrix form of the Bellman equation $v = r + \gamma Pv$.
 
-> **Next**: [E.1.2 Matrix Form of the Bellman Equation](./linear-algebra-bellman) shows how vectors, matrices, and matrix multiplication combine into the matrix form of the Bellman equation.
+> **Next**: [D.1.2 Matrix Form of the Bellman Equation](./linear-algebra-bellman) shows how vectors, matrices, and matrix multiplication combine into the matrix form of the Bellman equation.

@@ -1,8 +1,11 @@
 ---
-title: 6.1 Why We Need Policy Gradients
+title: 6.1 Policy Gradient Theorem
 ---
 
-# 6.1 Why We Need Policy Gradients
+# 6.1 Policy Gradient Theorem
+
+<!--@include: ./intro.md{7,}-->
+
 ## Section Overview
 
 **Key takeaways**

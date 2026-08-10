@@ -1,10 +1,10 @@
 ---
-title: E.2.5 Bellman Expectation Equation and Action Values
+title: D.2.5 Bellman Expectation Equation and Action Values
 ---
 
-# E.2.5 Bellman Expectation Equation and Action Values
+# D.2.5 Bellman Expectation Equation and Action Values
 
-> **Prerequisites**: [E.2.1 Probability Basics](./probability-basics) and [E.2.2 State Values](./probability-value) -- you should know conditional probability and the linearity of expectation.
+> **Prerequisites**: [D.2.1 Probability Basics](./probability-basics) and [D.2.2 State Values](./probability-value) -- you should know conditional probability and the linearity of expectation.
 
 ---
 
@@ -250,4 +250,4 @@ This article expanded the value function from a "black-box expectation" into the
 
 The core idea of the Bellman expectation equation is recursion: we do not need to run a full trajectory if we know "one-step reward plus next-state value." Action values let us compare actions, and the advantage function turns that comparison into a number. Trajectory importance sampling lets us reuse old data, but it carries the risk of variance explosion.
 
-> **Next**: [E.2.6 Probability and Statistics Formula Reference and Exercises](./probability-formulas-exercises) -- a formula summary for this module, with exercises.
+> **Next**: [D.2.6 Probability and Statistics Formula Reference and Exercises](./probability-formulas-exercises) -- a formula summary for this module, with exercises.

@@ -1,10 +1,10 @@
 ---
-title: E.4.4 Mutual Information
+title: D.4.4 Mutual Information
 ---
 
-# E.4.4 Mutual Information and Representation Learning
+# D.4.4 Mutual Information and Representation Learning
 
-> **Prerequisites**: [E.4.1 Entropy](./information-basics) and [E.4.2 KL Divergence](./information-cross-entropy-kl). You need to know the definitions of entropy and KL divergence.
+> **Prerequisites**: [D.4.1 Entropy](./information-basics) and [D.4.2 KL Divergence](./information-cross-entropy-kl). You need to know the definitions of entropy and KL divergence.
 
 ---
 
@@ -67,6 +67,6 @@ This article introduced a tool for measuring how much information two random var
 | Mutual information                  | How much one variable reduces uncertainty in another | $I(X;Y)=H(X)-H(X\mid Y)$        | Evaluates whether representations keep task-relevant information |
 | KL definition of mutual information | Expressing mutual information with KL divergence     | $I(X;Y)=D_{KL}(P_{XY}\|P_XP_Y)$ | Mutual information is 0 under independence                       |
 
-Mutual information connects the entropy and KL divergence from the previous articles: it uses KL to measure the difference between a joint distribution and the independence assumption, and it uses the reduction in entropy to measure information gain. The next article summarizes all complete formulas in module E.4.
+Mutual information connects the entropy and KL divergence from the previous articles: it uses KL to measure the difference between a joint distribution and the independence assumption, and it uses the reduction in entropy to measure information gain. The next article summarizes all complete formulas in module D.4.
 
-> **Next**: [E.4.5 Complete Information Theory Formulas](./information-advanced-formulas) -- full expressions for KL, RLHF, DPO, and mutual information.
+> **Next**: [D.4.5 Complete Information Theory Formulas](./information-advanced-formulas) -- full expressions for KL, RLHF, DPO, and mutual information.

@@ -1,8 +1,8 @@
 ---
-title: C.3 DPO Family
+title: B.3 DPO Family
 ---
 
-# C.3 DPO Family
+# B.3 DPO Family
 
 DPO loss is the single most frequently requested "handwritten code" question in post-training interviews — almost every interview covers it. This section gives one-page cheatsheets for DPO, IPO, KTO, and SimPO.
 

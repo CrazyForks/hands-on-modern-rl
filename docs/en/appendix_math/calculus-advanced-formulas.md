@@ -1,10 +1,10 @@
 ---
-title: E.3.5 Complete Formulas
+title: D.3.5 Complete Formulas
 ---
 
-# E.3.5 Complete Formulas for PG, DQN, GAE, PPO, and GRPO
+# D.3.5 Complete Formulas for PG, DQN, GAE, PPO, and GRPO
 
-> **Prerequisite**: This page summarizes all formulas in module E.3. It is best reviewed after reading [E.3.1](./calculus-basics) through [E.3.4](./calculus-derivations).
+> **Prerequisite**: This page summarizes all formulas in module D.3. It is best reviewed after reading [D.3.1](./calculus-basics) through [D.3.4](./calculus-derivations).
 
 On the previous pages, we derived the single-sample form of the policy gradient, the log-derivative trick, PPO clipping, and GRPO group normalization. This page organizes those results into complete formulas and adds the DQN loss function and the derivation of GAE. You can treat this page as a quick reference and return to it whenever an unfamiliar symbol appears.
 
@@ -186,7 +186,7 @@ For example, if the rewards are $[2,4,10]$, the mean is $5.33$. The third answer
 
 ## Summary
 
-This page summarized all core formulas in module E.3:
+This page summarized all core formulas in module D.3:
 
 | Formula                 | Core expression                                                        | Use                                               |
 | ----------------------- | ---------------------------------------------------------------------- | ------------------------------------------------- |
@@ -198,4 +198,4 @@ This page summarized all core formulas in module E.3:
 
 When you encounter an unfamiliar symbol, return to this page for reference. The next page uses exercises to check your understanding of these formulas.
 
-> **Next**: [E.3.6 Formula Reference and Exercises](./calculus-formulas-exercises), which summarizes all formulas in this module and checks understanding through exercises.
+> **Next**: [D.3.6 Formula Reference and Exercises](./calculus-formulas-exercises), which summarizes all formulas in this module and checks understanding through exercises.

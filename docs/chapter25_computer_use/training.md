@@ -1,6 +1,8 @@
-# 23.1 GUI Agent 训练实践
+# 23.1 GUI Agent 训练
 
-> [本章导读](./intro)讲清楚了 Computer Use 的 MDP 建模和 GUI Grounding 的视觉对齐。本节回答下一个工程问题：**怎么把一个 VLM 真正训成 GUI Agent**？这涉及数据合成、课程设计、奖励工程、虚拟环境等一整套工业 pipeline。我们以 2025-2026 年中国实验室的代表性工作为线索——UI-TARS-2、AutoGLM、MobileRL、ComputerRL、CogAgent——对比各家技术路线的优劣。
+<!--@include: ./intro.md{3,}-->
+
+前文讲清楚了 Computer Use 的 MDP 建模和 GUI Grounding 的视觉对齐。本节回答下一个工程问题：**如何把 VLM 训练成 GUI Agent？** 这涉及数据合成、课程设计、奖励工程和虚拟环境等完整的工业训练流水线。下面以 2025—2026 年中国实验室的代表性工作为线索，对比 UI-TARS-2、AutoGLM、MobileRL、ComputerRL 和 CogAgent 的技术路线。
 
 ## 中国实验室的 GUI Agent 集中爆发
 

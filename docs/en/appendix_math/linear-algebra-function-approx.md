@@ -1,10 +1,10 @@
 ---
-title: E.1.3 Dot Products, Norms, and Function Approximation
+title: D.1.3 Dot Products, Norms, and Function Approximation
 ---
 
-# E.1.3 Dot Products, Norms, and Function Approximation
+# D.1.3 Dot Products, Norms, and Function Approximation
 
-> **Prerequisites**: [E.1.1 Vectors and Matrices](./linear-algebra-basics), especially vectors and vector operations. [E.1.2 Bellman Matrix Form](./linear-algebra-bellman), especially the matrix form $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$.
+> **Prerequisites**: [D.1.1 Vectors and Matrices](./linear-algebra-basics), especially vectors and vector operations. [D.1.2 Bellman Matrix Form](./linear-algebra-bellman), especially the matrix form $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$.
 
 ---
 
@@ -303,4 +303,4 @@ But after introducing function approximation, two questions remain:
 
 The common essence of these two questions is that we must analyze how "amount of change" behaves differently in different directions. This leads to eigenvalues, spectral radius, and weighted norms, the topic of the next article.
 
-> **Next**: [E.1.4 Convergence, Eigenvalues, and Trust Regions](./linear-algebra-advanced) explains why value iteration is stable and how parameter updates can account for direction sensitivity.
+> **Next**: [D.1.4 Convergence, Eigenvalues, and Trust Regions](./linear-algebra-advanced) explains why value iteration is stable and how parameter updates can account for direction sensitivity.

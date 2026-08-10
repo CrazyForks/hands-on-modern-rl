@@ -1,10 +1,10 @@
 ---
-title: E.2.3 Monte Carlo, Incremental Averages, and Importance Sampling
+title: D.2.3 Monte Carlo, Incremental Averages, and Importance Sampling
 ---
 
-# E.2.3 Monte Carlo, Incremental Averages, and Importance Sampling
+# D.2.3 Monte Carlo, Incremental Averages, and Importance Sampling
 
-> **Prerequisites**: [E.2.2 Random Variables, Returns, and State Values](./probability-value) -- you should know the definitions of expectation and variance.
+> **Prerequisites**: [D.2.2 Random Variables, Returns, and State Values](./probability-value) -- you should know the definitions of expectation and variance.
 
 ---
 
@@ -109,4 +109,4 @@ This article introduced three practical methods for computing expectations:
 
 Monte Carlo solves the problem "we cannot directly compute the expectation without transition probabilities": sample repeatedly and average. Incremental averaging solves Monte Carlo's memory problem: keep only the current estimate and update it online. Importance sampling solves the problem "the data was collected by an old policy": weight samples by probability ratios to correct the bias. Together, these three methods form the basis for almost all value estimation and policy update algorithms in RL.
 
-> **Next**: [E.2.4 Trajectory Probability, Baselines, and GAE](./probability-trajectory-td) -- from single-step sampling to full trajectories, and from expectations to variance control.
+> **Next**: [D.2.4 Trajectory Probability, Baselines, and GAE](./probability-trajectory-td) -- from single-step sampling to full trajectories, and from expectations to variance control.

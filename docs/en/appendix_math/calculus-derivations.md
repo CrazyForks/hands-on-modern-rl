@@ -1,10 +1,10 @@
 ---
-title: E.3.4 Derivation Tools
+title: D.3.4 Derivation Tools
 ---
 
-# E.3.4 Policy Gradient, Taylor, and GRPO Derivations
+# D.3.4 Policy Gradient, Taylor, and GRPO Derivations
 
-> **Prerequisite**: [E.3.2 Policy Gradients and Advantage Functions](./calculus-policy-gradient). You need to know the basic form of the policy gradient.
+> **Prerequisite**: [D.3.2 Policy Gradients and Advantage Functions](./calculus-policy-gradient). You need to know the basic form of the policy gradient.
 
 ---
 
@@ -233,4 +233,4 @@ This page introduced three derivation tools:
 
 These three tools correspond to the derivation skeleton of policy gradients, the theoretical basis for limiting update size, and an alternative to using a Critic. The next page organizes them into a complete formula reference.
 
-> **Next**: [E.3.5 Complete Optimization Formulas](./calculus-advanced-formulas), a formula reference for PG, DQN, GAE, PPO, and GRPO.
+> **Next**: [D.3.5 Complete Optimization Formulas](./calculus-advanced-formulas), a formula reference for PG, DQN, GAE, PPO, and GRPO.

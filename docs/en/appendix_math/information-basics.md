@@ -1,10 +1,12 @@
 ---
-title: E.4.1 Entropy and Exploration
+title: D.4.1 Entropy and Exploration
 ---
 
-# E.4.1 Information Theory Basics: Self-Information, Entropy, and Exploration
+# D.4.1 Information Theory Basics: Self-Information, Entropy, and Exploration
 
-> **Prerequisites**: This article does not require prior knowledge of information theory, but it is recommended that you first read the [appendix introduction](./intro) and [E.2.1 Probability Basics](./probability-basics).
+<!--@include: ./information-theory.md{7,}-->
+
+> **Prerequisites**: This article does not require prior knowledge of information theory. Read the two-state running example above and [D.2.1 Probability Basics](./probability-basics) first.
 
 ---
 
@@ -201,4 +203,4 @@ This article started from "how surprising is a probability event?" and gradually
 
 This article discussed only the properties of a single distribution. The next article compares two distributions, such as model predictions vs. true labels or a new policy vs. an old policy. For that, we need cross-entropy and KL divergence.
 
-> **Next**: [E.4.2 Cross-Entropy and KL Divergence](./information-cross-entropy-kl) -- measuring the distance between two distributions.
+> **Next**: [D.4.2 Cross-Entropy and KL Divergence](./information-cross-entropy-kl) -- measuring the distance between two distributions.

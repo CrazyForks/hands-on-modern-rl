@@ -1,8 +1,8 @@
 ---
-title: C.5 Softmax and Cross-Entropy
+title: B.5 Softmax and Cross-Entropy
 ---
 
-# C.5 Softmax and Cross-Entropy
+# B.5 Softmax and Cross-Entropy
 
 A common warm-up question. Before you write DPO or PPO on the whiteboard, an interviewer may ask you to handwrite a numerically stable softmax and cross-entropy.
 

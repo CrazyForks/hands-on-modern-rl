@@ -8,16 +8,16 @@
 
 | 节                                                           | 主题                            | 它解决什么问题                                                  |
 | ------------------------------------------------------------ | ------------------------------- | --------------------------------------------------------------- |
-| [B.1 RL 训练系统：采样、异步与分布式](./rl-infrastructure)   | RL 训练系统怎么跑起来           | 采样瓶颈、rollout engine、异步训练、权重同步、DP/TP/PP/EP       |
-| [B.2 Agentic RL 基础设施](./agentic-rl-infra)                | Agentic RL 需要什么基础设施     | 沙箱、轨迹存储、工具执行、多轮调度、Relax 案例                  |
-| [B.3 RL 后训练与 Agentic RL Benchmark](./evaluation-badcase) | 怎么知道模型和 Agent 有没有变好 | 后训练评测、Agentic benchmark、训练监控、Badcase 归因、上线门禁 |
-| [B.4 大模型 RL 训练指标词典](./metrics-glossary)             | 训练日志里的指标是什么意思      | PPO/GRPO/DPO/RM 训练指标按功能分组，含异常信号和框架差异        |
-| [B.5 工业岗位练习](./industrial-exercises)                   | 后训练与 RL 岗位能力            | 按中美欧岗位要求拆解真实工作、能力地图和 8 个工业练习           |
+| [A.2 RL 训练系统：采样、异步与分布式](./rl-infrastructure)   | RL 训练系统怎么跑起来           | 采样瓶颈、rollout engine、异步训练、权重同步、DP/TP/PP/EP       |
+| [A.3 Agentic RL 基础设施](./agentic-rl-infra)                | Agentic RL 需要什么基础设施     | 沙箱、轨迹存储、工具执行、多轮调度、Relax 案例                  |
+| [A.4 RL 后训练与 Agentic RL Benchmark](./evaluation-badcase) | 怎么知道模型和 Agent 有没有变好 | 后训练评测、Agentic benchmark、训练监控、Badcase 归因、上线门禁 |
+| [C.3 大模型 RL 训练指标词典](./metrics-glossary)             | 训练日志里的指标是什么意思      | PPO/GRPO/DPO/RM 训练指标按功能分组，含异常信号和框架差异        |
+| [C.4 工业岗位练习](./industrial-exercises)                   | 后训练与 RL 岗位能力            | 按中美欧岗位要求拆解真实工作、能力地图和 8 个工业练习           |
 
 ## 阅读建议
 
-- **如果你在做 LLM 后训练**：按 B.1 → B.3 → B.4 顺序阅读
-- **如果你在做 Agentic RL**：按 B.1 → B.2 → B.3 顺序阅读
-- **如果你在做游戏/机器人 RL**：重点看 B.1 的非 LLM RL 部分和 B.3 的监控部分
-- **如果你在准备面试**：直接看 B.5 的练习，遇到盲区再往回翻
-- **如果你在查指标含义**：直接看 [B.4 指标词典](./metrics-glossary)，按需查阅
+- **如果你在做 LLM 后训练**：按 A.2 → A.4 → C.3 顺序阅读
+- **如果你在做 Agentic RL**：按 A.2 → A.3 → A.4 顺序阅读
+- **如果你在做游戏/机器人 RL**：重点看 A.2 的非 LLM RL 部分和 A.4 的监控部分
+- **如果你在准备面试**：直接看 C.4 的练习，遇到盲区再往回翻
+- **如果你在查指标含义**：直接看 [C.3 指标词典](./metrics-glossary)，按需查阅
