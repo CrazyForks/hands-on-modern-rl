@@ -1,31 +1,29 @@
 # 17.1 Outcome vs Process 奖励
 
-上一章我们看到推理模型在硬任务上取得了突破——o1、DeepSeek-R1、Claude Opus 4.6 都能做复杂数学、代码、科研推理。但这些模型都依赖一个关键假设：**最终答案的对错可以作为 RL 的奖励信号**。
-
-这个假设在简单任务上成立——一道数学题答对就是答对，答错就是答错。但随着任务变复杂，这个假设开始失效：
+第 16 章说明了模型怎样增加推理长度与推理计算。推理链变长以后，最终答案只能说明整条轨迹是否成功，无法指出错误从哪一步开始。简单数学题可以直接核对答案；代码和多步 Agent 任务还需要知道哪一次修改或哪一个动作改变了结果。
 
 - **长 CoT 任务**：一个 10000 token 的推理链，可能前 8000 token 都对，最后 2000 token 错。模型只看到"答错了"，不知道哪里错了
 - **代码生成**：一个程序编译失败，是哪一行错了？哪个逻辑错了？
 - **多步 agent 任务**：10 步 trajectory 失败了，是第几步失败的？
 
-这就是 **稀疏奖励问题（sparse reward problem）**——奖励信号只在序列结尾出现，中间步骤得不到反馈。**过程奖励模型（Process Reward Model, PRM）** 就是为这个问题而生：它给推理过程的每一步打分，把稀疏奖励变成密集奖励。
+这就是 **稀疏奖励问题（sparse reward problem）**：奖励只在序列结尾出现，中间步骤得不到直接反馈。**过程奖励模型（Process Reward Model, PRM）** 对中间步骤进行评价，使训练和搜索能够定位更具体的成功与失败。
 
-## 本章要回答的问题
+## 1. 最终结果为什么不足以指导长推理
 
 - **Outcome 奖励 vs Process 奖励**的本质区别是什么？
 - **判别式 PRM**（OpenAI 的经典路线）怎么工作？标注成本为什么是瓶颈？
 - **生成式 PRM**（ThinkPRM）为什么用更少标签就能超越判别式？
-- **形式化 PRM**（AlphaProof、Lean4）怎么实现"零误判"验证？
+- **形式化 PRM**（AlphaProof、Lean4）怎样用证明检查器提供确定反馈？
 - **推理时搜索**（MCTS、Tree of Thoughts、Beam Search）怎么用 PRM 引导？
 - **并行协调推理**（PaCoRe）如何替代传统的深度优先推理？
 
-## 章节地图
+### 1.1 本章学习路线
 
 ```text
 Outcome 奖励 vs Process 奖励
      ├── 稀疏奖励问题
      ├── 信用分配的本质
-     └── 为什么 PRM 在长 CoT 任务里不可替代
+     └── PRM 在长 CoT 任务里提供什么额外信号
 判别式 PRM（经典路线）
      ├── OpenAI "Let's Verify Step by Step"
      ├── PRM800K 数据集
@@ -36,8 +34,8 @@ Outcome 奖励 vs Process 奖励
      ├── 标签少 100 倍的关键
      ├── Verifier Compute Scaling
      └── 生成式 vs 判别式对比
-形式化 PRM（终极 Verifier）
-     ├── Lean4 / Coq：零误判验证
+形式化 PRM（证明检查器）
+     ├── Lean4 / Coq：确定性的形式检查
      ├── AlphaProof：IMO 银牌
      ├── AlphaGeometry 2：几何专用
      └── DeepSeek-Prover-V2：MiniF2F 88.9%
@@ -57,20 +55,20 @@ GenRM 与 Verifier 模型
      └── Self-Rewarding Language Models
 ```
 
-## 与其他章的关系
+### 1.2 与前后章节的关系
 
-这一章假定你已经读过：
+理解本章需要用到：
 
 - [第 13 章 RLHF 微调流程](../chapter15_rlhf/standard-rlhf-pipeline)——Outcome Reward Model 的基础
 - [第 15 章 GRPO 改进家族](../chapter18_grpo/grpo-family)——信用分配问题在 GRPO 中的体现
 - [第 16 章推理模型](../chapter19_reasoning/intro)——为什么推理模型需要 PRM
 
-本章后续会指向：
+本章后续依次讨论：
 
 - [第 19 章 Agentic RL](../chapter22_agentic/overview)——多步 trajectory 的过程奖励
 - [第 25 章奖励黑客](../chapter30_alignment_failures/classical-failures)——PRM 的 reward hacking 问题
 
-## 一个直觉性的开场
+### 1.3 从考试评分到逐步批改
 
 在进入正式内容前，先建立两个关键直觉：
 
@@ -82,7 +80,7 @@ GenRM 与 Verifier 模型
 
 这一节我们从最基础的问题开始：**为什么 outcome reward 在长 CoT 任务上不够？为什么需要 process reward？**
 
-## 稀疏奖励问题
+### 1.4 稀疏奖励怎样掩盖中间错误
 
 考虑一个具体的例子：让模型证明"√2 是无理数"。
 
@@ -116,7 +114,7 @@ Step 9: 所以 √2 是无理数  ✓
 
 这就是**稀疏奖励问题（sparse reward problem）**——奖励信号在时间维度上分布太稀疏，无法提供有效的学习信号。
 
-## 信用分配问题
+## 2. 把最终奖励分配给中间步骤
 
 稀疏奖励问题在 RL 里有一个更正式的名字：**信用分配问题（credit assignment problem）**。
 
@@ -124,7 +122,7 @@ Step 9: 所以 √2 是无理数  ✓
 
 经典 RL 用几个方法解决这个问题：
 
-### 折扣回报（Discounted Return）
+### 2.1 折扣回报
 
 把未来 reward 折扣到现在：
 
@@ -132,23 +130,23 @@ $$G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \ldots + \gamma^{T-t} r_T$$
 
 这是 [第 3 章价值函数与贝尔曼方程](../chapter03_mdp/value-bellman) 讨论的经典方法。它隐含一个假设：**离当前时刻越远的 reward，对当前决策的影响越小**。这个假设在物理控制任务里成立（推小车时，10 步后的 reward 对当前推力的影响确实小），但在 LLM 推理里不成立——一个数学证明的第 1 步和第 10 步同等重要。
 
-### GAE（Generalized Advantage Estimation）
+### 2.2 GAE
 
-[第 8 章 PPO 的 GAE](../chapter10_ppo/gae-reward-model) 通过引入 $\lambda$ 参数，在 bias 和 variance 之间做权衡。GAE 是 PPO 的标准做法，但它的根本局限是——**它需要 value function**，而 GRPO 故意省略了 value function。
+[第 8 章 PPO 的 GAE](../chapter10_ppo/gae-reward-model) 通过引入 $\lambda$ 参数，在偏差和方差之间做权衡。GAE 需要价值函数；GRPO 省略了价值函数，因此必须用组内比较或其他反馈构造优势。
 
-### Token-level loss
+### 2.3 Token-Level Loss
 
 [DAPO](../chapter18_grpo/deepseek-dapo) 的 Token 级损失是一种近似 PRM 的方法——不是给"整条推理链"打分，而是给"每个 token"打分。但 token 级 loss 仍然依赖 outcome reward 反向传播——它没有独立的 verifier 来评估"这个 token 好不好"。
 
-### PRM（Process Reward Model）
+### 2.4 PRM
 
-这是本章的主角——**训练一个独立的 verifier，对每一步推理打分**。PRM 的输出是密集的——每一步都有一个分数，模型可以精确地知道"哪一步好，哪一步坏"。
+PRM 训练一个独立的 verifier，对每一步推理打分。与结尾的单个结果奖励相比，它提供更密集的反馈，使系统能够比较具体步骤。
 
-## Outcome Reward vs Process Reward：形式化对比
+## 3. 形式化比较 Outcome Reward 与 Process Reward
 
 让我们用数学形式化两者的区别。
 
-### Outcome Reward Model (ORM)
+### 3.1 Outcome Reward Model
 
 ORM 接受一个 prompt $q$ 和一个完整回答 $o$，输出一个标量分数：
 
@@ -164,7 +162,7 @@ ORM 训练数据形式：
 
 例：("证明 √2 是无理数", "<完整证明>", 1)
 
-### Process Reward Model (PRM)
+### 3.2 Process Reward Model
 
 PRM 接受 prompt $q$、回答 $o$、和回答中的某个步骤位置 $i$，输出该步骤的分数：
 
@@ -183,7 +181,7 @@ PRM 训练数据形式：
 
 例：("证明 √2 是无理数", "<完整证明>", 4, 1) # 第 4 步是正确的
 
-### 在 RL 训练中的使用
+### 3.3 两类奖励怎样进入 RL 训练
 
 ORM 用于 RL 训练时：
 
@@ -199,35 +197,35 @@ $$r_t = \text{PRM}(q, o, \text{step}(t))$$
 
 这种做法把稀疏 reward 变成了密集 reward，每个 token 都有清晰的训练信号。
 
-## 为什么 PRM 在长 CoT 任务里不可替代
+## 4. 根据任务长度选择过程奖励
 
 PRM 的价值在长 CoT 任务里最明显。考虑三个场景：
 
-### 短回答任务（function calling、简单问答）
+### 4.1 短回答任务
 
 - CoT 长度：100-500 token
 - ORM 信号密度：每 100-500 token 一个 reward
 - PRM 价值：**有限**——序列短，ORM 信号已经够密
 
-### 中等推理任务（GSM8K、MATH）
+### 4.2 中等推理任务
 
 - CoT 长度：500-2000 token
 - ORM 信号密度：每 500-2000 token 一个 reward
 - PRM 价值：**显著**——可以精确定位错误步骤
 
-### 长 CoT 推理任务（AIME、IMO、科研）
+### 4.3 长推理任务
 
 - CoT 长度：5000-50000 token
 - ORM 信号密度：每 5000+ token 一个 reward
-- PRM 价值：**不可替代**——ORM 信号几乎无法提供有效学习信号
+- PRM 价值：可以定位长轨迹中的中间错误，补充 ORM 的结尾信号
 
 [DeepSeek-R1](https://arxiv.org/abs/2501.12948) 训练时报告了一个现象：训练初期，模型的 CoT 长度迅速从几百 token 增长到几千 token，但 AIME 准确率提升缓慢。直到训练后期，模型学会"在关键步骤做检查"（self-verification），AIME 才有显著突破。这说明长 CoT 任务**需要过程级信号才能高效学习**。
 
-## PRM 的三条工业路线
+### 4.4 三类 PRM 怎样提供步骤反馈
 
 PRM 的工业实现有两条主要路线，对应不同的训练方法：
 
-### 判别式 PRM（Discriminative PRM）
+#### 判别式 PRM
 
 把 PRM 当作一个**分类器**——输入 prompt + step，输出"这步对/错"的概率。
 
@@ -237,7 +235,7 @@ PRM 的工业实现有两条主要路线，对应不同的训练方法：
 
 模型：BERT-style encoder 或 decoder-only LLM 加分类头。
 
-### 生成式 PRM（Generative PRM）
+#### 生成式 PRM
 
 把 PRM 当作一个**生成器**——让 LLM 用自然语言"评价"每个步骤。
 
@@ -247,7 +245,7 @@ PRM 的工业实现有两条主要路线，对应不同的训练方法：
 
 模型：任何 LLM（LLaMA、Qwen、DeepSeek），用 prompting + 少量 fine-tune。
 
-### 形式化 PRM（Formal PRM）
+#### 形式化 PRM
 
 把 PRM 当作一个**形式化验证器**——用 Lean4 / Coq 这种定理证明器自动验证。
 
@@ -267,6 +265,6 @@ PRM 有三条工业路线：
 
 - **判别式**：分类器思路，准确但标注成本高
 - **生成式**：LLM 评价思路，标注少但精度依赖 prompt engineering
-- **形式化**：Lean4 验证，零误判但只适用于形式化任务
+- **形式化**：Lean4 等证明检查器提供确定反馈，但只适用于已经形式化的任务
 
 下面三节分别详细讨论这三条路线，最后两节讨论 PRM 在推理时搜索（MCTS、ToT）和并行协调推理（PaCoRe）中的应用。

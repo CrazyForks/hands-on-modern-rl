@@ -1,12 +1,10 @@
-# 16.4 Hybrid Thinking 思考预算
+# 16.4 Hybrid Thinking 与思考预算
 
-上一节我们看到 test-time compute scaling 的潜力——模型思考越多，答案越好。但工业部署立刻遇到一个反向问题：**如果模型对所有问题都深度思考，每次 API 调用都要花 10K+ token 在思考上，这会让服务慢得无法用**。
+16.3 节展示了增加推理计算的三种方法，但简单翻译、事实问答和短代码通常不需要长推理链。若所有请求都使用同一套高预算，服务延迟和成本会随输出长度一起增加。
 
-更深层的问题是：**绝大多数用户的请求根本不需要深度推理**。"今天天气怎么样"、"帮我翻译这句话"、"写个简单的 hello world"——这些任务让模型思考反而拖慢响应、增加成本。
+**Hybrid Thinking** 让同一个模型同时支持直接回答与深度思考。本节先介绍两种模式怎样进入同一模型，再比较长思考与并行短回答，随后说明 long2short 压缩，最后讨论部署时的模式切换和预算控制。
 
-于是 2025 年下半年出现了一个新的工程范式：**Hybrid Thinking**——同一个模型同时支持"思考"和"不思考"两种模式，由用户或模型自己决定用哪种。
-
-## 16.4.1 DeepSeek V3.1 与 Hybrid 模式融合
+## 1. 让同一模型支持思考与直接回答
 
 [DeepSeek V3.1](https://api-docs.deepseek.com/news/news250821)（2025.08）是 Hybrid Thinking 的早期工业实现。V3.1 的设计思路是：
 
@@ -21,11 +19,11 @@ V3.1 的训练流程包括两个阶段：
 
 第二阶段的关键是**保持模型已有的推理能力，同时学会"什么时候该推理、什么时候不该"**。DeepSeek 的具体做法是混合训练数据——一部分 prompt 显式触发推理（数学题），一部分 prompt 不触发（闲聊），让模型自己学到模式切换的判断力。
 
-## 16.4.2 Qwen3 与 Thinking Mode Fusion 与 Thinking Budget
+### 1.1 Qwen3 怎样融合两种模式
 
 [Qwen3 技术报告](https://arxiv.org/abs/2505.09388)（2025.05）提出了更系统的 Hybrid Thinking 方案。Qwen3 全系模型（从 0.6B 到 235B）都支持两种模式：
 
-### Thinking Mode Fusion
+#### Thinking Mode Fusion
 
 Qwen3 不是简单地"训练一个推理模型 + 训练一个非推理模型"，而是**在单一模型中融合两种模式**。具体做法：
 
@@ -36,7 +34,7 @@ Qwen3 不是简单地"训练一个推理模型 + 训练一个非推理模型"，
 
 这个训练方式让模型**自动学会根据 prompt 选择模式**——遇到数学题就开 think，遇到闲聊就不开。
 
-### Thinking Budget 与 可控的思考深度
+#### Thinking Budget 与可控的思考深度
 
 Qwen3 引入了一个工程参数 **thinking budget**——用户可以在 API 调用中指定 `thinking_budget=N`，限制模型最多花 N 个 token 在思考上。
 
@@ -57,11 +55,11 @@ response = client.chat.completions.create(
 
 但 thinking budget 也带来一个**算法挑战**：怎么让模型"在 budget 用完时优雅地停下来"？Qwen3 的做法是在 RL 训练中加入**长度惩罚**——超过 budget 的回答会被惩罚。这与 [DAPO 的 Overlong Reward Shaping](../chapter18_grpo/deepseek-dapo) 思路一致。
 
-## 16.4.3 NoThinking + Best-of-N 与 反直觉的发现
+## 2. 比较长思考与并行短回答
 
 2025 年 4 月，Ma et al. 发表了一篇有趣的研究——[Reasoning Models Can Be Effective Without Thinking](https://arxiv.org/abs/2504.09858)（常称 NoThinking）。这篇论文提出了一个反直觉的主张：**在很多任务上，"不思考 + Best-of-N" 比 "思考" 效果更好**。
 
-### NoThinking 的核心实验
+### 2.1 NoThinking 的核心实验
 
 实验设置：
 
@@ -81,7 +79,7 @@ response = client.chat.completions.create(
 
 也就是说，**把 N 次 thinking 的算力，改成 N 次 nothinking + 投票，效果反而更好**。
 
-### 为什么 NoThinking 有效？
+### 2.2 NoThinking 为什么在部分任务上有效
 
 Ma et al. 给出了几个解释：
 
@@ -96,7 +94,7 @@ Ma et al. 给出了几个解释：
 
 这个研究的意义不是否定 Thinking，而是揭示了**test-time compute 有多种花法，没有一种是最优的**——任务特征决定最优策略。
 
-## 16.4.4 长 CoT 压缩 与 Kimi k1.5 的 long2short RL
+## 3. 用 Long2Short 压缩推理链
 
 推理模型训练后期会出现一个普遍问题：**CoT 越来越长**。R1-Zero、o1、Qwen3 都报告了类似现象——训练步数越多，模型的回答越长，最终长度可以膨胀到 50K+ token。这有几个原因：
 
@@ -108,11 +106,11 @@ Ma et al. 给出了几个解释：
 
 [Kimi k1.5](https://arxiv.org/abs/2501.12599)（2025.01）提出了 **long2short RL**——一个分两阶段的训练方案：
 
-### 训练长 CoT 推理模型
+### 3.1 先训练长推理链
 
 先用标准 RL（GRPO + 数学奖励）训练一个长 CoT 推理模型。这个阶段不限制长度，让模型充分学习推理能力。训练后，模型的典型 CoT 长度可能在 5K-20K token。
 
-### long2short 蒸馏 + RL
+### 3.2 再蒸馏并加入长度奖励
 
 第二阶段是把长 CoT 的能力迁移到短 CoT 上：
 
@@ -127,7 +125,7 @@ $$r_{\text{total}} = r_{\text{correct}} - \lambda \cdot \max(0, |o| - L_{\text{t
 
 其中 $|o|$ 是回答长度，$L_{\text{target}}$ 是目标长度，$\lambda$ 是惩罚强度。这个形式与 [DAPO 的 Overlong Reward Shaping](../chapter18_grpo/deepseek-dapo) 类似，但 Kimi 把它当作"主动压缩"的训练信号，不只是"防止过长"的工程约束。
 
-### long2short 的效果
+### 3.3 比较压缩前后的效果
 
 Kimi k1.5 论文报告：
 
@@ -136,7 +134,7 @@ Kimi k1.5 论文报告：
 
 也就是说，**用 25% 的 token 数，保留了 97.7% 的能力**。这个 trade-off 在工业部署上是非常划算的。
 
-### long2short 与 thinking budget 的关系
+### 3.4 训练压缩与推理预算怎样配合
 
 long2short 和 thinking budget 是互补的：
 
@@ -150,11 +148,11 @@ long2short 和 thinking budget 是互补的：
 推理阶段：thinking budget 设一个安全上限
 ```
 
-## 16.4.5 Hybrid Thinking 的算法挑战
+## 4. 把模式切换与预算控制用于部署
 
 Hybrid Thinking 不是"加一个开关"这么简单。它带来几个新的算法问题：
 
-### 模式切换的判断
+### 4.1 判断是否需要思考
 
 模型怎么决定"这道题该 think 还是不 think"？
 
@@ -163,13 +161,13 @@ Hybrid Thinking 不是"加一个开关"这么简单。它带来几个新的算�
 
 Qwen3 用的是混合策略——默认让模型自动判断，但用户可以显式覆盖。模型自动判断的训练数据需要包含两类样本：thinking 适合的（数学 / 代码）和不适合的（闲聊 / 翻译）。
 
-### 双模式的一致性
+### 4.2 保持两种模式的答案一致
 
 thinking 模式和 nothinking 模式应该给出**一致的答案**——不能 think 说"A"，nothinking 说"B"。但训练时这两种模式是分开优化的，容易出现不一致。
 
 DeepSeek 的做法是在 RL 阶段加入**一致性约束**——同一 prompt 的两种模式答案应该一致，不一致就降低奖励。
 
-### thinking budget 的优雅停止
+### 4.3 在预算用完时结束推理
 
 当 thinking budget 用完时，模型需要"中断当前思考，直接给答案"。但 RL 训练时模型没见过这种情况，强行截断会生成质量很差的答案。
 
@@ -177,7 +175,7 @@ Qwen3 的做法是在训练时**模拟 budget 用完的场景**——在 rollout
 
 ## 小结
 
-Hybrid Thinking 和思考预算是推理模型从"实验室原型"走向"工业产品"的必经之路。它们解决的核心问题是：**如何让一个会思考的模型，在不需要思考时也能高效工作**。
+Hybrid Thinking 用模式切换避免简单任务产生不必要的长推理，思考预算则为复杂任务设置计算上限。long2short 从训练阶段缩短推理链，二者可以配合使用。
 
 DeepSeek V3.1、Qwen3、Kimi K2 都在这个方向上做了重要探索：
 
@@ -186,4 +184,4 @@ DeepSeek V3.1、Qwen3、Kimi K2 都在这个方向上做了重要探索：
 - **Kimi k1.5**：long2short RL 主动压缩 CoT
 - **NoThinking 研究**：揭示了"不思考 + 投票"在某些任务上反超思考
 
-但 Hybrid Thinking 也带来了一个新问题：**模型在思考什么，要不要让用户看见？** 这就是下一节 Hidden vs Visible CoT 的核心话题。
+固定的模式开关仍然需要用户或路由器预先判断任务难度。[16.5 自适应思考](./adaptive-thinking) 进一步让模型根据输入动态决定推理深度。

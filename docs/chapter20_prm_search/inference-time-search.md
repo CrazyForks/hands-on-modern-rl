@@ -1,14 +1,10 @@
 # 17.5 推理时搜索
 
-前面三节我们讨论了 PRM 的训练——判别式、生成式、形式化。这一节我们换一个角度：**PRM 在推理时怎么用**。
+17.2—17.4 节使用三类 verifier 评价推理步骤。推理时也可以使用同一类信号：Best-of-N 生成多个完整答案后统一排序，推理时搜索则在生成过程中保留中间状态，把较好的前缀继续展开，把较差的前缀剪枝。
 
-最直接的应用是 [Best-of-N + Re-ranking](./discriminative-prm)（17.2 节讨论过）——生成 N 个候选，用 PRM 选最好的。但 Best-of-N 是**无记忆的并行采样**，没有利用推理的中间状态。
+本节先说明独立采样为什么无法复用中间步骤，再介绍 Beam Search、Tree of Thoughts 和 MCTS，随后用执行反馈说明代码搜索，最后比较搜索收益与计算开销。
 
-**推理时搜索（Inference-time Search）** 是更结构化的方法——把推理过程展开成一棵**思考树（Thought Tree）**，用 PRM 评估每个节点，用搜索算法（DFS、BFS、Beam Search、MCTS）找最优路径。
-
-这一节讨论几种主要的推理时搜索方法。
-
-## 17.5.1 为什么需要搜索？
+## 1. 为什么独立采样不足以复用中间推理
 
 考虑一个数学题：
 
@@ -49,11 +45,11 @@ Best-of-N 解决这个问题——生成多条独立路径，用 PRM 选最好�
 - **中间评估**：用 PRM 评估中间状态，决定继续走还是回退
 - **资源分配**：把搜索算力用在最有希望的方向
 
-## 17.5.2 Beam Search over Thoughts
+## 2. 用 Beam Search 与 ToT 扩展推理树
 
 **Beam Search** 是最简单的搜索方法——维护 K 个最优的"部分推理"（beam），每步扩展所有 beam，用 PRM 评估，保留 K 个最好的。
 
-### 算法描述
+### 2.1 Beam Search 的算法
 
 ```python
 def beam_search_thoughts(prompt, model, prm, K=4, max_steps=10):
@@ -82,7 +78,7 @@ def beam_search_thoughts(prompt, model, prm, K=4, max_steps=10):
     return beams[0]["thought"]  # 返回最优 beam
 ```
 
-### Beam Search 的特点
+### 2.2 Beam Search 的特点
 
 **优点**：
 
@@ -96,7 +92,7 @@ def beam_search_thoughts(prompt, model, prm, K=4, max_steps=10):
 - 没有"回退"机制——一旦 beam 被淘汰，不再考虑
 - 容易陷入局部最优
 
-### 适用场景
+### 2.3 Beam Search 的适用场景
 
 Beam Search 适合：
 
@@ -104,11 +100,11 @@ Beam Search 适合：
 - 单步推理容易评估
 - 简单到中等难度的任务
 
-## 17.5.3 Tree of Thoughts（ToT）
+### 2.4 Tree of Thoughts
 
 [Tree of Thoughts](https://arxiv.org/abs/2305.10601)（Yao et al. 2023）是 Beam Search 的扩展——支持**分支、回退、DFS/BFS 混合**。
 
-### ToT 的核心结构
+#### ToT 的核心结构
 
 ```text
                 Root
@@ -124,7 +120,7 @@ Beam Search 适合：
        回退：低分节点被剪枝
 ```
 
-### ToT 的算法
+#### ToT 的算法
 
 ```python
 def tree_of_thoughts(prompt, model, prm, max_depth=10, breadth=4):
@@ -155,7 +151,7 @@ def tree_of_thoughts(prompt, model, prm, max_depth=10, breadth=4):
     return dfs("", 0)
 ```
 
-### ToT 的特点
+#### ToT 的特点
 
 **优点**：
 
@@ -169,7 +165,7 @@ def tree_of_thoughts(prompt, model, prm, max_depth=10, breadth=4):
 - PRM 评估的次数多
 - 不适合超长 CoT 任务
 
-### ToT 的实验结果
+#### ToT 的实验结果
 
 在 [24 Game](https://arxiv.org/abs/2305.10601)（24 点游戏）任务上：
 
@@ -182,7 +178,7 @@ def tree_of_thoughts(prompt, model, prm, max_depth=10, breadth=4):
 
 这是一个巨大的提升——同样的 GPT-4 base，仅仅通过更好的推理时搜索，成功率从 7% 提升到 74%。
 
-## 17.5.4 MCTS over Thoughts
+## 3. 用 MCTS 与执行反馈选择路径
 
 **Monte Carlo Tree Search（MCTS）** 是 AlphaGo 用的算法。在 LLM 推理上，MCTS 的核心思想是：
 
@@ -190,7 +186,7 @@ def tree_of_thoughts(prompt, model, prm, max_depth=10, breadth=4):
 - 用模型作为 policy（推荐下一步）
 - 用 UCB 公式平衡探索与利用
 
-### MCTS 的四个步骤
+### 3.1 MCTS 的四个步骤
 
 每次迭代执行：
 
@@ -199,7 +195,7 @@ def tree_of_thoughts(prompt, model, prm, max_depth=10, breadth=4):
 3. **Simulation（模拟）**：对子节点做 rollout（快速生成完整推理）
 4. **Backpropagation（回传）**：把 rollout 的 reward 回传到所有祖先节点
 
-### UCB 公式
+### 3.2 UCB 公式
 
 UCB（Upper Confidence Bound）平衡探索与利用：
 
@@ -214,7 +210,7 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 
 直觉：第一项是"已知价值"（exploitation），第二项是"未探索的潜力"（exploration）。
 
-### MCTS 的特点
+### 3.3 MCTS 的特点
 
 **优点**：
 
@@ -228,20 +224,20 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 - 计算成本高（每步多次 rollout）
 - 对 PRM 质量敏感
 
-### 代表工作
+### 3.4 代表工作
 
 - **rStar**（[arXiv:2408.06195](https://arxiv.org/abs/2408.06195)）：MCTS + 自我对弈，用于数学推理
 - **AlphaProof**（[DeepMind 2024](https://deepmind.google/discover/blog/ai-solves-imo-problems-at-silver-medal-level/)）：MCTS + Lean4 verifier
 - **RAP**（[Reasoning via Planning](https://arxiv.org/abs/2305.14992)）：MCTS + LLM 作为 world model
 
-## 17.5.5 AlphaCodium 与 代码生成搜索
+### 3.5 AlphaCodium 的代码生成搜索
 
 [AlphaCodium](https://arxiv.org/abs/2401.08500)（2024.01）是专门为代码生成设计的搜索方法。它的核心思想：
 
 - 代码任务的"正确性"可以用**单元测试**自动验证（类似 Lean4）
 - 用迭代式搜索：生成 → 测试 → 修复 → 再测试
 
-### AlphaCodium 的流程
+#### AlphaCodium 的流程
 
 ```text
 1. 问题理解：让 LLM 提取关键信息、生成测试用例
@@ -254,13 +250,13 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 4. 输出最终解
 ```
 
-### AlphaCodium 的特点
+#### AlphaCodium 的特点
 
 - 不需要 PRM——单元测试就是 verifier
 - 迭代式（不是树搜索）——简单高效
 - 在 Codeforces 上比单次生成提升 30%+
 
-## 17.5.6 推理时搜索的算力开销
+## 4. 在搜索收益与算力开销之间取舍
 
 不同搜索方法的算力开销（以"模型 forward 次数"为度量）：
 
@@ -276,9 +272,9 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 
 但在科学计算、形式化证明、竞赛编程等"对就是对的"的任务上，搜索的算力开销是值得的——因为这些任务对正确性的要求极高。
 
-## 17.5.7 训练时 vs 推理时搜索
+### 4.1 训练时搜索与推理时搜索
 
-一个深刻的问题是：**搜索应该在训练时做，还是推理时做？**
+还需要决定搜索发生在训练阶段还是推理阶段。
 
 **训练时搜索**（如 AlphaProof 的自博弈）：
 
@@ -310,6 +306,6 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 - **MCTS**：自适应探索，理论保证
 - **AlphaCodium**：代码专用，用单元测试作为 verifier
 
-搜索的算力开销是指数级的，所以**工业上 Best-of-N 仍然是主流**，搜索只在科研、形式化、竞赛等高价值任务上使用。
+完整展开搜索树的节点数会随深度迅速增长；Beam Search 和 MCTS 通过限制保留宽度或采样次数控制开销。因此，实际系统要根据任务价值和验证器成本选择 Best-of-N、受限搜索或直接生成。
 
-下一节讨论 PaCoRe——一种新的推理范式，把"深度搜索"转为"广度并行"，平衡算力和质量。
+[17.6 并行与协同推理](./parallel-reasoning-and-summary) 继续讨论另一种分配方式：并行生成多条推理，再让模型或 verifier 交换信息并聚合结果。

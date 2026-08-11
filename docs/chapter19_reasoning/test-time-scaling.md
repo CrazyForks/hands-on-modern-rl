@@ -1,10 +1,8 @@
 # 16.3 Test-time Compute Scaling
 
-上一节我们看到 o1/o3/o4 在硬任务上远超传统 LLM。但 o1 的参数量并不比 GPT-4o 大，训练算力也不显著超过 GPT-4o。**那它为什么这么强？**
+16.2 节说明了 R1-Zero 怎样用结果奖励强化长推理。模型能够生成更长的推理链以后，还要决定一次任务究竟投入多少推理计算。[Snell et al.](https://arxiv.org/abs/2408.03314) 系统比较了训练计算与推理计算，并把问题表述为 **Test-time Compute Scaling**：在模型参数不变时，通过增加候选、修订或搜索提高当前任务的成功率。
 
-OpenAI 在 o1 发布时给出的官方答案是：o1 花了更多算力在**推理（inference）阶段**——也就是 test-time compute。这个答案在 2024 年下半年被 [Snell et al.](https://arxiv.org/abs/2408.03314) 的研究系统化，成为 **Test-time Compute Scaling** 这个研究方向。
-
-## 16.3.1 训练算力 vs 推理算力
+## 1. 在训练与推理之间分配算力
 
 传统 LLM 的算力分配是高度倾斜的：
 
@@ -20,7 +18,7 @@ OpenAI 在 o1 发布时给出的官方答案是：o1 花了更多算力在**推�
 
 Snell et al. 的关键问题是：**如果固定总预算（训练 + 推理），应该花在哪里？**
 
-## 16.3.2 Snell 2024 的核心发现
+### 1.1 Snell 等人的预算实验
 
 [Snell et al. 2024](https://arxiv.org/abs/2408.03314)（"Scaling LLM Test-Time Compute Optimally")是 Test-time Compute Scaling 的奠基性论文。它的实验设计很巧妙：
 
@@ -42,11 +40,11 @@ Snell et al. 的关键问题是：**如果固定总预算（训练 + 推理）�
 
 所以推理模型的核心优势不是"参数更多"，而是**"算力分配更灵活"**。
 
-## 16.3.3 Test-time Compute 的两种范式
+## 2. 三种增加推理计算的方法
 
 Snell et al. 把 test-time compute 的使用方式归纳为两类：
 
-### 并行采样（Parallel Sampling）
+### 2.1 并行采样
 
 让模型独立生成 N 个候选解，然后用一个 verifier 选最好的。这是 best-of-N 的思路。
 
@@ -67,7 +65,7 @@ best = candidates[argmax(scores)]
 - 难题效果差——如果 base model 的单次解题概率 < 1/N，N 个采样也大概率全错
 - 需要 verifier（这是 [第 17 章 PRM](../chapter20_prm_search/outcome-vs-process) 的核心话题）
 
-### 顺序修订（Sequential Revision）
+### 2.2 顺序修订
 
 让模型生成一个初始解，然后基于这个解生成修订版本，反复迭代。
 
@@ -89,11 +87,11 @@ for _ in range(K):
 - 串行，速度慢
 - 修订可能越改越错（feedback 本身可能错）
 
-### 树搜索（Tree Search）
+### 2.3 树搜索
 
 更复杂的方式是树搜索——把推理过程展开成一棵树，每个节点是一个中间推理步骤，用搜索算法（MCTS、beam search）找最优路径。这是 [第 17 章 PRM 与推理时搜索](../chapter20_prm_search/inference-time-search) 的核心内容，这里先不展开。
 
-## 16.3.4 Gemini 3 Pro Deep Think 与 并行推理的旗舰
+## 3. 用 Deep Think 理解并行推理
 
 2025 年 10 月，Google 发布了 [Gemini 3 Pro Deep Think](https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/)——把 test-time compute scaling 推到了一个新的极端。Deep Think 的核心思想是：**在 MoE 模型上叠加一层"并行推理层"**。
 
@@ -107,7 +105,7 @@ Deep Think 引入了**并行推理**：
 
 这种结构让 Deep Think 可以在固定时间内**生成比串行模型多 N 倍的推理 token**（N 是并行路径数）。
 
-### Deep Think 的 benchmark 表现
+### 3.1 Deep Think 的评测表现
 
 Deep Think 在发布时的几个关键数字：
 
@@ -116,7 +114,7 @@ Deep Think 在发布时的几个关键数字：
 - **ARC-AGI-2**：84.6%，比 o3 的 75% 进一步突破
 - **Codeforces rating**：超过 3000（人类 top 0.01%）
 
-### 2026.02 的 3.1 Deep Think 升级
+### 3.2 动态调整并行路径
 
 2026 年 2 月，Google 发布了 Gemini 3.1 Pro Deep Think。主要改进：
 
@@ -126,7 +124,7 @@ Deep Think 在发布时的几个关键数字：
 
   3.1 Deep Think 在 ARC-AGI-2 上达到 91.2%，HLE 上达到 52.7%——再次刷新了 test-time scaling 的上限。
 
-## 16.3.5 推理算力的经济学
+## 4. 在质量、延迟与成本之间取舍
 
 test-time compute scaling 不是免费的。每多花一倍推理算力，意味着：
 
@@ -143,13 +141,13 @@ test-time compute scaling 不是免费的。每多花一倍推理算力，意味
 | 数学竞赛 / 代码生成                    | 充分推理，几千到几万 token |
 | 科研推理（OpenAI o1-pro / Deep Think） | 极致推理，十万级 token     |
 
-这也是 Hybrid Thinking（下一节）的工程动机——**让模型自己决定什么时候该深度推理**。
+这也构成了 [16.4 Hybrid Thinking 与思考预算](./hybrid-thinking) 的工程动机：根据任务难度选择推理模式和预算。
 
-## 16.3.6 一个反思 与 scaling law 会饱和吗？
+### 4.1 Test-Time Scaling 何时饱和
 
 Snell et al. 的实验发现，test-time compute 的收益在难题上递减。后续研究（[DeepSeek R1 论文](https://arxiv.org/abs/2501.12948)、[Qwen3 技术报告](https://arxiv.org/abs/2505.09388)）在更大规模上确认了这个现象：
 
-- **简单题**：test-time compute 几乎没有上限——模型可以反复检查、反复修订
+- **简单题**：少量推理通常已经足够，继续增加计算的边际收益很低
 - **中等题**：test-time compute 在某个点之后开始收益递减
 - **难题**：test-time compute 很快饱和——base model 的能力不足是硬约束
 
@@ -158,10 +156,10 @@ Snell et al. 的实验发现，test-time compute 的收益在难题上递减。�
 - training compute 决定**能力上限**
 - test-time compute 决定**接近上限的程度**
 
-一个 base model 不够强的模型，再多的 test-time compute 也救不了。这就是为什么 R1-Zero、o1 这些推理模型，背后都是万亿参数级的预训练 base——**推理 scaling 需要强 base 支撑**。
+如果基座模型没有掌握解题所需的知识或操作，增加采样和修订次数也难以产生正确路径。因此，推理计算依赖基座模型已经具备的能力。
 
 ## 小结
 
-Test-time Compute Scaling 不是"用更多算力做推理"这么简单。它的核心洞察是：**算力的最优分配点，从训练阶段转移到了推理阶段**。Snell et al. 的研究证明了这个转移在数学和推理任务上是划算的；Gemini Deep Think 证明了它在大规模工业模型上也能突破 SOTA。
+Test-time Compute Scaling 提供了三种可以直接调节的资源：并行候选数量、单条推理链的修订次数和搜索树的规模。任务越难，增加这些资源越可能带来收益；基座能力不足或任务已经很简单时，收益会很快降低。
 
-但这个转移也带来新的工程问题：怎么控制推理深度？怎么避免模型思考太久？怎么让模型自己学会"这道题不需要思考"？这就是下一节 Hybrid Thinking 与思考预算要解决的问题。
+下一节把这条规律用于部署：同一个模型怎样在直接回答与深度思考之间切换，并用思考预算限制延迟和成本。

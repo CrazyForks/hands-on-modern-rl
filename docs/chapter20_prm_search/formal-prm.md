@@ -1,17 +1,17 @@
 # 17.4 形式化 PRM Verifier
 
-前面两节的 PRM 路线——判别式和生成式——都有一个共同的根本问题：**它们都是基于 LLM 的，所以会继承 LLM 的错误**。
+判别式和生成式 PRM 都可能继承标注者或评价模型的错误：
 
 - 判别式 PRM 错标：标注员判断错，PRM 学到错的标签
 - 生成式 PRM 错判：LLM 自己对推理理解错，输出错的评价
 
-如果有一种 verifier，**对正确的推理永远说对，对错误的推理永远说错，零误判**，那 PRM 的所有问题都消失了。
+在已经形式化的数学任务中，可以把候选证明交给 Lean4、Coq、Isabelle 等证明检查器。检查器按照形式系统的规则判断证明是否通过，因此能够为符合其语言和公理的输入提供确定反馈。
 
-这种 verifier 存在——它就是**形式化证明器**（formal theorem prover），如 Lean4、Coq、Isabelle。这一节我们讨论形式化 PRM 路线，这是 PRM 研究的"终极 verifier"方向。
+本节先解释形式化验证的反馈为何确定，再看 AlphaProof、AlphaGeometry 和 DeepSeek-Prover-V2 怎样把语言模型与证明搜索结合，最后讨论形式化范围、数据与翻译成本。
 
-## 17.4.1 为什么形式化是终极 verifier
+## 1. 形式化验证为什么能够提供确定反馈
 
-### 形式化语言 vs 自然语言
+### 1.1 形式化语言与自然语言的差别
 
 数学证明可以用两种语言表达：
 
@@ -46,16 +46,16 @@ theorem sqrt_two_irrational : Irrational (√2) := by
 
 完全无歧义，**每一步推理都必须用 Lean4 的规则严格证明**。如果证明通过 Lean4 编译器，**它就是数学上正确的**——没有讨论余地。
 
-### Lean4 verifier 的特点
+### 1.2 Lean4 Verifier 的特点
 
 Lean4 的特性让它成为理想的 PRM：
 
-- **零误判**：通过编译 = 证明正确。这是数学定理保证的
+- **确定性检查**：在给定形式系统、公理和实现正确的前提下，通过检查表示证明满足规则
 - **自动化**：编译过程是自动的，不需要人工判断
 - **可扩展**：可以定义新的数学结构、新的定理
 - **社区支持**：[Mathlib](https://github.com/leanprover-community/mathlib4) 已经形式化了大学水平的数学
 
-### 形式化的代价
+### 1.3 形式化的适用边界
 
 但形式化也有代价：
 
@@ -63,11 +63,11 @@ Lean4 的特性让它成为理想的 PRM：
 - **数据稀缺**：Lean4 代码相对少，LLM 在 Lean4 上的预训练数据不足
 - **门槛高**：写 Lean4 代码需要专门训练，大部分数学家不熟悉
 
-## 17.4.2 AlphaProof 与 DeepMind 的 IMO 银牌
+## 2. 用 AlphaProof 和 AlphaGeometry 搜索证明
 
 2024 年 7 月，DeepMind 宣布 [AlphaProof](https://deepmind.google/discover/blog/ai-solves-imo-problems-at-silver-medal-level/) 在国际数学奥林匹克（IMO）2024 上达到**银牌水平**——解决了 6 道题中的 4 道。这是形式化 PRM 路线的里程碑。
 
-### AlphaProof 的架构
+### 2.1 AlphaProof 的架构
 
 AlphaProof 的核心思路是**AlphaZero 风格的自我博弈 + Lean4 verifier**：
 
@@ -88,7 +88,7 @@ AlphaProof 的核心思路是**AlphaZero 风格的自我博弈 + Lean4 verifier*
 
 这个架构与 [AlphaGo Zero](https://www.nature.com/articles/nature24270) 几乎完全一样——区别只是动作空间从"围棋棋盘"变成了"Lean4 tactic 序列"。
 
-### AlphaProof 的关键设计
+### 2.2 AlphaProof 的关键设计
 
 **设计一：问题形式化**
 
@@ -108,7 +108,7 @@ AlphaProof 在约 **100 万个** Lean4 问题上做了训练。这些问题包�
 
 AlphaProof 用 MCTS 搜索证明——每个节点是一个证明状态，每个动作是一个 Lean4 tactic，reward 是"是否完成证明"。Lean4 编译器作为 MCTS 的环境——告诉搜索"这个 tactic 是否有效"。
 
-### AlphaProof 的成绩
+### 2.3 AlphaProof 的成绩
 
 IMO 2024 的 6 道题，AlphaProof 解出 4 道：
 
@@ -123,7 +123,7 @@ IMO 2024 的 6 道题，AlphaProof 解出 4 道：
 
 Geometry 失败的原因不是推理能力不足，而是 **Lean4 翻译失败**——几何题的形式化比代数难得多。
 
-## 17.4.3 AlphaGeometry 2 与 几何专用
+### 2.4 AlphaGeometry 怎样处理几何题
 
 针对 AlphaProof 在几何上的弱点，DeepMind 发布了 [AlphaGeometry 2](https://www.nature.com/articles/s41586-024-07819-5)——专门解决几何题的形式化系统。
 
@@ -135,14 +135,14 @@ AlphaGeometry 2 的关键创新：
 
   2024.07 的报告中，AlphaGeometry 2 在 IMO 几何题上达到了金牌水平。
 
-## 17.4.4 DeepSeek-Prover-V2 与 开源的形式化 PRM
+## 3. 用 DeepSeek-Prover-V2 建立开源证明系统
 
 [DeepSeek-Prover-V2](https://arxiv.org/abs/2504.21801)（2025.04）是 DeepSeek 开源的形式化 PRM 工作。它的目标是：
 
 - 用 Lean4 + RL 训练一个能解数学竞赛题的开源模型
 - 推进形式化 PRM 的工业可用性
 
-### Prover-V2 的方法
+### 3.1 Prover-V2 的方法
 
 DeepSeek 的方法与 AlphaProof 类似，但有几个改进：
 
@@ -172,7 +172,7 @@ DeepSeek 自动生成了大量 Lean4 定理和证明，用于训练。生成的�
 - 用 Monte Carlo Tree Search 找证明
 - 把找到的证明作为训练数据
 
-### Prover-V2 的成绩
+### 3.2 Prover-V2 的成绩
 
 Prover-V2 在 MiniF2F（形式化数学 benchmark）上的成绩：
 
@@ -182,13 +182,13 @@ Prover-V2 在 MiniF2F（形式化数学 benchmark）上的成绩：
 | **DeepSeek-Prover-V2**         | **88.9%**         |
 | GPT-5（natural language 推理） | ~50%              |
 
-这是开源模型在 MiniF2F 上的 SOTA。88.9% 意味着 Prover-V2 在大学水平的形式化数学上接近完美。
+论文报告其在 MiniF2F 上达到 88.9%。这个数字衡量的是特定形式化基准的通过率，说明模型和证明检查器的组合能够覆盖其中的大部分题目。
 
-## 17.4.5 形式化 PRM 的代价
+## 4. 在确定性验证与适用范围之间取舍
 
-虽然形式化 PRM 在数学上"零误判"，但它有几个代价：
+形式化 PRM 的反馈更确定，但应用它需要满足以下条件：
 
-### 领域受限
+### 4.1 领域受限
 
 Lean4 主要用于数学。其他领域：
 
@@ -198,7 +198,7 @@ Lean4 主要用于数学。其他领域：
 
 所以形式化 PRM 目前只适用于**数学和形式化数学相关任务**。
 
-### 形式化数据稀缺
+### 4.2 形式化数据稀缺
 
 Lean4 代码相对少：
 
@@ -207,44 +207,44 @@ Lean4 代码相对少：
 
 LLM 在 Lean4 上的能力远弱于自然语言。这是形式化 PRM 的根本瓶颈。
 
-### 翻译成本
+### 4.3 翻译成本
 
 形式化 PRM 要求把任务翻译成 Lean4。这个翻译本身是 LLM 的工作，会引入错误。AlphaProof 报告 50% 的翻译成功率——一半的题目被翻译错误。
 
-### 训练成本
+### 4.4 训练成本
 
 Lean4 MCTS 训练的计算成本极高——每次 tactic 调用都要触发 Lean4 编译（每次编译几百毫秒到几秒）。AlphaProof 训练了几个月，消耗的算力与 GPT-4 相当。
 
-## 17.4.6 形式化 PRM 的未来
+### 4.5 形式化 PRM 的扩展方向
 
 尽管有这些代价，形式化 PRM 的研究方向仍然非常重要。几个未来方向：
 
-### 自动形式化
+#### 自动形式化
 
 让 LLM 学会把自然语言自动翻译成 Lean4。这是 [AlphaProof 的形式化器](https://deepmind.google/discover/blog/ai-solves-imo-problems-at-silver-medal-level/) 和 [Autoformalization with Large Language Models](https://arxiv.org/abs/2205.12615) 等研究的方向。
 
-### Lean4 + LLM 混合
+#### Lean4 与 LLM 混合
 
 不要求 LLM 完全生成 Lean4，而是让 LLM 生成自然语言推理 + Lean4 验证。这样既有 LLM 的灵活性，又有形式化的严谨性。
 
-### 扩展到其他领域
+#### 扩展到其他领域
 
 把形式化方法扩展到代码（用 Dafny、F\*）、物理（用 Lean4 物理库）、生物（用 Lean4 化学库）。这是 Mathlib 之外的扩展方向。
 
-### 神经符号集成
+#### 神经符号集成
 
 把 LLM 的"灵感"和形式化的"严谨"结合——LLM 提出证明思路，形式化系统验证。这是 DeepMind AlphaProof 和 AlphaGeometry 2 共同的方向。
 
 ## 小结
 
-形式化 PRM 是 PRM 研究的终极方向——通过 Lean4 等形式化系统实现零误判验证。AlphaProof 在 IMO 上达到银牌水平，DeepSeek-Prover-V2 在 MiniF2F 上达到 88.9%，证明了这条路的技术可行性。
+形式化 PRM 使用 Lean4 等系统检查候选证明。AlphaProof 和 DeepSeek-Prover-V2 说明，语言模型可以负责提出候选与搜索方向，证明检查器负责验证形式规则。
 
 但形式化 PRM 受限于领域（主要是数学）、数据稀缺（Lean4 训练数据少）、翻译成本（自然语言→Lean4 不完美）。它的工业应用目前集中在数学推理领域，难以推广到通用 LLM 任务。
 
 至此，我们看完了 PRM 的三条路线：
 
-- **判别式 PRM**（11.2）：标注成本高，但分类精确
-- **生成式 PRM**（11.3）：标注少，泛化好，但依赖 LLM 自己判断
-- **形式化 PRM**（11.4）：零误判，但领域受限
+- **判别式 PRM**（17.2）：标注成本高，但推理成本较低
+- **生成式 PRM**（17.3）：能够解释判断依据，但依赖评价模型的能力
+- **形式化 PRM**（17.4）：反馈确定，但只覆盖能够形式化的任务
 
 接下来两节讨论 PRM 在推理时搜索（MCTS、ToT、PaCoRe）中的应用——PRM 不只是训练时的 reward，还是推理时的搜索引导。
