@@ -20,7 +20,9 @@ outline: false
 
 **训练框架的作用，是安排这些角色在什么设备上运行、何时交换数据、何时同步新参数。** 它没有改变 PPO、GRPO 或奖励模型的数学定义，只是让同一条训练流程能够稳定地跑在多张卡和多台机器上。
 
-## 先看两个使用场景
+## 1. 从单机训练认识系统规模
+
+### 1.1 训练规模与框架选择
 
 选择工具之前，先看模型能不能在现有机器上完成训练：
 
@@ -33,7 +35,7 @@ outline: false
 
 本课程后面仍会使用 veRL 完成代码生成 RL 实验。veRL 与 slime 都能承担规模化 RL 训练，二者采用的训练与生成后端不同。OpenRLHF 则是基于 Ray、DeepSpeed 和 vLLM 的另一套方案，放在进阶对比中了解即可。
 
-## 同步与异步解决什么问题
+### 1.2 同步训练与异步训练
 
 假设一批任务里有九道短数学题和一道需要反复调用工具的任务。前九道题很快结束，最后一道却要运行几分钟。
 
@@ -43,16 +45,18 @@ outline: false
 数学和代码题的生成时长较接近，通常先用同步方案。工具调用、浏览器操作和长时间环境交互的耗时差别很大，更容易从异步方案中受益。
 
 ::: tip 第一次阅读到这里即可
-先记住一条线：**生成回答 → 计算奖励 → 更新模型 → 同步新参数**。训练框架负责让这四步在多张 GPU 上顺畅衔接。下面保留框架选型、奖励工程、成本估算和系统设计细节，需要实现大规模训练时再展开。
+先记住一条线：**生成回答 → 计算奖励 → 更新模型 → 同步新参数**。后面的框架、奖励、成本和系统设计，都在解释这四步怎样扩展到更大的模型与集群。
 :::
 
-:::: details 进阶参考：更多训练框架与选型细节
+### 1.3 从训练脚本到分布式框架
 
-## 训练框架对比
+先从一台机器上的数学题训练开始。程序取出一批题目，让模型生成回答，用答案验证器计算奖励，再根据奖励更新模型。模型较小、回答较短时，这几步可以写在同一个训练脚本里。此时最重要的是确认三件事：数据格式是否正确，奖励是否真的反映答案质量，参数更新后正确率是否提高。
 
-LLM RL 训练框架要同时编排多个模型（Actor、Critic、Reference、Reward Model、Rollout Engine），还要处理 on-policy 数据流、分布式训练、推理引擎权重同步等工程问题。下面按用途介绍有代表性的工具，重点是理解它们各自解决哪一层问题。
+LlamaFactory 和 TRL 适合完成这个阶段。[LlamaFactory](https://arxiv.org/abs/2403.13372)用统一配置组织 SFT、奖励模型、DPO 和 PPO；[TRL](https://huggingface.co/docs/trl/index)用 Trainer 接口提供 SFT、DPO、GRPO 和 PPO 等实现。第一次实验时，框架的价值是把数据、算法和模型接起来，让学习者能够看清一次训练怎样完成。
 
-### 框架全景
+模型增大后，同一个脚本会遇到新的问题。Actor 负责生成和更新，Reference Model 负责计算 KL，PPO 还需要 Critic；生成阶段又要为每道题采样多条回答。这些模型和中间结果可能无法同时装入一组 GPU，回答生成也会让训练 GPU 长时间等待。框架这时需要决定：每个模型放在哪些 GPU 上，生成结果交给哪个进程，Actor 更新后怎样把新权重同步回生成端。
+
+[veRL](https://arxiv.org/abs/2409.19256)把 Actor、Critic、Reference Model、Reward Model 和 rollout 引擎表示为可以调度的角色，Driver 再按照 PPO 或 GRPO 的顺序调用它们。OpenRLHF、NeMo-Aligner 和 slime 也解决这类问题，只是采用的底层组件不同：OpenRLHF 使用 Ray、DeepSpeed 和 vLLM，NeMo-Aligner 使用 NeMo 与 Megatron，slime 使用 Megatron 与 SGLang。它们之间的区别主要在资源调度和训练、生成后端，算法仍然是前面学过的 PPO、DPO 或 GRPO。
 
 ```mermaid
 flowchart LR
@@ -71,127 +75,82 @@ flowchart LR
     Learn --> Scale --> Long
 ```
 
-### 常规后训练与分布式 RL
+#### 1.3.1 长任务为什么需要异步训练
 
-#### LlamaFactory
+数学题的回答长度通常比较接近。一批题目开始生成后，往往能在相近时间结束。代码仓库和浏览器任务则不同：有的任务第一次测试就通过，有的任务需要反复读取文件、调用工具和等待外部环境。同一批任务可能相差几分钟甚至更久。
 
-[LlamaFactory](https://github.com/hiyouga/LlamaFactory) 把持续预训练、SFT、奖励模型、PPO、DPO 等后训练方法放在统一的数据格式和配置入口下，也支持全量微调、LoRA 与量化微调。它适合先看清“准备什么数据、选择什么训练阶段、得到什么模型”，因此放在本节的学习入口。
+同步训练必须等最慢的任务结束，才能把整批轨迹交给训练进程。异步训练会把已经完成的轨迹先放进队列，生成进程继续处理新任务，训练进程则持续从队列取数据。这样可以减少 GPU 等待，但会带来一个新问题：某条轨迹生成时使用的是旧版 Actor，等它进入训练时，Actor 可能已经更新了几轮。
 
-LlamaFactory 也能运行 PPO，但它在这里承担的是实验入口。等到生成吞吐、跨节点调度和频繁权重同步成为主要问题时，再进入 slime、veRL 或 OpenRLHF 这类专门面向分布式 RL 数据流的框架。
-
-#### veRL
-
-[veRL](https://github.com/volcengine/verl)（Volcano Engine Reinforcement Learning，字节跳动，2024）是事实上的主流 LLM RL 训练框架，配套论文 [HybridFlow, arXiv:2409.19256](https://arxiv.org/abs/2409.19256)。它的核心抽象是 **single-controller + multi-model orchestration**：一个 Driver 进程编排 Actor、Critic、Reference、Reward Model、Rollout Engine 五个 Worker，每个 Worker 跑在一组 GPU 上（ResourcePool）。
-
-veRL 的工程亮点是把训练栈和推理栈解耦：Actor 用 FSDP/Megatron 训练，Rollout 用 vLLM 推理，二者通过权重同步接口 `sync_weights` 衔接。这种解耦让 vLLM 的 PagedAttention、Continuous Batching、Tensor Parallelism 等推理优化能直接接入 RL 训练，rollout 吞吐比朴素 HuggingFace 生成高 5-10 倍。
-
-veRL 是 Qwen3、DeepSeek-R1、Llama 4、Mistral 等开源训练脚本的事实选择。详细架构参考 [18.4 多机 RL 训练如何协同](./distributed-sync)。
-
-#### OpenRLHF
-
-[OpenRLHF](https://github.com/OpenRLHF/OpenRLHF) 采用 Ray 编排、DeepSpeed 训练和 vLLM rollout，覆盖 PPO、GRPO、REINFORCE++ 等方法，并提供异步 RL 能力。它与 slime、veRL 属于同一层的可选工程方案，不需要在第一次阅读时记忆。需要使用 DeepSpeed/Ray 技术栈，或准备比较不同分布式 RL 架构时，再展开了解。
-
-#### TRL
-
-[TRL](https://github.com/huggingface/trl)（Transformer Reinforcement Learning，HuggingFace 官方）是入门级框架。它直接基于 `transformers.Trainer`，支持 PPO、DPO、GRPO 等算法。TRL 的定位是"让任何 HuggingFace 用户 5 分钟内跑通 RLHF"，因此**牺牲了大规模训练能力**——没有 vLLM 集成、没有 ResourcePool 调度、没有多节点编排。TRL 适合 7B 以下的单机实验和教学场景。
-
-#### NeMo-Aligner
-
-[NeMo-Aligner](https://github.com/NVIDIA/NeMo-Aligner)（NVIDIA）是 NeMo 训练栈的 RL 扩展，底层是 Megatron-LM。它的特点是和 NVIDIA 硬件栈深度绑定：支持 TensorRT-LLM 推理加速、TransformerEngine 的 FP8 训练、NVLink 全互联优化。NeMo-Aligner 在 H100/H200 集群上有最佳单卡吞吐，但配置复杂度高、社区生态比 veRL/OpenRLHF 小。
-
-### 异步与 Agentic RL
-
-同步框架（veRL/OpenRLHF/NeMo）在 RLHF/GRPO 任务上工作良好，因为单次 rollout 短（数学题平均 500-2000 token）。但 Agentic RL 任务（SWE、Browser、DeepResearch）的 rollout 耗时差异巨大——快的几秒，慢的要跑测试、调工具、等待环境响应，可能几分钟。同步训练会让整个 GPU 集群等待最慢的 episode，利用率掉到 30% 以下。
-
-异步框架解决的就是这个问题：把 rollout generation 和 training 解耦，让不同速度的经验持续进入训练队列。
-
-#### AReaL
-
-[AReaL](https://github.com/inclusionAI/AReaL)（Ant Group 和清华，2025）是大规模异步 LLM RL 系统，论文 [arXiv:2505.24298](https://arxiv.org/abs/2505.24298)。它的核心创新是 **fully asynchronous rollout**：rollout worker 持续生成经验，training worker 异步消费。AReaL 用 staleness-aware PPO / importance sampling 处理"训练时策略已经更新了 K 步"的偏移问题：
+[AReaL](https://arxiv.org/abs/2505.24298)和 [LlamaRL](https://arxiv.org/abs/2505.24034)都在处理生成与训练异步推进的问题。AReaL 为每条轨迹记录生成它的策略版本，并用重要性采样比较生成策略与当前策略。设生成轨迹时的策略为 $\pi_{\theta_{\text{gen}}}$，训练时的策略为 $\pi_\theta$，某一步动作的修正比率为：
 
 $$\rho_t^{\text{stale}} = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{gen}}}(a_t \mid s_t)}$$
 
-其中 $\pi_{\theta_{\text{gen}}}$ 是生成时的旧策略。当训练落后太多时，AReaL 会丢弃过于陈旧的经验。AReaL 在 SWE-bench 多轮 agent 训练上把 GPU 利用率从同步方案的 35% 提升到 85%。
+分子表示当前模型生成动作 $a_t$ 的概率，分母表示旧模型当时生成该动作的概率。比率偏离 1 越远，说明这条轨迹与当前模型的差异越大。系统可以降低它的训练权重；版本相差过大时，也可以直接丢弃。LlamaRL 还讨论了模型卸载、异步 Off-Policy 训练和大规模权重同步。
 
-#### AgentRL
+#### 1.3.2 Agent 训练还要管理环境
 
-[AgentRL](https://github.com/THUDM/AgentRL)（THUDM / 智谱，2025）是面向多轮、多任务 Agentic RL 的训练与环境部署框架，论文 [arXiv:2510.04206](https://arxiv.org/abs/2510.04206)。它的核心不是“多智能体”，而是把 generation 和 training 做成 fully-asynchronous pipeline，并为异构任务环境提供统一的 function-call API、容器化环境开发、集中式 controller 与 task worker。算法侧，AgentRL 使用 cross-policy sampling 增强多轮探索，并用 task advantage normalization 稳定多任务训练；该框架也被用于 AutoGLM 的构建。
+普通问答的环境很简单：程序给出问题，验证器检查答案。代码 Agent 的一次轨迹却可能包含读取文件、修改代码、运行测试和处理报错；浏览器 Agent 还要保存网页状态、工具返回和终止原因。训练框架因此要管理两条线：模型怎样更新，以及外部环境怎样创建、交互、复位和回收。
 
-#### SLIME
+[AgentRL](https://github.com/THUDM/AgentRL)使用 Controller 和 Task Worker 管理多轮、多任务环境，并用 rollout、Actor 和 Reference worker 完成异步 GRPO。[slime](https://github.com/THUDM/slime)把工具调用、沙箱交互和验证器反馈接入数据生成流程，再写入 rollout 缓冲区。阿里的 [ROLL](https://alibaba.github.io/ROLL/)同样提供环境与 rollout 接口，并把训练和 Agent 部署放在一套生命周期中。它们增加环境管理，是因为 Agent 轨迹已经包含外部状态，无法只保存一段模型回答。
 
-[slime](https://github.com/THUDM/slime)（THUDM / 智谱生态，2025）是面向 RL scaling 的 LLM post-training 框架，不是单纯的 HTTP rollout 服务。它的两项核心能力是：用 Megatron + SGLang 支持高性能训练与 rollout；通过自定义数据生成接口和 server-based engines 接入任意 rollout 工作流。多轮工具调用、环境交互、verifier 反馈和 reward 计算都走同一套 training / rollout / Data Buffer 路径。slime 已在 GLM-4.5、GLM-4.6、GLM-5 等模型后训练中验证。
+#### 1.3.3 按当前问题选择框架
 
-#### ROLL
+现在可以把框架放回它所解决的问题：
 
-[ROLL](https://github.com/alibaba/ROLL)（阿里达摩院）是 rollout factory，专注于把各种环境（SWE-bench、BrowserGym、OSWorld）封装成统一的 rollout 接口。它的特色是 **environment recipe system**——把"任务定义 + 工具集 + 数据库 schema + verifier"打包成可复用的 recipe，让 agent 训练数据可以批量化生产。
+| 系统阶段         | 代表工具                            | 首先要解决的问题                 |
+| ---------------- | ----------------------------------- | -------------------------------- |
+| 跑通后训练       | LlamaFactory、TRL                   | 数据、奖励与算法配置能否正确运行 |
+| 扩展到分布式 RL  | veRL、OpenRLHF、NeMo-Aligner、slime | 多模型放置、生成吞吐与权重同步   |
+| 训练长轨迹 Agent | AReaL、LlamaRL、AgentRL、ROLL       | 异步经验、环境生命周期与策略版本 |
 
-#### LlamaRL
-
-[LlamaRL](https://arxiv.org/abs/2505.24034)（Meta, 2025）是 Llama 4 后训练使用的纯异步框架。它的设计哲学是 **完全 disaggregated**：rollout generation、policy training、reward evaluation 三个阶段用独立的 GPU 集群，通过分布式参数服务器（parameter server）做异步权重同步。LlamaRL 的设计假设是万亿参数 MoE 模型——在这个规模下，单集群无法承载所有模型，必须物理分离。
-
-### 框架对比表
-
-下表只比较学习时需要区分的定位，不记录会频繁变化的 Stars 和版本数字：
-
-| 工具         | 主要定位              | 适合什么时候学习                       |
-| ------------ | --------------------- | -------------------------------------- |
-| LlamaFactory | 统一的后训练实验入口  | 第一次运行 SFT、奖励模型、PPO 或 DPO   |
-| TRL          | Hugging Face 研究工具 | 阅读算法实现或制作小型教学实验         |
-| slime        | RL scaling            | 学习 Megatron、SGLang 和 RL 数据循环   |
-| veRL         | 分布式 RL 编排        | 完成本课程后续实战，理解训练与生成协作 |
-| OpenRLHF     | Ray/DeepSpeed RL      | 需要这一技术栈或比较工程方案           |
-| AReaL 等     | 异步与 Agentic RL     | rollout 耗时差别很大、同步等待严重时   |
-
-### 选型决策树
+先判断实验停在哪一层，再看团队已经使用的训练和推理后端：
 
 ```text
 你现在要解决什么问题？
 ├── 第一次跑后训练
-│   └── LlamaFactory
-├── 学习本课程的规模化 RL 实战
+│   └── LlamaFactory / TRL
+├── 需要灵活编排多模型和多种后端
 │   └── veRL
 ├── 使用 Megatron + SGLang 放大 RL
 │   └── slime
 ├── 使用 Ray + DeepSpeed + vLLM
 │   └── OpenRLHF
+├── 已经使用 NVIDIA NeMo / Megatron 训练栈
+│   └── NeMo-Aligner
 └── 长时间工具或环境交互造成大量等待
-    └── 再比较异步 Agentic RL 方案
+    └── 比较 AReaL / LlamaRL / AgentRL / ROLL
 ```
 
-学习顺序可以压缩成两步：先用 LlamaFactory 检查数据格式、奖励和训练目标，再根据已有技术栈选择 slime、veRL 或 OpenRLHF 放大训练。这样可以把算法问题与分布式系统问题分开定位。
+学习时不必同时掌握所有框架。先用 LlamaFactory 或 TRL 跑通一轮训练，确认数据、奖励和算法正确；模型放不下或生成太慢时，再学习 veRL、slime 或 OpenRLHF；任务开始调用工具并出现长短不一的轨迹后，最后进入 AReaL、LlamaRL、AgentRL 或 ROLL。这个顺序对应问题出现的顺序。
 
-::::
+## 2. 设计训练奖励
 
-:::: details 进阶参考：双轨奖励设计
+后训练常用两类奖励：可验证任务由程序或规则判断结果，开放任务则依赖人类偏好或奖励模型。两类信号的来源不同，混合训练前需要先理解各自的误差和适用范围。
 
-## 双轨奖励设计
-
-[18.2 节](./industrial-post-training) 已经提到，现代后训练把奖励分成两类——**Verifiable Reward**（可验证奖励）和 **Pairwise Preference Reward**（成对偏好奖励）。本节深入讨论二者的数学结构、适用边界和工业级的混合策略。
-
-### 两条奖励路线的本质差异
+### 2.1 两类奖励的定义与适用范围
 
 **Verifiable Reward（VR）** 来自一个**确定性的验证函数**：给定 prompt $q$ 和 response $o$，验证器输出二值（或连续）分数：
 
 $$r_{\text{VR}}(q, o) = \mathbb{1}[\text{extract}(o) == \text{answer}(q)]$$
 
-数学题用答案对比，代码题用测试用例，逻辑题用规则验证器。VR 的核心特征是**无噪声、无主观性**——答案对就是对，错就是错。
+数学题可以对比最终答案，代码题可以运行测试，逻辑题可以使用规则验证器。验证过程可以重复，但仍要防止答案解析错误、测试覆盖不足和环境故障。
 
 **Pairwise Preference Reward（PPR）** 来自一个学到的 Reward Model $R_\phi$，它从人类偏好数据 $(o_w, o_l)$（chosen 和 rejected）中训练：
 
 $$\mathcal{L}_{\text{RM}} = -\mathbb{E}\left[\log \sigma\left(R_\phi(q, o_w) - R_\phi(q, o_l)\right)\right]$$
 
-训练好后，$R_\phi(q, o)$ 给出标量分数作为 RL 的奖励。PPR 的特征是**有噪声、有主观偏差**——它学的是"人类平均喜欢什么"，容易 reward hacking，也容易在 minority 偏好上犯错。
+训练完成后，$R_\phi(q, o)$ 给出标量奖励。它学习的是标注数据中的偏好分布，因此会受到标注一致性、样本覆盖和奖励模型泛化能力影响。
 
-| 维度         | Verifiable Reward      | Pairwise Preference Reward |
-| ------------ | ---------------------- | -------------------------- |
-| 奖励来源     | 规则验证器 / 执行环境  | 学到的 Reward Model        |
-| 噪声水平     | 零（确定性）           | 高（依赖 RM 质量）         |
-| 标注成本     | 接近零（自动验证）     | 高（需 pairwise 比较）     |
-| 适用任务     | 数学、代码、逻辑、工具 | 开放对话、写作、安全、风格 |
-| Hacking 风险 | 低（验证器权威）       | 高（RM 可被钻空子）        |
-| 训练稳定性   | 高                     | 中（需要 KL 约束）         |
+| 维度     | Verifiable Reward      | Pairwise Preference Reward |
+| -------- | ---------------------- | -------------------------- |
+| 奖励来源 | 规则验证器 / 执行环境  | 学到的 Reward Model        |
+| 噪声来源 | 解析器、测试与执行环境 | 标注分歧与 RM 泛化误差     |
+| 标注成本 | 接近零（自动验证）     | 高（需 pairwise 比较）     |
+| 适用任务 | 数学、代码、逻辑、工具 | 开放对话、写作、安全、风格 |
+| 奖励漏洞 | 测试覆盖不足、规则绕过 | 利用 RM 偏差               |
+| 训练约束 | 校验验证器与执行环境   | 监控 KL 与独立评测         |
 
-### Pre-PPO 的 Prompt 选择策略
+### 2.2 训练 Prompt 的难度筛选
 
 VR 训练的成功率高度依赖 prompt 质量。一个关键观察来自字节 Seed-Thinking 论文 [arXiv:2504.13914](https://arxiv.org/abs/2504.13914)：**并非所有可验证 prompt 都有训练价值**。如果一道题对当前策略来说太简单（全部 rollout 都对）或太难（全部都错），组内 reward 方差为零，advantage 也为零，这批数据**对梯度没有贡献**。
 
@@ -219,17 +178,17 @@ def filter_prompts(prompts, base_model, num_rollouts=16):
     return {"easy": easy, "hard": hard}
 ```
 
-这条策略让 RL 信号集中到"边界题"上——模型刚好能解一部分、错一部分的题。DAPO 的 **Dynamic Sampling** 也是同一思想：训练中持续监控每个 prompt 的组内 reward 方差，方差过低的 prompt 被丢弃或加采样。
+这条策略把算力集中到当前模型有时成功、有时失败的题目上。DAPO 的 Dynamic Sampling 也会持续监控每个提示的组内奖励方差，并降低低方差提示的采样比例。
 
-### Hybrid Reward 与 VR + GenRM 联合训练
+### 2.3 可验证奖励与生成式奖励的组合
 
-真实产品模型不会只用 VR 或只用 PPR。**Hybrid Reward** 把两者按任务类型混合：
+产品模型通常同时面对可验证任务和开放任务，可以按任务类型组合奖励：
 
 $$R_{\text{total}}(q, o) = \alpha \cdot R_{\text{VR}}(q, o) + (1 - \alpha) \cdot R_{\text{GenRM}}(q, o)$$
 
 其中 $\alpha$ 是任务相关权重——数学/代码题 $\alpha = 1.0$（纯 VR），开放对话 $\alpha = 0.0$（纯 GenRM），中间任务按比例混合。
 
-#### GenRM vs 判别式 RM
+#### 2.3.1 生成式奖励模型与判别式奖励模型
 
 **判别式 RM**（Discriminative RM）是传统做法：训练一个分类头预测"哪个回答更好"，输出标量分数 $R_\phi(q, o) \in \mathbb{R}$。
 
@@ -237,17 +196,17 @@ $$R_{\text{total}}(q, o) = \alpha \cdot R_{\text{VR}}(q, o) + (1 - \alpha) \cdot
 
 $$P_{\text{GenRM}}(o_1 \succ o_2 \mid q) = \frac{\pi_\theta(\text{"A"} \mid q, o_1, o_2)}{\pi_\theta(\text{"A"} \mid q, o_1, o_2) + \pi_\theta(\text{"B"} \mid q, o_1, o_2)}$$
 
-GenRM 的优势：
+生成式奖励模型有三项特点：
 
 - **复用预训练能力**：不需要从头训分类头，直接用强 LLM 的 in-context 推理能力。
 - **支持 chain-of-thought 判断**：让 RM 先生成推理再给判断，准确率比直接打分高 10-20%。
 - **可解释**：判断过程是文本，可审计、可调试。
 
-劣势是推理成本高（每次判断要生成几百 token），因此 GenRM 通常**离线**生成偏好数据，再训练一个轻量级判别 RM 用于在线 RL。这个流程在 Qwen3、Llama 4、ERNIE 4.5 中都有出现。
+它的代价是每次判断都要生成额外 token。工程上可以先离线生成偏好和解释，再训练较小的判别式奖励模型供在线 RL 使用。
 
-#### Rule + Test + Verifier 的三层结构
+#### 2.3.2 代码任务的多层验证
 
-对于代码任务，纯单元测试 reward 不够鲁棒——模型可能写出"只通过测试用例但不通用"的硬编码答案。**RTV（Rule-Test-Verifier）** 是一种三层奖励：
+代码任务只使用公开单元测试时，模型可能通过硬编码绕过检查。RTV（Rule-Test-Verifier）把格式规则、公开测试和隐藏验证分成三层：
 
 ```python
 def rtv_reward(prompt, code, test_cases):
@@ -264,9 +223,9 @@ def rtv_reward(prompt, code, test_cases):
     return 0.1 * rule_score + 0.5 * test_score + 0.3 * hidden_score + 0.1 * judge_score
 ```
 
-RTV 的设计动机是**反 reward hacking**——单层奖励容易被钻空子（硬编码测试、长度作弊、格式空转），多层冗余让 hacking 难度指数级上升。MiniMax M2.1、Cursor Composer 2、GPT-5-Codex 都采用了类似的多层 reward 结构。
+每一层检查不同的失败：规则层过滤格式与明显硬编码，测试层验证已知行为，隐藏测试和模型裁判检查泛化、风格与效率。分项结果也应单独记录，便于发现奖励漏洞来自哪一层。
 
-### 奖励尺度的归一化
+### 2.4 奖励尺度对齐
 
 混合多种 reward 时最大的工程问题是**尺度不一致**。数学题 reward 是 $\{0, 1\}$，代码题通过率是 $[0, 1]$，GenRM 分数可能是 $[-3, 3]$，length penalty 是 $[-0.5, 0.5]$。直接相加会让大尺度 reward 主导梯度。
 
@@ -276,17 +235,13 @@ $$\tilde{r}_{\text{domain}} = \frac{r - \mu_{\text{domain}}}{\sigma_{\text{domai
 
 其中 $\mu_{\text{domain}}, \sigma_{\text{domain}}$ 是当前 batch 内同域 reward 的均值和标准差。归一化后所有 reward 都在 $[-3, 3]$ 量级，可以安全相加。
 
-另一种做法是 **GRPO 的组内归一化**——同一 prompt 的 $G$ 个 rollout 内部做 z-score。这天然消除了跨 prompt 的尺度差异，是 GRPO 相比 PPO 的一个隐含优势。
+另一种做法是对同一提示的 $G$ 条 rollout 进行组内标准化。GRPO 使用这项统计量构造相对优势，使不同提示的原始奖励尺度不会直接进入同一次组内比较。
 
-::::
+## 3. 估算训练成本
 
-:::: details 进阶参考：训练成本估算
+训练成本影响模型、算法和数据规模的选择。下面先估算单次训练的计算量，再拆解后训练各阶段的成本。
 
-## 训练成本估算
-
-工业 LLM 训练的成本核算是融资、招聘、算力采购的决策依据。本节给出从预训练到 RL 的完整成本模型，并用 DeepSeek、Qwen、Llama 公开数据校准估算公式。
-
-### 成本模型的基本公式
+### 3.1 成本模型的基本公式
 
 LLM 训练的 GPU 小时数大致服从：
 
@@ -306,7 +261,7 @@ $$\text{GPU-hours} = \frac{6 \cdot 671 \times 10^9 \cdot 14.8 \times 10^{12}}{98
 
 这与 [DeepSeek-V3 技术报告](https://arxiv.org/abs/2412.19437) 公开的 **2.664M H800 小时**完全吻合，说明上述公式在千亿参数规模下是可靠的。
 
-### 各训练阶段的成本占比
+### 3.2 各训练阶段的成本分布
 
 下表汇总了几个公开模型的训练成本（来自技术报告或可信估算）：
 
@@ -320,13 +275,13 @@ $$\text{GPU-hours} = \frac{6 \cdot 671 \times 10^9 \cdot 14.8 \times 10^{12}}{98
 | DeepSeek-R1-Zero | 671B (MoE) | -             | -                | ~128K GPU-hours  | ~$0.26M                      |
 | GPT-4（推测）    | ~1.8T      | ~13T          | ~80M             | ~10M             | ~$180M                       |
 
-几个值得关注的观察：
+表中的数值可以用来理解三个成本来源：
 
-1. **预训练占绝对大头**：典型模型预训练占总成本 80%-90%。RL 只是"调味"——但这一勺调味决定模型能否成为产品。
-2. **MoE 显著降本**：DeepSeek-V3 用 671B MoE（37B 激活），实际计算量相当于 100B 量级 dense 模型，成本只有 Llama 3 405B 的 1/10。
-3. **R1-Zero 极致省钱**：DeepSeek 报告 R1-Zero 的 RL 阶段只用了约 128K GPU 小时（约 13 天 × 512 卡），相对预训练成本可忽略。这是为什么开源社区能快速复现 R1-Zero。
+1. **预训练处理的 token 更多。** 典型模型的预训练成本高于单次后训练，但后训练通常要经历多轮数据生成、实验和回归评测。
+2. **MoE 按激活参数计算。** DeepSeek-V3 共有 671B 参数，每次前向只激活其中一部分，计算成本不能直接按总参数与 Dense 模型比较。
+3. **RL 成本取决于 rollout。** 每个提示的采样数量、回答长度和验证器类型都会改变最终 GPU 小时数。
 
-### RL 阶段的成本拆解
+### 3.3 RL 训练的成本构成
 
 RL 训练成本比 SFT 复杂，因为它包含多个模型的计算开销。以 veRL 跑 GRPO 为例，单步成本可拆解为：
 
@@ -341,9 +296,9 @@ $$C_{\text{RL-step}} = C_{\text{rollout}} + C_{\text{actor-update}} + C_{\text{r
 | Reference forward  | 10%-15%    | 计算 KL 散度（no_grad）             |
 | Reward computation | 5%-10%     | VR 是 CPU 计算；GenRM 需要额外推理  |
 
-**Rollout generation 是瓶颈**——这也是为什么 veRL/AReaL 都把 vLLM 集成和异步 rollout 当作核心工程。
+在这组配置中，rollout 占总计算量的一半以上。因此 veRL 和 AReaL 都会单独优化生成吞吐、异步调度和参数同步。
 
-### 成本估算的工程经验
+### 3.4 成本估算方法
 
 下面给出几个实用的经验公式：
 
@@ -367,7 +322,7 @@ GRPO 省掉了 Critic 和 Reward Model 训练，成本约为 PPO 的 60%：
 
 $$C_{\text{RLVR}} \approx 0.6 \cdot C_{\text{RLHF}}$$
 
-这也是为什么 R1-Zero 能用极少算力训出强推理模型——critic-free 设计把 RL 成本压到最低。
+省去 Critic 可以减少一套大模型的前向、反向和优化器状态；实际节省比例仍由 rollout 长度、组大小与验证成本决定。
 
 **4. 推理成本估算（部署阶段）**
 
@@ -375,28 +330,24 @@ $$C_{\text{RLVR}} \approx 0.6 \cdot C_{\text{RLHF}}$$
 
 $$C_{\text{inference}} = \text{requests} \cdot \text{avg\_tokens} \cdot \frac{2 \cdot N_{\text{active}}}{\text{GPU\_FLOPS} \cdot \text{MFU}_{\text{infer}}}$$
 
-注意这里用 $N_{\text{active}}$（激活参数）而非总参数——MoE 模型推理时只激活部分 expert，成本比 dense 模型低得多。这是 MoE 在产品部署上的核心优势。
+这里使用 $N_{\text{active}}$（激活参数）而非总参数，因为 MoE 模型每次推理只执行部分专家。部署估算还要加入专家路由与跨卡通信成本。
 
-### 实战成本控制策略
+### 3.5 成本控制策略
 
 1. **数据筛选优先于算力堆叠**：用高质量 10K 样本胜过低质量 100K 样本，但筛选本身需要算力（rejection sampling）。
 2. **小模型先验证**：7B 模型验证算法和超参，再放大到 70B/400B，避免大模型上的失败重训。
 3. **混合精度训练**：BF16 训练比 FP32 快 2 倍；FP8（H100 支持）再快 1.5-2 倍。但低精度训练对稳定性要求更高，需要 QK-clip 等技巧。
 4. **Checkpoint 复用**：pretraining → SFT → RL 各阶段保留 checkpoint，避免从零重训。DeepSeek 的多阶段训练流水线就是基于 checkpoint 复用设计的。
 
-::::
+## 4. 连接算法与系统
 
-:::: details 进阶参考：系统设计与面试推导
+前面的框架、奖励和成本最终都建立在三组基础上：策略优化决定模型怎样更新，并行策略决定模型怎样放入集群，资源估算决定一次实验需要多少设备和时间。下面按这三组关系整理公式与工程约束。
 
-## 中国对齐团队面试常见考点
+### 4.1 从策略梯度到 GRPO
 
-本节梳理 2025-2026 年智谱、字节 Seed、Moonshot、阿里通义、DeepSeek、腾讯混元等中国对齐团队面试中反复出现的核心考点。这些考点不是"考题集锦"，而是反映工业团队真正关心的能力维度——**算法推导能力、工程系统理解、训练资源推算**。
+从策略梯度到 GRPO，每一步都在修正前一种方法的方差、更新幅度或显存成本。先从期望回报的梯度开始。
 
-### PG → REINFORCE → TRPO → PPO → GRPO 完整推导链
-
-这是智谱、字节 Seed 反复考查的核心推导。面试官会从策略梯度定理开始，要求候选人完整推导到 GRPO，并解释每一步的工程动机。
-
-#### 第 1 步 与 策略梯度定理（Policy Gradient Theorem）
+#### 策略梯度定理
 
 从期望回报出发：
 
@@ -408,7 +359,7 @@ $$\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[\nabla_\theta
 
 其中 $G_t = \sum_{t' \geq t} \gamma^{t'-t} r_{t'}$ 是 return。详细推导见 [第 6 章 REINFORCE](../chapter08_policy_gradient/reinforce)。
 
-#### 第 2 步 与 REINFORCE 的方差问题
+#### REINFORCE 的方差与价值基线
 
 直接用 $G_t$ 作为权重方差极大——单次 rollout 的 return 波动剧烈。**引入 baseline** 降低方差：
 
@@ -416,7 +367,7 @@ $$\nabla_\theta J(\theta) = \mathbb{E}\left[\nabla_\theta \log \pi_\theta(a_t \m
 
 理论分析表明最优 baseline 是 $b(s_t) = V^\pi(s_t)$（状态价值函数），此时 $(G_t - V^\pi(s_t))$ 就是**优势函数** $A_t$。这就是 Actor-Critic 的雏形——需要一个 Critic 网络估计 $V^\pi$。
 
-#### 第 3 步 与 TRPO 的信任区域
+#### TRPO 的信任域约束
 
 REINFORCE 和 vanilla PG 有个工程问题：步长太大策略就崩溃。TRPO（Schulman et al. 2015）用 KL 散度约束更新幅度：
 
@@ -424,7 +375,7 @@ $$\max_\theta \; \mathbb{E}\left[\frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\t
 
 TRPO 用共轭梯度法 + line search 求解这个约束优化，工程复杂。详细推导见 [第 8 章 PPO](../chapter10_ppo/intro)。
 
-#### 第 4 步 与 PPO 的 clip 近似
+#### PPO 的裁剪目标
 
 PPO（Schulman et al. 2017）发现 TRPO 的约束优化可以用简单 clip 近似：
 
@@ -432,7 +383,7 @@ $$\mathcal{L}_{\text{PPO}} = \mathbb{E}\left[\min\left(\rho_t A_t, \; \text{clip
 
 其中 $\rho_t = \pi_\theta(a_t \mid s_t) / \pi_{\theta_{\text{old}}}(a_t \mid s_t)$ 是重要性采样比。clip 防止 $\rho_t$ 偏离 1 太远，等价于软约束的 TRPO。
 
-#### 第 5 步 与 GRPO 省掉 Critic
+#### GRPO 的组内优势
 
 PPO 要训练 Critic 估计 $A_t$，但在 LLM 场景下 Critic 是和 Actor 同等大小的网络，显存翻倍。GRPO（DeepSeek, 2024）的关键洞察：**同一 prompt 采样一组 rollout，用组内均值替代 Critic**：
 
@@ -440,9 +391,9 @@ $$A_i = \frac{r_i - \text{mean}(r_1, \ldots, r_G)}{\text{std}(r_1, \ldots, r_G)}
 
 其中 $r_i$ 是第 $i$ 个 rollout 的 reward，$G$ 是组大小。这样省掉了 Critic 网络，advantage 直接从组内 reward 统计得到。详细推导见 [15.1 节 GRPO 核心机制](../chapter18_grpo/grpo-practice-and-mechanism)。
 
-#### 面试加分项
+#### 算法演进对照
 
-完整推导后，面试官常追问"每一步解决了什么问题"：
+把上述变化放在同一张表中，可以看到每一步解决的问题和新增代价：
 
 | 演进           | 解决的问题           | 代价                          |
 | -------------- | -------------------- | ----------------------------- |
@@ -452,11 +403,11 @@ $$A_i = \frac{r_i - \text{mean}(r_1, \ldots, r_G)}{\text{std}(r_1, \ldots, r_G)}
 | TRPO → PPO     | 简化约束为 clip      | 超参 $\epsilon$ 敏感          |
 | PPO → GRPO     | 省掉 Critic          | 组大小敏感、丢失 token 级信号 |
 
-能讲清楚"为什么 GRPO 在数学上等价于用一个数据驱动的 baseline"，是从能背公式到真正理解的分水岭。
+GRPO 的组内均值相当于由当前采样数据构造的基线。组内奖励没有差异时，标准化优势也无法提供有效更新信号。
 
-### DPO 家族与正则化
+### 4.2 DPO 家族与正则化
 
-DPO 家族是另一个高频考点。常见问题：DPO 的推导、IPO/SimPO/KTO 的差异、DPO 训练时的正则化。
+DPO 把带 KL 约束的奖励优化转写为偏好数据上的分类目标。理解这一步以后，IPO、SimPO、KTO 等变体的差别会更清楚。
 
 #### DPO 的核心推导
 
@@ -507,9 +458,9 @@ DPO 训练中常见的失败模式：
 - **Conservative DPO (cDPO)**：在标签上做 label smoothing，避免过度自信
 - **Iterative DPO**：用当前策略生成新偏好数据，再训练，缓解分布偏移
 
-### DeepSpeed vs Megatron 工程对比
+### 4.3 DeepSpeed 与 Megatron 的并行策略
 
-这是字节、阿里、华为面试中常问的分布式训练工程问题。两个框架代表了 LLM 训练的两种哲学。
+模型无法装入单张 GPU 后，需要同时切分训练状态、权重矩阵或网络层。DeepSpeed ZeRO 和 Megatron 3D Parallelism 分别从这两类切分方式出发。
 
 #### DeepSpeed 与 ZeRO 系列的显存优化
 
@@ -531,7 +482,7 @@ ZeRO-3 让单卡显存从 $O(N)$ 降到 $O(N / \text{GPUs})$，代价是通信�
 
 3D 并行的优势是显存效率高、通信模式清晰，特别适合超大模型。Megatron 的 TP 实现对 NVLink/RoCE 互联带宽要求高。
 
-#### 工程对比
+#### 并行方案对比
 
 | 维度     | DeepSpeed ZeRO              | Megatron 3D Parallel          |
 | -------- | --------------------------- | ----------------------------- |
@@ -544,9 +495,9 @@ ZeRO-3 让单卡显存从 $O(N)$ 降到 $O(N / \text{GPUs})$，代价是通信�
 | MoE 支持 | 有（DeepSpeed-MoE）         | 有（Megatron-Core MoE）       |
 | 长上下文 | 有（DeepSpeed-Ulysses）     | 有（Megatron-Context）        |
 
-#### 选型经验
+#### 并行方案选型
 
-工业团队的典型选择：
+模型规模和集群互联决定并行方式：
 
 - **小模型（<10B）**：DeepSpeed ZeRO-2，简单够用
 - **中等模型（10B-100B）**：DeepSpeed ZeRO-3 + Megatron TP（混合并行）
@@ -555,11 +506,11 @@ ZeRO-3 让单卡显存从 $O(N)$ 降到 $O(N / \text{GPUs})$，代价是通信�
 
 veRL 同时支持 FSDP（DeepSpeed 风格）和 Megatron 后端，用户可以按规模选择。
 
-### 训练资源现场推算
+### 4.4 训练资源估算
 
-这是面试中最实战的考查——给一个具体训练任务，现场估算需要多少 GPU、多少天、多少钱。
+资源估算从模型规模、训练 token、单卡算力和实际利用率出发。下面用一个 GRPO 任务走完计算过程。
 
-#### 典型题目
+#### 计算示例
 
 > "用 Qwen2.5-7B 做 GRPO，10 万道数学题，每题采样 8 个 rollout，每个 rollout 平均 1024 token，训练 3 个 epoch。需要多少 GPU？训多久？"
 
@@ -601,22 +552,22 @@ $$\text{天数} = \frac{3300}{250} \approx 13 \text{ 天}$$
 
 $$\text{成本} = 3300 \times 2 = \$6,600$$
 
-#### 面试加分点
+#### 估算中的工程修正
 
-能主动指出几个工程细节，加分：
+公式得到的是理想估算，落到真实集群时还要修正以下因素：
 
 1. **显存检查**：7B 模型 + GRPO，单卡需要约 60GB（Actor 14GB + Ref 14GB + Rollout 14GB + Activations + KV cache）。A100 80GB 单卡能放下；如果是 40GB A100，需要 2 卡 TP。
 2. **MFU 校准**：小 batch 时 MFU 只有 20%；大 batch 才能达到 40%。给出 MFU 估计范围，不要拍脑袋。
 3. **失败重训预算**：实际训练要预留 30% 的失败重训预算，所以最终采购要按 4300 GPU-hours 估。
 4. **成本对比**：能用 H100 替代吗？H100 BF16 是 A100 的 3 倍 FLOPs，单价约 $3/小时。$3300 \times 3 / 3 = $3300，但 H100 数量少一半——如果集群紧张，H100 更划算。
 
-### 开放问题与系统设计
+### 4.5 完整 RLHF 系统设计
 
-高级面试会问开放问题，考查候选人对整个 RL 系统的理解。典型问题：
+最后把前面的组件放进一个完整系统。假设目标是支持 70B 模型、1000 万条偏好数据，并在两周内完成训练：
 
 **"设计一个 RLHF 训练系统，支持 70B 模型，1000 万条偏好数据，要求训练时间 < 2 周。"**
 
-回答框架：
+系统至少包含六个部分：
 
 1. **数据层**：偏好数据存储、采样、去重、质量过滤
 2. **训练层**：RM 训练（70B RM）+ Actor PPO 训练
@@ -625,9 +576,7 @@ $$\text{成本} = 3300 \times 2 = \$6,600$$
 5. **资源分配**：RM 训练用多少卡，Actor 用多少卡，rollout 用多少卡
 6. **失败恢复**：checkpoint 策略、断点续训、预热启动
 
-回答这类问题的核心是**系统性思维**——不只是"用 PPO 算法"，而是从数据到部署的全链路设计。
-
-::::
+这六部分必须共同满足时间和显存约束。只选择 PPO 还无法决定 rollout 吞吐、模型放置、故障恢复和评测是否能够完成。
 
 ## 本节小结
 
