@@ -1,4 +1,4 @@
-# 13.8 动手：veRL PPO 训练 GSM8K
+# 13.7 动手：veRL PPO 训练 GSM8K
 
 13.4 节我们讲了 PPO-RLHF 的四模型协作原理——Actor、Reference、Reward Model、Critic 各自的角色，以及 KL 惩罚、token-level reward、advantage 估计的数学关系。这一节我们换一个姿势：用工业级框架 [veRL](https://github.com/volcengine/verl)，在 GSM8K 数学推理数据集上跑通 PPO 训练。
 
@@ -157,7 +157,7 @@ for split in ["train", "test"]:
 
 ## Reward 函数设计
 
-GSM8K 的 reward 不需要训练 Reward Model——直接用规则验证答案即可。这和 13.4 节讲的 RLHF 不同：RLHF 用 RM 提供偏好信号，而数学推理用**可验证奖励**（verifiable reward）。16.3 节会详细讨论 RLVR 范式，这里先用一个简单的实现。
+GSM8K 的 reward 不需要训练 Reward Model——直接用规则验证答案即可。这和 13.4 节讲的 RLHF 不同：RLHF 用 RM 提供偏好信号，而数学推理用**可验证奖励**（verifiable reward）。15.3 节会详细讨论 RLVR 范式，这里先用一个简单的实现。
 
 本仓库已经提供了课程适配版本：[`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py)。如果你在 veRL 仓库内操作，也可以按下面内容创建同名文件：
 
@@ -230,7 +230,7 @@ def compute_score(reward_input: dict[str, Any], **kwargs) -> dict[str, float]:
 - **`check_answer`**：数值比较。`1,000` 和 `1000` 会被视为相同，`42` 和 `42.0` 也相同。
 - **`compute_score`**：返回 `overall`（PPO 使用的总奖励）和两个辅助指标（`accuracy` 和 `format`），后者会记录到训练日志。
 
-为什么不需要 Reward Model？因为 GSM8K 的答案是**客观可验证**的——答对就是 1.0，答错就是 0.0。这个信号虽然稀疏（整段回答只有一个 0/1），但它是精确的、无噪声的、不可被 hack 的。这正是 16.3 节 RLVR 的核心思想。
+为什么不需要 Reward Model？因为 GSM8K 的答案是**客观可验证**的——答对就是 1.0，答错就是 0.0。这个信号虽然稀疏（整段回答只有一个 0/1），但它是精确的、无噪声的、不可被 hack 的。这正是 15.3 节 RLVR 的核心思想。
 
 ## 单卡训练脚本
 
@@ -389,14 +389,14 @@ vLLM 的 KV cache 会预分配显存。单卡场景下 vLLM 和训练模型共�
 回顾 13.4 节的四模型协作表，每个配置项在 veRL 中都有对应：
 
 | 13.4 节角色 | veRL 配置                       | 说明                               |
-| ---------- | ------------------------------- | ---------------------------------- |
-| Actor      | `actor_rollout_ref.actor.*`     | 可训练策略，负责生成和更新         |
-| Reference  | `actor_rollout_ref.ref.*`       | 冻结的 SFT 模型，计算 KL 约束      |
-| Critic     | `critic.*`                      | 可训练价值函数，GAE 估计 advantage |
-| RM/Reward  | `gsm8k_reward.py:compute_score` | 规则验证（GSM8K 不需要训练 RM）    |
-| KL 约束    | 默认 KL reward penalty          | 防止 Actor 偏离 Reference          |
-| PPO clip   | `actor.clip_ratio=0.2`          | 限制策略更新幅度                   |
-| GAE        | `algorithm.adv_estimator=gae`   | advantage 估计方法                 |
+| ----------- | ------------------------------- | ---------------------------------- |
+| Actor       | `actor_rollout_ref.actor.*`     | 可训练策略，负责生成和更新         |
+| Reference   | `actor_rollout_ref.ref.*`       | 冻结的 SFT 模型，计算 KL 约束      |
+| Critic      | `critic.*`                      | 可训练价值函数，GAE 估计 advantage |
+| RM/Reward   | `gsm8k_reward.py:compute_score` | 规则验证（GSM8K 不需要训练 RM）    |
+| KL 约束     | 默认 KL reward penalty          | 防止 Actor 偏离 Reference          |
+| PPO clip    | `actor.clip_ratio=0.2`          | 限制策略更新幅度                   |
+| GAE         | `algorithm.adv_estimator=gae`   | advantage 估计方法                 |
 
 注意一个关键区别：本实验用**规则 reward**（答案对错自动验证）代替了 13.4 节的 **Reward Model**。这意味着我们不需要训练一个 RM，也不需要偏好数据。代价是 reward 信号只有 0/1 二值（没有"这个回答比那个好多少"的细粒度信息），但对于数学推理来说，0/1 信号已经足够。
 
@@ -726,7 +726,7 @@ actor_rollout_ref.actor.clip_ratio=0.2     # 标准裁剪范围
 
 本节用 veRL 跑的 PPO 训练，和 13.4 节讲的 PPO-RLHF 原理完全一致，但有三点工程层面的差异值得注意：
 
-**1. Reward 来源不同**：13.4 节用 Reward Model 提供偏好信号（连续值，训练得到），本节用规则验证提供正确性信号（0/1 二值，自动计算）。这是 RLVR 的核心思想——16.3 节会详细展开。
+**1. Reward 来源不同**：13.4 节用 Reward Model 提供偏好信号（连续值，训练得到），本节用规则验证提供正确性信号（0/1 二值，自动计算）。这是 RLVR 的核心思想——15.3 节会详细展开。
 
 **2. 四模型共存方式不同**：13.4 节的 TRL 实验在同一进程内管理四个模型，简单但显存效率低。veRL 通过 Ray + FSDP 把 Actor/Critic（可训练）和 Reference/Reward（冻结）分配到同一组 GPU 上，用 3D-HybridEngine 在训练和推理之间切换，显存效率更高。
 
@@ -746,8 +746,8 @@ actor_rollout_ref.actor.clip_ratio=0.2     # 标准裁剪范围
 
 本节依赖外部 veRL，不复制 veRL 源码。本仓库只保存课程适配层：
 
-| 文件                                                                                                                                              | 作用                          |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| 文件                                                                                                                                                                                                 | 作用                          |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
 | [`code/chapter15_rlhf/verl_gsm8k/README.md`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/README.md)                                                   | 外部 veRL 索引与使用说明      |
 | [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py)                                       | 基础 0/1 accuracy reward      |
 | [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py)                     | accuracy + format 组合 reward |

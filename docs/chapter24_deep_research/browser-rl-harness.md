@@ -950,8 +950,8 @@ Search-R1 使用 veRL 实现的 GRPO，核心步骤：
 
 Search-R1 是本书前面所有 RL 知识在搜索 Agent 场景的具体落地：
 
-- **RLVR（第 16 章）**：Search-R1 的 reward 是纯粹的"答案对不对"，不需要 Reward Model——这正是 RLVR 的核心思想。
-- **GRPO（第 16 章）**：Search-R1 默认使用 GRPO，组采样 + 相对比较替代了 PPO 的 Critic 网络。
+- **RLVR（第 15 章）**：Search-R1 的 reward 是纯粹的"答案对不对"，不需要 Reward Model——这正是 RLVR 的核心思想。
+- **GRPO（第 15 章）**：Search-R1 默认使用 GRPO，组采样 + 相对比较替代了 PPO 的 Critic 网络。
 - **Agent Loop（19.1 节）**：Search-R1 的 Rollout 就是 Agent Loop 的具体实现——模型在推理和工具调用之间交替。
 - **ORM vs PRM（19.3 节）**：Search-R1 只用 ORM（终态 reward）。Atom-Searcher[^atom_searcher] 和 Web-Shepherd[^web_shepherd] 在此基础上加了 PRM（过程奖励）。
 - **Retrieved Token Masking**：与 PPO 中 mask prompt token 的思路一致——只对策略可控的部分做梯度更新。
@@ -1320,8 +1320,8 @@ async def parallel_rollout(
 
 实测在 8×H100 GPU + 64-core CPU server 上，单次 GRPO step 处理 1024 prompts 约需 8-12 分钟。训练一个 7B Deep Research 模型到收敛通常需要 5000-10000 step，即 4-7 天。
 
-::: tip 与 [第 16 章 GRPO](../chapter18_grpo/grpo-practice-and-mechanism) 的衔接
-Deep Research 的 RL 训练流水线和 [第 16 章](../chapter18_grpo/grpo-practice-and-mechanism) 讲的 GRPO 没有本质区别——都是 group-normalized advantage + PPO-Clip。差异只在环境（浏览器 vs 文本 sandbox）和奖励（任务完成 vs 答案正确）。如果你已经跑通过 [16.6 金融 API 工具调用 GRPO](../chapter18_grpo/financial-tool-calling-grpo)，迁移到 Deep Research 只需要换 `Environment Wrapper` 和 `Reward Verifier` 两个模块。
+::: tip 与 [第 15 章 GRPO](../chapter18_grpo/grpo-practice-and-mechanism) 的衔接
+Deep Research 的 RL 训练流水线和 [第 15 章](../chapter18_grpo/grpo-practice-and-mechanism) 讲的 GRPO 没有本质区别——都是 group-normalized advantage + PPO-Clip。差异只在环境（浏览器 vs 文本 sandbox）和奖励（任务完成 vs 答案正确）。如果你已经跑通过 [15.6 金融 API 工具调用 GRPO](../chapter18_grpo/financial-tool-calling-grpo)，迁移到 Deep Research 只需要换 `Environment Wrapper` 和 `Reward Verifier` 两个模块。
 :::
 
 ## 本节总结

@@ -709,8 +709,8 @@ graph TD
     AC --> PPO["PPO (Chapter 8)<br/><-- You just used this"]
 
     PPO --> LLM["LLM Alignment"]
-    LLM --> DPOG["DPO (Chapter 15)"]
-    LLM --> GRPOG["GRPO (Chapter 16)"]
+    LLM --> DPOG["DPO (Chapter 14)"]
+    LLM --> GRPOG["GRPO (Chapter 15)"]
 
     style ROOT fill:#f8f9fa,stroke:#24292f,color:#24292f
     style VB fill:#e3f2fd,stroke:#1976d2,color:#000
@@ -737,7 +737,7 @@ graph TD
 This diagram will reappear at the beginning of each subsequent chapter.
 For now, just remember one key point:
 **The PPO we used in this chapter is the product of the two routes converging.
-The DPO introduced in Chapter 15 is a simplified version of PPO for the LLM era.**
+The DPO introduced in Chapter 14 is a simplified version of PPO for the LLM era.**
 
 In the next chapter, we will see that reinforcement learning is not limited to making a cart balance a pole --
 it can also make large language models learn to align with human preferences.

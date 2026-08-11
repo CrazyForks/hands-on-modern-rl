@@ -3,6 +3,7 @@ title: 7.2 Actor-Critic Architecture
 ---
 
 # 7.2 Actor-Critic Architecture
+
 In the previous two sections we met the [advantage function](./advantage-function) $A(s,a)$ and the [training method for the Critic](./critic-training). Now let's assemble all the parts and see how the Actor and the Critic collaborate.
 
 ::: tip Prerequisites for This Section
@@ -506,12 +507,12 @@ On CartPole, Actor-Critic typically stabilizes at 500 points (the maximum) withi
 
 Actor-Critic is not the destination; it is a skeleton. In later chapters you will encounter various extensions:
 
-| Chapter                                                         | Variant                          | Key improvement                                                                                  |
-| --------------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------ |
-| [Chapter 8 PPO](../chapter10_ppo/intro)                         | PPO-Clip                         | Limit the size of policy updates to avoid "taking steps that are too big"                        |
-| [Chapter 8 GAE](../chapter10_ppo/gae-reward-model)              | Generalized Advantage Estimation | Exponentially weighted sum of multi-step TD errors; precisely control the bias-variance tradeoff |
-| [Chapter 15 DPO](../chapter17_dpo/intro)                         | Implicit Actor-Critic            | Replace the Critic with preference data; remove the on-policy constraint                         |
-| [Chapter 16 GRPO](../chapter18_grpo/grpo-practice-and-mechanism) | Remove the Critic                | Replace $V(s)$ with an in-group mean; save one network                                           |
+| Chapter                                                          | Variant                          | Key improvement                                                                                  |
+| ---------------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [Chapter 8 PPO](../chapter10_ppo/intro)                          | PPO-Clip                         | Limit the size of policy updates to avoid "taking steps that are too big"                        |
+| [Chapter 8 GAE](../chapter10_ppo/gae-reward-model)               | Generalized Advantage Estimation | Exponentially weighted sum of multi-step TD errors; precisely control the bias-variance tradeoff |
+| [Chapter 14 DPO](../chapter17_dpo/intro)                         | Implicit Actor-Critic            | Replace the Critic with preference data; remove the on-policy constraint                         |
+| [Chapter 15 GRPO](../chapter18_grpo/grpo-practice-and-mechanism) | Remove the Critic                | Replace $V(s)$ with an in-group mean; save one network                                           |
 
 All variants share the same skeleton: one network responsible for choosing, plus one signal responsible for evaluating. What changes is only "where the evaluation signal comes from" and "how the selection network is updated."
 

@@ -22,7 +22,7 @@ One-sentence distinction: A.2 answers "how does the system feed samples into the
 
 ## From Single-Turn Generation to Multi-Turn Action
 
-Consider GRPO training (Chapter 16) on math tasks: given a question, the model generates a full solution in one shot, and a verifier checks correctness. The entire process is single-turn. The model's only operation is text generation, and the computation is GPU-bound.
+Consider GRPO training (Chapter 15) on math tasks: given a question, the model generates a full solution in one shot, and a verifier checks correctness. The entire process is single-turn. The model's only operation is text generation, and the computation is GPU-bound.
 
 By contrast, training an agent that can fix bugs requires a different interaction pattern. Given buggy code, the model must read files, locate the issue, edit code, run tests, and iterate if tests fail. A single task may require five or six turns. Between turns, there is waiting: reading files depends on disk I/O, running tests depends on sandbox execution, and searching depends on network latency. These operations are not on the GPU, and their latency ranges from tens of milliseconds to seconds.
 
@@ -203,7 +203,7 @@ The `external` mode is worth highlighting: it can use idle capacity or preemptib
 
 ### Algorithms, Models, and Operations
 
-**Algorithm support.** Relax includes four algorithms: GRPO (see [Sections 16.1–16.2](/chapter18_grpo/grpo-practice-and-mechanism)), GSPO, SAPO, and OPD (see [Section 16.7](/chapter18_grpo/on-policy-distillation)). Adding a new algorithm requires implementing a Service class and registering it in the `ALGOS` dictionary.
+**Algorithm support.** Relax includes four algorithms: GRPO (see [Sections 15.1–15.2](/chapter18_grpo/grpo-practice-and-mechanism)), GSPO, SAPO, and OPD (see [Section 15.7](/chapter18_grpo/on-policy-distillation)). Adding a new algorithm requires implementing a Service class and registering it in the `ALGOS` dictionary.
 
 **Model support.** The Qwen3 family (4B, 30B-A3B MoE), Qwen3-VL (vision-language), Qwen3-Omni (omni-modal), and Qwen3.5.
 

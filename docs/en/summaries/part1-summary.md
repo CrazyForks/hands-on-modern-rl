@@ -14,7 +14,7 @@ The Chinese restructure commit (`d0d5925`) deleted `docs/summaries/` entirely. T
 In the first two chapters, we ran two complete reinforcement learning training experiments from scratch.
 
 In Chapter 1, we trained a CartPole agent with Stable Baselines3. This is the "Hello World" of reinforcement learning.
-In Chapter 15, we use the TRL library to run DPO preference alignment on the Qwen2.5-0.5B model, and directly observed the model learning to distinguish good answers from bad ones.
+In Chapter 14, we use the TRL library to run DPO preference alignment on the Qwen2.5-0.5B model, and directly observed the model learning to distinguish good answers from bad ones.
 
 Together, these two chapters gave us the following takeaways:
 
@@ -96,7 +96,7 @@ print(f"Mean reward: {mean_reward:.2f} +/- {std_reward:.2f}")
 
 Here we used PPO, the most widely used policy-gradient method in practice. Its key idea is developed in detail in Chapter 8. For now, the only point you need is: PPO adds a **clipping mechanism** on top of policy gradients to prevent updates that are too large, which can cause training to collapse.
 
-## Chapter 15: DPO - Teaching an LLM to "Speak Well"
+## Chapter 14: DPO - Teaching an LLM to "Speak Well"
 
 ### The Three Stages of Modern LLM Training
 

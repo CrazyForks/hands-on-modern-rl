@@ -1,4 +1,4 @@
-# 16.8 动手：veRL 代码生成 RL 实验
+# 15.8 动手：veRL 代码生成 RL 实验
 
 上一节讲 OPD 时，我们把 teacher 当成密集奖励来源。本节回到 RLVR 的路线，换一个更硬的场景：**代码生成**。
 
@@ -103,13 +103,13 @@ pip install flash-attn --no-build-isolation
 
 > **注意（issue #53）**：Eurus-2-RL-Data **没有** `entry_point`、`tests` 这类顶层字段。它的真实结构是 veRL 原生格式，验证信息存在 `reward_model` 列里：
 >
-> | 字段           | 含义                                                                 |
-> | -------------- | -------------------------------------------------------------------- |
-> | `prompt`       | chat 消息数组：`[{"role":"system",...}, {"role":"user",...}]`。system 是 PRIME 推理动作模板（`[ASSESS]`/`[ADVANCE]`/…），user 才是题目 |
-> | `ability`      | `"math"` 或 `"code"`，本实验只取 `code`                              |
+> | 字段           | 含义                                                                                                                                                 |
+> | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+> | `prompt`       | chat 消息数组：`[{"role":"system",...}, {"role":"user",...}]`。system 是 PRIME 推理动作模板（`[ASSESS]`/`[ADVANCE]`/…），user 才是题目               |
+> | `ability`      | `"math"` 或 `"code"`，本实验只取 `code`                                                                                                              |
 > | `reward_model` | `{"ground_truth": <答案>, "style": "rule"}`。code 样本的 `ground_truth` 是 JSON 字符串 `{"inputs": [...], "outputs": [...]}`，即 stdin/stdout 测试对 |
-> | `data_source`  | 题目来源：`codecontests` / `taco` / `apps` / `codeforces`            |
-> | `extra_info`   | `{"index": ..., "split": ...}`                                       |
+> | `data_source`  | 题目来源：`codecontests` / `taco` / `apps` / `codeforces`                                                                                            |
+> | `extra_info`   | `{"index": ..., "split": ...}`                                                                                                                       |
 
 也就是说，这些 code 样本是**"读 stdin、写 stdout"的竞赛编程题**，不是"实现某个函数签名"的题目——所以没有 `entry_point`，测试也不是 assert 语句，而是输入输出对。reward 函数要把模型生成的代码当独立程序运行，喂入输入、比对输出。
 
@@ -130,13 +130,13 @@ python code/chapter18_grpo/verl_code_rlvr/prepare_data.py
 
 处理完成后，`train1000.parquet` 的列就是 veRL 原生格式：
 
-| 字段           | 含义                                 | 示例                                        |
-| -------------- | ------------------------------------ | ------------------------------------------- |
-| `prompt`       | **chat 消息列表**（system 指令 + user 题目） | `[{"role":"system","content":"You are a competitive programming assistant."}, {"role":"user","content":"Read the problem…"}]` |
-| `reward_model` | `{"ground_truth": I/O 测试 JSON, "style": "rule"}` | `'{"inputs": [...], "outputs": [...]}'` |
-| `data_source`  | 题目来源                             | `"codecontests"` / `"taco"` / `"apps"`      |
-| `ability`      | `"code"`                             | `"code"`                                    |
-| `extra_info`   | `{index, split}`                     | `{"index": 0, "split": "dummy"}`            |
+| 字段           | 含义                                               | 示例                                                                                                                          |
+| -------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `prompt`       | **chat 消息列表**（system 指令 + user 题目）       | `[{"role":"system","content":"You are a competitive programming assistant."}, {"role":"user","content":"Read the problem…"}]` |
+| `reward_model` | `{"ground_truth": I/O 测试 JSON, "style": "rule"}` | `'{"inputs": [...], "outputs": [...]}'`                                                                                       |
+| `data_source`  | 题目来源                                           | `"codecontests"` / `"taco"` / `"apps"`                                                                                        |
+| `ability`      | `"code"`                                           | `"code"`                                                                                                                      |
+| `extra_info`   | `{index, split}`                                   | `{"index": 0, "split": "dummy"}`                                                                                              |
 
 > **为什么 prompt 必须是 chat 消息格式，而不是纯文本？** veRL 的 RLHFDataset 会把 `prompt` 交给模型的 `apply_chat_template`。如果 `prompt` 是纯字符串，Qwen 的模板会直接丢弃内容，只生成 system + assistant 两个特殊 token（实测只有 24 个 token），模型根本看不到题目、reward 恒为 0。所以 `prepare_data.py` 重建 prompt 时用的是 `[{"role": "system", ...}, {"role": "user", ...}]` 结构。
 
@@ -283,12 +283,18 @@ python code/chapter18_grpo/verl_code_rlvr/code_reward.py
 
 Eurus-2-RL-Data 的 code 样本是"读 stdin、写 stdout"的竞赛题，**没有** `entry_point`/`problem_statement` 这种字段拆分。`prepare_data.py` 重建 prompt 时用 **chat 消息格式**（见 [prepare_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter18_grpo/verl_code_rlvr/prepare_data.py) 里的 `CODE_GEN_SYSTEM` / `CODE_GEN_USER_TEMPLATE`）：
 
-````json
+```json
 [
-  {"role": "system", "content": "You are a competitive programming assistant."},
-  {"role": "user", "content": "Read the problem below and write a Python solution that reads from stdin and writes to stdout.\nReturn only one Python code block, with no explanations.\n\nProblem:\n{problem}"}
+  {
+    "role": "system",
+    "content": "You are a competitive programming assistant."
+  },
+  {
+    "role": "user",
+    "content": "Read the problem below and write a Python solution that reads from stdin and writes to stdout.\nReturn only one Python code block, with no explanations.\n\nProblem:\n{problem}"
+  }
 ]
-````
+```
 
 其中 `{problem}` 是数据集 user 消息里的题目（保留 Input/Output 格式说明和示例）。相比文档早期的方案，这里去掉了 `Function name: {entry_point}`——因为这类题目不要求实现某个函数签名，而是要求程序自己读 stdin 并写 stdout。
 
@@ -327,13 +333,13 @@ python3 -m verl.trainer.main_ppo \
 
 和 13.7 节 GSM8K 的 PPO 配置相比，几个关键差异：
 
-| 配置项                | GSM8K（13.7 节） | 代码生成（本节） | 原因                           |
-| --------------------- | --------------- | ---------------- | ------------------------------ |
-| 数据集                | GSM8K 数学题    | Eurus-2-RL-Data（仅 code 样本） | 代码任务需要可验证的测试用例 |
-| reward 函数           | `gsm8k_reward`  | `code_reward`    | 代码需要提取 + 运行 stdin/stdout 测试 |
-| `max_response_length` | 256             | 512              | 代码回答通常比数学推理更长     |
-| 基座模型              | Qwen2.5-0.5B    | Qwen2.5-Coder    | 代码生成用 coder 变体效果更好  |
-| reward 接线           | —               | `custom_reward_function` | 代码 reward 是自定义函数，必须显式接线 |
+| 配置项                | GSM8K（13.7 节） | 代码生成（本节）                | 原因                                   |
+| --------------------- | ---------------- | ------------------------------- | -------------------------------------- |
+| 数据集                | GSM8K 数学题     | Eurus-2-RL-Data（仅 code 样本） | 代码任务需要可验证的测试用例           |
+| reward 函数           | `gsm8k_reward`   | `code_reward`                   | 代码需要提取 + 运行 stdin/stdout 测试  |
+| `max_response_length` | 256              | 512                             | 代码回答通常比数学推理更长             |
+| 基座模型              | Qwen2.5-0.5B     | Qwen2.5-Coder                   | 代码生成用 coder 变体效果更好          |
+| reward 接线           | —                | `custom_reward_function`        | 代码 reward 是自定义函数，必须显式接线 |
 
 其他参数（学习率、clip_ratio、GAE 等）和 13.7 节保持一致——它们是 PPO 的算法参数，不随任务类型变化。
 
@@ -341,12 +347,12 @@ python3 -m verl.trainer.main_ppo \
 
 和 13.7 节一样，PPO 训练涉及四个模型角色：
 
-| 13.7 节角色 | 本节对应                       | 说明                               |
-| ---------- | ------------------------------ | ---------------------------------- |
-| Actor      | `actor_rollout_ref.actor.*`    | 可训练策略，生成候选代码并更新     |
-| Reference  | `actor_rollout_ref.ref.*`      | 冻结的 SFT 模型，计算 KL 约束      |
-| Critic     | `critic.*`                     | 可训练价值函数，GAE 估计 advantage |
-| RM/Reward  | `code_reward.py:compute_score` | 代码验证：提取 + 子进程跑 stdin/stdout 测试 |
+| 13.7 节角色 | 本节对应                       | 说明                                        |
+| ----------- | ------------------------------ | ------------------------------------------- |
+| Actor       | `actor_rollout_ref.actor.*`    | 可训练策略，生成候选代码并更新              |
+| Reference   | `actor_rollout_ref.ref.*`      | 冻结的 SFT 模型，计算 KL 约束               |
+| Critic      | `critic.*`                     | 可训练价值函数，GAE 估计 advantage          |
+| RM/Reward   | `code_reward.py:compute_score` | 代码验证：提取 + 子进程跑 stdin/stdout 测试 |
 
 关键区别是最后一行：13.7 节用数学答案匹配（抽取数字做数值比较），本节用代码执行验证（提取代码 → 子进程运行 → 比对输入输出）。reward 信号按测试通过率给 0~1 的分数，但代码 reward 的工程复杂度更高。
 

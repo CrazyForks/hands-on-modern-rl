@@ -58,7 +58,7 @@ The disadvantage of PRM is that the **labeling cost is extremely high**. You nee
 | Labeling cost       | Low, outcome only                       | High, every step must be labeled          |
 | Learning speed      | Slow, little signal and high variance   | Fast, more signal and lower variance      |
 | Best suited for     | Verifiable tasks, such as code and math | Complex reasoning requiring fine guidance |
-| Representative work | GRPO, Chapter 16                         | Math-Shepherd[^mathshepherd], PRS         |
+| Representative work | GRPO, Chapter 15                        | Math-Shepherd[^mathshepherd], PRS         |
 
 ### SALT: A Third Path Between ORM and PRM[^salt]
 

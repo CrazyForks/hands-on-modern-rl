@@ -5,11 +5,11 @@ title: 9. Post-Training Alignment (archived)
 ::: warning TODO: Archived during English restructure (2026-06-25)
 This was the combined intro for the old Chapter 9 "Post-Training Alignment", which merged DPO + GRPO + RLVR. The Chinese restructure split this into three separate chapters:
 
-- Chapter 15 (DPO) — `docs/chapter17_dpo/intro.md`
-- Chapter 16 (GRPO / RLVR) — `docs/chapter18_grpo/grpo-practice-and-mechanism.md`
-- Chapter 16 (LLM RL industrial) — `docs/chapter16_llm_rl_industrial/industrial-post-training.md`
+- Chapter 14 (DPO) — `docs/chapter17_dpo/intro.md`
+- Chapter 15 (GRPO / RLVR) — `docs/chapter18_grpo/grpo-practice-and-mechanism.md`
+- Chapter 18 (LLM RL industrial) — `docs/chapter16_llm_rl_industrial/industrial-post-training.md`
 
-The file is kept as translation reference. It will be removed or rewritten when Chapter 17 / 18 English translations catch up.
+The file is kept as translation reference. It will be removed or rewritten when the corresponding English chapters catch up.
 :::
 
 # Alignment and Reasoning RL
@@ -80,15 +80,15 @@ In industrial practice, these methods are usually combined. A system may use SFT
 
 ## Chapter Roadmap
 
-| Section                                                                    | Core question                                                                                                   | What you will gain                                               |
-| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| [DPO theory and method selection](./dpo-theory-and-family)                 | How does DPO derive a classification loss from a KL-regularized RL objective? When should we use DPO/KTO/SimPO? | Understand DPO mathematically and choose variants by scenario    |
-| [Hands-on: DPO alignment](./dpo-hands-on)                                  | How do we read DPO metrics such as reward accuracy, margin, and beta sensitivity?                               | Diagnose DPO training logs                                       |
-| [Hands-on: GRPO mechanisms](../chapter18_grpo/grpo-practice-and-mechanism) | How does GRPO replace the Critic with group normalization? How much memory does it save?                        | Run GRPO training and understand the difference from PPO         |
-| [DeepSeek-R1 and DAPO](../chapter18_grpo/deepseek-dapo)                    | Can pure RL work without SFT? What do SimpleRL and DAPO teach us?                                               | Understand R1-Zero, SimpleRL reproduction, and DAPO improvements |
-| [RLVR: verifiable rewards](../chapter18_grpo/rlvr)                         | Can verifiable rewards replace reward models? Why does 1-shot RLVR work?                                        | Understand verifier design and RLVR training                     |
-| [RL scaling outlook](../chapter32_selfplay/rl-scaling-outlook)             | When should we choose online vs offline RL? Where are the scaling limits?                                       | Build global judgment about RL training paradigms                |
-| [On-policy distillation](../chapter18_grpo/on-policy-distillation)         | Why can distillation be more effective than RL for small models? How can teacher log-probs act like rewards?    | Understand the RL nature of distillation                         |
+| Section                                                                                      | Core question                                                                                                   | What you will gain                                               |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [DPO theory and method selection](./dpo-theory-and-family)                                   | How does DPO derive a classification loss from a KL-regularized RL objective? When should we use DPO/KTO/SimPO? | Understand DPO mathematically and choose variants by scenario    |
+| [Hands-on: DPO alignment](./dpo-hands-on)                                                    | How do we read DPO metrics such as reward accuracy, margin, and beta sensitivity?                               | Diagnose DPO training logs                                       |
+| [Hands-on: GRPO mechanisms](../chapter18_grpo/grpo-practice-and-mechanism)                   | How does GRPO replace the Critic with group normalization? How much memory does it save?                        | Run GRPO training and understand the difference from PPO         |
+| [DeepSeek-R1 and DAPO](../chapter18_grpo/deepseek-dapo)                                      | Can pure RL work without SFT? What do SimpleRL and DAPO teach us?                                               | Understand R1-Zero, SimpleRL reproduction, and DAPO improvements |
+| [RLVR: verifiable rewards](../chapter18_grpo/rlvr)                                           | Can verifiable rewards replace reward models? Why does 1-shot RLVR work?                                        | Understand verifier design and RLVR training                     |
+| [RL scaling outlook](../chapter32_selfplay/rl-scaling-outlook)                               | When should we choose online vs offline RL? Where are the scaling limits?                                       | Build global judgment about RL training paradigms                |
+| [On-policy distillation](../chapter18_grpo/on-policy-distillation)                           | Why can distillation be more effective than RL for small models? How can teacher log-probs act like rewards?    | Understand the RL nature of distillation                         |
 | [Industrial post-training practice](../chapter16_llm_rl_industrial/industrial-post-training) | How do major labs combine SFT, RLHF, DPO, RLVR, and Agentic RL in real systems?                                 | Connect papers to production post-training pipelines             |
 
 Ready? We begin with the mathematical structure of DPO:

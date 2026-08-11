@@ -586,7 +586,7 @@ Design notes:
 
 ## Trainer — Orchestrating the Training Loop
 
-At this point, we can already collect complete interaction trajectories. But trajectories alone are not enough — we need to turn them into gradients that update the model parameters. Recall from Chapter 16 that GRPO's core idea is to sample multiple trajectories per prompt and compare within the group to compute advantage.
+At this point, we can already collect complete interaction trajectories. But trajectories alone are not enough — we need to turn them into gradients that update the model parameters. Recall from Chapter 15 that GRPO's core idea is to sample multiple trajectories per prompt and compare within the group to compute advantage.
 
 So, who is responsible for the complete training loop of "sample multiple trajectories → compute advantage → perform gradient update → repeat"? This is the **Trainer**'s responsibility.
 

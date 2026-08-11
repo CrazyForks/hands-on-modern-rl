@@ -1,4 +1,4 @@
-# 15.3 DPO 原理、数学与家族选型
+# 14.3 DPO 原理、数学与家族选型
 
 前面你已经跑过 DPO 的训练代码，也观察了 loss、accuracy、reward margin 这些指标如何变化。现在我们放慢一步，回到 DPO 要解决的原始问题：**如果手里已经有人类偏好数据，能不能不再训练 Reward Model，也不再跑一整套 PPO，就直接训练语言模型？**
 
@@ -298,7 +298,7 @@ $$
 
 ### 代入 Bradley-Terry 模型
 
-回顾[第 13 章 RLHF](../chapter15_rlhf/reward-function-design) 和[第 8 章 GAE](../chapter10_ppo/gae-reward-model) 中的 Bradley-Terry 偏好模型：
+回顾[第 13 章偏好数据](../chapter15_rlhf/imitation-learning-pipeline)和[第 8 章 GAE](../chapter10_ppo/gae-reward-model)中介绍的成对偏好模型：
 
 $$
 P(y_w > y_l \mid x) = \sigma\left(r(x, y_w) - r(x, y_l)\right)
@@ -332,7 +332,7 @@ $$
 \mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(x, y_w, y_l)} \left[ \log \sigma\left(\beta \log \frac{\pi_\theta(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \beta \log \frac{\pi_\theta(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\right) \right]
 $$
 
-这就是你在[第 15 章](../chapter17_dpo/intro)代码里调的那个 `DPOTrainer` 背后的真正面目：
+这就是你在[第 14 章](../chapter17_dpo/intro)代码里调的那个 `DPOTrainer` 背后的真正面目：
 
 <DpoCodeFocus focus="loss" />
 

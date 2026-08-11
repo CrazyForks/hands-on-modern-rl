@@ -1,6 +1,6 @@
-# 16.5 RL Environments 与 Verifier 工程
+# 15.5 RL Environments 与 Verifier 工程
 
-> [13.4 AI 反馈与安全原则](../chapter21_cai_rlvr/hhh-practice) 讨论了如何用 AI 反馈减少人工标注；本章则延续第 16 章的 RLVR，用规则验证器替代奖励模型。当任务从"数学题答对/答错"扩展到"写代码、调工具、订机票、修 Bug"时，**奖励信号本身成了瓶颈**。本章解决一个工程问题：如何把真实世界任务封装成可训练的 RL 环境，以及如何设计能抵抗作弊的 Verifier。这是 2025 年下半年 RL 训练流水线最受关注的工程方向。
+> [13.3 AI 反馈与安全原则](../chapter21_cai_rlvr/hhh-practice) 讨论了如何用 AI 反馈减少人工标注；本章则延续第 15 章的 RLVR，用规则验证器替代奖励模型。当任务从"数学题答对/答错"扩展到"写代码、调工具、订机票、修 Bug"时，**奖励信号本身成了瓶颈**。本章解决一个工程问题：如何把真实世界任务封装成可训练的 RL 环境，以及如何设计能抵抗作弊的 Verifier。这是 2025 年下半年 RL 训练流水线最受关注的工程方向。
 
 ## RL Environments 作为新瓶颈
 
@@ -12,7 +12,7 @@ Karpathy 在 2025 年初明确指出："**RLVR 是 LLM 训练流水线的新主�
 - **Mechanize 开出 $500K 年薪**招募 RL 环境工程师，高于当时多数模型训练岗位
 - **OpenAI、Google、Meta、字节、阿里** 同时成立 RL Environments 团队，工程文档中频繁出现 "Eval is the new bottleneck"、"Environments are the new data"
 
-为什么环境成了瓶颈？回到 PPO/GRPO 的目标函数（[第 16 章 GRPO](../chapter18_grpo/grpo-family)）：
+为什么环境成了瓶颈？回到 PPO/GRPO 的目标函数（[第 15 章 GRPO](../chapter18_grpo/grpo-family)）：
 
 $$\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_t A(s_t, a_t) \cdot \nabla_\theta \log \pi_\theta(a_t \mid s_{<t}, a_{<t})\right]$$
 

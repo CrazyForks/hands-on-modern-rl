@@ -1,4 +1,5 @@
-# 13.8 Hands-on: Running PPO on GSM8K with veRL
+# 13.7 Hands-on: Running PPO on GSM8K with veRL
+
 In Section 13.4, we explained the four-model collaboration behind PPO-RLHF: the roles of the Actor, Reference, Reward Model, and Critic, and the mathematical relationship between the KL penalty, token-level rewards, and advantage estimation. In this section, we take a more practical route: we will use the industrial-grade framework [veRL](https://github.com/volcengine/verl) to run PPO training end-to-end on the GSM8K mathematical reasoning dataset.
 
 Handwritten pseudo-code helps you internalize the principles; veRL helps you run a real experiment. The relationship is similar to Chapter 8, where we run PPO with Stable Baselines3: the algorithm is the same, but the framework takes care of engineering details such as distributed scheduling, VRAM optimizations, and inference acceleration.
@@ -156,7 +157,7 @@ In practice, prefer veRL's built-in script: it tracks veRL version changes and h
 
 ## Designing the Reward Function
 
-For GSM8K, you do not need to train a Reward Model. You can directly validate the final answer with rules. This is different from RLHF in Section 13.4: RLHF uses an RM to produce preference signals, while math reasoning uses **verifiable rewards**. Section 16.3 will discuss the RLVR paradigm in detail; here we start with a simple implementation.
+For GSM8K, you do not need to train a Reward Model. You can directly validate the final answer with rules. This is different from RLHF in Section 13.4: RLHF uses an RM to produce preference signals, while math reasoning uses **verifiable rewards**. Section 15.3 will discuss the RLVR paradigm in detail; here we start with a simple implementation.
 
 This repository provides the course adaptation here: [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py). If you are working inside the veRL repository, you can also create the same file manually:
 
@@ -229,7 +230,7 @@ Key design points of this reward function:
 - **`check_answer`**: numeric comparison. For example, `1,000` and `1000` are treated as the same; `42` and `42.0` are also treated as the same.
 - **`compute_score`**: returns `overall` (the total reward used by PPO) and two auxiliary metrics (`accuracy` and `format`) that will be logged.
 
-Why no Reward Model? Because GSM8K answers are **objectively verifiable**: correct is 1.0; incorrect is 0.0. The signal is sparse (an entire response yields a single 0/1), but it is precise, noise-free, and hard to game. This is exactly the core idea behind RLVR, which we will revisit in Section 16.3.
+Why no Reward Model? Because GSM8K answers are **objectively verifiable**: correct is 1.0; incorrect is 0.0. The signal is sparse (an entire response yields a single 0/1), but it is precise, noise-free, and hard to game. This is exactly the core idea behind RLVR, which we will revisit in Section 15.3.
 
 ## Single-GPU Training Script
 
@@ -388,14 +389,14 @@ This is a common practice in PPO-RLHF. The Critic needs to learn a reasonably ac
 Recall the four-model collaboration in Section 13.4. In veRL, each role maps cleanly to configuration fields:
 
 | Role in Section 13.4 | veRL config                     | Notes                                                         |
-| ------------------- | ------------------------------- | ------------------------------------------------------------- |
-| Actor               | `actor_rollout_ref.actor.*`     | trainable policy; generates outputs and gets updated          |
-| Reference           | `actor_rollout_ref.ref.*`       | frozen SFT model; used to compute KL constraints              |
-| Critic              | `critic.*`                      | trainable value function; used to estimate advantages via GAE |
-| RM/Reward           | `gsm8k_reward.py:compute_score` | rule-based verification (no RM training needed for GSM8K)     |
-| KL constraint       | default KL reward penalty       | prevents Actor from drifting too far from Reference           |
-| PPO clip            | `actor.clip_ratio=0.2`          | limits update magnitude                                       |
-| GAE                 | `algorithm.adv_estimator=gae`   | advantage estimation method                                   |
+| -------------------- | ------------------------------- | ------------------------------------------------------------- |
+| Actor                | `actor_rollout_ref.actor.*`     | trainable policy; generates outputs and gets updated          |
+| Reference            | `actor_rollout_ref.ref.*`       | frozen SFT model; used to compute KL constraints              |
+| Critic               | `critic.*`                      | trainable value function; used to estimate advantages via GAE |
+| RM/Reward            | `gsm8k_reward.py:compute_score` | rule-based verification (no RM training needed for GSM8K)     |
+| KL constraint        | default KL reward penalty       | prevents Actor from drifting too far from Reference           |
+| PPO clip             | `actor.clip_ratio=0.2`          | limits update magnitude                                       |
+| GAE                  | `algorithm.adv_estimator=gae`   | advantage estimation method                                   |
 
 One important difference to keep in mind: here we replace the **Reward Model** from Section 13.4 with a **rule-based reward** (automatic answer verification). That means we do not need to train an RM, nor do we need preference data. The trade-off is that the reward signal is binary (0/1) instead of a smooth scalar indicating "how much better" one response is than another. For math reasoning, however, a 0/1 signal is often sufficient.
 
@@ -725,7 +726,7 @@ actor_rollout_ref.actor.clip_ratio=0.2     # standard clipping range
 
 The PPO training we ran with veRL is algorithmically identical to the PPO-RLHF principles in Section 13.4, but there are three engineering differences worth highlighting:
 
-**1. Reward source**: Section 13.4 uses a Reward Model to provide continuous preference signals learned from data; this section uses rule-based verification to provide a 0/1 correctness signal computed automatically. This is the core idea of RLVR and will be covered in detail in Section 16.3.
+**1. Reward source**: Section 13.4 uses a Reward Model to provide continuous preference signals learned from data; this section uses rule-based verification to provide a 0/1 correctness signal computed automatically. This is the core idea of RLVR and will be covered in detail in Section 15.3.
 
 **2. How the four models co-exist**: the TRL setup in Section 13.4 manages four models in a single process, which is simple but memory-inefficient. veRL uses Ray + FSDP to place Actor/Critic (trainable) and Reference/Reward (frozen) onto the same GPU pool, and switches between training and inference using the 3D-HybridEngine for better memory efficiency.
 
@@ -745,8 +746,8 @@ From an algorithmic viewpoint, this experiment follows the same six-step loop fr
 
 This section depends on external veRL and does not copy veRL source code. This repository only keeps the course adaptation layer:
 
-| File                                                                                                                                              | Purpose                             |
-| ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| File                                                                                                                                                                                                 | Purpose                             |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
 | [`code/chapter15_rlhf/verl_gsm8k/README.md`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/README.md)                                                   | External veRL index and usage notes |
 | [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py)                                       | Basic 0/1 accuracy reward           |
 | [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py)                     | Accuracy + format combined reward   |

@@ -1,4 +1,4 @@
-# 18.4 形式化 PRM Verifier
+# 17.4 形式化 PRM Verifier
 
 前面两节的 PRM 路线——判别式和生成式——都有一个共同的根本问题：**它们都是基于 LLM 的，所以会继承 LLM 的错误**。
 
@@ -9,7 +9,7 @@
 
 这种 verifier 存在——它就是**形式化证明器**（formal theorem prover），如 Lean4、Coq、Isabelle。这一节我们讨论形式化 PRM 路线，这是 PRM 研究的"终极 verifier"方向。
 
-## 18.4.1 为什么形式化是终极 verifier
+## 17.4.1 为什么形式化是终极 verifier
 
 ### 形式化语言 vs 自然语言
 
@@ -63,7 +63,7 @@ Lean4 的特性让它成为理想的 PRM：
 - **数据稀缺**：Lean4 代码相对少，LLM 在 Lean4 上的预训练数据不足
 - **门槛高**：写 Lean4 代码需要专门训练，大部分数学家不熟悉
 
-## 18.4.2 AlphaProof 与 DeepMind 的 IMO 银牌
+## 17.4.2 AlphaProof 与 DeepMind 的 IMO 银牌
 
 2024 年 7 月，DeepMind 宣布 [AlphaProof](https://deepmind.google/discover/blog/ai-solves-imo-problems-at-silver-medal-level/) 在国际数学奥林匹克（IMO）2024 上达到**银牌水平**——解决了 6 道题中的 4 道。这是形式化 PRM 路线的里程碑。
 
@@ -123,7 +123,7 @@ IMO 2024 的 6 道题，AlphaProof 解出 4 道：
 
 Geometry 失败的原因不是推理能力不足，而是 **Lean4 翻译失败**——几何题的形式化比代数难得多。
 
-## 18.4.3 AlphaGeometry 2 与 几何专用
+## 17.4.3 AlphaGeometry 2 与 几何专用
 
 针对 AlphaProof 在几何上的弱点，DeepMind 发布了 [AlphaGeometry 2](https://www.nature.com/articles/s41586-024-07819-5)——专门解决几何题的形式化系统。
 
@@ -135,7 +135,7 @@ AlphaGeometry 2 的关键创新：
 
   2024.07 的报告中，AlphaGeometry 2 在 IMO 几何题上达到了金牌水平。
 
-## 18.4.4 DeepSeek-Prover-V2 与 开源的形式化 PRM
+## 17.4.4 DeepSeek-Prover-V2 与 开源的形式化 PRM
 
 [DeepSeek-Prover-V2](https://arxiv.org/abs/2504.21801)（2025.04）是 DeepSeek 开源的形式化 PRM 工作。它的目标是：
 
@@ -184,7 +184,7 @@ Prover-V2 在 MiniF2F（形式化数学 benchmark）上的成绩：
 
 这是开源模型在 MiniF2F 上的 SOTA。88.9% 意味着 Prover-V2 在大学水平的形式化数学上接近完美。
 
-## 18.4.5 形式化 PRM 的代价
+## 17.4.5 形式化 PRM 的代价
 
 虽然形式化 PRM 在数学上"零误判"，但它有几个代价：
 
@@ -215,7 +215,7 @@ LLM 在 Lean4 上的能力远弱于自然语言。这是形式化 PRM 的根本�
 
 Lean4 MCTS 训练的计算成本极高——每次 tactic 调用都要触发 Lean4 编译（每次编译几百毫秒到几秒）。AlphaProof 训练了几个月，消耗的算力与 GPT-4 相当。
 
-## 18.4.6 形式化 PRM 的未来
+## 17.4.6 形式化 PRM 的未来
 
 尽管有这些代价，形式化 PRM 的研究方向仍然非常重要。几个未来方向：
 

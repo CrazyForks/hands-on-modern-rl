@@ -25,7 +25,7 @@ Part V 已经把策略扩展到多轮工具交互。多模态任务进一步把�
 本章会用到以下概念，如果记不清了，点进去复习一下再继续：
 
 - [GRPO 算法](../chapter18_grpo/grpo-practice-and-mechanism)——不用 Critic 的组内相对优化
-- [奖励函数设计](../chapter15_rlhf/reward-function-design)——规则奖励、模型奖励与 reward hacking
+- [RLHF 微调流程](../chapter15_rlhf/standard-rlhf-pipeline)——规则奖励、模型奖励与 reward hacking
 - [PPO-RLHF 训练循环](../chapter15_rlhf/ppo-rlhf-loop)——KL 惩罚、梯度裁剪与参考模型
   :::
 

@@ -1,8 +1,9 @@
 ---
-title: '16.3 RLVR: Verifiable Rewards'
+title: '15.3 RLVR: Verifiable Rewards'
 ---
 
-# 16.3 RLVR: Reinforcement Learning with Verifiable Rewards
+# 15.3 RLVR: Reinforcement Learning with Verifiable Rewards
+
 In Sections 9.2 and 9.3, we saw how GRPO removes the Critic from the policy side and how DAPO allows pure RL to avoid dependence on SFT. Both ideas have an implicit premise: **the reward signal is reliable**. In mathematics and code, this premise is natural: a correct answer is correct. RLVR, or Reinforcement Learning with Verifiable Rewards, formalizes this premise into a training paradigm: **in domains with objective answers, there is no need to train an RM; direct rule-based verification is enough**.
 
 This section starts from the core idea of RLVR, examines how it replaces the RM, discusses verifier design principles, implements a minimal RLVR training loop in code, and finally looks honestly at its limitations.

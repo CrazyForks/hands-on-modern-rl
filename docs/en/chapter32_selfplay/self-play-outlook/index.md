@@ -6,7 +6,7 @@ title: 26.1 Self-Play Basics and LLM Self-Play
 
 The preceding parts focused on building stronger policies and broader agent capabilities. Part VII turns to the conditions under which those systems fail, how they should be evaluated, and which research directions may change their limits. Its currently translated material begins with self-play, where the policy's opponents and training data evolve together.
 
-From Chapter 1 CartPole to Chapter 16 GRPO, we walked through the core arc of modern reinforcement learning:
+From Chapter 1 CartPole to Chapter 15 GRPO, we walked through the core arc of modern reinforcement learning:
 
 - Q-learning and DQN: learning from trial-and-error,
 - policy gradients: optimizing behavior directly,
@@ -194,7 +194,7 @@ In standard GRPO/DAPO training, each prompt is uniformly randomly sampled, but s
 
 $$\mathcal{P}^*(d) \propto \mathcal{P}_0(d) \cdot (1 - p(d))$$
 
-Prompts with low pass rates are sampled more. More advanced approaches have a Proposer model learn through RL to generate problems "just beyond the Solver's current ability" — the Proposer itself is also trained with RL. This connects directly to Chapter 16's GRPO: GRPO's within-group advantage automatically provides difficulty signals (prompts where the entire group answered correctly are too easy, where the entire group failed are too hard), which can be used to dynamically adjust the prompt distribution.
+Prompts with low pass rates are sampled more. More advanced approaches have a Proposer model learn through RL to generate problems "just beyond the Solver's current ability" — the Proposer itself is also trained with RL. This connects directly to Chapter 15's GRPO: GRPO's within-group advantage automatically provides difficulty signals (prompts where the entire group answered correctly are too easy, where the entire group failed are too hard), which can be used to dynamically adjust the prompt distribution.
 
 ### Closed Loop 3: Reward Signal Self-Evolution — From External RM to Self-Verification
 
@@ -202,7 +202,7 @@ The highest form of self-evolution is **reward signals themselves evolving throu
 
 **Stage 1: External RM (RLHF, Chapter 13)**. Rewards come from a Reward Model trained on human preferences, with an upper limit constrained by RM quality.
 
-**Stage 2: Rule Verification (RLVR, Chapter 16)**. Rewards come from verifiable signals (answer correctness, code executability), eliminating the RM but limited to domains with standard answers.
+**Stage 2: Rule Verification (RLVR, Chapter 15)**. Rewards come from verifiable signals (answer correctness, code executability), eliminating the RM but limited to domains with standard answers.
 
 **Stage 3: Self-Verification and LLM-as-Judge**. The model evaluates its own generation quality — the Self-Rewarding LM discussed in this section. As generation capability improves, judging capability improves simultaneously, forming a positive flywheel. **STaR (Self-Taught Reasoner)** is a typical implementation of this closed loop: the model writes its own reasoning process, and if the final answer is correct (positive reward), the reasoning is treated as a positive example; if wrong (negative reward), the correct answer is provided for the model to reason backwards — the entire process is itself an RL loop.
 
@@ -236,16 +236,16 @@ The ideas of self-play and self-evolution thread through the core themes of the 
 | Concept from Previous Chapters            | Correspondence in Self-Play/Self-Evolution                                                       |
 | ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | AlphaGo self-play (Chapter 7)             | Direct predecessor of self-play — from Go to language                                            |
-| GRPO within-group comparison (Chapter 16) | Within-group comparison is "simplified self-play" — multiple answers from the same model compete |
+| GRPO within-group comparison (Chapter 15) | Within-group comparison is "simplified self-play" — multiple answers from the same model compete |
 | Experience replay (Chapter 5)             | "Experience distillation" in self-evolution — from raw replay to summarized distillation         |
 | PPO (Chapter 8)                           | Policy optimization algorithm for self-play training                                             |
-| RLVR (Chapter 16)                         | Self-play rewards can use verifiable signals, no RM needed                                       |
+| RLVR (Chapter 15)                         | Self-play rewards can use verifiable signals, no RM needed                                       |
 | Agentic RL (Chapter 19)                   | Self-play can train tool-use policies — model generates its own tool-call scenarios              |
 | Test-time search                          | Reasoning strategies learned through self-play can be used at inference time                     |
 
 Perhaps the deepest connection: **GRPO is a simplified version of self-play**. GRPO has the same model generate multiple answers, then compares them within the group — this is equivalent to multiple instances of the same model "competing." Self-play extends this competition to more complex scenarios: not just comparing final answers, but competing in multi-turn interactions, even playing different roles (Generator vs Judge, Debater A vs Debater B).
 
-From this perspective, the path from Chapter 16's GRPO to this chapter's self-play is a natural technical evolution: **from simple within-group competition to complex multi-role games, from fixed datasets to continuously evolving training loops**.
+From this perspective, the path from Chapter 15's GRPO to this chapter's self-play is a natural technical evolution: **from simple within-group competition to complex multi-role games, from fixed datasets to continuously evolving training loops**.
 
 ---
 

@@ -26,7 +26,7 @@ $$\text{Pre-training} \;\xrightarrow{\text{Base Model}}\; \underbrace{\text{SFT}
 
 We'll explain each stage and then identify where DPO fits.
 
-### 15.1.1 Stage 1: Pre-training
+### 14.1.1 Stage 1: Pre-training
 
 Pre-training consumes massive amounts of raw text. The model learns by **next-token prediction**, which is typically optimized via cross-entropy.
 
@@ -45,7 +45,7 @@ The key capability of the base model is continuation: given a prefix, it extends
 
 If you want a parallel from classic RL: in CartPole, a randomly initialized policy network samples actions almost uniformly. A base LM is similar: it samples tokens from a learned distribution, but does not yet represent the interaction contract of "user asks, assistant helps".
 
-### 15.1.2 Stage 2: Supervised Fine-Tuning (SFT)
+### 14.1.2 Stage 2: Supervised Fine-Tuning (SFT)
 
 SFT trains on curated prompt-response pairs so the model learns a dialog format and instruction-following behavior.
 
@@ -69,7 +69,7 @@ SFT is best understood as behavior cloning: it makes the model imitate high-qual
 
 The training signal in SFT flows in only one direction -- "imitate." The model lacks comparative information about "what constitutes a bad response," so it cannot develop a sense of response quality. This is the motivation for the third stage: we need preference comparisons so the model can learn not only what to do, but what not to do.
 
-### 15.1.3 Stage 3: Alignment (RL / Preference Optimization)
+### 14.1.3 Stage 3: Alignment (RL / Preference Optimization)
 
 This is where DPO sits. Instead of single responses, we train on preference triples:
 
@@ -164,13 +164,13 @@ It is very difficult. Pre-training determines the upper bound of the model's kno
 
 </details>
 
-### 15.1.4 DPO's Optimization Objective
+### 14.1.4 DPO's Optimization Objective
 
 In Chapter 1, we disassembled SB3's `model.learn()`, revealing the three-step loop behind it: collect experience, compute advantages, update parameters. In this section, we look at what `DPOTrainer.train()` does -- that is, how DPO's loss function is computed from preference data.
 
 To understand DPO's innovation, we first need to see what it simplifies.
 
-#### 15.1.4.1 From RLHF to DPO: Skipping the Reward Model
+#### 14.1.4.1 From RLHF to DPO: Skipping the Reward Model
 
 In the traditional RLHF pipeline, aligning a model requires two steps:
 
@@ -204,7 +204,7 @@ trainer = DPOTrainer(
 
 Only one model is passed in; there is no reward model. `DPOTrainer` internally creates a frozen copy of `model` as the reference model $\pi_{ref}$, and at each training step compares the output probabilities of $\pi_\theta$ and $\pi_{ref}$. The $\beta$ coefficient was set to 0.1 in `DPOConfig` -- we will mention it repeatedly when deriving the loss function below.
 
-#### 15.1.4.2 Loss Function Derivation
+#### 14.1.4.2 Loss Function Derivation
 
 DPO's final loss function is:
 

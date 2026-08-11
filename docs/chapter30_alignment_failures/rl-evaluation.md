@@ -341,7 +341,7 @@ $$\text{Score} = \mathbf{1}[\text{最终结果正确}]$$
 
 #### 2. 过程评估（Process-Based）
 
-用 Process Reward Model（[第 18 章 PRM](../chapter20_prm_search/outcome-vs-process)）评估每一步：
+用 Process Reward Model（[第 17 章 PRM](../chapter20_prm_search/outcome-vs-process)）评估每一步：
 
 $$\text{Score} = \frac{1}{T}\sum_{t=1}^T \text{PRM}(s_t, a_t)$$
 

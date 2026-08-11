@@ -362,7 +362,7 @@ Anthropic 在 Claude Computer Use（2024.10 发布）上实践了一套完整的
 
 ### Constitutional AI 的扩展
 
-[13.4 AI 反馈与安全原则](../chapter21_cai_rlvr/hhh-practice) 的核心思想是让模型自己判断"该做 vs 不该做"。Computer Use 扩展了 constitution：
+[13.3 AI 反馈与安全原则](../chapter21_cai_rlvr/hhh-practice) 的核心思想是让模型自己判断"该做 vs 不该做"。Computer Use 扩展了 constitution：
 
 ```
 1. 不要执行任何 destructive 操作（删文件、改密码）除非用户明确确认

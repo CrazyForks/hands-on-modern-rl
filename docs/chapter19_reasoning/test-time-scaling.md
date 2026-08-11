@@ -1,10 +1,10 @@
-# 17.3 Test-time Compute Scaling
+# 16.3 Test-time Compute Scaling
 
 上一节我们看到 o1/o3/o4 在硬任务上远超传统 LLM。但 o1 的参数量并不比 GPT-4o 大，训练算力也不显著超过 GPT-4o。**那它为什么这么强？**
 
 OpenAI 在 o1 发布时给出的官方答案是：o1 花了更多算力在**推理（inference）阶段**——也就是 test-time compute。这个答案在 2024 年下半年被 [Snell et al.](https://arxiv.org/abs/2408.03314) 的研究系统化，成为 **Test-time Compute Scaling** 这个研究方向。
 
-## 17.3.1 训练算力 vs 推理算力
+## 16.3.1 训练算力 vs 推理算力
 
 传统 LLM 的算力分配是高度倾斜的：
 
@@ -20,7 +20,7 @@ OpenAI 在 o1 发布时给出的官方答案是：o1 花了更多算力在**推�
 
 Snell et al. 的关键问题是：**如果固定总预算（训练 + 推理），应该花在哪里？**
 
-## 17.3.2 Snell 2024 的核心发现
+## 16.3.2 Snell 2024 的核心发现
 
 [Snell et al. 2024](https://arxiv.org/abs/2408.03314)（"Scaling LLM Test-Time Compute Optimally")是 Test-time Compute Scaling 的奠基性论文。它的实验设计很巧妙：
 
@@ -42,7 +42,7 @@ Snell et al. 的关键问题是：**如果固定总预算（训练 + 推理）�
 
 所以推理模型的核心优势不是"参数更多"，而是**"算力分配更灵活"**。
 
-## 17.3.3 Test-time Compute 的两种范式
+## 16.3.3 Test-time Compute 的两种范式
 
 Snell et al. 把 test-time compute 的使用方式归纳为两类：
 
@@ -65,7 +65,7 @@ best = candidates[argmax(scores)]
 **缺点**：
 
 - 难题效果差——如果 base model 的单次解题概率 < 1/N，N 个采样也大概率全错
-- 需要 verifier（这是 [第 18 章 PRM](../chapter20_prm_search/outcome-vs-process) 的核心话题）
+- 需要 verifier（这是 [第 17 章 PRM](../chapter20_prm_search/outcome-vs-process) 的核心话题）
 
 ### 顺序修订（Sequential Revision）
 
@@ -91,9 +91,9 @@ for _ in range(K):
 
 ### 树搜索（Tree Search）
 
-更复杂的方式是树搜索——把推理过程展开成一棵树，每个节点是一个中间推理步骤，用搜索算法（MCTS、beam search）找最优路径。这是 [第 18 章 PRM 与推理时搜索](../chapter20_prm_search/inference-time-search) 的核心内容，这里先不展开。
+更复杂的方式是树搜索——把推理过程展开成一棵树，每个节点是一个中间推理步骤，用搜索算法（MCTS、beam search）找最优路径。这是 [第 17 章 PRM 与推理时搜索](../chapter20_prm_search/inference-time-search) 的核心内容，这里先不展开。
 
-## 17.3.4 Gemini 3 Pro Deep Think 与 并行推理的旗舰
+## 16.3.4 Gemini 3 Pro Deep Think 与 并行推理的旗舰
 
 2025 年 10 月，Google 发布了 [Gemini 3 Pro Deep Think](https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/)——把 test-time compute scaling 推到了一个新的极端。Deep Think 的核心思想是：**在 MoE 模型上叠加一层"并行推理层"**。
 
@@ -126,7 +126,7 @@ Deep Think 在发布时的几个关键数字：
 
   3.1 Deep Think 在 ARC-AGI-2 上达到 91.2%，HLE 上达到 52.7%——再次刷新了 test-time scaling 的上限。
 
-## 17.3.5 推理算力的经济学
+## 16.3.5 推理算力的经济学
 
 test-time compute scaling 不是免费的。每多花一倍推理算力，意味着：
 
@@ -145,7 +145,7 @@ test-time compute scaling 不是免费的。每多花一倍推理算力，意味
 
 这也是 Hybrid Thinking（下一节）的工程动机——**让模型自己决定什么时候该深度推理**。
 
-## 17.3.6 一个反思 与 scaling law 会饱和吗？
+## 16.3.6 一个反思 与 scaling law 会饱和吗？
 
 Snell et al. 的实验发现，test-time compute 的收益在难题上递减。后续研究（[DeepSeek R1 论文](https://arxiv.org/abs/2501.12948)、[Qwen3 技术报告](https://arxiv.org/abs/2505.09388)）在更大规模上确认了这个现象：
 

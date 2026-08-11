@@ -2,7 +2,8 @@
 title: 13.4 The RLHF Pipeline
 ---
 
-# 13.5 The RLHF Pipeline
+# 13.4 The RLHF Pipeline
+
 ## Reading Guide
 
 **Core points**
@@ -152,7 +153,7 @@ $$
 r_\phi(x,y_w) > r_\phi(x,y_l).
 $$
 
-The common Bradley-Terry loss makes this trainable:
+A pairwise preference loss makes this trainable:
 
 $$
 \mathcal{L}_{RM} = -\log \sigma(r_\phi(x,y_w)-r_\phi(x,y_l)).

@@ -1,4 +1,4 @@
-# 18.6 并行协调推理总结
+# 17.6 并行协调推理总结
 
 至此我们讨论了 PRM 的三条训练路线（判别式、生成式、形式化）和四种推理时搜索方法（Beam Search、ToT、MCTS、AlphaCodium）。这些方法都隐含一个假设：**推理是串行的**——模型一步一步往下走。
 
@@ -6,9 +6,9 @@
 
 这一节讨论 PaCoRe 路线，以及 PRM 的一个相关概念——**GenRM（Generative Reward Model）**。
 
-## 18.6.1 深度 vs 广度 与 推理算力的两种花法
+## 17.6.1 深度 vs 广度 与 推理算力的两种花法
 
-[第 17 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 我们讨论过两种推理算力的花法：
+[第 16 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 我们讨论过两种推理算力的花法：
 
 - **串行深度（Sequential Depth）**：模型生成一条很长的 CoT
 - **并行广度（Parallel Breadth）**：模型生成多条独立的 CoT，用某种方式聚合
@@ -20,7 +20,7 @@
 
 **PaCoRe** 是并行广度的极致版本——把 16-32 条独立推理聚合，但聚合方式不是简单的 majority vote，而是**用 LLM 协调**。
 
-## 18.6.2 PaCoRe 的设计
+## 17.6.2 PaCoRe 的设计
 
 [PaCoRe](https://github.com/stepfun-ai/PaCoRe)（StepFun，ACL 2026 论文）的设计核心：
 
@@ -75,7 +75,7 @@ def pacore_reward(prompt, target_answer):
 
 这种训练方式让**整个 PaCoRe 系统作为一个整体被 RL 优化**，而不是单独优化每条推理。
 
-## 18.6.3 PaCoRe 的实验结果
+## 17.6.3 PaCoRe 的实验结果
 
 PaCoRe 在 [AIME 2025](https://github.com/stepfun-ai/PaCoRe) 上的结果：
 
@@ -88,7 +88,7 @@ PaCoRe 在 [AIME 2025](https://github.com/stepfun-ai/PaCoRe) 上的结果：
 
 PaCoRe 用**比 Best-of-N 更少的算力**达到了更高的准确率——这说明协调器（LLM 聚合）比简单投票更有效。
 
-## 18.6.4 PaCoRe vs Deep Think vs MCTS
+## 17.6.4 PaCoRe vs Deep Think vs MCTS
 
 三种推理范式的对比：
 
@@ -114,7 +114,7 @@ PaCoRe 的优势在于：
 - 中等难度推理（不需要深度树搜索）
 - 算力充足但模型改动困难
 
-## 18.6.5 GenRM 与 生成式奖励模型
+## 17.6.5 GenRM 与 生成式奖励模型
 
 讨论 PaCoRe 时我们提到"协调器是一个 LLM"。这引出一个更广泛的概念——**GenRM（Generative Reward Model）**。
 
@@ -147,12 +147,12 @@ $$\text{GenRM}(q, o) = P(\text{"good"} | q, o, \text{prompt})$$
 
 GenRM 是一个更宽泛的概念——它可以做 ORM（输出整条回答的评价）或 PRM（输出每步推理的评价）。
 
-[18.3 节的 ThinkPRM](./generative-prm) 是 GenRM 做 PRM 的代表。其他 GenRM 工作：
+[17.3 节的 ThinkPRM](./generative-prm) 是 GenRM 做 PRM 的代表。其他 GenRM 工作：
 
 - **Generative Verifiers**（[Zhang et al.](https://arxiv.org/abs/2408.15240)）：用 Chain-of-Thought 评价
 - **LLM-as-Judge**（[Zheng et al.](https://arxiv.org/abs/2306.05685)）：用 GPT-4 评价其他模型的输出
 
-## 18.6.6 LLM-as-Judge 与 Self-Rewarding
+## 17.6.6 LLM-as-Judge 与 Self-Rewarding
 
 LLM-as-Judge 是 GenRM 的一种工业实践——用一个强 LLM（GPT-4、Claude）评价其他模型的输出。
 
@@ -180,7 +180,7 @@ def self_reward_training(prompt, model):
 
 这种方法**完全摆脱了外部 RM**——模型自己既是 policy 又是 reward。优点是不需要 RM 训练，缺点是**自我评价可能强化已有的偏见**（模型认为自己好的，会被强化；模型不擅长的，会被弱化）。
 
-## 18.6.7 PRM 与 Verifier 的未来
+## 17.6.7 PRM 与 Verifier 的未来
 
 到 2026 年中，PRM 和 verifier 研究的几个趋势：
 
@@ -204,12 +204,12 @@ ORM-only → PRM-only → PRM + ORM + 形式化 + LLM-as-Judge 混合——趋�
 
 这一章我们把 PRM 和推理时搜索的全貌梳理了一遍：
 
-- **18.1 节**：Outcome vs Process 奖励——稀疏奖励问题与信用分配
-- **18.2 节**：判别式 PRM——OpenAI Let's Verify 与 PRM800K
-- **18.3 节**：生成式 PRM——ThinkPRM 用 1% 标签达到 SOTA
-- **18.4 节**：形式化 PRM——AlphaProof、Lean4、DeepSeek-Prover-V2
-- **18.5 节**：推理时搜索——Beam Search、ToT、MCTS、AlphaCodium
-- **18.6 节**：并行协调推理 PaCoRe 与 GenRM、LLM-as-Judge
+- **17.1 节**：Outcome vs Process 奖励——稀疏奖励问题与信用分配
+- **17.2 节**：判别式 PRM——OpenAI Let's Verify 与 PRM800K
+- **17.3 节**：生成式 PRM——ThinkPRM 用 1% 标签达到 SOTA
+- **17.4 节**：形式化 PRM——AlphaProof、Lean4、DeepSeek-Prover-V2
+- **17.5 节**：推理时搜索——Beam Search、ToT、MCTS、AlphaCodium
+- **17.6 节**：并行协调推理 PaCoRe 与 GenRM、LLM-as-Judge
 
 **核心收获**：
 
@@ -221,6 +221,6 @@ ORM-only → PRM-only → PRM + ORM + 形式化 + LLM-as-Judge 混合——趋�
 
 **接下来的章节**：
 
+- [第 18 章工业实践](../chapter16_llm_rl_industrial/industrial-post-training)——把偏好优化、RLVR、推理模型和 PRM 接入完整训练闭环
 - [第 19 章 Agentic RL](../chapter22_agentic/overview)——多步 trajectory 中的 PRM
 - [第 25 章奖励黑客](../chapter30_alignment_failures/classical-failures)——PRM 的 reward hacking 问题
-- [第 14 章工业实战](../chapter16_llm_rl_industrial/industrial-post-training)——PRM 在工业训练中的使用

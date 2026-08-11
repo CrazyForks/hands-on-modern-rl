@@ -1,8 +1,9 @@
 ---
-title: 16.1 GRPO Training and Core Mechanisms
+title: 15.1 GRPO Training and Core Mechanisms
 ---
 
-# 16.1 GRPO Training and Core Mechanisms
+# 15.1 GRPO Training and Core Mechanisms
+
 In the previous chapter, we studied DPO theory and practice and saw that it can learn directly from fixed preference data: under the same prompt, the chosen answer should become more likely than the rejected answer. Now we return to **online training**. The model no longer only reads preference pairs labeled by someone else. During training, it generates its own answers, receives feedback, and uses that feedback to update itself.
 
 The entry point of GRPO is **multiple answers for the same question**. Given one problem, the model generates several answers at once; the reward function scores each answer; then the answers are compared only inside that group. On the surface, this looks like asking the model to try several times. The real problem it solves is:
@@ -305,7 +306,7 @@ print(rule_based_reward(prompt, good, '63'))  # 1.5
 print(rule_based_reward(prompt, bad, '63'))   # 0.5
 ```
 
-Notice the key difference: **we do not need to train any RM; the rule is the judge**. Math problems have standard answers, so direct comparison is enough. This kind of "verifiable reward" is exactly the core idea of RLVR, which will be discussed in depth in Section 16.3.
+Notice the key difference: **we do not need to train any RM; the rule is the judge**. Math problems have standard answers, so direct comparison is enough. This kind of "verifiable reward" is exactly the core idea of RLVR, which will be discussed in depth in Section 15.3.
 
 In the handwritten code map, the reward function corresponds to **[B]**. It receives only the answer and the ground truth answer and returns a scalar reward:
 

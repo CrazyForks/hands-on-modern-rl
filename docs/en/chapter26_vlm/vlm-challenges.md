@@ -36,7 +36,7 @@ This chapter opens these issues in a progressive way: first a minimal GRPO exper
 ::: tip Prerequisites
 
 - [GRPO](../chapter18_grpo/grpo-practice-and-mechanism): group-based optimization without a critic
-- [Reward model design](../chapter15_rlhf/reward-function-design): rules vs model rewards, hacking risks
+- [The RLHF pipeline](../chapter15_rlhf/standard-rlhf-pipeline): rules vs model rewards, hacking risks
 - [PPO-RLHF loop](../chapter15_rlhf/ppo-rlhf-loop): KL penalty, clipping, reference model
   :::
 

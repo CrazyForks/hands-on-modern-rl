@@ -1,6 +1,110 @@
-# 14.4 分布式同步、异步与 MoE 训练
+---
+outline: false
+---
 
-> [附录 B.1 RL 训练系统](../appendix_industrial_training/rl-infrastructure) 已经讲了基础——采样、异步、分布式并行。本章把视角提升到**框架级架构**和**前沿工业实践**：veRL 如何用 HybridFlow 统一编排多模型、AReaL/LlamaRL 如何用纯异步打破生成-训练壁垒、DeepSeek V3 的 DualPipe 如何在 MoE 上做流水线并行、万卡集群如何 profile 与调优。
+# 18.4 多机 RL 训练如何协同
+
+[18.3](./modern-industrial-practice) 已经说明，训练系统必须保证采样策略、模型版本和数值计算保持一致。现在把一次训练分到多张 GPU 上，看看数据怎样流动。
+
+假设 rollout GPU 生成了一批回答。奖励进程读取回答并计算分数，训练 GPU 再用这些回答更新 Actor。更新完成后，新参数必须同步回 rollout GPU，下一批回答才能来自最新策略：
+
+```text
+Rollout GPU 生成回答
+        ↓
+奖励进程计算分数
+        ↓
+训练 GPU 更新 Actor
+        ↓
+把新参数同步给 Rollout GPU
+        └──────────────► 下一批回答
+```
+
+单机代码里的四个函数，到多机系统中变成了不同进程之间的数据传输与等待。系统设计主要解决三个问题：
+
+1. **模型放在哪里。** Actor、Reference、Reward Model 和 rollout 引擎可能无法同时装进一组 GPU。
+2. **谁在等待谁。** 生成回答、奖励计算和参数更新耗时不同，慢的一步会让其他设备闲置。
+3. **何时交换数据与参数。** 同步过于频繁会增加通信，间隔过长又会让 rollout 使用过时策略。
+
+## 三个基本选择
+
+| 系统问题                  | 常见选择                   | 主要取舍                                      |
+| ------------------------- | -------------------------- | --------------------------------------------- |
+| 训练与生成是否共享 GPU    | 共享部署 / 分离部署        | 减少所需 GPU 数量，对比避免切换并提高并行吞吐 |
+| 是否等待整批 rollout 完成 | 同步 / 异步                | 保持数据较新，对比减少等待但接受经验陈旧      |
+| 一个模型怎样分到多张 GPU  | FSDP、张量并行、流水线并行 | 分摊显存，同时增加通信与调度复杂度            |
+
+先根据瓶颈做选择：显存不足时先解决模型切分；GPU 大量等待时再考虑生成与训练分离或异步；模型采用 MoE 时，还要处理 token 在专家之间的路由与通信。
+
+::: tip 第一次阅读到这里即可
+记住数据顺序：**生成 → 奖励 → 更新 → 同步参数**。veRL、slime 和 OpenRLHF 的实现不同，都在安排这四步使用哪些 GPU、何时交换数据。
+:::
+
+:::: details 进阶一：生成与训练为什么会算出不同策略
+
+## 训推不一致：同一组权重不一定得到相同概率
+
+参数同步解决了模型版本问题。rollout GPU 和训练 GPU 拿到同一组权重后，还要经过各自的计算引擎才能得到 token 概率。推理侧通常使用 vLLM 或 SGLang，并采用 KV Cache 和低精度计算；训练侧常用 FSDP 或 Megatron，并保留反向传播所需的计算图。两条计算路径不同，最终得到的概率也可能不同。
+
+把 rollout 引擎实际执行的策略记为 $\pi_{\text{rollout}}$，把训练端记录的旧策略记为 $\pi_{\text{old}}$。理想情况下二者应当相同；出现模型版本滞后、浮点精度差异、MoE 路由差异或 log-probability 重算误差时，二者就会产生偏差。这就是训推不一致（Training-Inference Mismatch）。
+
+### 两个策略在哪里产生差异
+
+- rollout 侧通常使用 vLLM 或 SGLang，以 FP8/BF16 生成回答，并启用 KV Cache 优化。
+- 训练侧通常使用 FSDP 或 Megatron，以 BF16/FP32 计算 log-probability 和梯度，并可能启用激活重计算。
+
+模型权重相同，只能保证两边从同一组参数出发。计算精度、算子实现和 MoE 专家路由仍会改变 token 的 log-probability。高概率 token 的微小误差通常影响有限；低概率 token 数量多，误差累积后可能明显改变梯度估计。
+
+### 为什么 PPO clipping 不能自动解决
+
+PPO 使用下面的重要性采样比率限制一次更新的幅度：
+
+$$
+\mathcal{L}^{\text{CLIP}} = \mathbb{E}\left[\min\left( r_t(\theta) \hat{A}_t,\ \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_t \right)\right],
+$$
+
+其中
+
+$$
+r_t(\theta) = \frac{\pi_\theta(a_t\mid s_t)}{\pi_{\text{old}}(a_t\mid s_t)}.
+$$
+
+这个比率假定分母 $\pi_{\text{old}}$ 就是生成动作时使用的策略。如果回答实际来自 $\pi_{\text{rollout}}$，而训练端用另一条计算路径重算出 $\pi_{\text{old}}$，分母在更新开始前已经带有偏差。clipping 可以限制新旧策略之间的更新幅度，无法消除两个引擎的计算差异。
+
+### 先判断偏差来自哪里
+
+排查时沿着回答的生成和训练路径逐项对齐：
+
+1. 核对 rollout 使用的模型版本，确认参数同步已经完成。
+2. 用同一批 token 分别记录 rollout 侧和训练侧的 log-probability，观察误差集中在哪些位置。
+3. 对齐两侧的浮点精度和算子实现，再比较误差是否缩小。
+4. 对 MoE 模型额外记录专家路由，确认训练端是否复现了生成时的路由。
+
+### 常见修复方法
+
+- **统一计算精度。** 先用 FP16/BF16 替代 rollout 侧的 FP8，判断低精度计算是否是主要误差来源。需要继续使用 FP8 时，应同时加入偏差监控和重要性采样修正。
+- **记录真实行为策略。** 直接保存 rollout 时的 log-probability，避免训练端把重新计算的结果当作真实行为概率。
+- **重新计算并校验。** 训练前用训练引擎重算 log-probability，并与 rollout 记录逐 token 对比。重算本身不能恢复真实行为策略，但能暴露差异的位置和大小。
+- **限制极端比率。** Truncated IS（TIS）等方法会截断过大的重要性采样比率，降低少量异常 token 对梯度的影响。
+- **处理长尾 token。** 动态词表剪枝等方法会过滤偏差最大的低概率区域，减少误差在长序列中的累积。
+- **回放 MoE 路由。** R3（Rollout Routing Replay）在训练时复现 rollout 的专家选择，减少路由变化造成的概率偏差。
+
+### 进一步研究
+
+下面几类工作分别从数值精度、分布修正和系统调度处理这一问题：
+
+- _When Speed Kills Stability: Demystifying RL Collapse from the Training-Inference Mismatch_（Liu et al., 2025）集中分析训推不一致与训练崩溃的关系。
+- _Defeating the Training-Inference Mismatch via FP16_（Qi et al., 2025）考察浮点精度对两侧 log-probability 偏差的影响。
+- _Taming the Tail: Stable LLM Reinforcement Learning via Dynamic Vocabulary Pruning_（arXiv:2512.23087）处理低概率 token 上更明显的偏差。
+- _Stabilizing Reinforcement Learning with LLMs: Formulation and Practices_（Zheng et al., arXiv:2512.01374）讨论训推一致、策略时效性和 MoE 路由回放。
+- FP8-RL（Qiu et al., arXiv:2601.18150）在 veRL 中结合 W8A8 低精度训练与重要性采样修正。
+- TIS（Yao et al., NeurIPS 2025）和 MinPRO（Lei et al., arXiv:2601.22718）限制策略偏移后产生的极端重要性采样比率。
+- 动态优化方法（Zhang et al., arXiv:2602.01826）根据回答长度等训练信号调整优化过程。
+
+工程中的 On-policy 程度取决于 $\pi_{\text{rollout}}$ 与当前训练策略之间的距离。参数同步控制模型版本，精度对齐、概率记录和重要性采样修正继续控制计算路径带来的偏差。[第 4 章算法分类](../chapter03_mdp/algorithm-taxonomy)介绍了 On-policy 与 Off-policy 的算法区别；这里关注的是同一概念落到分布式系统后怎样被测量和修正。
+
+::::
+
+:::: details 进阶二：veRL 架构与其他框架实现
 
 ## veRL 架构深度解析
 
@@ -140,7 +244,7 @@ veRL 是第一个把这些维度都做成可配置的框架。DeepSpeed-Chat、O
 | **推理后端** | vLLM/SGLang       | vLLM              | TRT-LLM          | HF generate    |
 | **典型规模** | 8-1024 GPU        | 8-256 GPU         | 8-512 GPU        | 1-8 GPU        |
 
-[第 16 章 GRPO 实践](../chapter18_grpo/grpo-practice-and-mechanism) 用的就是 veRL。
+[第 15 章 GRPO 实践](../chapter18_grpo/grpo-practice-and-mechanism) 用的就是 veRL。
 
 ## OpenRLHF / NeMo-Aligner / TRL 对比
 
@@ -217,6 +321,10 @@ trainer.train(dataset)
 - 学习、原型：TRL
 - 研究、中等规模：OpenRLHF 或 veRL
 - 大规模生产：veRL 或 NeMo-Aligner（看硬件栈）
+
+::::
+
+:::: details 进阶三：Rollout 引擎与显存优化
 
 ## Rollout 引擎与 vLLM 集成
 
@@ -413,7 +521,11 @@ class CheckpointedBlock(nn.Module):
 | ZeRO-3 + Gradient Checkpointing        | 30 GB        | 1×       |
 | ZeRO-3 + Gradient Checkpointing + LoRA | 8 GB         | 1.2×     |
 
-LoRA（[第 14 章](./industrial-post-training)）只训少量参数，显存需求大幅降低。工业级 70B RL 训练通常用 LoRA + FSDP。
+LoRA（[第 18 章](./industrial-post-training)）只训少量参数，显存需求大幅降低。工业级 70B RL 训练通常用 LoRA + FSDP。
+
+::::
+
+:::: details 进阶四：异步 RL 的系统与算法问题
 
 ## 异步 RL 训练
 
@@ -509,6 +621,10 @@ controller.route_function_calls(task_workers)
 | **LlamaRL** | Meta             | 完全去中心化                         | 10.4×      | 超大规模 Dense |
 | **AReaL**   | Ant Group 和清华 | 全异步 rollout + staleness-aware PPO | 2.77×      | 大规模 LLM RL  |
 | **AgentRL** | THUDM/智谱       | 多轮多任务 + 统一环境接口            | 论文未标注 | Agent 训练     |
+
+::::
+
+:::: details 进阶五：MoE、DualPipe 与序列装箱
 
 ## MoE + RL 训练
 
@@ -684,6 +800,10 @@ def best_fit_pack(items, bin_capacity):
 
 DeepSeek V3 用 Best-Fit Packing 让 GPU 利用率从 70% 提升到 95%。
 
+::::
+
+:::: details 进阶六：性能分析与大规模集群实践
+
 ## 性能 Profiling 与瓶颈分析
 
 RL 训练的性能优化必须基于 profiling——不能凭感觉。
@@ -856,19 +976,16 @@ def monitor_expert_balance(model):
 - **数据压缩**：用更紧凑的格式存储
 - **分布式存储**：数据分布在多个 SSD，避免单点 I/O 瓶颈
 
-## 本章总结
+::::
 
-分布式 RL 训练系统是 LLM 时代的核心工程：
+## 本节小结
 
-1. **veRL (HybridFlow)** 是主流框架——single-controller 多模型编排，灵活的资源分配
-2. **OpenRLHF/NeMo-Aligner/TRL** 各有定位——研究、NVIDIA 栈、轻量教学
-3. **vLLM/SGLang** 是 rollout 引擎的核心——PagedAttention、Continuous Batching、Prefix Caching
-4. **ZeRO/FSDP/Checkpointing** 解决显存——LoRA + FSDP + Checkpointing 是 70B 训练标配
-5. **异步训练（LlamaRL/AReaL/AgentRL）** 是 2025 年的方向——10× 加速、Off-policy 容忍
-6. **MoE + RL** 需要 GSPO、Expert Balancing、DualPipe、Best-Fit Packing 协同优化
-7. **万卡集群** 是工程极限——故障常态、通信瓶颈、监控告警、数据 pipeline
+- 多机 RL 仍然沿着生成、奖励、更新和参数同步四步运行。
+- 模型切分解决显存问题，训练与生成的资源安排解决等待问题，权重同步保证 rollout 使用正确的策略版本。
+- 同步训练更容易保证数据较新；异步训练减少等待，同时必须处理经验陈旧和重要性修正。
+- MoE 在普通并行之外还要处理专家负载与路由通信。
 
-[第 14 章 LLM RL 工业实战](./industrial-post-training) 会从产品视角再讲一遍这些技术如何落地——这一章是工程视角。
+多机系统解决了算力怎样协同，训练仍然需要持续供应可执行、可验证的数据。[18.5 大规模 RL 数据工程](./data-engineering) 将沿着一条轨迹的生命周期，说明任务、环境、奖励和失败样本怎样进入下一轮训练。
 
 ## 延伸阅读
 

@@ -989,173 +989,173 @@ const zhSidebar = {
               link: '/chapter15_rlhf/imitation-learning-pipeline'
             },
             {
-              text: '13.3 Bradley-Terry 奖励模型',
-              link: '/chapter15_rlhf/reward-function-design'
-            },
-            {
-              text: '13.4 AI 反馈与安全原则',
+              text: '13.3 AI 反馈与安全原则',
               link: '/chapter21_cai_rlvr/hhh-practice'
             },
             {
-              text: '13.5 强化学习微调流程',
+              text: '13.4 强化学习微调流程',
               link: '/chapter15_rlhf/standard-rlhf-pipeline'
             },
             {
-              text: '13.6 大规模训练工程',
+              text: '13.5 大规模训练工程',
               link: '/chapter15_rlhf/extended-practice'
             },
             {
-              text: '13.7 对齐评测方法',
+              text: '13.6 对齐评测方法',
               link: '/chapter15_rlhf/evaluation'
             },
             {
-              text: '13.8 动手：使用 veRL 和 PPO 训练 GSM8K',
+              text: '13.7 动手：使用 veRL 和 PPO 训练 GSM8K',
               link: '/chapter15_rlhf/verl-ppo-gsm8k'
             }
           ]
         },
         {
-          text: '14. 大模型 RL 工业实践',
+          text: '14. 偏好对齐与 DPO 家族',
           collapsed: false,
           items: [
             {
-              text: '14.1 训练框架与双轨奖励',
-              link: '/chapter16_llm_rl_industrial/intro'
-            },
-            {
-              text: '14.2 现代后训练流水线',
-              link: '/chapter16_llm_rl_industrial/industrial-post-training'
-            },
-            {
-              text: '14.3 优化器与训练稳定性',
-              link: '/chapter16_llm_rl_industrial/modern-industrial-practice'
-            },
-            {
-              text: '14.4 分布式同步、异步与 MoE 训练',
-              link: '/chapter16_llm_rl_industrial/distributed-sync'
-            }
-          ]
-        },
-        {
-          text: '15. 偏好对齐与 DPO 家族',
-          collapsed: false,
-          items: [
-            {
-              text: '15.1 DPO 数学推导',
+              text: '14.1 DPO 数学推导',
               link: '/chapter17_dpo/intro'
             },
             {
-              text: '15.2 DPO 训练指标',
+              text: '14.2 DPO 训练指标',
               link: '/chapter17_dpo/metrics'
             },
             {
-              text: '15.3 DPO 方法家族与选型',
+              text: '14.3 DPO 方法家族与选型',
               link: '/chapter17_dpo/dpo-theory-and-family'
             },
             {
-              text: '15.4 动手：DPO 对齐实验',
+              text: '14.4 动手：DPO 对齐实验',
               link: '/chapter17_dpo/dpo-hands-on'
             }
           ]
         },
         {
-          text: '16. GRPO、RLVR 与 Verifier 工程',
+          text: '15. GRPO、RLVR 与 Verifier 工程',
           collapsed: false,
           items: [
             {
-              text: '16.1 GRPO 核心机制',
+              text: '15.1 GRPO 核心机制',
               link: '/chapter18_grpo/grpo-practice-and-mechanism'
             },
             {
-              text: '16.2 R1-Zero 与 DAPO',
+              text: '15.2 R1-Zero 与 DAPO',
               link: '/chapter18_grpo/deepseek-dapo'
             },
             {
-              text: '16.3 动手：RLVR 可验证奖励',
+              text: '15.3 动手：RLVR 可验证奖励',
               link: '/chapter18_grpo/rlvr'
             },
             {
-              text: '16.4 GRPO 改进方法',
+              text: '15.4 GRPO 改进方法',
               link: '/chapter18_grpo/grpo-family'
             },
             {
-              text: '16.5 RL Environments 与 Verifier 工程',
+              text: '15.5 RL Environments 与 Verifier 工程',
               link: '/chapter18_grpo/rl-environments'
             },
             {
-              text: '16.6 动手：GRPO 训练金融工具调用',
+              text: '15.6 动手：GRPO 训练金融工具调用',
               link: '/chapter18_grpo/financial-tool-calling-grpo'
             },
             {
-              text: '16.7 OPD 在线蒸馏',
+              text: '15.7 OPD 在线蒸馏',
               link: '/chapter18_grpo/on-policy-distillation'
             },
             {
-              text: '16.8 动手：使用 veRL 训练代码生成',
+              text: '15.8 动手：使用 veRL 训练代码生成',
               link: '/chapter18_grpo/verl-code-sandbox'
             }
           ]
         },
         {
-          text: '17. 推理模型与 Test-Time Scaling',
+          text: '16. 推理模型与 Test-Time Scaling',
           collapsed: false,
           items: [
             {
-              text: '17.1 推理模型的兴起',
+              text: '16.1 推理模型的兴起',
               link: '/chapter19_reasoning/emergence-and-o1'
             },
             {
-              text: '17.2 R1-Zero 纯 RL 训练',
+              text: '16.2 R1-Zero 纯 RL 训练',
               link: '/chapter19_reasoning/intro'
             },
             {
-              text: '17.3 Test-time Compute Scaling',
+              text: '16.3 Test-time Compute Scaling',
               link: '/chapter19_reasoning/test-time-scaling'
             },
             {
-              text: '17.4 Hybrid Thinking 与思考预算',
+              text: '16.4 Hybrid Thinking 与思考预算',
               link: '/chapter19_reasoning/hybrid-thinking'
             },
             {
-              text: '17.5 自适应思考',
+              text: '16.5 自适应思考',
               link: '/chapter19_reasoning/adaptive-thinking'
             },
             {
-              text: '17.6 推理链可读性与对齐',
+              text: '16.6 推理链可读性与对齐',
               link: '/chapter19_reasoning/cot-visibility-alignment'
             }
           ]
         },
         {
-          text: '18. 过程奖励模型与推理时搜索',
+          text: '17. 过程奖励模型与推理时搜索',
           collapsed: false,
           items: [
             {
-              text: '18.1 Outcome vs Process 奖励',
+              text: '17.1 Outcome vs Process 奖励',
               link: '/chapter20_prm_search/outcome-vs-process'
             },
             {
-              text: '18.2 判别式 PRM',
+              text: '17.2 判别式 PRM',
               link: '/chapter20_prm_search/discriminative-prm'
             },
             {
-              text: '18.3 生成式 PRM',
+              text: '17.3 生成式 PRM',
               link: '/chapter20_prm_search/generative-prm'
             },
             {
-              text: '18.4 形式化 PRM Verifier',
+              text: '17.4 形式化 PRM Verifier',
               link: '/chapter20_prm_search/formal-prm'
             },
             {
-              text: '18.5 推理时搜索',
+              text: '17.5 推理时搜索',
               link: '/chapter20_prm_search/inference-time-search'
             },
             {
-              text: '18.6 并行与协同推理',
+              text: '17.6 并行与协同推理',
               link: '/chapter20_prm_search/parallel-reasoning-and-summary'
             }
           ]
         },
+        {
+          text: '18. 大模型 RL 工业实践',
+          collapsed: false,
+          items: [
+            {
+              text: '18.1 从单机实验到工业训练',
+              link: '/chapter16_llm_rl_industrial/intro'
+            },
+            {
+              text: '18.2 工业后训练的完整流程',
+              link: '/chapter16_llm_rl_industrial/industrial-post-training'
+            },
+            {
+              text: '18.3 训练为什么会不稳定',
+              link: '/chapter16_llm_rl_industrial/modern-industrial-practice'
+            },
+            {
+              text: '18.4 多机 RL 训练如何协同',
+              link: '/chapter16_llm_rl_industrial/distributed-sync'
+            },
+            {
+              text: '18.5 大规模 RL 数据工程',
+              link: '/chapter16_llm_rl_industrial/data-engineering'
+            }
+          ]
+        }
       ]
     },
     {
@@ -1879,154 +1879,153 @@ const enSidebar = {
               link: '/en/chapter15_rlhf/imitation-learning-pipeline'
             },
             {
-              text: '13.3 Bradley-Terry Reward Model',
-              link: '/en/chapter15_rlhf/reward-function-design'
+              text: '13.3 AI Feedback and Safety Principles'
             },
             {
-              text: '13.4 AI Feedback and Safety Principles'
-            },
-            {
-              text: '13.5 RL Fine-Tuning Pipeline',
+              text: '13.4 RL Fine-Tuning Pipeline',
               link: '/en/chapter15_rlhf/standard-rlhf-pipeline'
             },
             {
-              text: '13.6 Large-Scale Training Engineering',
+              text: '13.5 Large-Scale Training Engineering',
               link: '/en/chapter15_rlhf/extended-practice'
             },
             {
-              text: '13.7 Evaluation Methods',
+              text: '13.6 Evaluation Methods',
               link: '/en/chapter15_rlhf/evaluation'
             },
             {
-              text: '13.8 Hands-on: veRL PPO on GSM8K',
+              text: '13.7 Hands-on: veRL PPO on GSM8K',
               link: '/en/chapter15_rlhf/verl-ppo-gsm8k'
             }
           ]
         },
         {
-          text: '14. Industrial LLM RL Engineering',
+          text: '14. Preference Alignment and the DPO Family',
           collapsed: false,
           items: [
             {
-              text: '14.1 Training Frameworks and Dual-Track Rewards'
-            },
-            {
-              text: '14.2 Modern Post-Training Pipelines',
-              link: '/en/chapter16_llm_rl_industrial/industrial-post-training'
-            },
-            {
-              text: '14.3 Optimizers and Training Stability'
-            },
-            {
-              text: '14.4 Distributed Synchronous, Asynchronous and MoE Training'
-            }
-          ]
-        },
-        {
-          text: '15. Preference Alignment and the DPO Family',
-          collapsed: false,
-          items: [
-            {
-              text: '15.1 DPO Derivation',
+              text: '14.1 DPO Derivation',
               link: '/en/chapter17_dpo/intro'
             },
             {
-              text: '15.2 DPO Training Metrics',
+              text: '14.2 DPO Training Metrics',
               link: '/en/chapter17_dpo/metrics'
             },
             {
-              text: '15.3 DPO Methods and Family Selection',
+              text: '14.3 DPO Methods and Family Selection',
               link: '/en/chapter17_dpo/dpo-theory-and-family'
             },
             {
-              text: '15.4 Hands-on: A DPO Alignment Experiment',
+              text: '14.4 Hands-on: A DPO Alignment Experiment',
               link: '/en/chapter17_dpo/dpo-hands-on'
             }
           ]
         },
         {
-          text: '16. GRPO, RLVR and Verifier Engineering',
+          text: '15. GRPO, RLVR and Verifier Engineering',
           collapsed: false,
           items: [
             {
-              text: '16.1 GRPO Core Mechanism',
+              text: '15.1 GRPO Core Mechanism',
               link: '/en/chapter18_grpo/grpo-practice-and-mechanism'
             },
             {
-              text: '16.2 R1-Zero and DAPO',
+              text: '15.2 R1-Zero and DAPO',
               link: '/en/chapter18_grpo/deepseek-dapo'
             },
             {
-              text: '16.3 Hands-on: RLVR Verifiable Rewards',
+              text: '15.3 Hands-on: RLVR Verifiable Rewards',
               link: '/en/chapter18_grpo/rlvr'
             },
             {
-              text: '16.4 GRPO Improvements'
+              text: '15.4 GRPO Improvements'
             },
             {
-              text: '16.5 RL Environments and Verifier Engineering'
+              text: '15.5 RL Environments and Verifier Engineering'
             },
             {
-              text: '16.6 Hands-on: GRPO for Financial Tool Calling',
+              text: '15.6 Hands-on: GRPO for Financial Tool Calling',
               link: '/en/chapter18_grpo/financial-tool-calling-grpo'
             },
             {
-              text: '16.7 On-Policy Distillation',
+              text: '15.7 On-Policy Distillation',
               link: '/en/chapter18_grpo/on-policy-distillation'
             },
             {
-              text: '16.8 Hands-on: Code Generation with veRL'
+              text: '15.8 Hands-on: Code Generation with veRL'
             }
           ]
         },
         {
-          text: '17. Reasoning Models and Test-Time Scaling',
+          text: '16. Reasoning Models and Test-Time Scaling',
           collapsed: false,
           items: [
             {
-              text: '17.1 Emergence of Reasoning Models'
+              text: '16.1 Emergence of Reasoning Models'
             },
             {
-              text: '17.2 R1-Zero Pure RL Training'
+              text: '16.2 R1-Zero Pure RL Training'
             },
             {
-              text: '17.3 Test-Time Compute Scaling'
+              text: '16.3 Test-Time Compute Scaling'
             },
             {
-              text: '17.4 Hybrid Thinking and Thinking Budgets'
+              text: '16.4 Hybrid Thinking and Thinking Budgets'
             },
             {
-              text: '17.5 Adaptive Thinking'
+              text: '16.5 Adaptive Thinking'
             },
             {
-              text: '17.6 CoT Readability and Alignment'
+              text: '16.6 CoT Readability and Alignment'
             }
           ]
         },
         {
-          text: '18. Process Reward Models and Inference-Time Search',
+          text: '17. Process Reward Models and Inference-Time Search',
           collapsed: false,
           items: [
             {
-              text: '18.1 Outcome and Process Rewards'
+              text: '17.1 Outcome and Process Rewards'
             },
             {
-              text: '18.2 Discriminative PRM'
+              text: '17.2 Discriminative PRM'
             },
             {
-              text: '18.3 Generative PRM'
+              text: '17.3 Generative PRM'
             },
             {
-              text: '18.4 Formal PRM Verifier'
+              text: '17.4 Formal PRM Verifier'
             },
             {
-              text: '18.5 Inference-Time Search'
+              text: '17.5 Inference-Time Search'
             },
             {
-              text: '18.6 Parallel and Coordinated Reasoning'
+              text: '17.6 Parallel and Coordinated Reasoning'
             }
           ]
         },
+        {
+          text: '18. Industrial LLM RL Engineering',
+          collapsed: false,
+          items: [
+            {
+              text: '18.1 From Single-Machine Experiments to Industrial Training'
+            },
+            {
+              text: '18.2 The Complete Industrial Post-Training Workflow',
+              link: '/en/chapter16_llm_rl_industrial/industrial-post-training'
+            },
+            {
+              text: '18.3 Why Training Becomes Unstable'
+            },
+            {
+              text: '18.4 How Multi-Node RL Training Works Together'
+            },
+            {
+              text: '18.5 Data Engineering for Large-Scale RL'
+            }
+          ]
+        }
       ]
     },
     {

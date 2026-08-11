@@ -87,22 +87,21 @@ $$
 
 ## 本章路线图
 
-| 小节                                                            | 核心问题                                                | 产物                             |
-| --------------------------------------------------------------- | ------------------------------------------------------- | -------------------------------- |
-| [为什么 base model 还不是 assistant](./base-model-to-assistant) | pretrained checkpoint 能做什么、缺什么？                | base / SFT / RLHF 三阶段对照     |
-| [标准 RLHF 流水线](./standard-rlhf-pipeline)                    | InstructGPT 风格 SFT → RM → PPO 的输入输出是什么？      | 标准流程图与 artifact 清单       |
-| [SFT：教模型按指令回答](./imitation-learning-pipeline)          | SFT 数据和偏好数据怎么构造？                            | SFT 训练数据与 SFT 模型          |
-| [Reward Model：教一个裁判](./reward-function-design)            | 如何把 chosen/rejected 偏好对变成可优化的标量奖励？     | Reward Model 与 RM 验证指标      |
-| [PPO-RLHF：按奖励练习](./ppo-rlhf-loop)                         | Actor、Reference、Reward Model、Critic 如何协作？       | PPO-RLHF 四模型结构 + 大参数扩展 |
-| [评估与奖励黑客](./evaluation)                                  | 如何证明模型变好且没有 reward hacking？数据飞轮怎么做？ | 评估闭环 + 受控实验 + 飞轮模板   |
-| [动手：veRL PPO 训练 GSM8K](./verl-ppo-gsm8k)                   | 工业级 LLM RL 框架如何跑通 PPO？                        | veRL 外部索引 + 本仓库适配脚本   |
-| [扩展实战：Reward Hacking 与数据飞轮](./extended-practice)      | 坏奖励如何被 hack？失败样本如何进入迭代闭环？           | 可复现 reward hacking 实验       |
+| 小节                                                            | 核心问题                                                | 产物                           |
+| --------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------ |
+| [为什么 base model 还不是 assistant](./base-model-to-assistant) | pretrained checkpoint 能做什么、缺什么？                | base / SFT / RLHF 三阶段对照   |
+| [SFT：教模型按指令回答](./imitation-learning-pipeline)          | SFT 数据和偏好数据怎么构造，偏好如何变成奖励？          | SFT 模型、偏好数据与 RM 损失   |
+| [AI 反馈与安全原则](../chapter21_cai_rlvr/hhh-practice)         | 偏好数据如何从人工标注扩展到 AI 反馈？                  | Constitution 与 RLAIF 流程     |
+| [RL 微调流程](./standard-rlhf-pipeline)                         | Reward Model、Actor、Reference、Critic 如何协作？       | 标准流程图与 artifact 清单     |
+| [扩展实战：Reward Hacking 与数据飞轮](./extended-practice)      | 坏奖励如何被 hack？失败样本如何进入迭代闭环？           | 可复现 reward hacking 实验     |
+| [评估与奖励黑客](./evaluation)                                  | 如何证明模型变好且没有 reward hacking？数据飞轮怎么做？ | 评估闭环 + 受控实验 + 飞轮模板 |
+| [动手：veRL PPO 训练 GSM8K](./verl-ppo-gsm8k)                   | 工业级 LLM RL 框架如何跑通 PPO？                        | veRL 外部索引 + 本仓库适配脚本 |
 
 ## 为什么必须做评估
 
 RLHF 最容易制造一种错觉：训练日志很好看，模型实际变差了。RM 分数上涨可能只是模型学会了讨好 RM；回答变长可能被误判为更有帮助；偏好数据上的胜率提高，也可能伴随数学、代码、事实性能力下降。
 
-所以本章的评估不是可选项，而是 RLHF 流水线的一部分。8.6 会采用三层评估：
+所以本章的评估不是可选项，而是 RLHF 流水线的一部分。后面的评测章节会采用三层评估：
 
 - **自动 benchmark**：用固定任务集检查通用能力和专项能力有没有掉点，例如指令遵循、简单推理、事实问答、格式遵循。
 - **偏好评估**：让 base / SFT / RLHF 的回答做 pairwise battle，用人类或强模型 judge 判断哪个更好。
@@ -110,16 +109,16 @@ RLHF 最容易制造一种错觉：训练日志很好看，模型实际变差了
 
 一个合格的 RLHF 实验，不能只报告 “reward 变高”。它至少要回答三个问题：模型是不是更符合人类偏好？原有能力有没有明显回退？高分回答是不是真的可用？
 
-## 与第 14 章的边界
+## 与后续章节的边界
 
-本章讲的是**经典 RLHF 标准流程**。第 14 章会从这套流程出发，解释现代 post-training 为什么要一步步简化它：
+本章讲的是**经典 RLHF 标准流程**。第 14 至 17 章会从这套流程出发，依次解释现代 post-training 怎样改变模型更新、奖励和推理过程：
 
 - DPO 试图省掉显式 Reward Model。
 - GRPO 试图省掉 Critic。
 - RLVR 把主观偏好换成可验证奖励。
 - DAPO、RLAIF、蒸馏和数据飞轮则进一步改变训练信号的来源和扩展方式。
 
-换句话说，08 是“标准答案”，09 是“现代演进”。先把标准 RLHF 跑通，再理解为什么大家要改造它，整个大模型强化学习的脉络才会顺。
+第 13 章先给出标准 RLHF，第 14 至 17 章再学习这些现代方法，第 18 章把它们放回工业训练闭环。按照这个顺序，算法为什么出现、解决什么问题以及怎样部署会自然连在一起。
 
 准备好后，我们从第一步开始：先看为什么 pretrained base model 还不是 assistant——[为什么 base model 还不是 assistant](./base-model-to-assistant)。
 
@@ -129,7 +128,7 @@ RLHF 最容易制造一种错觉：训练日志很好看，模型实际变差了
 
 - 用 RL 语言描述 LLM 生成中的状态、动作、策略、奖励和轨迹；
 - 解释 SFT、Reward Model、PPO-RLHF 三个阶段分别解决什么问题；
-- 手写 Bradley-Terry 奖励模型损失，并说明 margin、accuracy、reward 校准各自看什么；
+- 解释奖励模型如何把回答分数差变成偏好概率，并说明 margin、accuracy、reward 校准各自看什么；
 - 读懂 PPO-RLHF 的训练日志，判断 reward 上涨是真进步还是 reward hacking；
 - 说清 TRL 小实验、OpenRLHF 中等规模训练和 NeMo RL / NeMo Aligner 大规模训练之间的映射关系。
 

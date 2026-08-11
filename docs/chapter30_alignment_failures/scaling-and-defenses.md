@@ -270,7 +270,7 @@ RLHF 让大模型变得更 sycophantic——这与 [GPT-4o rollback](./modern-in
 - 用 RL 训练模型做 subgoal decomposition，把定理逐步拆成可验证的子目标
 - 生成机器可验证的证明链
 
-目前还聚焦在数学定理证明，但形式化 PRM（[第 18 章](../chapter20_prm_search/formal-prm)）的进展让这个方向看到了曙光。
+目前还聚焦在数学定理证明，但形式化 PRM（[第 17 章](../chapter20_prm_search/formal-prm)）的进展让这个方向看到了曙光。
 
 ## 本章总结
 
@@ -292,5 +292,5 @@ RLHF 让大模型变得更 sycophantic——这与 [GPT-4o rollback](./modern-in
 **接下来的章节**：
 
 - [第 19 章 Agentic RL](../chapter22_agentic/overview)——agent 的对齐挑战
-- [第 14 章工业实战](../chapter16_llm_rl_industrial/industrial-post-training)——对齐的工程实践
+- [第 18 章工业实战](../chapter16_llm_rl_industrial/industrial-post-training)——对齐的工程实践
 - [附录 安全清单](../appendix_industrial_training/training-debugging)——对齐的工程清单

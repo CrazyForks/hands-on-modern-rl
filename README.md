@@ -108,6 +108,7 @@
 - [Quick Start](#quick-start)
 - [Contributing](#contributing)
 - [Citation](#citation)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ## Overview
@@ -452,6 +453,10 @@ If you use this course in teaching materials, study notes, or derivative non-com
   note         = {Open courseware repository}
 }
 ```
+
+## Acknowledgements
+
+We thank [OpenAI](https://openai.com/) for providing development resources and [AMD](https://www.amd.com/) for providing computing resources that support this project. Without their support, this course could not have evolved so quickly.
 
 ## License
 

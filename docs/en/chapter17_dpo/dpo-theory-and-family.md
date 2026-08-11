@@ -1,8 +1,9 @@
 ---
-title: 15.3 DPO Theory, Math, and Method Selection
+title: 14.3 DPO Theory, Math, and Method Selection
 ---
 
-# 15.3 DPO Theory, Math, and Method Selection
+# 14.3 DPO Theory, Math, and Method Selection
+
 You have already run DPO training code and watched metrics such as loss, accuracy, and reward margin move during training. Now let us slow down and return to the original problem DPO tries to solve: **if we already have human preference data, can we train the language model directly, without training a Reward Model and without running a full PPO pipeline?**
 
 A DPO training sample is a "choose one of two answers to the same question" preference item. Given the same prompt, the data contains two answers: one answer humans prefer, called chosen, and one answer humans do not prefer, called rejected.
@@ -480,7 +481,7 @@ In code, this is exactly the step where we compute the answer log probabilities 
 
 ### Step 3: Substitute into the Bradley-Terry Model
 
-Recall the Bradley-Terry preference model from [the previous RLHF chapter](../chapter15_rlhf/reward-function-design) and [Chapter 8 on GAE](../chapter10_ppo/gae-reward-model):
+Recall the pairwise preference model from [the RLHF preference-data section](../chapter15_rlhf/imitation-learning-pipeline) and [Chapter 8 on GAE](../chapter10_ppo/gae-reward-model):
 
 $$P(y_w > y_l \mid x) = \sigma\left( r(x, y_w) - r(x, y_l) \right)$$
 
@@ -519,7 +520,7 @@ Substituting the preference probability above gives the full DPO loss:
 
 $$\mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(x, y_w, y_l)} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(y_w\mid x)}{\pi_{\text{ref}}(y_w\mid x)} - \beta \log \frac{\pi_\theta(y_l\mid x)}{\pi_{\text{ref}}(y_l\mid x)} \right) \right]$$
 
-This is the true form behind the `DPOTrainer` you used in [Chapter 15](../chapter17_dpo/intro):
+This is the true form behind the `DPOTrainer` you used in [Chapter 14](../chapter17_dpo/intro):
 
 <DpoCodeFocus focus="loss" />
 
@@ -755,7 +756,7 @@ flowchart TD
     DPO --> SimPO["SimPO (2024)\n1 model\nremove Reference"]
     DPO --> IPO["IPO (2024)\nKL regularization\nmore robust"]
 
-    DPO --> GRPO["GRPO (2025)\nno Critic\ncovered in Section 16.1"]
+    DPO --> GRPO["GRPO (2025)\nno Critic\ncovered in Section 14.1"]
 
     style PPO fill:#fce4ec,stroke:#c62828
     style DPO fill:#fff3e0,stroke:#f57c00

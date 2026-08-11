@@ -389,7 +389,7 @@ def compute_progress_reward(s_t, s_{t+1}, task):
     return float(llm_judge(prompt))
 ```
 
-这种 LLM-as-judge 的中间奖励类似 [第 18 章 Process Reward Model](../chapter20_prm_search/inference-time-search) 的思想——用 LLM 评估中间步质量。
+这种 LLM-as-judge 的中间奖励类似 [第 17 章 Process Reward Model](../chapter20_prm_search/inference-time-search) 的思想——用 LLM 评估中间步质量。
 
 ### 与正向课程的对比
 

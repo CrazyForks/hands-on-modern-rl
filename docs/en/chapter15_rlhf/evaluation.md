@@ -2,7 +2,8 @@
 title: 13.6 Evaluation
 ---
 
-# 13.7 Evaluation
+# 13.6 Evaluation
+
 ## Reading Guide
 
 **Core points**
@@ -559,7 +560,7 @@ RLHF evaluation must simultaneously answer three questions:
 
 If you only look at the reward curve, it is easy to mistake reward hacking for model improvement. Evaluation loop + reward hacking controlled experiment + data flywheel together form RLHF's quality guardrails.
 
-With this, the classic RLHF main thread is complete: the base model is not an assistant, SFT gives it a behavioral starting point, the RM gives it preference direction, PPO lets it practice according to reward, and evaluation and the data flywheel prevent it from learning the wrong things. For a controlled debugging exercise, continue to [Extended Practice](./extended-practice). Chapter 14 starts from this classic RLHF pipeline and examines how industrial post-training changes rewards, optimizers, and distributed systems — [Industrial LLM RL](../chapter16_llm_rl_industrial/industrial-post-training).
+With this, the classic RLHF main thread is complete: the base model is not an assistant, SFT gives it a behavioral starting point, the RM gives it preference direction, PPO lets it practice according to reward, and evaluation and the data flywheel prevent it from learning the wrong things. For a controlled debugging exercise, continue to [Extended Practice](./extended-practice). Chapter 14 continues with [DPO](../chapter17_dpo/intro), which learns directly from preference pairs.
 
 ## Exercises
 

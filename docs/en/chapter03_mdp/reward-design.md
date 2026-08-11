@@ -3,6 +3,7 @@ title: 4.3 Reward Function Design
 ---
 
 # 4.3 Reward Functions: Where Does the Optimization Objective Come From?
+
 In the previous sections, we discussed value estimation methods and how data is collected. But whether we are doing DP, MC, or TD, and whether we are on-policy or off-policy, the target of every update ultimately comes from the same upstream source: the reward function.
 
 The last section answered “where does the data come from.” In this section, we go one step further upstream and ask: **how does the reward determine the direction of optimization, and why is it so hard to write a good reward?**
@@ -434,7 +435,7 @@ RLAIF substantially reduces labeling cost, but introduces a new question: are AI
 
 All methods above rely on an explicit reward model. But training a reward model is itself a source of $R \neq R^*$. **GRPO (Group Relative Policy Optimization)** tries to bypass this: for the same problem, generate a group of answers (e.g., 8), rank them using some rule (e.g., correctness checks or another model’s judgment), and then use within-group relative ranking as the reward signal to update the policy directly.
 
-The key difference is that GRPO does not require training a separate reward model. The reward signal comes from relative comparisons within the current batch rather than a fixed scoring function. This works especially well for tasks like mathematical reasoning where answers are verifiable: correctness can be checked automatically without human judgment. Chapter 16 will describe GRPO’s mechanism and implementation in detail.
+The key difference is that GRPO does not require training a separate reward model. The reward signal comes from relative comparisons within the current batch rather than a fixed scoring function. This works especially well for tasks like mathematical reasoning where answers are verifiable: correctness can be checked automatically without human judgment. Chapter 15 will describe GRPO’s mechanism and implementation in detail.
 
 ### Summary
 

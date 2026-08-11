@@ -55,7 +55,7 @@ where $N_{tools}$ is the number of tool calls and $\lambda$ is the efficiency we
 
 ### Combining with GRPO
 
-VISTA-Gym combines naturally with GRPO. For the same image-question pair, the model generates multiple reasoning chains (each containing a different tool-call sequence), evaluates each group's quality with rule-based rewards, computes within-group relative advantages, and updates the policy. This is exactly the same as GRPO from Chapter 16 — except the generated "answers" go from pure text to "tool-call sequences + final answers."
+VISTA-Gym combines naturally with GRPO. For the same image-question pair, the model generates multiple reasoning chains (each containing a different tool-call sequence), evaluates each group's quality with rule-based rewards, computes within-group relative advantages, and updates the policy. This is exactly the same as GRPO from Chapter 15 — except the generated "answers" go from pure text to "tool-call sequences + final answers."
 
 ## Framework Comparison
 
@@ -92,12 +92,12 @@ VeRL-Omni targets RL post-training for three families of generative models:
 
 Its relationship to other material in this chapter:
 
-| | VLM GRPO (23.3 hands-on) | EasyR1 (23.4 GeoQA) | VisPlay / VISTA-Gym | VeRL-Omni |
-| --- | --- | --- | --- | --- |
-| **Level** | Teaching / demo | VLM **understanding** RL framework | Research algorithms / environments | Multimodal **generation** RL framework |
-| **Optimized object** | Text answer tokens | Text answer tokens | Dual-model game / tool trajectories | Diffusion denoising trajectories / generation latents |
-| **Typical rewards** | Rules (correctness + format) | Rules + GeoQA verification | Game signals / tool efficiency | Preference models, OCR, GenRM, etc. |
-| **When to choose** | Learn GRPO fundamentals | Run understanding RL on real VLM datasets | Explore frontier research | Image / video / omni-modality generation RL |
+|                      | VLM GRPO (23.3 hands-on)     | EasyR1 (23.4 GeoQA)                       | VisPlay / VISTA-Gym                 | VeRL-Omni                                             |
+| -------------------- | ---------------------------- | ----------------------------------------- | ----------------------------------- | ----------------------------------------------------- |
+| **Level**            | Teaching / demo              | VLM **understanding** RL framework        | Research algorithms / environments  | Multimodal **generation** RL framework                |
+| **Optimized object** | Text answer tokens           | Text answer tokens                        | Dual-model game / tool trajectories | Diffusion denoising trajectories / generation latents |
+| **Typical rewards**  | Rules (correctness + format) | Rules + GeoQA verification                | Game signals / tool efficiency      | Preference models, OCR, GenRM, etc.                   |
+| **When to choose**   | Learn GRPO fundamentals      | Run understanding RL on real VLM datasets | Explore frontier research           | Image / video / omni-modality generation RL           |
 
 ### When Learners Should Use VeRL-Omni
 
@@ -208,7 +208,7 @@ Reviewing the full learning path across chapters, we see RL develop from the sim
 | Ch 10: Agentic RL     | Text + tool trajectories | Tool calls / tokens | Outcome + process rewards | PPO/GRPO       |
 | Ch 11: VLM RL         | Image + tokens           | Discrete (tokens)   | Rules + model + grounding | GRPO           |
 
-The core ideas remain the same throughout — the policy gradient theorem (Chapter 6), Actor-Critic architecture (Chapter 7), PPO's clipping stability (Chapter 8), GRPO's within-group advantage (Chapter 16). What changes is the input modality, the action space, and the reward source. This is why earlier chapters spent considerable time building theoretical foundations — these foundations apply fully in multimodal settings.
+The core ideas remain the same throughout — the policy gradient theorem (Chapter 6), Actor-Critic architecture (Chapter 7), PPO's clipping stability (Chapter 8), GRPO's within-group advantage (Chapter 15). What changes is the input modality, the action space, and the reward source. This is why earlier chapters spent considerable time building theoretical foundations — these foundations apply fully in multimodal settings.
 
 <details>
 <summary>Exercise: If you replaced the VLM's input from static images to video streams, which parts of GRPO code would need to change?</summary>

@@ -198,7 +198,7 @@ MAPoRL [^maporl] models the collaboration of multiple LLM Agents as a joint poli
 
 ### M-GRPO: The Multi-Agent Extension of GRPO
 
-Recall GRPO from Chapter 16: the same model generates multiple responses and compares within a group. M-GRPO [^mgrpo] extends this idea to multi-agent scenarios -- multiple groups of outputs from multiple roles are compared together. For example, for the same programming task, generate 3 "Coder-Reviewer-Tester" teams and compare which team has a higher task completion rate.
+Recall GRPO from Chapter 15: the same model generates multiple responses and compares within a group. M-GRPO [^mgrpo] extends this idea to multi-agent scenarios -- multiple groups of outputs from multiple roles are compared together. For example, for the same programming task, generate 3 "Coder-Reviewer-Tester" teams and compare which team has a higher task completion rate.
 
 $$\text{Advantage}_i = \frac{R_i - \text{mean}(R_{1..G})}{\text{std}(R_{1..G})}$$
 
@@ -214,16 +214,16 @@ MARTI [^marti] improves reasoning quality through multi-agent debate. The core i
 
 ## Connections to Previous Chapters
 
-| Previous Chapter                                   | Correspondence in LLM Multi-Agent RL                            |
-| -------------------------------------------------- | --------------------------------------------------------------- |
-| CTDE global Critic                                 | Theoretical foundation for cross-role credit assignment         |
-| [Self-play Generator-Judge (Section 26.1)](../self-play-outlook/)           | Direct predecessor of debate/competition architecture           |
-| Multi-turn credit assignment ORM/PRM (Section 19.3) | Methodological foundation for cross-role credit assignment      |
-| GRPO within-group comparison (Chapter 16)           | M-GRPO extends within-group comparison to multi-agent           |
-| DQN experience replay (Chapter 5)                  | Memory mechanisms: from raw reuse to preference distillation    |
-| PPO (Chapter 8)                                    | Foundation algorithm for multi-agent policy optimization        |
-| Training stability (Chapter 8)                     | Amplified non-stationarity requires stronger stability controls |
-| Bespoke Labs KL=0.001 (Section 19.6)                | KL constraints are equally critical in multi-agent scenarios    |
+| Previous Chapter                                                  | Correspondence in LLM Multi-Agent RL                            |
+| ----------------------------------------------------------------- | --------------------------------------------------------------- |
+| CTDE global Critic                                                | Theoretical foundation for cross-role credit assignment         |
+| [Self-play Generator-Judge (Section 26.1)](../self-play-outlook/) | Direct predecessor of debate/competition architecture           |
+| Multi-turn credit assignment ORM/PRM (Section 19.3)               | Methodological foundation for cross-role credit assignment      |
+| GRPO within-group comparison (Chapter 15)                         | M-GRPO extends within-group comparison to multi-agent           |
+| DQN experience replay (Chapter 5)                                 | Memory mechanisms: from raw reuse to preference distillation    |
+| PPO (Chapter 8)                                                   | Foundation algorithm for multi-agent policy optimization        |
+| Training stability (Chapter 8)                                    | Amplified non-stationarity requires stronger stability controls |
+| Bespoke Labs KL=0.001 (Section 19.6)                              | KL constraints are equally critical in multi-agent scenarios    |
 
 The deepest connection may be: **LLM multi-agent RL is the "highest-difficulty comprehensive application" of all core concepts in this book**. It requires simultaneously handling multi-turn credit assignment (Section 19.3), policy gradient optimization (Chapters 6-8), training stability (Chapter 8), reward design (Section 19.6) -- only extended from single-agent to multi-agent, where each problem's difficulty increases by an order of magnitude.
 
@@ -441,7 +441,7 @@ More specifically:
 - **Actions** = choosing reasoning paths (verification, backtracking, exploring new directions)
 - **Reward** = correctness of the final answer
 
-This is why Chapter 16's GRPO and DeepSeek-R1 can elicit reasoning capability through RL -- the large model itself is a powerful world model, and RL teaches it how to better utilize this world model to plan reasoning paths.
+This is why Chapter 15's GRPO and DeepSeek-R1 can elicit reasoning capability through RL -- the large model itself is a powerful world model, and RL teaches it how to better utilize this world model to plan reasoning paths.
 
 ### Multi-Agent + MBRL: "Mental Simulation" in Collaboration
 

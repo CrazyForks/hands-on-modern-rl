@@ -932,8 +932,8 @@ After reproducing Search-R1, you can explore these directions:
 
 Search-R1 is the concrete implementation of all RL knowledge from previous chapters in the search Agent scenario:
 
-- **RLVR (Chapter 16)**: Search-R1's reward is purely "is the answer correct," requiring no Reward Model — this is exactly RLVR's core idea.
-- **GRPO (Chapter 16)**: Search-R1 defaults to GRPO, with group sampling + relative comparison replacing PPO's Critic network.
+- **RLVR (Chapter 15)**: Search-R1's reward is purely "is the answer correct," requiring no Reward Model — this is exactly RLVR's core idea.
+- **GRPO (Chapter 15)**: Search-R1 defaults to GRPO, with group sampling + relative comparison replacing PPO's Critic network.
 - **Agent Loop ([chapter overview](./intro))**: Search-R1's Rollout is the concrete implementation of the Agent Loop — the model alternates between reasoning and tool calls.
 - **ORM vs PRM ([Section 19.3](./multi-turn-rl))**: Search-R1 only uses ORM (terminal reward). Atom-Searcher[^atom_searcher] and Web-Shepherd[^web_shepherd] add PRM (process rewards) on top.
 - **Retrieved Token Masking**: Consistent with the idea of masking prompt tokens in PPO — only do gradient updates on policy-controllable parts.

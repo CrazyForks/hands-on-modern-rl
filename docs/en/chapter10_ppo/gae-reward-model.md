@@ -3,6 +3,7 @@ title: 8.3 Advantage Estimation and Reward Modeling
 ---
 
 # 8.3 Advantage Estimation and Reward Modeling
+
 ## Section Overview
 
 **Core content**
@@ -211,7 +212,7 @@ Classic RL environments (CartPole, LunarLander) hand us the reward directly thro
 LLM alignment has two tracks:
 
 - **Subjective alignment** (politeness, safety, helpfulness): no objective ground truth, requires a reward model trained from human preferences
-- **Objective reasoning** (math, code): verifiable by rules, can use rule-based rewards directly (covered in [Chapter 16: RLVR](../chapter18_grpo/rlvr))
+- **Objective reasoning** (math, code): verifiable by rules, can use rule-based rewards directly (covered in [Chapter 15: RLVR](../chapter18_grpo/rlvr))
 
 This chapter focuses on subjective alignment — the classic PPO-for-LLM use case.
 
@@ -338,4 +339,4 @@ This is why RM training must carefully control capacity and regularization — b
 
 </details>
 
-**The RM is the heaviest burden in PPO-for-LLM alignment — heavy to label, heavy to host, and risky to trust. Can we skip it?** Chapter 15 later gives DPO's answer: [DPO — Bypassing the Reward Model](../chapter17_dpo/intro).
+**The RM is the heaviest burden in PPO-for-LLM alignment — heavy to label, heavy to host, and risky to trust. Can we skip it?** Chapter 14 later gives DPO's answer: [DPO — Bypassing the Reward Model](../chapter17_dpo/intro).

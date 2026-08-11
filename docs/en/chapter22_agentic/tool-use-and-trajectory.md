@@ -3,11 +3,12 @@ title: 19.4 Tool Use, Trajectory Synthesis, and Agentic Engineering
 ---
 
 # 19.4 Tool Use, Trajectory Synthesis, and Agentic Engineering
+
 This section merges the original topics of "trajectory synthesis and data engineering" and "tool use and Agentic engineering" into one engineering storyline. We first ask where the training data comes from, then discuss how a model learns tool-use policies, and finally land on the environment, sandboxing, asynchronous rollout, and reward-design problems that real training systems must solve.
 
 ## Trajectory Synthesis: Where Does the Training Data Come From?
 
-In the previous section, we unpacked the credit-assignment problem in multi-turn RL. But before training begins, there is an even more basic question: **where does the data come from?** Standard LLM RL, such as GRPO in Chapter 16, only needs a prompt plus a verifiable answer. The model generates the response itself and checks it itself; no external data is required. Agentic RL is different. The model must interact with an environment: call tools, execute code, browse the web. The "trajectories" produced by these interactions are both the training data and the source of reward. High-quality trajectories determine the ceiling of the model. In this section, we unpack the data-engineering core of Agentic RL: trajectory synthesis.
+In the previous section, we unpacked the credit-assignment problem in multi-turn RL. But before training begins, there is an even more basic question: **where does the data come from?** Standard LLM RL, such as GRPO in Chapter 15, only needs a prompt plus a verifiable answer. The model generates the response itself and checks it itself; no external data is required. Agentic RL is different. The model must interact with an environment: call tools, execute code, browse the web. The "trajectories" produced by these interactions are both the training data and the source of reward. High-quality trajectories determine the ceiling of the model. In this section, we unpack the data-engineering core of Agentic RL: trajectory synthesis.
 
 ### Why Do We Need Trajectory Synthesis?
 
@@ -60,7 +61,7 @@ def rejection_sampling(model, task, tool_env, num_samples=64):
 # Worse, those 3 trajectories may all follow the same success path and lack diversity.
 ```
 
-The advantage of rejection sampling is that it is **simple to implement**. You only need a verifier that can judge "success" or "failure." The RLVR training in Chapter 16 uses exactly this idea.
+The advantage of rejection sampling is that it is **simple to implement**. You only need a verifier that can judge "success" or "failure." The RLVR training in Chapter 15 uses exactly this idea.
 
 Its weaknesses are also obvious: **low efficiency and poor diversity**. If the current success rate of the model is only 5%, you need to sample 20 trajectories to obtain one success. More seriously, successful trajectories tend to concentrate on "strategies the model already knows well." Paths the model has not explored, even if they might be better, never appear under rejection sampling.
 
@@ -227,7 +228,7 @@ def filter_trajectories(trajectories, quality_threshold=0.7):
 
 ### How Trajectory Synthesis Connects to Chapter 9
 
-You may have noticed that many ideas in trajectory synthesis are closely related to RLVR from Chapter 16. The core of RLVR is "use verifiable outcomes as reward." Trajectory synthesis pushes this idea one step earlier: verification is used not only for reward, but also to **filter and generate better training data**.
+You may have noticed that many ideas in trajectory synthesis are closely related to RLVR from Chapter 15. The core of RLVR is "use verifiable outcomes as reward." Trajectory synthesis pushes this idea one step earlier: verification is used not only for reward, but also to **filter and generate better training data**.
 
 Concretely, RLVR has three uses at the data layer of Agentic RL:
 
@@ -462,7 +463,7 @@ class ToolAugmentedPolicy(nn.Module):
 
 ### Reward Design: The Scenario Determines the Reward
 
-Tool-call reward is not as subjective as preference alignment. It can be designed from objective signals. This is a direct application of **RLVR, Reinforcement Learning from Verifiable Rewards**, from Chapter 16 in agentic scenarios.
+Tool-call reward is not as subjective as preference alignment. It can be designed from objective signals. This is a direct application of **RLVR, Reinforcement Learning from Verifiable Rewards**, from Chapter 15 in agentic scenarios.
 
 | Scenario        | Reward source                                | Type                             | Special consideration                  |
 | --------------- | -------------------------------------------- | -------------------------------- | -------------------------------------- |
@@ -713,16 +714,16 @@ def tool_rl_training_loop(
             optimizer.zero_grad()
 ```
 
-Notice that the core idea of this training loop is very similar to GRPO in Chapter 16: sample multiple trajectories within a group and use relative comparison to compute advantages. The difference is that GRPO compares multiple text answers, while here we compare multiple tool-use trajectories.
+Notice that the core idea of this training loop is very similar to GRPO in Chapter 15: sample multiple trajectories within a group and use relative comparison to compute advantages. The difference is that GRPO compares multiple text answers, while here we compare multiple tool-use trajectories.
 
 ### Connection to RLVR
 
-You may have noticed that reward design for tool-use RL is very similar to RLVR from Chapter 16. This is not a coincidence. **Agentic RL is the natural extension of RLVR to multi-turn interaction scenarios**. The core idea of RLVR is "use verifiable outcomes as reward, without training a Reward Model." In tool-use scenarios, tool execution results are naturally verifiable: whether code passes tests, whether SQL query results are correct, and whether search results contain the target information can all be automatically verified without human annotation.
+You may have noticed that reward design for tool-use RL is very similar to RLVR from Chapter 15. This is not a coincidence. **Agentic RL is the natural extension of RLVR to multi-turn interaction scenarios**. The core idea of RLVR is "use verifiable outcomes as reward, without training a Reward Model." In tool-use scenarios, tool execution results are naturally verifiable: whether code passes tests, whether SQL query results are correct, and whether search results contain the target information can all be automatically verified without human annotation.
 
 This is also one reason Agentic RL is considered more suitable for agent training than preference alignment, RLHF/DPO. Preference alignment needs a Reward Model to simulate human preferences. Agent tasks usually have objective evaluation criteria, so verifiable rewards can be used directly.
 
 <details>
-<summary>Reflection question: What are the similarities and differences between the two-stage pattern of "SFT teaches format + RL teaches strategy" and DPO in Chapter 15?</summary>
+<summary>Reflection question: What are the similarities and differences between the two-stage pattern of "SFT teaches format + RL teaches strategy" and DPO in Chapter 14?</summary>
 
 The similarity is that both follow "SFT first, then RL." Supervised learning first teaches the model basic format and capability, and RL then optimizes strategy. This is a common training pattern for large models.
 
@@ -782,7 +783,7 @@ In the previous sections, we covered credit assignment in multi-turn RL, traject
 
 ### Environment Bottlenecks: Why Agentic RL Is Slow
 
-In standard LLM RL training, such as PPO in Chapter 8 or GRPO in Chapter 16, the training loop is purely GPU-based: the model generates answers on the GPU, the Reward Model scores on the GPU, and gradients are computed on the GPU. The slowest part is usually GPU computation.
+In standard LLM RL training, such as PPO in Chapter 8 or GRPO in Chapter 15, the training loop is purely GPU-based: the model generates answers on the GPU, the Reward Model scores on the GPU, and gradients are computed on the GPU. The slowest part is usually GPU computation.
 
 The Agentic RL training loop is completely different. Whenever the model generates a "tool-call" action, it must pause and wait for the tool result. This execution happens outside the GPU:
 
@@ -971,16 +972,16 @@ In real engineering systems, this kind of asynchronous concurrency often raises 
 
 Agentic RL does not appear from nowhere. It is connected to almost every concept studied in the previous chapters. The table below summarizes these connections:
 
-| Concept                      | Earlier chapters                                 | Corresponding idea in Agentic RL                                      |
-| ---------------------------- | ------------------------------------------------ | --------------------------------------------------------------------- |
-| Action space                 | Only "generate token," Chapters 5-9              | Expanded to "generate text + call tools," heterogeneous actions       |
-| Reward source                | RM scoring / preference comparison, Chapters 13-15 | Environment execution results, verifiable; Chapter 16 RLVR             |
-| Credit assignment            | Token-level PPO/RLHF, Chapters 7-8               | Turn level across multiple rounds, ORM vs PRM                         |
-| GRPO within-group comparison | Compare multiple answers, Chapter 16              | Compare multiple trajectories, same idea applies                      |
-| Experience replay            | DQN Replay Buffer, Chapter 5                     | Replay of tool-call trajectories, requiring reproducible environments |
-| Policy gradient theorem      | REINFORCE, Chapter 6                             | Multi-turn policy gradient, turn-level discounting                    |
-| Actor-Critic                 | PPO, Chapter 8                                   | Agentic PPO, critic estimates turn-level value                        |
-| RLVR                         | Verifiable rewards, Chapter 16                    | Natural verifiability of tool execution results                       |
+| Concept                      | Earlier chapters                                   | Corresponding idea in Agentic RL                                      |
+| ---------------------------- | -------------------------------------------------- | --------------------------------------------------------------------- |
+| Action space                 | Only "generate token," Chapters 5-9                | Expanded to "generate text + call tools," heterogeneous actions       |
+| Reward source                | RM scoring / preference comparison, Chapters 13-14 | Environment execution results, verifiable; Chapter 15 RLVR            |
+| Credit assignment            | Token-level PPO/RLHF, Chapters 7-8                 | Turn level across multiple rounds, ORM vs PRM                         |
+| GRPO within-group comparison | Compare multiple answers, Chapter 15               | Compare multiple trajectories, same idea applies                      |
+| Experience replay            | DQN Replay Buffer, Chapter 5                       | Replay of tool-call trajectories, requiring reproducible environments |
+| Policy gradient theorem      | REINFORCE, Chapter 6                               | Multi-turn policy gradient, turn-level discounting                    |
+| Actor-Critic                 | PPO, Chapter 8                                     | Agentic PPO, critic estimates turn-level value                        |
+| RLVR                         | Verifiable rewards, Chapter 15                     | Natural verifiability of tool execution results                       |
 
 Experience replay is more subtle in Agentic RL than in standard DQN. DQN can directly reuse old data because the environment is deterministic, the physics of CartPole do not change. In Agentic RL, tool execution results may change over time, such as search-engine results being updated. Old trajectories may therefore no longer be valid. This means Agentic RL experience replay needs an **expiration mechanism**: old trajectories should be discarded after a certain time or when the environment state changes.
 

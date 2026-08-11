@@ -1,15 +1,40 @@
-# 14.3 优化器与训练稳定性
+---
+outline: false
+---
 
-[14.2 节工业实践](./industrial-post-training) 讨论了 2024-2025 年的主流工业方案——MiniMax、Qwen、Kimi、Seed、DeepSeek。这一节我们补充几个 2025-2026 年的最新工业实践：
+# 18.3 训练为什么会不稳定
 
-- **GLM-4.5 / GLM-4.6**（智谱）：中国开源推理模型新秀
-- **Llama 4**（Meta）：开源旗舰的进化
-- **Seed-Thinking**（字节 Seed）：reasoning model 工业配方
-- **MuonClip + QK-clip**（Kimi K2）：训练稳定性的新工具
+[18.2](./industrial-post-training) 介绍了数据准备、采样、奖励计算和模型更新。真正开始训练以后，第一件事通常是看奖励曲线：奖励持续上涨，似乎说明模型正在进步。
 
-这些工作代表了 LLM RL 工业训练的**最新 SOTA**——把 [前面章节](./intro) 的算法用到极致。
+假设一个数学模型的训练奖励从 0.4 升到 0.7，但独立测试集的正确率没有变化，平均回答长度却增加了一倍。模型学到的可能只是“写得更长更容易得分”。另一种情况更直接：某次更新后 loss 和梯度突然变成 NaN，后面的参数已经无法继续使用。还有一些故障来自系统本身——生成回答的模型版本落后于训练端，记录下来的概率和当前策略对不上。
 
-## 14.3.1 智谱 GLM-4.5 / GLM-4.6
+这些问题会反映在不同曲线上。只看奖励，无法区分模型真的学会了解题、利用了奖励漏洞，还是参数更新已经出错。因此，训练时需要把 loss、梯度范数、KL、熵和独立评测放到同一条时间线上比较。
+
+## 四种曲线变化分别说明什么
+
+- **loss 或梯度范数突然变大，甚至出现 NaN：数值计算失稳。** loss 反映当前训练目标的变化，梯度范数反映这一步准备把参数推多远。两者同时暴涨时，先检查学习率、低精度计算、梯度裁剪和异常 batch。
+- **KL 快速升高：策略移动过快。** KL 衡量当前模型与参考模型的输出分布有多远。它持续升高，说明一次或连续多次更新把模型推离了原有能力范围，应检查更新幅度、KL 约束和训练端与生成端的模型版本。
+- **熵快速下降：探索过早消失。** 熵表示模型的输出分布有多分散。熵很快降到低位，说明少数 token 或回答模式占据了大部分概率，模型可能只会重复当前高奖励路径。
+- **训练奖励升高，独立评测却没有提升：目标信号失真。** 模型可能找到了验证器漏洞，也可能只记住训练任务。此时先检查奖励规则、回答长度、训练集重复和评测集污染，不要继续增加训练步数。
+
+这些信号要放在同一条时间线上看。奖励升高、平均回答长度同时激增，而独立评测不变，问题通常出在奖励设计；loss 跳变并伴随梯度范数爆炸，则先检查学习率、精度和优化器状态。
+
+## 按因果顺序排查
+
+1. **先检查数据和奖励。** 确认训练样本、答案解析器、测试环境和奖励方向没有错误。目标信号错了，优化越稳定，模型偏得越远。
+2. **再检查单步更新。** 观察学习率、梯度范数、KL、熵和参数是否出现 NaN，确认一个 batch 的前向、反向和更新能够重复。
+3. **然后检查策略变化。** 比较采样时的旧策略与更新后的新策略，避免一次更新跨得过大，也要检查经验是否已经过时。
+4. **最后检查训练系统。** 对比 rollout 引擎与训练引擎的 token、log probability、精度和模型版本，确认二者确实在描述同一个策略。
+
+## 优化器只能解决其中一部分
+
+优化器决定怎样把梯度变成参数更新。AdamW、Muon 以及各种 clipping 方法可以减小过大的更新，改善大模型训练中的数值行为。它们无法修复错误奖励、损坏的数据或生成端与训练端使用不同模型版本的问题。
+
+因此，选择优化器之前要先定位失稳来自哪一层。下面保留 GLM、Llama、Seed 与 Kimi 的公开案例，用来观察不同团队怎样组合数据、训练阶段和稳定性工具。
+
+:::: details 案例库：GLM、Llama、Seed 与 Kimi 的训练实践
+
+## 18.3.1 智谱 GLM-4.5 / GLM-4.6
 
 [GLM-4.5](https://github.com/zai-org/GLM-4.5)（智谱 AI, 2025.07 发布）和 GLM-4.6（2025.10）是中国开源推理模型的重要进展。
 
@@ -80,7 +105,7 @@ GLM 系列的工业意义：
 2. **MoE 架构在推理 RL 上的验证**——证明了 [GSPO](../chapter18_grpo/grpo-family) 在 MoE 上的有效性
 3. **代码 + 推理的整合**——GLM-4.6 特别强调 agentic 能力，与 Claude Code 等竞争
 
-## 14.3.2 Meta Llama 4
+## 18.3.2 Meta Llama 4
 
 [Llama 4](https://ai.meta.com/blog/llama-4-multimodal-intelligence/)（Meta, 2025.04 发布）是 Meta 的开源旗舰。
 
@@ -153,7 +178,7 @@ LM Arena 上跑的 Maverick 是一个**经过专门优化的版本**——使用
 2. **多模态新范式**——early fusion 是后续工作的参考
 3. **超长 context**——10M context 开启新应用场景
 
-## 14.3.3 Seed-Thinking 与 字节的 Reasoning 配方
+## 18.3.3 Seed-Thinking 与 字节的 Reasoning 配方
 
 [Seed1.5-Thinking](https://arxiv.org/abs/2504.13914)（字节 Seed, 2025.04）是字节对 reasoning model 工业训练的系统总结。
 
@@ -222,7 +247,7 @@ Seed-Thinking 1.5 在多个 benchmark 上：
 
 这是字节 Seed 内部 reasoning model 的核心配方——后来用于豆包 Pro 推理版等产品。
 
-## 14.3.4 Kimi K2 的 MuonClip + QK-clip
+## 18.3.4 Kimi K2 的 MuonClip + QK-clip
 
 [Kimi K2](https://arxiv.org/abs/2507.20534)（Moonshot, 2025.07）的工业贡献之一是 **MuonClip + QK-clip**——训练稳定性的新工具。
 
@@ -296,7 +321,7 @@ MuonClip 是训练**超大规模 LLM**的关键工具：
 - **超长 context**：QK-clip 让 1M+ context 训练可行
 - **开源生态**：Muon 已经在开源社区普及（OpenLM、PyTorch 都支持）
 
-## 14.3.5 中国工业实践的总结
+## 18.3.5 中国工业实践的总结
 
 到 2026 年中，中国 LLM RL 工业实践的格局：
 
@@ -316,7 +341,7 @@ MuonClip 是训练**超大规模 LLM**的关键工具：
 2. **算法创新主要来自中国**——这与美国闭源派（OpenAI、Anthropic）形成对比
 3. **工业贡献互补**——不是替代，是从不同角度解决 RL 训练问题
 
-## 14.3.6 未来的工业方向
+## 18.3.6 未来的工业方向
 
 ### 万亿参数 + 超长 context
 
@@ -342,78 +367,7 @@ MuonClip 是训练**超大规模 LLM**的关键工具：
 - 2026 年可能下降到 $10M（更优算法 + 更便宜算力）
 - 这让小团队也能参与 SOTA 研究
 
-## 训推不一致：LLM-RL 训练稳定性的隐藏杀手
-
-前面讨论的 GLM-4.6、Llama 4、MuonClip 等方法都在解决"显式"的训练不稳定问题——loss spike、梯度爆炸、KV 崩塌。但 LLM-RL 中还有一个**被长期忽视的隐藏杀手**：**训推不一致（Training-Inference Mismatch）**。
-
-严格来说，训推不一致本身并不是大模型独有的问题——任何 RL 系统中，只要采样策略和待优化策略之间存在漂移，就都会产生类似的分布偏差。AlphaGo、Atari DQN 时代就已经有了策略滞后（Policy Lag）导致训练不稳定的经验。但这个问题**在大模型 RL 的工程实现中被急剧放大了**，因为在 LLM-RL 系统中，采样和训练使用的是完全不同的引擎和精度，导致了一个根本性的撕裂。
-
-### 问题根源：$\pi_{\text{rollout}}$ 与 $\pi_{\text{old}}$ 不是同一个策略
-
-> **"When Speed Kills Stability: Demystifying RL Collapse from the Training-Inference Mismatch"**
-> _(Liu et al., 2025)_
-
-在绝大多数 LLM-RL 实现中，$\pi_{\text{rollout}}$（负责采样数据的推理策略）和 $\pi_{\text{old}}$（训练框架里记录的"旧策略"）**根本就不是同一个策略**：
-
-- **推理侧**（生成 rollout 数据）：vLLM / SGLang，FP8/BF16 精度，KV Cache 优化
-- **训练侧**（计算 log prob 和梯度）：FSDP/Megatron，BF16/FP32 精度，激活重计算
-
-同一个模型参数在不同的精度、不同的计算图下，输出的 log-probability **天然就不一样**。你以为行为策略 $\mu$ 等于目标策略 $\pi_\theta$，实际上 $\mu \approx \pi_\theta$ 里的那个"约等于"可能已经偏离了几十个百分点。
-
-### 精度是首要嫌疑人
-
-> **"Defeating the Training-Inference Mismatch via FP16"**
-> _(Qi et al., 2025)_
-
-这篇论文把根因追到了浮点精度。BF16 的尾数位太少，在 token 级别的 log-probability 计算中引入了系统性舍入误差。而仅仅把精度切回 FP16，这个偏差就几乎消失了——几行代码解决了 LLM-RL 最令人头疼的训练崩溃。
-
-> **"Taming the Tail: Stable LLM Reinforcement Learning via Dynamic Vocabulary Pruning"**
-> _(arXiv 2512.23087, 2025)_
-
-这篇论文进一步揭示训推不一致的**非对称性**：偏差与 $(1-p)$ 成正比——高频 token 误差微乎其微，但长尾低频 token 会产生系统性偏差，在梯度估计中持续累积，最终导致崩溃。
-
-> **"Stabilizing Reinforcement Learning with LLMs: Formulation and Practices"**
-> _(Zheng et al., Qwen Team, arXiv 2512.01374, 2025)_
-
-阿里 Qwen 团队提出了统一的理论框架：token-level 的 REINFORCE 目标本质上是对序列级奖励的**一阶近似**，而这个近似成立需要两个前提——**(1) 训推一致**，**(2) 策略不过时**。一旦训推不一致成立，一阶近似就失效了。
-
-### 与 PPO Clipping 的关系
-
-读者可能会问：这跟 PPO 有什么关系？答案是：**PPO 的 Clipping 机制就是对训推不一致的一种"防御术"，但它只能防住一半**。
-
-PPO 的核心公式是：
-
-$$
-\mathcal{L}^{\text{CLIP}} = \mathbb{E}\left[\min\left( r_t(\theta) \hat{A}_t,\ \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon) \hat{A}_t \right)\right]
-$$
-
-其中 $r_t(\theta) = \frac{\pi_\theta(a_t|s_t)}{\pi_{\text{old}}(a_t|s_t)}$ 是重要性采样比率。但 PPO 的 Clipping 有一个默认的前提假设——**分母 $\pi_{\text{old}}$ 确实是"采样时真正执行的那个策略"**。
-
-在经典 RL 中，采样的进程和训练的进程是同一个 Python 进程，$\pi_{\text{old}}$ 就是采样那一瞬间保存下来的网络权重。但在 LLM-RL 中：
-
-- $\pi_{\text{rollout}}$：vLLM 引擎在 FP8 下采样时**真实生效的策略**
-- $\pi_{\text{old}}$：训练框架事后用 BF16/FP32 重新算出来的"你以为采样时用的策略"
-
-这两个**本来就不是同一个策略**。重要性采样比率 $r_t$ 的**分母本身就是有偏的**——PPO 的 Clipping 在试图纠正优化导致的漂移，但它没有机制去纠正推理引擎和训练引擎之间的不一致。
-
-打个比方：PPO 的 Clipping 保证了你**从旧策略出发不会走太远**，但它没保证"旧策略"那张地图本身是准的。训推不一致意味着**地图一开始就有偏差**，Clipping 发现不了这个问题。
-
-### 工业界的主流修复路线
-
-围绕训推不一致的修复方案，前沿工作大致沿着几条线展开：
-
-- **精度修复**：FP16/BF16 替代 FP8 做 Rollout，减少 $\pi_{\text{rollout}}$ 和 $\pi_{\text{old}}$ 之间的数值偏差（Qi et al., 2025）；也有工作反过来压低训练端精度——FP8-RL 在 veRL 框架中实现了 W8A8 全栈低精度训练，配合重要性采样纠正，Rollout 吞吐提升 44% 同时匹配 BF16 基线（Qiu et al., arXiv 2601.18150）。
-- **重要性采样（IS）纠正**：既然 $\pi_{\text{rollout}} \neq \pi_{\text{old}}$，那就显式引入重要性权重来纠正分布偏移。Truncated IS（TIS）是最直接的做法，剪掉极端的 IS 比率避免梯度爆炸（Yao et al., NeurIPS 2025）；更新的工作是 MinPRO（Lei et al., arXiv 2601.22718），用前缀内最小 token 级比率替代累积乘积，在 Off-policy 漂移较大时更稳定。
-- **剪枝长尾 token**：训推不一致集中在低概率区域，直接剔除极端长尾 token 可以从源头消除最大偏差源（"Taming the Tail", arXiv 2512.23087）。
-- **MoE 路由回放**：推理时的 Expert 路由与训练时天然不同，R3（Rollout Routing Replay）在训练时回放推理的路由分布，解决了 MoE-RL 独有的训推不一致放大效应（Zheng et al., arXiv 2512.01374）。
-- **优化视角**：将训推不一致视为动态优化问题，通过响应长度激增等信号触发学习率调度（Zhang et al., arXiv 2602.01826）。
-- **工程侧回滚纠正**：在训练前用当前训练引擎重新计算 Rollout 策略的 log-probability，暴力对齐 $\pi_{\text{rollout}}$ 和 $\pi_{\text{old}}$——成本高但最可靠。
-
-### 与现实和解
-
-这些论文共同指向一个结论：在 LLM-RL 的工程实践中，不存在"纯粹"的 On-policy。我们能做到的只是**把 $\mu$ 和 $\pi_\theta$ 的差距控制在可接受范围内**——PPO 的 Clipping 是一种控制，FP16 是一种控制，R3 路由回放也是一种控制。[第 4 章算法分类](../chapter03_mdp/algorithm-taxonomy)里讲的 On/Off-policy 理论是干净的二值分类，而工程现实是一个**连续的光谱**——理论上的 On-policy，实践中总是带着一点 Off-policy 的味道。
-
-## 小结
+## 案例小结
 
 现代 LLM RL 工业实践的核心趋势：
 
@@ -422,10 +376,18 @@ $$
 - **MuonClip + QK-clip**：训练稳定性的新工具
 - **中国厂商主导算法创新**：每家都有自己的招牌方法
 
-这些工作共同把 RL 在 LLM 训练中的地位**从可选变为核心**——没有 RL，就无法训出 SOTA 模型。
+这些案例分别展示了模型结构、推理训练和数值稳定性怎样影响大规模 RL 训练。
 
-接下来：
+相关章节：
 
-- [第 17 章 Reasoning Models](../chapter19_reasoning/intro)——推理模型的详细讨论
-- [第 18 章 PRM](../chapter20_prm_search/outcome-vs-process)——过程奖励的工业实践
+- [第 16 章 Reasoning Models](../chapter19_reasoning/intro)——推理模型的详细讨论
+- [第 17 章 PRM](../chapter20_prm_search/outcome-vs-process)——过程奖励的工业实践
 - [第 20 章 RL-based SWE](../chapter23_rl_based_swe/swe-bench-and-rlvr)——代码 agent 的训练
+
+::::
+
+## 本节小结
+
+训练稳定性需要同时观察数值、策略、奖励和系统四个层面。排查时从数据与奖励开始，再检查单步更新、策略漂移，最后核对生成引擎与训练引擎的一致性。优化器和 clipping 负责控制参数更新，不能代替前面三层检查。
+
+[18.4](./distributed-sync) 将继续展开最后一层问题：当生成、奖励和训练分布在多张 GPU 上时，系统怎样保证数据与模型版本正确流动。

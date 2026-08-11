@@ -1,6 +1,6 @@
-# 13.4 AI 反馈与安全原则
+# 13.3 AI 反馈与安全原则
 
-> 前面的 [13.1 从基座模型到指令对齐](../chapter15_rlhf/base-model-to-assistant)、13.2 SFT 和 [13.3 奖励模型](../chapter15_rlhf/reward-function-design) 已经把“人类标注偏好 → 奖励模型”这条路线讲清楚了。这条路线依赖一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，人类标注会同时遇到成本、速度和专业判断力的瓶颈。本节由此引出一个问题：**训练信号还能从哪里来？** Anthropic 2022 年提出 Constitutional AI，让 AI 按明确的安全原则评价回答、修订回答并生成偏好对；这也为后面的 RL 微调建立了另一种反馈来源。
+> 前面的 [13.1 从基座模型到指令对齐](../chapter15_rlhf/base-model-to-assistant) 和 [13.2 SFT 指令微调](../chapter15_rlhf/imitation-learning-pipeline) 已经说明如何收集人类偏好，并把 `chosen/rejected` 回答对变成奖励模型的训练信号。这条路线依赖一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，人类标注会同时遇到成本、速度和专业判断力的瓶颈。本节由此引出一个问题：**训练信号还能从哪里来？** Anthropic 2022 年提出 Constitutional AI，让 AI 按明确的安全原则评价回答、修订回答并生成偏好对；这也为后面的 RL 微调建立了另一种反馈来源。
 
 ## Constitutional AI 框架
 
@@ -103,7 +103,7 @@ RLAIF（Reinforcement Learning from AI Feedback）和 RLHF 共用 PPO 框架，�
 
 ### 训练 Preference RM
 
-RLAIF 仍然训一个 RM，结构和 RLHF 完全一样，损失仍是 [Bradley-Terry 形式](../chapter15_rlhf/reward-function-design)：
+RLAIF 仍然训练一个 RM，结构和 RLHF 完全一样，损失仍采用 [13.2 介绍的成对偏好形式](../chapter15_rlhf/imitation-learning-pipeline)：
 
 $$
 \mathcal{L}_{RM}(\phi) = -\mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}_{AI}} \log \sigma\big(r_\phi(x, y_w) - r_\phi(x, y_l)\big)
@@ -204,7 +204,7 @@ $$
 \mathcal{L}_{\text{DPO}}(\theta) = -\log \sigma\Big(\beta \log \frac{\pi_\theta(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \beta \log \frac{\pi_\theta(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\Big)
 $$
 
-关键观察：DPO 不需要显式 RM（[第 15 章证明](../chapter17_dpo/dpo-theory-and-family)），所以**整个流程是 self-contained 的**——模型同时是 generator、judge 和 learner。
+关键观察：DPO 不需要显式 RM（[第 14 章证明](../chapter17_dpo/dpo-theory-and-family)），所以**整个流程是 self-contained 的**——模型同时是 generator、judge 和 learner。
 
 ### 三轮迭代的效果
 
@@ -323,7 +323,7 @@ $$
 R(x, y) = w_{\text{task}} r_{\text{RLVR}}(x, y) + w_{\text{safe}} r_{\text{CAI}}(x, y) + w_{\text{hon}} r_{\text{verifier}}(x, y) - \beta D_{KL}
 $$
 
-这种 **multi-objective RL** 是 Claude 3.5 / 4 的核心训练范式，也是 [第 18 章 PRM 引导搜索](../chapter20_prm_search/inference-time-search) 的奖励组合方式之一。
+这种 **multi-objective RL** 是 Claude 3.5 / 4 的核心训练范式，也是 [第 17 章 PRM 引导搜索](../chapter20_prm_search/inference-time-search) 的奖励组合方式之一。
 
 ### Claude 3.5 的几个工程经验
 
@@ -424,7 +424,7 @@ $$
 4. **HHH** 将 Helpful、Harmless、Honest 组织成三个可优化目标，并通过多目标奖励处理它们之间的冲突。
 5. **层级化 Constitution** 用情境训练和原则归因取代简单的规则罗列，使模型能够处理新情境并支持审计。
 
-[第 16 章 RL Environments 与 Verifiers](../chapter18_grpo/rl-environments)继续讨论奖励信号的另一部分：如何用可执行环境和验证器判断数学答案、代码与工具调用是否正确，从而把软偏好与硬规则结合起来。
+[第 15 章 RL Environments 与 Verifiers](../chapter18_grpo/rl-environments)继续讨论奖励信号的另一部分：如何用可执行环境和验证器判断数学答案、代码与工具调用是否正确，从而把软偏好与硬规则结合起来。
 
 ## 延伸阅读
 

@@ -48,7 +48,7 @@ RL 训练需要大量 rollout——每次 rollout 几分钟，让视频 RL 的�
 
 ### DanceGRPO 的核心思想
 
-回顾 [第 16 章 GRPO](../chapter18_grpo/grpo-practice-and-mechanism)：
+回顾 [第 15 章 GRPO](../chapter18_grpo/grpo-practice-and-mechanism)：
 
 - 对同一 prompt 生成 G 个 rollout
 - 计算每个 rollout 的 reward

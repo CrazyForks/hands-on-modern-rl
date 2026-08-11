@@ -185,7 +185,7 @@ Rule checks reduce noise; the LLM judge covers semantic quality. Financial scena
 
 ## GRPO Training: Learning Preferences from Multiple Trajectories
 
-rLLM-FinQA uses GRPO for post-training. Chapter 16 already introduced GRPO's intuition: sample a group of answers for the same question, estimate advantages from within-group relative scores, then update the policy.
+rLLM-FinQA uses GRPO for post-training. Chapter 15 already introduced GRPO's intuition: sample a group of answers for the same question, estimate advantages from within-group relative scores, then update the policy.
 
 Applied to the financial Agent, GRPO's objects are no longer single responses but complete trajectories:
 

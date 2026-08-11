@@ -74,7 +74,7 @@ class ToolAugmentedPolicy(nn.Module):
 
 ## 场景决定 Reward
 
-工具调用的 reward 不像偏好对齐那样主观——它可以根据客观信号来设计。这实际上就是第 16 章提到的 **RLVR（Reinforcement Learning from Verifiable Rewards）** 在 Agentic 场景的直接应用。
+工具调用的 reward 不像偏好对齐那样主观——它可以根据客观信号来设计。这实际上就是第 15 章提到的 **RLVR（Reinforcement Learning from Verifiable Rewards）** 在 Agentic 场景的直接应用。
 
 | 场景     | Reward 来源            | 类型                | 特殊考量                |
 | -------- | ---------------------- | ------------------- | ----------------------- |
@@ -325,16 +325,16 @@ def tool_rl_training_loop(
             optimizer.zero_grad()
 ```
 
-注意这个训练循环的核心思路和第 16 章的 GRPO 非常相似——都是"组内采样多条轨迹，用相对比较来计算 advantage"。区别在于：GRPO 比较的是多条文本回答，这里比较的是多条工具调用轨迹。
+注意这个训练循环的核心思路和第 15 章的 GRPO 非常相似——都是"组内采样多条轨迹，用相对比较来计算 advantage"。区别在于：GRPO 比较的是多条文本回答，这里比较的是多条工具调用轨迹。
 
 ## 与 RLVR 的联系
 
-你可能已经注意到，工具调用 RL 的 reward 设计和第 16 章的 RLVR 非常相似。这不是巧合——**Agentic RL 就是 RLVR 在多轮交互场景的自然延伸**。RLVR 的核心思想是"用可验证的结果作为 reward，不需要训练 Reward Model"。在工具调用场景中，工具的执行结果天然就是可验证的：代码是否通过测试、SQL 查询结果是否正确、搜索结果是否包含目标信息——这些都可以自动化验证，不需要人工标注。
+你可能已经注意到，工具调用 RL 的 reward 设计和第 15 章的 RLVR 非常相似。这不是巧合——**Agentic RL 就是 RLVR 在多轮交互场景的自然延伸**。RLVR 的核心思想是"用可验证的结果作为 reward，不需要训练 Reward Model"。在工具调用场景中，工具的执行结果天然就是可验证的：代码是否通过测试、SQL 查询结果是否正确、搜索结果是否包含目标信息——这些都可以自动化验证，不需要人工标注。
 
 这也是为什么 Agentic RL 被认为比偏好对齐（RLHF/DPO）更适合 Agent 训练的原因之一：偏好对齐需要训练一个 Reward Model 来模拟人类偏好，而 Agent 的任务通常有客观的评判标准，直接用可验证奖励就可以了。
 
 <details>
-<summary>思考题：SFT 教格式 + RL 教策略的两阶段范式，和第 15 章的 DPO 有什么异同？</summary>
+<summary>思考题：SFT 教格式 + RL 教策略的两阶段范式，和第 14 章的 DPO 有什么异同？</summary>
 
 相同之处在于两者都是"先 SFT 再 RL"——先用监督学习教模型基本的格式和能力，再用 RL 优化策略。这是大模型训练的通用范式。
 
@@ -388,7 +388,7 @@ def tool_rl_training_loop(
 
 ## 为什么 Agentic RL 跑不快
 
-在标准的 LLM RL 训练中（如第 8 章的 PPO 或第 16 章的 GRPO），训练循环是纯 GPU 的：模型在 GPU 上生成回答，Reward Model 在 GPU 上打分，梯度在 GPU 上计算。整个过程中最慢的环节通常是 GPU 计算。
+在标准的 LLM RL 训练中（如第 8 章的 PPO 或第 15 章的 GRPO），训练循环是纯 GPU 的：模型在 GPU 上生成回答，Reward Model 在 GPU 上打分，梯度在 GPU 上计算。整个过程中最慢的环节通常是 GPU 计算。
 
 但 Agentic RL 的训练循环完全不同。模型每生成一个"工具调用"动作，就需要暂停等待工具执行的结果。这个执行过程发生在 GPU 之外：
 
@@ -576,16 +576,16 @@ async def parallel_rollouts(model, tasks, sandbox, num_workers=16):
 
 Agentic RL 不是凭空出现的——它和前面章节学过的几乎所有概念都有联系。下面的表格帮你梳理这些联系：
 
-| 概念          | 前面章节                         | Agentic RL 中的对应                     |
-| ------------- | -------------------------------- | --------------------------------------- |
+| 概念          | 前面章节                           | Agentic RL 中的对应                     |
+| ------------- | ---------------------------------- | --------------------------------------- |
 | 动作空间      | 只有"生成 token"（第 13-16 章）    | 扩展为"生成文本 + 调用工具"（异构动作） |
-| Reward 来源   | RM 打分 / 偏好比较（第 13-15 章）  | 环境执行结果（可验证，第 16 章 RLVR）    |
+| Reward 来源   | RM 打分 / 偏好比较（第 13-14 章）  | 环境执行结果（可验证，第 15 章 RLVR）   |
 | 信用分配      | Token 级别 PPO/RLHF（第 8、13 章） | Turn 级别（跨多轮，ORM vs PRM）         |
-| GRPO 组内比较 | 多条回答对比（第 16 章）          | 多条轨迹对比（同样适用）                |
-| 经验回放      | DQN 的 Replay Buffer（第 5 章）  | 工具调用轨迹的回放（需要环境可复现）    |
-| 策略梯度定理  | REINFORCE（第 6 章）            | 多轮策略梯度（Turn-Level Discounting）  |
-| Actor-Critic  | PPO（第 8 章）                   | Agentic PPO（Critic 评估轮次价值）      |
-| RLVR          | 可验证奖励（第 16 章）            | 工具执行结果的天然可验证性              |
+| GRPO 组内比较 | 多条回答对比（第 15 章）           | 多条轨迹对比（同样适用）                |
+| 经验回放      | DQN 的 Replay Buffer（第 5 章）    | 工具调用轨迹的回放（需要环境可复现）    |
+| 策略梯度定理  | REINFORCE（第 6 章）               | 多轮策略梯度（Turn-Level Discounting）  |
+| Actor-Critic  | PPO（第 8 章）                     | Agentic PPO（Critic 评估轮次价值）      |
+| RLVR          | 可验证奖励（第 15 章）             | 工具执行结果的天然可验证性              |
 
 值得注意的是，经验回放在 Agentic RL 中的使用比在标准 DQN 中更加微妙。DQN 的经验回放可以直接复用旧数据，因为环境是确定的（CartPole 的物理规律不变）。但 Agentic RL 中，工具的执行结果可能随时间变化（搜索引擎的结果会更新），所以旧轨迹可能不再有效。这意味着 Agentic RL 的经验回放需要**过期机制**——超过一定时间或者环境状态发生变化的旧轨迹应该被丢弃。
 

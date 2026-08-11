@@ -80,8 +80,7 @@ const LEGACY_INTRO_REDIRECTS = {
   '/chapter09_actor_critic/intro': '/chapter09_actor_critic/advantage-function',
   '/chapter15_rlhf/intro': '/chapter15_rlhf/base-model-to-assistant',
   '/chapter21_cai_rlvr/intro': '/chapter21_cai_rlvr/hhh-practice',
-  '/chapter21_cai_rlvr/rlaif-engineering':
-    '/chapter21_cai_rlvr/hhh-practice',
+  '/chapter21_cai_rlvr/rlaif-engineering': '/chapter21_cai_rlvr/hhh-practice',
   '/chapter20_prm_search/intro': '/chapter20_prm_search/outcome-vs-process',
   '/chapter22_agentic/intro': '/chapter22_agentic/overview',
   '/chapter23_rl_based_swe/intro': '/chapter23_rl_based_swe/swe-bench-and-rlvr',
@@ -335,25 +334,10 @@ function clampDocWidth(value) {
   return Math.min(MAX_DOC_WIDTH, Math.max(MIN_DOC_WIDTH, numeric))
 }
 
-function getSidebarWidthBounds() {
-  if (typeof window === 'undefined') {
-    return { min: MIN_SIDEBAR_WIDTH, max: MAX_SIDEBAR_WIDTH }
-  }
-
-  return {
-    min: MIN_SIDEBAR_WIDTH,
-    max: Math.min(
-      MAX_SIDEBAR_WIDTH,
-      Math.max(MIN_SIDEBAR_WIDTH, window.innerWidth - 260)
-    )
-  }
-}
-
 function clampSidebarWidth(value) {
   const numeric = Number(value)
   if (!Number.isFinite(numeric)) return DEFAULT_SIDEBAR_WIDTH
-  const bounds = getSidebarWidthBounds()
-  return Math.min(bounds.max, Math.max(bounds.min, numeric))
+  return Math.min(MAX_SIDEBAR_WIDTH, Math.max(MIN_SIDEBAR_WIDTH, numeric))
 }
 
 function applyFontSize(size) {
@@ -2433,6 +2417,49 @@ watch(
 
   .ct-mobile-language-switcher {
     display: block;
+  }
+}
+
+/* Keep the full course menu hidden until it fits beside the widest allowed
+   sidebar. Narrower viewports use the same screen menu as mobile. */
+@media (min-width: 768px) and (max-width: 1439px) {
+  .VPNavBar .VPNavBarMenu,
+  .VPNavBar .VPNavBarExtra {
+    display: none !important;
+  }
+
+  .VPNavBar .VPNavBarHamburger {
+    display: flex !important;
+  }
+
+  .VPNavScreen {
+    display: block !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .VPNavBar .container > .title {
+    width: var(--vp-nav-logo-height);
+  }
+
+  .VPNavBarTitle .title {
+    padding-right: 0;
+  }
+
+  .VPNavBarTitle .logo {
+    margin-right: 0;
+  }
+
+  .VPNavBarTitle .ct-nav-title-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
   }
 }
 

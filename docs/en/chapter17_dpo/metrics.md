@@ -1,9 +1,10 @@
 ---
-title: 15.2 Training Metrics
+title: 14.2 Training Metrics
 ---
 
-# 15.2 Training Metrics
-In Section 15.1, we derived the DPO loss. Now let's come back to the experiment and interpret the metrics that `DPOTrainer.train()` prints during training.
+# 14.2 Training Metrics
+
+In Section 14.1, we derived the DPO loss. Now let's come back to the experiment and interpret the metrics that `DPOTrainer.train()` prints during training.
 
 Compared to classic RL benchmarks like CartPole, preference alignment does not have an environment-provided scalar reward per step. As a result, the training log exposes a richer set of internal signals.
 

@@ -59,12 +59,12 @@ Scaling 与 Alignment 的关系
 这一章假定你已经读过：
 
 - [第 13 章 RLHF 评估](../chapter15_rlhf/evaluation)——基础 reward hacking 检测
-- [第 13 章奖励模型](../chapter15_rlhf/reward-function-design)——RM 的训练
-- [第 17 章推理模型](../chapter19_reasoning/cot-visibility-alignment)——推理链中的对齐
+- [第 13 章 RLHF 微调流程](../chapter15_rlhf/standard-rlhf-pipeline)——RM 的训练
+- [第 16 章推理模型](../chapter19_reasoning/cot-visibility-alignment)——推理链中的对齐
 
 本章后续会指向：
 
-- [13.4 AI 反馈与安全原则](../chapter21_cai_rlvr/hhh-practice)
+- [13.3 AI 反馈与安全原则](../chapter21_cai_rlvr/hhh-practice)
 - 附录的安全清单
 
 ## 一个直觉性的开场

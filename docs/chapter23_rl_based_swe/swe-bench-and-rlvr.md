@@ -4,7 +4,7 @@
 
 为什么单独成章？三个原因：
 
-1. **SWE 是 RLVR 的天然战场**——单元测试是完美的"零噪声 verifier"，与 [第 18 章 PRM 的形式化路线](../chapter20_prm_search/formal-prm) 同源
+1. **SWE 是 RLVR 的天然战场**——单元测试是完美的"零噪声 verifier"，与 [第 17 章 PRM 的形式化路线](../chapter20_prm_search/formal-prm) 同源
 2. **2025 年这个领域出现了多个工业级突破**——Meta SWE-RL、字节 DeepSWE、清华 SSR、阿里 CWM，每个都把 SWE-bench 准确率推向新高度
 3. **SWE-RL 是 Agentic RL 的"算法实验室"**——它的很多发现（长 horizon credit assignment、self-play、world model）可以推广到其他领域
 
@@ -54,9 +54,9 @@ RL-based SWE 的工业落地
 
 这一章假定你已经读过：
 
-- [第 16 章 GRPO 改进家族](../chapter18_grpo/grpo-family)——基础 RL 算法
+- [第 15 章 GRPO 改进家族](../chapter18_grpo/grpo-family)——基础 RL 算法
 - [第 19 章 Agentic RL](../chapter22_agentic/overview)——agent 的多轮交互基础
-- [第 18 章 PRM](../chapter20_prm_search/outcome-vs-process)——形式化 verifier 思想
+- [第 17 章 PRM](../chapter20_prm_search/outcome-vs-process)——形式化 verifier 思想
 
 本章后续会指向：
 
@@ -141,7 +141,7 @@ SWE-bench Verified（高质量子集，500 题）的 SOTA 表现：
 
 ## 为什么 SWE 是 RLVR 的理想战场
 
-回顾 [第 16 章 RLVR](../chapter18_grpo/rlvr)——RLVR 的核心思想是**用规则验证替代 RM**。RLVR 需要三个条件：
+回顾 [第 15 章 RLVR](../chapter18_grpo/rlvr)——RLVR 的核心思想是**用规则验证替代 RM**。RLVR 需要三个条件：
 
 1. **任务有明确答案**：对就是对，错就是错
 2. **验证可以自动化**：不需要人工判断

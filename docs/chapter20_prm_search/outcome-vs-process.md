@@ -1,4 +1,4 @@
-# 18.1 Outcome vs Process 奖励
+# 17.1 Outcome vs Process 奖励
 
 上一章我们看到推理模型在硬任务上取得了突破——o1、DeepSeek-R1、Claude Opus 4.6 都能做复杂数学、代码、科研推理。但这些模型都依赖一个关键假设：**最终答案的对错可以作为 RL 的奖励信号**。
 
@@ -61,9 +61,9 @@ GenRM 与 Verifier 模型
 
 这一章假定你已经读过：
 
-- [第 13 章 RLHF 奖励模型](../chapter15_rlhf/reward-function-design)——Outcome Reward Model 的基础
-- [第 16 章 GRPO 改进家族](../chapter18_grpo/grpo-family)——信用分配问题在 GRPO 中的体现
-- [第 17 章推理模型](../chapter19_reasoning/intro)——为什么推理模型需要 PRM
+- [第 13 章 RLHF 微调流程](../chapter15_rlhf/standard-rlhf-pipeline)——Outcome Reward Model 的基础
+- [第 15 章 GRPO 改进家族](../chapter18_grpo/grpo-family)——信用分配问题在 GRPO 中的体现
+- [第 16 章推理模型](../chapter19_reasoning/intro)——为什么推理模型需要 PRM
 
 本章后续会指向：
 
@@ -257,7 +257,7 @@ PRM 的工业实现有两条主要路线，对应不同的训练方法：
 
 模型：LLM + Lean4 verifier。
 
-这三条路线是接下来三节的主题：[18.2 判别式 PRM](./discriminative-prm)、[18.3 生成式 PRM](./generative-prm)、[18.4 形式化 PRM](./formal-prm)。
+这三条路线是接下来三节的主题：[17.2 判别式 PRM](./discriminative-prm)、[17.3 生成式 PRM](./generative-prm)、[17.4 形式化 PRM](./formal-prm)。
 
 ## 小结
 

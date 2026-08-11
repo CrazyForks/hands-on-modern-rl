@@ -118,13 +118,12 @@ If you cannot trace which dataset, which checkpoint, and which evaluation produc
 | Section                                                                | Core question                                             | Deliverable                               |
 | ---------------------------------------------------------------------- | --------------------------------------------------------- | ----------------------------------------- |
 | [13.1 From Base Model to Aligned Assistant](./base-model-to-assistant) | What does a base model miss?                              | base vs SFT vs RLHF comparison            |
+| [13.2 SFT Instruction Tuning](./imitation-learning-pipeline)           | How do preferences become reward-model training signals?  | SFT data, preference data, and RM loss    |
 | [13.4 The RLHF Pipeline](./standard-rlhf-pipeline)                     | What are the inputs/outputs of SFT -> RM -> PPO?          | artifact checklist + flow diagram         |
-| [13.2 SFT Instruction Tuning](./imitation-learning-pipeline)           | How do we build SFT and preference data?                  | data pipeline and masking rules           |
-| [13.3 Reward Models](./reward-function-design)                         | How do we turn preferences into reward?                   | RM loss + metrics + failure modes         |
 | [8.5 PPO-RLHF](./ppo-rlhf-loop)                                        | How do Actor/Ref/RM/Critic work together?                 | the four-model loop + how to read metrics |
+| [13.5 Extended Practice](./extended-practice)                          | What does reward hacking look like in a controlled setup? | a repeatable debugging workflow           |
 | [13.6 Evaluation](./evaluation)                                        | How do we prove we improved without cheating the RM?      | evaluation gate and badcase loop          |
 | [13.7 Hands-On: veRL + GSM8K](./verl-ppo-gsm8k)                        | How does the pipeline look in an industrial framework?    | an end-to-end PPO experiment              |
-| [13.5 Extended Practice](./extended-practice)                          | What does reward hacking look like in a controlled setup? | a repeatable debugging workflow           |
 
 ## Why Evaluation Is Mandatory
 
@@ -157,7 +156,7 @@ After reading this chapter, you should be able to:
 
 - Describe LLM generation in RL terms: states, actions, policy, reward, and trajectories.
 - Explain what each of the three stages — SFT, Reward Model, PPO-RLHF — solves.
-- Write the Bradley-Terry reward model loss by hand, and explain what margin, accuracy, and reward calibration each measure.
+- Explain how a reward model turns response-score differences into preference probabilities, and what margin, accuracy, and reward calibration each measure.
 - Read PPO-RLHF training logs and distinguish genuine improvement from reward hacking.
 - Map the relationship between small TRL experiments, mid-scale OpenRLHF training, and large-scale NeMo RL / NeMo Aligner training.
 

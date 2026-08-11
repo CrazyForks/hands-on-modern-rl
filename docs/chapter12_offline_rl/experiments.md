@@ -8,7 +8,7 @@
 
 ### DPO 作为隐式 Q-Learning
 
-[第 15 章 DPO](../chapter17_dpo/intro) 推导的 DPO 目标：
+[第 14 章 DPO](../chapter17_dpo/intro) 推导的 DPO 目标：
 
 $$\mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(x, y_w, y_l)}\left[\log \sigma\left(\beta \log \frac{\pi_\theta(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \beta \log \frac{\pi_\theta(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\right)\right]$$
 
@@ -58,7 +58,7 @@ $$\mathcal{L} = -\mathbb{E}\left[\log \sigma\left(\hat{A}(x, y_w) - \hat{A}(x, y
 
 DT 的思想在 LLM 时代获得了第二次生命。现代 LLM 本身就是序列模型，把 RL 后训练重新表述为"条件序列生成"几乎是自然的：
 
-- **Process Reward Model + Search**（[第 18 章](../chapter20_prm_search/inference-time-search)）：把 reasoning trajectory 当作决策序列，PRM 作为 step-level reward，beam search 类似 Trajectory Transformer
+- **Process Reward Model + Search**（[第 17 章](../chapter20_prm_search/inference-time-search)）：把 reasoning trajectory 当作决策序列，PRM 作为 step-level reward，beam search 类似 Trajectory Transformer
 - **Expert Iteration / STaR**：用当前模型生成 trajectory，过滤高 reward 轨迹，再 SFT——本质是 DT 的 iterative 版本
 - **In-Context RL（Algorithm Distillation, Laskin et al. 2022）**：把整个 RL 学习历史作为 prompt，让 transformer 学会"在 context 里做 RL"——直接继承 DT 的"RL as sequence modeling" 哲学
 
@@ -72,7 +72,7 @@ graph LR
 ```
 
 ::: tip 一句话总结
-**离线 RL 是 LLM 后训练的母学科**。CQL/IQL 处理外推误差的智慧，DPO 用 KL 约束 + 偏好学习继承了下来；Decision Transformer 把 RL 重写为序列建模的洞察，让 RL 训练栈和 LLM 训练栈合二为一。理解本章，是理解 [第 11 章 模仿学习与反向 RL](../chapter13_imitation_meta_rl/bc-dagger)、[第 18 章 PRM 搜索](../chapter20_prm_search/inference-time-search)、以及 [第 20 章 Code World Model](../chapter23_rl_based_swe/world-model-and-deep-swe) 的前提。
+**离线 RL 是 LLM 后训练的母学科**。CQL/IQL 处理外推误差的智慧，DPO 用 KL 约束 + 偏好学习继承了下来；Decision Transformer 把 RL 重写为序列建模的洞察，让 RL 训练栈和 LLM 训练栈合二为一。理解本章，是理解 [第 11 章 模仿学习与反向 RL](../chapter13_imitation_meta_rl/bc-dagger)、[第 17 章 PRM 搜索](../chapter20_prm_search/inference-time-search)、以及 [第 20 章 Code World Model](../chapter23_rl_based_swe/world-model-and-deep-swe) 的前提。
 :::
 
 ## 本章总结

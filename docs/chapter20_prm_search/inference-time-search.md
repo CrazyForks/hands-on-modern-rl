@@ -1,14 +1,14 @@
-# 18.5 推理时搜索
+# 17.5 推理时搜索
 
 前面三节我们讨论了 PRM 的训练——判别式、生成式、形式化。这一节我们换一个角度：**PRM 在推理时怎么用**。
 
-最直接的应用是 [Best-of-N + Re-ranking](./discriminative-prm)（18.2 节讨论过）——生成 N 个候选，用 PRM 选最好的。但 Best-of-N 是**无记忆的并行采样**，没有利用推理的中间状态。
+最直接的应用是 [Best-of-N + Re-ranking](./discriminative-prm)（17.2 节讨论过）——生成 N 个候选，用 PRM 选最好的。但 Best-of-N 是**无记忆的并行采样**，没有利用推理的中间状态。
 
 **推理时搜索（Inference-time Search）** 是更结构化的方法——把推理过程展开成一棵**思考树（Thought Tree）**，用 PRM 评估每个节点，用搜索算法（DFS、BFS、Beam Search、MCTS）找最优路径。
 
 这一节讨论几种主要的推理时搜索方法。
 
-## 18.5.1 为什么需要搜索？
+## 17.5.1 为什么需要搜索？
 
 考虑一个数学题：
 
@@ -49,7 +49,7 @@ Best-of-N 解决这个问题——生成多条独立路径，用 PRM 选最好�
 - **中间评估**：用 PRM 评估中间状态，决定继续走还是回退
 - **资源分配**：把搜索算力用在最有希望的方向
 
-## 18.5.2 Beam Search over Thoughts
+## 17.5.2 Beam Search over Thoughts
 
 **Beam Search** 是最简单的搜索方法——维护 K 个最优的"部分推理"（beam），每步扩展所有 beam，用 PRM 评估，保留 K 个最好的。
 
@@ -104,7 +104,7 @@ Beam Search 适合：
 - 单步推理容易评估
 - 简单到中等难度的任务
 
-## 18.5.3 Tree of Thoughts（ToT）
+## 17.5.3 Tree of Thoughts（ToT）
 
 [Tree of Thoughts](https://arxiv.org/abs/2305.10601)（Yao et al. 2023）是 Beam Search 的扩展——支持**分支、回退、DFS/BFS 混合**。
 
@@ -182,7 +182,7 @@ def tree_of_thoughts(prompt, model, prm, max_depth=10, breadth=4):
 
 这是一个巨大的提升——同样的 GPT-4 base，仅仅通过更好的推理时搜索，成功率从 7% 提升到 74%。
 
-## 18.5.4 MCTS over Thoughts
+## 17.5.4 MCTS over Thoughts
 
 **Monte Carlo Tree Search（MCTS）** 是 AlphaGo 用的算法。在 LLM 推理上，MCTS 的核心思想是：
 
@@ -234,7 +234,7 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 - **AlphaProof**（[DeepMind 2024](https://deepmind.google/discover/blog/ai-solves-imo-problems-at-silver-medal-level/)）：MCTS + Lean4 verifier
 - **RAP**（[Reasoning via Planning](https://arxiv.org/abs/2305.14992)）：MCTS + LLM 作为 world model
 
-## 18.5.5 AlphaCodium 与 代码生成搜索
+## 17.5.5 AlphaCodium 与 代码生成搜索
 
 [AlphaCodium](https://arxiv.org/abs/2401.08500)（2024.01）是专门为代码生成设计的搜索方法。它的核心思想：
 
@@ -260,7 +260,7 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 - 迭代式（不是树搜索）——简单高效
 - 在 Codeforces 上比单次生成提升 30%+
 
-## 18.5.6 推理时搜索的算力开销
+## 17.5.6 推理时搜索的算力开销
 
 不同搜索方法的算力开销（以"模型 forward 次数"为度量）：
 
@@ -276,7 +276,7 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 
 但在科学计算、形式化证明、竞赛编程等"对就是对的"的任务上，搜索的算力开销是值得的——因为这些任务对正确性的要求极高。
 
-## 18.5.7 训练时 vs 推理时搜索
+## 17.5.7 训练时 vs 推理时搜索
 
 一个深刻的问题是：**搜索应该在训练时做，还是推理时做？**
 
@@ -297,7 +297,7 @@ $$\text{UCB}(n) = Q(n) + c \cdot \sqrt{\frac{\ln N(p)}{N(n)}}$$
 - 训练时轻度搜索（加速收敛）
 - 推理时根据任务难度决定是否搜索
 
-这与 [第 17 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 的思想一致——把算力花在哪里，是一个工程权衡。
+这与 [第 16 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 的思想一致——把算力花在哪里，是一个工程权衡。
 
 ## 小结
 

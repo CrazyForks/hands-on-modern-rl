@@ -1,10 +1,10 @@
-# 18.2 判别式 PRM 路线
+# 17.2 判别式 PRM 路线
 
 判别式 PRM 是最早被系统研究的 PRM 路线。它的思路最直接——把"判断推理步骤对错"建模为一个**分类任务**：输入 prompt + step，输出"这步对/错"的概率。
 
 这一节我们以 OpenAI 的 [Let's Verify Step by Step](https://arxiv.org/abs/2305.20050)（Lightman et al. 2023）为主线，讲解判别式 PRM 的方法、数据集、应用、局限。
 
-## 18.2.1 OpenAI 的过程监督研究
+## 17.2.1 OpenAI 的过程监督研究
 
 2023 年 5 月，OpenAI 发表了 [Let's Verify Step by Step](https://arxiv.org/abs/2305.20050)。这篇论文的背景是：
 
@@ -28,7 +28,7 @@ OpenAI 比较了三种监督方式：
 
 这是一个**显著的提升**——同样的 base model，仅仅通过更细致的监督方式，准确率从 53.9% 提升到 78.2%。这证明了 PRM 的价值。
 
-## 18.2.2 PRM800K 数据集
+## 17.2.2 PRM800K 数据集
 
 [PRM800K](https://github.com/openai/prm800k) 是 OpenAI 公开的步骤级标注数据集。规模：
 
@@ -55,7 +55,7 @@ OpenAI 没有公开 PRM800K 的标注成本，但可以从规模估算：
 
 这个成本对工业实验室（OpenAI、Anthropic、Google）可以承受，但对学术研究和小公司几乎不可行。这就是判别式 PRM 的核心瓶颈——**标注成本太高**。
 
-## 18.2.3 判别式 PRM 的训练
+## 17.2.3 判别式 PRM 的训练
 
 有了 PRM800K，训练一个判别式 PRM 就是标准的分类任务。
 
@@ -85,7 +85,7 @@ PRM800K 只有 800K 标注，对训练一个强大的 PRM 不够。常见增强�
 - **合成数据**：从已知正确的解题过程中生成"看起来像错"的步骤作为负样本
 - **数据混合**：把 PRM800K 和 Math-Shepherd 等其他数据集合并
 
-## 18.2.4 PRM 作为 Re-ranking 模型
+## 17.2.4 PRM 作为 Re-ranking 模型
 
 PRM 的主要应用不是直接用于 RL 训练，而是用于 **Re-ranking（重排序）**。
 
@@ -123,7 +123,7 @@ OpenAI 用的是步骤级——这样更符合人类判断"这步对不对"的�
 
 OpenAI 实验显示 **min** 在数学任务上效果最好——一个步骤错了，整条推理就不可信。但在 creative writing 等任务上 mean 更合适。
 
-## 18.2.5 判别式 PRM 在 RL 训练中的使用
+## 17.2.5 判别式 PRM 在 RL 训练中的使用
 
 Re-ranking 是 inference-time 应用。PRM 也可以用于 RL 训练——把 PRM 的步骤级分数作为 RL 的密集 reward。
 
@@ -147,7 +147,7 @@ def prm_reward(prompt, response):
 
 [Math-Shepherd](https://arxiv.org/abs/2312.08935) 是这种做法的代表作。它在 GSM8K 和 MATH 上用 PRM reward 训练 LLaMA，比 ORM reward 训练的 baseline 高 5-10 个百分点。
 
-## 18.2.6 判别式 PRM 的局限
+## 17.2.6 判别式 PRM 的局限
 
 判别式 PRM 虽然有效，但有几个根本局限：
 
@@ -183,7 +183,7 @@ PRM800K 的标注成本是百万美元级。对于一个新的领域（如代码
 
 不同的切分方式会显著影响 PRM 的判断。这是判别式 PRM 的工程复杂度来源。
 
-## 18.2.7 判别式 PRM 的工业实践
+## 17.2.7 判别式 PRM 的工业实践
 
 尽管有这些局限，判别式 PRM 仍然是工业实践的主流：
 

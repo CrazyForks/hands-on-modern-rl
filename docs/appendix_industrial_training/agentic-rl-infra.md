@@ -18,7 +18,7 @@ A.3 不重复讲 vLLM/SGLang 如何做高吞吐生成，也不重复讲 FSDP、Z
 
 ## 从单轮生成到多轮行动
 
-以第 16 章的 GRPO 训练为例：给定一道数学题，模型一次性生成完整解答，随后检查答案是否正确。整个过程在单轮内完成，模型唯一的操作是文本生成，所有计算均在 GPU 上进行。
+以第 15 章的 GRPO 训练为例：给定一道数学题，模型一次性生成完整解答，随后检查答案是否正确。整个过程在单轮内完成，模型唯一的操作是文本生成，所有计算均在 GPU 上进行。
 
 相比之下，训练一个具备 bug 修复能力的 Agent 需要完全不同的交互模式。模型拿到一段有错误的代码后，需要先读取代码、定位问题、修改代码、运行测试验证结果。若测试未通过，还需继续修改。一个任务可能需要五六个回合，而每一步之间都存在等待——读文件依赖磁盘 IO，跑测试依赖沙箱执行，搜索依赖网络响应。这些操作不在 GPU 上运行，延迟从几十毫秒到几秒不等。
 
@@ -193,7 +193,7 @@ curl -X POST http://controller:8000/scale \
 
 ### 算法、模型和运维
 
-**算法支持。** Relax 内置了四种算法：GRPO（见 [16.1–16.2 节](/chapter18_grpo/grpo-practice-and-mechanism)）、GSPO、SAPO 和 OPD（见 [16.7 节](/chapter18_grpo/on-policy-distillation)）。添加新算法只需实现一个 Service 类并注册到 `ALGOS` 字典。
+**算法支持。** Relax 内置了四种算法：GRPO（见 [15.1–15.2 节](/chapter18_grpo/grpo-practice-and-mechanism)）、GSPO、SAPO 和 OPD（见 [15.7 节](/chapter18_grpo/on-policy-distillation)）。添加新算法只需实现一个 Service 类并注册到 `ALGOS` 字典。
 
 **模型支持。** Qwen3 全系列（4B、30B-A3B MoE）、Qwen3-VL（视觉语言）、Qwen3-Omni（全模态）和 Qwen3.5。
 

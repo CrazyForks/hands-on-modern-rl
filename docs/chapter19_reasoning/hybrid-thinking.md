@@ -1,4 +1,4 @@
-# 17.4 Hybrid Thinking 思考预算
+# 16.4 Hybrid Thinking 思考预算
 
 上一节我们看到 test-time compute scaling 的潜力——模型思考越多，答案越好。但工业部署立刻遇到一个反向问题：**如果模型对所有问题都深度思考，每次 API 调用都要花 10K+ token 在思考上，这会让服务慢得无法用**。
 
@@ -6,7 +6,7 @@
 
 于是 2025 年下半年出现了一个新的工程范式：**Hybrid Thinking**——同一个模型同时支持"思考"和"不思考"两种模式，由用户或模型自己决定用哪种。
 
-## 17.4.1 DeepSeek V3.1 与 Hybrid 模式融合
+## 16.4.1 DeepSeek V3.1 与 Hybrid 模式融合
 
 [DeepSeek V3.1](https://api-docs.deepseek.com/news/news250821)（2025.08）是 Hybrid Thinking 的早期工业实现。V3.1 的设计思路是：
 
@@ -21,7 +21,7 @@ V3.1 的训练流程包括两个阶段：
 
 第二阶段的关键是**保持模型已有的推理能力，同时学会"什么时候该推理、什么时候不该"**。DeepSeek 的具体做法是混合训练数据——一部分 prompt 显式触发推理（数学题），一部分 prompt 不触发（闲聊），让模型自己学到模式切换的判断力。
 
-## 17.4.2 Qwen3 与 Thinking Mode Fusion 与 Thinking Budget
+## 16.4.2 Qwen3 与 Thinking Mode Fusion 与 Thinking Budget
 
 [Qwen3 技术报告](https://arxiv.org/abs/2505.09388)（2025.05）提出了更系统的 Hybrid Thinking 方案。Qwen3 全系模型（从 0.6B 到 235B）都支持两种模式：
 
@@ -57,7 +57,7 @@ response = client.chat.completions.create(
 
 但 thinking budget 也带来一个**算法挑战**：怎么让模型"在 budget 用完时优雅地停下来"？Qwen3 的做法是在 RL 训练中加入**长度惩罚**——超过 budget 的回答会被惩罚。这与 [DAPO 的 Overlong Reward Shaping](../chapter18_grpo/deepseek-dapo) 思路一致。
 
-## 17.4.3 NoThinking + Best-of-N 与 反直觉的发现
+## 16.4.3 NoThinking + Best-of-N 与 反直觉的发现
 
 2025 年 4 月，Ma et al. 发表了一篇有趣的研究——[Reasoning Models Can Be Effective Without Thinking](https://arxiv.org/abs/2504.09858)（常称 NoThinking）。这篇论文提出了一个反直觉的主张：**在很多任务上，"不思考 + Best-of-N" 比 "思考" 效果更好**。
 
@@ -96,7 +96,7 @@ Ma et al. 给出了几个解释：
 
 这个研究的意义不是否定 Thinking，而是揭示了**test-time compute 有多种花法，没有一种是最优的**——任务特征决定最优策略。
 
-## 17.4.4 长 CoT 压缩 与 Kimi k1.5 的 long2short RL
+## 16.4.4 长 CoT 压缩 与 Kimi k1.5 的 long2short RL
 
 推理模型训练后期会出现一个普遍问题：**CoT 越来越长**。R1-Zero、o1、Qwen3 都报告了类似现象——训练步数越多，模型的回答越长，最终长度可以膨胀到 50K+ token。这有几个原因：
 
@@ -150,7 +150,7 @@ long2short 和 thinking budget 是互补的：
 推理阶段：thinking budget 设一个安全上限
 ```
 
-## 17.4.5 Hybrid Thinking 的算法挑战
+## 16.4.5 Hybrid Thinking 的算法挑战
 
 Hybrid Thinking 不是"加一个开关"这么简单。它带来几个新的算法问题：
 

@@ -1,4 +1,4 @@
-# 13.5 RL 微调流程
+# 13.4 RL 微调流程
 
 ## 本节导读
 
@@ -170,7 +170,7 @@ $$
 r_\phi(x,y_w) > r_\phi(x,y_l)
 $$
 
-Bradley-Terry 损失把这个不等式变成可优化目标：
+成对偏好损失把这个不等式变成可优化目标：
 
 $$
 \mathcal{L}_{RM} =
@@ -186,6 +186,54 @@ $$
 $$
 
 accuracy 告诉你排序有没有排对，margin 告诉你信号够不够强。一个 RM 可能 70% 排对，但 chosen 和 rejected 分差都很小；PPO 阶段拿到这种奖励会很难学。
+
+奖励模型通常复用语言模型的主干网络，在最后一个有效 token 的隐藏状态上增加标量输出头。训练时，同一组参数分别读取 chosen 和 rejected，得到两个分数，再用前面介绍的成对偏好损失更新。它学习的是回答之间的相对顺序，因此单个分数不能脱离当前模型和数据分布解释成绝对质量。
+
+从偏好排序到 PPO 奖励还要经过两道检查。第一，训练集和验证集要按 prompt 切分；同一 prompt 下拆出的多组回答对不能分散到两边，否则验证集会共享训练时见过的问题或回答。第二，要在固定校准集上检查奖励的均值、方差与长度相关性。分数尺度过小会被 KL 惩罚淹没，尺度过大又会让策略迅速偏离参考模型。
+
+这一步交付的不只是一个 RM checkpoint，还应包含偏好对准确率、分差分布、奖励与回答长度的相关性，以及一组高分和低分回答的人工抽检结果。具体评测方法放在后面的“评测方法”一节，这里先记住验收条件：**奖励模型既要把顺序排对，也要避免把长度、固定模板或虚假自信当成质量。**
+
+::: details 进阶：奖励模型的最小 PyTorch 结构
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class RewardModel(nn.Module):
+    """输入问题与回答，输出一个标量奖励。"""
+
+    def __init__(self, base_model, hidden_dim):
+        super().__init__()
+        self.base_model = base_model
+        self.reward_head = nn.Linear(hidden_dim, 1)
+
+    def forward(self, input_ids, attention_mask):
+        outputs = self.base_model(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+        )
+        # 实际实现应按 attention_mask 找到每条样本的最后一个有效 token。
+        last_hidden = outputs.last_hidden_state[:, -1, :]
+        return self.reward_head(last_hidden).squeeze(-1)
+
+
+def preference_loss(
+    reward_model,
+    chosen_ids,
+    chosen_mask,
+    rejected_ids,
+    rejected_mask,
+):
+    chosen_reward = reward_model(chosen_ids, chosen_mask)
+    rejected_reward = reward_model(rejected_ids, rejected_mask)
+    return -F.logsigmoid(chosen_reward - rejected_reward).mean()
+```
+
+这段代码只展示参数如何流动：同一个奖励模型分别计算 chosen 和 rejected 的分数，再根据分数差产生梯度。真正训练时还要处理 padding 位置、分布式批处理、按 prompt 切分数据，以及固定校准集上的奖励标准化。
+
+:::
 
 ## Step 3 与 PPO 按奖励练习
 

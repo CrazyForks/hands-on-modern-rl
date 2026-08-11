@@ -129,7 +129,7 @@ def deep_swe_reward(trajectory, final_test_result):
 
 **技巧二：Value Model**
 
-DeepSWE 重新引入 value model（与 VAPO 思路一致）——[参考第 16 章 VAPO](../chapter18_grpo/grpo-family)。
+DeepSWE 重新引入 value model（与 VAPO 思路一致）——[参考第 15 章 VAPO](../chapter18_grpo/grpo-family)。
 
 Value model $V_\phi(s_t)$ 估计当前状态的"未来 reward 期望"。这让 RL 可以用 GAE 做 credit assignment：
 
@@ -187,7 +187,7 @@ DeepSWE 在开源模型中达到 50%——证明了长 horizon RL 训练的可�
 
 DeepSWE 的设计与 [字节 VAPO](../chapter18_grpo/grpo-family) 高度相似——都用 value model 替代 GRPO 的"无 critic"路线。这反映了字节 Seed 内部对 **"长 horizon 任务需要 critic"** 的共识。
 
-这也印证了 [第 16 章 GRPO 改进家族](../chapter18_grpo/grpo-family) 的结论——**critic-free 是工程妥协，不是算法必然**。在长 horizon 任务（长 CoT 推理、长 SWE trajectory）上，value model 重新证明了自己的价值。
+这也印证了 [第 15 章 GRPO 改进家族](../chapter18_grpo/grpo-family) 的结论——**critic-free 是工程妥协，不是算法必然**。在长 horizon 任务（长 CoT 推理、长 SWE trajectory）上，value model 重新证明了自己的价值。
 
 ## 20.2.3 Test-time Search 集成
 
@@ -251,7 +251,7 @@ def deep_swe_beam_search(issue, model, value_model, K=4):
     return beams[0]["state"]
 ```
 
-Beam Search 让 DeepSWE 在推理时多花算力换准确率——与 [第 17 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 一致。
+Beam Search 让 DeepSWE 在推理时多花算力换准确率——与 [第 16 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 一致。
 
 ## 20.2.4 工业实践的对比
 

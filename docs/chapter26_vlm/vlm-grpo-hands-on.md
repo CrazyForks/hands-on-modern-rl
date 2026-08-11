@@ -1,6 +1,6 @@
 # 23.3 动手：中国多模态前沿
 
-第 16 章我们跑过 GRPO 训练纯文本模型做数学推理——给模型一道数学题，让它生成多个推理路径，用规则奖励（答案对不对）来计算组内相对优势，然后更新策略。现在我们要做一件更酷的事：给模型一张图片和一个关于图片的问题，让它先"看"再"想"再"答"。
+第 15 章我们跑过 GRPO 训练纯文本模型做数学推理——给模型一道数学题，让它生成多个推理路径，用规则奖励（答案对不对）来计算组内相对优势，然后更新策略。现在我们要做一件更酷的事：给模型一张图片和一个关于图片的问题，让它先"看"再"想"再"答"。
 
 这个实验的核心区别在于输入：纯文本 GRPO 的输入是一串 token，而 VLM GRPO 的输入是**视觉 token（图像编码）+ 文本 token（问题）**。奖励函数和优化算法本身没有变化——GRPO 的核心代码完全一样，只是模型的输入多了一个图像维度。
 
@@ -197,7 +197,7 @@ def vlm_grpo_train(model, tokenizer, dataset, num_epochs=3, group_size=4, lr=1e-
                 all_rewards.append(group_rewards)
 
             # GRPO 核心：计算组内相对优势
-            # 回顾第 16 章：组内相对优势 Advantage = (R_i - mean) / std
+            # 回顾第 15 章：组内相对优势 Advantage = (R_i - mean) / std
             rewards_tensor = torch.tensor(all_rewards)
             mean_r = rewards_tensor.mean(dim=-1, keepdim=True)
             std_r = rewards_tensor.std(dim=-1, keepdim=True) + 1e-8

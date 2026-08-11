@@ -3,6 +3,7 @@ title: 13.2 SFT Instruction Tuning
 ---
 
 # 13.2 SFT: Teaching Models to Follow Instructions
+
 ## Reading Guide
 
 **Core points**
@@ -316,17 +317,32 @@ A common beginner mistake is watching only SFT loss. SFT loss decreasing only me
 
 Preference data is the core fuel for DPO and the second stage of RLHF (RM training). Each data point is a triplet $(x, y_w, y_l)$: given the same prompt $x$, the model generates two responses, and a human (or AI) annotator labels $y_w$ (chosen) as better than $y_l$ (rejected).
 
-### The Minimal Math of Preference Modeling: Bradley-Terry and Pairwise Loss
+### How Preference Data Trains a Reward Model
 
-Why does a preference data point look like `chosen` vs `rejected`? Because it naturally corresponds to a simple probabilistic model: given the same prompt, the "quality" of a response can be represented by a scalar scoring function $r_\phi(x, y)$, and the probability of winning is expressed via a logistic function (Bradley-Terry). [^bt]
+Preference data tells us only that response A is better than response B, while PPO needs a numeric reward it can optimize. RLHF therefore introduces a reward model $r_\phi(x,y)$ between preference annotation and PPO. Given a prompt $x$ and response $y$, it outputs a scalar score.
 
-The pairwise loss commonly used in RM training is:
+The score is not an absolute grade. What matters is the difference between the chosen and rejected scores:
+
+$$
+\Delta r=r_\phi(x,y_w)-r_\phi(x,y_l)
+$$
+
+A positive difference means the reward model favors the chosen response. A larger difference means greater confidence. A sigmoid converts this difference into a preference probability:
+
+$$
+P(y_w \succ y_l\mid x)
+=\sigma\!\left(r_\phi(x,y_w)-r_\phi(x,y_l)\right)
+$$
+
+This way of modeling pairwise preferences from score differences is commonly called the **Bradley–Terry model**. [^bt] The mechanism—score difference to preference probability—is what matters for the rest of the chapter.
+
+The corresponding negative log-likelihood loss is:
 
 $$
 \mathcal{L}_{RM} = - \mathbb{E}_{(x, y_w, y_l)}\left[\log \sigma(r_\phi(x, y_w) - r_\phi(x, y_l))\right]
 $$
 
-The intuition behind this formula is very engineering-friendly: we do not require the RM to produce an "absolute score" — we only require it to rank responses for the same prompt correctly.
+If the chosen score is already much higher, the probability is close to 1 and the loss is small. If the reward model reverses the order, the loss becomes large and the gradient pushes the chosen score upward and the rejected score downward. This is also why pairwise annotation is useful: annotators generally agree more consistently on which of two responses is better than on absolute numeric grades.
 
 ### Four Sources of Preference Data
 
@@ -444,7 +460,7 @@ flowchart LR
 
 The three stages are not mechanically chained — the output quality of each stage directly affects the starting point of the next. If SFT data quality is poor, the model cannot even learn basic formatting, and the RM has nothing to evaluate; if preference data quality is poor, the RM learns a wrong scoring standard, and RL steers the model in the wrong direction. This is why data engineering is the true core of RLHF.
 
-With the data engineering details covered, the next step is to dive into the "heart" of RLHF — the reward function. It determines the direction of model optimization; a bad design sends everything off course. Let us move to the next section — [Reward Model: Training a Judge](./reward-function-design).
+Once preference data is ready, the remaining questions are who produces those preferences and how the reward model connects to PPO. The following sections cover AI feedback and the RL fine-tuning pipeline.
 
 ## Section Summary
 

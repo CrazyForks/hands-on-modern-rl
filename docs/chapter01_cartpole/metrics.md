@@ -710,8 +710,8 @@ graph TD
     AC --> PPO["PPO（第 8 章）<br/>← 你刚用的就是这个"]
 
     PPO --> LLM["LLM 对齐"]
-    LLM --> DPOG["DPO（第 15 章）<br/>← 第 15 章要用的"]
-    LLM --> GRPOG["GRPO（第 16 章）"]
+    LLM --> DPOG["DPO（第 14 章）<br/>← 第 14 章要用的"]
+    LLM --> GRPOG["GRPO（第 15 章）"]
 
     style ROOT fill:#f8f9fa,stroke:#24292f,color:#24292f
     style VB fill:#e3f2fd,stroke:#1976d2,color:#000
@@ -738,7 +738,7 @@ graph TD
 这张图会在后续每章的开头再次出现。
 当前只需记住一个要点：
 **本章使用的 PPO，正是两条路线汇合后的产物。
-第 15 章将要介绍的 DPO，则是 PPO 在 LLM 时代的简化版本。**
+第 14 章将要介绍的 DPO，则是 PPO 在 LLM 时代的简化版本。**
 
 在下一章中，我们将看到强化学习不仅限于让小车平衡杆子——
 它同样能让大语言模型学会对齐人类偏好。

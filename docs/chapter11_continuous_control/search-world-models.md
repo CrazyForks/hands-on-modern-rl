@@ -225,7 +225,7 @@ Dreamer V3（Hafner et al. 2023）的关键贡献：**单一超参数设置**跨
 LLM 训练中：
 
 - **Model-Free**：RLHF/GRPO 直接用 RM 奖励训练（model-free）
-- **Model-Based**：Process Reward Model、Verifier 模型就是某种"环境模型"，PRM 引导的搜索（[第 18 章 PRM 与搜索](../chapter20_prm_search/inference-time-search)）类比 AlphaZero
+- **Model-Based**：Process Reward Model、Verifier 模型就是某种"环境模型"，PRM 引导的搜索（[第 17 章 PRM 与搜索](../chapter20_prm_search/inference-time-search)）类比 AlphaZero
 - **World Model**：Code World Model（[第 20 章 SWE-Agent](../chapter23_rl_based_swe/world-model-and-deep-swe)）预测代码执行结果，是 LLM 时代的 MuZero
 
 理解了 model-based 与 model-free 的权衡，你就能理解为什么 Tongyi DeepResearch 用 PRM 引导搜索、为什么 SWE-Agent 用 Code World Model 提升样本效率。

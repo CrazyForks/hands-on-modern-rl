@@ -56,7 +56,7 @@ StepFun（阶跃星辰）是国内音频 LLM 的代表厂商。Step-Audio 系列
 
 #### Inverted scaling 反常现象
 
-文本和视觉推理模型普遍遵循 test-time compute scaling law——给模型更多推理 token，性能可预测地提升（见 [第 17 章推理模型](../chapter19_reasoning/intro)）。但音频域出现反常：
+文本和视觉推理模型普遍遵循 test-time compute scaling law——给模型更多推理 token，性能可预测地提升（见 [第 16 章推理模型](../chapter19_reasoning/intro)）。但音频域出现反常：
 
 ```mermaid
 graph LR
@@ -277,7 +277,7 @@ R1.5 的 RL 损失综合 RLVR 和 RLHF：
 
 $$\mathcal{L}_{\text{RL}} = \underbrace{\mathbb{E}_{\mathcal{D}_{\text{verified}}}\left[R_{\text{verify}}(r, a)\right]}_{\text{客观正确性（RLVR）}} + \lambda \cdot \underbrace{\mathbb{E}_{\mathcal{D}_{\text{pref}}}\left[\log\sigma\left(\beta \log\frac{\pi_\theta(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \beta \log\frac{\pi_\theta(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\right)\right]}_{\text{主观偏好（DPO 形式）}}$$
 
-前项保住客观推理能力（不让 RLHF 把 RLVR 学到的东西遗忘），后项用 DPO 损失（见[第 15 章 DPO](../chapter17_dpo/dpo-theory-and-family)）对齐主观体验。$\lambda$ 平衡两者——这是音频 RL 的核心超参。
+前项保住客观推理能力（不让 RLHF 把 RLVR 学到的东西遗忘），后项用 DPO 损失（见[第 14 章 DPO](../chapter17_dpo/dpo-theory-and-family)）对齐主观体验。$\lambda$ 平衡两者——这是音频 RL 的核心超参。
 
 ### 保留韵律自然度
 

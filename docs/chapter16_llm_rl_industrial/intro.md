@@ -1,42 +1,83 @@
-# 14.1 训练框架与双轨奖励
+---
+outline: false
+---
 
-[第 13 章 RLHF](../chapter15_rlhf/base-model-to-assistant) 给出了对齐训练的完整闭环：Reward Model 训练、PPO 主循环、KL 约束、评测方法。那里的实验跑在 7B 模型、单机 8 卡上。但当训练对象换成 671B 的 MoE、上下文拉到 128K、rollout 跑在千卡集群上时，每一处工程细节都会决定训练能否收敛。本章把视角从"算法层面"提升到"工业系统层面"——讲清训练框架选型、奖励信号设计、训练成本核算和工业面试里反复出现的核心推导。
+# 18.1 从单机实验到工业训练
 
-为了保持章节连贯，本章把同一主题的不同侧面分散到四个文件。本文件覆盖训练框架、双轨奖励、成本估算与常见推导，其余内容按下表跳转：
+[第 13 章 RLHF](../chapter15_rlhf/base-model-to-assistant) 建立了经典对齐流水线；[第 14 章 DPO](../chapter17_dpo/intro) 和[第 15 章 GRPO、RLVR](../chapter18_grpo/grpo-practice-and-mechanism)给出了不同的模型更新与奖励方法；[第 16 章推理模型](../chapter19_reasoning/intro)和[第 17 章 PRM](../chapter20_prm_search/outcome-vs-process)继续扩展了训练与推理阶段的能力。现在把这些方法放进同一个工业系统，观察它们怎样共享数据、算力、评测和训练基础设施。
 
-| 小节                                                              | 主题                       | 文件                                          |
-| ----------------------------------------------------------------- | -------------------------- | --------------------------------------------- |
-| [14.2 现代后训练流水线范式](./industrial-post-training)           | 国内外大厂后训练全景       | `chapter17_dpo/industrial-post-training.md`   |
-| [14.3 优化器与训练稳定性](./modern-industrial-practice)           | GLM-4.6、Llama 4、MuonClip | `chapter17_dpo/modern-industrial-practice.md` |
-| [16.8 动手 veRL 代码生成 RL](../chapter18_grpo/verl-code-sandbox) | 代码题 verifier + PPO 实战 | `chapter18_grpo/verl-code-sandbox.md`         |
+第 18 章沿着一个工业训练任务逐步展开：本节先说明单机实验为什么需要扩展；[18.2](./industrial-post-training) 把数据、训练、评测和数据回流接成完整流程；[18.3](./modern-industrial-practice) 解释训练为什么会失稳；[18.4](./distributed-sync) 说明多张 GPU 如何协同执行这条流程；[18.5](./data-engineering) 再把任务、环境、轨迹和验证结果整理成可持续使用的数据资产。
+
+假设训练数据里有一个问题：“为什么天空看起来是蓝色的？”一次训练会经过下面几步：
+
+1. **Actor 生成回答。** 它是正在训练的语言模型。
+2. **Reward Model 给回答打分。** 分数越高，说明回答越符合人类偏好。
+3. **Reference Model 提供参照。** 它帮助计算 KL 惩罚，避免 Actor 一次更新得太远。
+4. **Critic 估计这次回答比预期好多少。** PPO 用这个估计计算优势；GRPO 可以用同组回答的相对分数代替 Critic。
+5. **训练进程更新 Actor。** 新参数随后交给下一轮生成使用。
+
+模型较小时，这些角色可以在同一台机器上依次运行。模型和数据规模增大以后，问题首先出在执行方式上：多个模型无法同时装进有限显存；生成回答通常比一次参数更新慢；训练得到的新参数还要及时交给生成进程。只要其中一步等待过久，其他 GPU 就会闲置。
+
+**训练框架的作用，是安排这些角色在什么设备上运行、何时交换数据、何时同步新参数。** 它没有改变 PPO、GRPO 或奖励模型的数学定义，只是让同一条训练流程能够稳定地跑在多张卡和多台机器上。
+
+## 先看两个使用场景
+
+选择工具之前，先看模型能不能在现有机器上完成训练：
+
+| 你遇到的情况                 | 可以先用     | 具体要做什么                                                       |
+| ---------------------------- | ------------ | ------------------------------------------------------------------ |
+| 第一次训练自己的模型         | LlamaFactory | 准备数据和配置，依次运行 SFT、奖励模型、PPO 或 DPO                 |
+| 模型太大，单机放不下或跑得慢 | slime        | 把模型训练和回答生成分配到多张 GPU，并在每轮更新后同步最新模型参数 |
+
+先用 LlamaFactory 看清数据怎样进入训练、每个阶段会产出什么模型。等到单机显存不足，或者生成回答占用大量时间，再学习 slime 如何安排多张 GPU。这样可以先解决训练方法的问题，再处理多机系统的问题。
+
+本课程后面仍会使用 veRL 完成代码生成 RL 实验。veRL 与 slime 都能承担规模化 RL 训练，二者采用的训练与生成后端不同。OpenRLHF 则是基于 Ray、DeepSpeed 和 vLLM 的另一套方案，放在进阶对比中了解即可。
+
+## 同步与异步解决什么问题
+
+假设一批任务里有九道短数学题和一道需要反复调用工具的任务。前九道题很快结束，最后一道却要运行几分钟。
+
+- **同步训练**会等整批任务全部完成，再统一计算奖励和更新模型。数据较新，流程也容易理解，但所有进程都要等待最慢的任务。
+- **异步训练**让已经完成的结果先进入队列，训练进程可以持续取数据更新。设备等待更少，但数据可能来自稍早的模型，因此还要控制经验陈旧的问题。
+
+数学和代码题的生成时长较接近，通常先用同步方案。工具调用、浏览器操作和长时间环境交互的耗时差别很大，更容易从异步方案中受益。
+
+::: tip 第一次阅读到这里即可
+先记住一条线：**生成回答 → 计算奖励 → 更新模型 → 同步新参数**。训练框架负责让这四步在多张 GPU 上顺畅衔接。下面保留框架选型、奖励工程、成本估算和系统设计细节，需要实现大规模训练时再展开。
+:::
+
+:::: details 进阶参考：更多训练框架与选型细节
 
 ## 训练框架对比
 
-LLM RL 训练框架要同时编排多个模型（Actor、Critic、Reference、Reward Model、Rollout Engine），还要处理 on-policy 数据流、分布式训练、推理引擎权重同步等工程问题。这些需求超出了 HuggingFace `Trainer` 或 `Accelerate` 的设计边界，因此 2024 年起出现了专门面向 LLM RL 的训练框架。本节对比七个有代表性的开源框架，给出选型决策依据。
+LLM RL 训练框架要同时编排多个模型（Actor、Critic、Reference、Reward Model、Rollout Engine），还要处理 on-policy 数据流、分布式训练、推理引擎权重同步等工程问题。下面按用途介绍有代表性的工具，重点是理解它们各自解决哪一层问题。
 
 ### 框架全景
 
 ```mermaid
-flowchart TB
-    subgraph Sync["同步 PPO/GRPO 框架"]
-        veRL["veRL<br/>(字节, HybridFlow)"]
-        OpenRLHF["OpenRLHF<br/>(开源社区, Ray+DeepSpeed)"]
-        TRL["TRL<br/>(HuggingFace, 入门级)"]
-        NeMo["NeMo-Aligner<br/>(NVIDIA, Megatron 系)"]
+flowchart LR
+    subgraph Learn["先跑通后训练"]
+        LlamaFactory["LlamaFactory<br/>SFT / RM / PPO / DPO"]
+        TRL["TRL<br/>研究与教学实验"]
     end
-    subgraph Async["异步 RL 框架"]
-        AReaL["AReaL<br/>(Ant Group+清华, 流式异步)"]
-        AgentRL["AgentRL<br/>(THUDM/智谱, 多轮多任务)"]
-        SLIME["slime<br/>(THUDM/智谱, RL scaling)"]
-        ROLL["ROLL<br/>(阿里达摩院, rollout 工厂)"]
-        LlamaRL["LlamaRL<br/>(Meta, 纯异步后训练)"]
+    subgraph Scale["再放大 RL 训练"]
+        slime["slime<br/>Megatron + SGLang"]
+        veRL["veRL<br/>训练与 rollout 编排"]
+        OpenRLHF["OpenRLHF<br/>Ray + DeepSpeed + vLLM"]
     end
-    Sync --> Policy["Actor 训练<br/>(FSDP / Megatron)"]
-    Async --> Policy
-    Policy --> Converge["RL 收敛"]
+    subgraph Long["处理长时间环境交互"]
+        Async["异步与 Agentic RL 方案"]
+    end
+    Learn --> Scale --> Long
 ```
 
-### veRL、OpenRLHF、TRL、NeMo-Aligner
+### 常规后训练与分布式 RL
+
+#### LlamaFactory
+
+[LlamaFactory](https://github.com/hiyouga/LlamaFactory) 把持续预训练、SFT、奖励模型、PPO、DPO 等后训练方法放在统一的数据格式和配置入口下，也支持全量微调、LoRA 与量化微调。它适合先看清“准备什么数据、选择什么训练阶段、得到什么模型”，因此放在本节的学习入口。
+
+LlamaFactory 也能运行 PPO，但它在这里承担的是实验入口。等到生成吞吐、跨节点调度和频繁权重同步成为主要问题时，再进入 slime、veRL 或 OpenRLHF 这类专门面向分布式 RL 数据流的框架。
 
 #### veRL
 
@@ -44,13 +85,11 @@ flowchart TB
 
 veRL 的工程亮点是把训练栈和推理栈解耦：Actor 用 FSDP/Megatron 训练，Rollout 用 vLLM 推理，二者通过权重同步接口 `sync_weights` 衔接。这种解耦让 vLLM 的 PagedAttention、Continuous Batching、Tensor Parallelism 等推理优化能直接接入 RL 训练，rollout 吞吐比朴素 HuggingFace 生成高 5-10 倍。
 
-veRL 是 Qwen3、DeepSeek-R1、Llama 4、Mistral 等开源训练脚本的事实选择。详细架构参考 [第 14 章 14.4 分布式同步、异步与 MoE 训练](./distributed-sync)。
+veRL 是 Qwen3、DeepSeek-R1、Llama 4、Mistral 等开源训练脚本的事实选择。详细架构参考 [18.4 多机 RL 训练如何协同](./distributed-sync)。
 
 #### OpenRLHF
 
-[OpenRLHF](https://github.com/OpenRLHF/OpenRLHF)（开源社区，2024）走的是 Ray + DeepSpeed 路线。它把 Actor、Critic、Reward Model、Reference 都包装成 Ray Actor，用 Ray 的分布式调度做跨节点通信。训练后端是 DeepSpeed ZeRO，支持 ZeRO-1/2/3 三种零冗余优化器。
-
-OpenRLHF 的优势是**社区友好**——配置文件接近 HuggingFace 风格，算法覆盖最全（PPO、GRPO、DPO、KTO、SimPO、Rejection Sampling、Iterative DPO），文档详尽，适合学术复现。劣势是大规模训练的吞吐不如 veRL——OpenRLHF 的 rollout 没有原生 vLLM 集成（需要外挂），权重同步开销大。
+[OpenRLHF](https://github.com/OpenRLHF/OpenRLHF) 采用 Ray 编排、DeepSpeed 训练和 vLLM rollout，覆盖 PPO、GRPO、REINFORCE++ 等方法，并提供异步 RL 能力。它与 slime、veRL 属于同一层的可选工程方案，不需要在第一次阅读时记忆。需要使用 DeepSpeed/Ray 技术栈，或准备比较不同分布式 RL 架构时，再展开了解。
 
 #### TRL
 
@@ -60,7 +99,7 @@ OpenRLHF 的优势是**社区友好**——配置文件接近 HuggingFace 风格
 
 [NeMo-Aligner](https://github.com/NVIDIA/NeMo-Aligner)（NVIDIA）是 NeMo 训练栈的 RL 扩展，底层是 Megatron-LM。它的特点是和 NVIDIA 硬件栈深度绑定：支持 TensorRT-LLM 推理加速、TransformerEngine 的 FP8 训练、NVLink 全互联优化。NeMo-Aligner 在 H100/H200 集群上有最佳单卡吞吐，但配置复杂度高、社区生态比 veRL/OpenRLHF 小。
 
-### AReaL、AgentRL、SLIME、ROLL、LlamaRL
+### 异步与 Agentic RL
 
 同步框架（veRL/OpenRLHF/NeMo）在 RLHF/GRPO 任务上工作良好，因为单次 rollout 短（数学题平均 500-2000 token）。但 Agentic RL 任务（SWE、Browser、DeepResearch）的 rollout 耗时差异巨大——快的几秒，慢的要跑测试、调工具、等待环境响应，可能几分钟。同步训练会让整个 GPU 集群等待最慢的 episode，利用率掉到 30% 以下。
 
@@ -92,40 +131,42 @@ $$\rho_t^{\text{stale}} = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{gen
 
 ### 框架对比表
 
-下表把七个框架的关键维度对齐：
+下表只比较学习时需要区分的定位，不记录会频繁变化的 Stars 和版本数字：
 
-| 框架         | 出处            | 训练后端       | 推理引擎    | 异步支持 | 典型规模    | 算法覆盖               | GitHub Stars (2026Q2) | 社区活跃度 |
-| ------------ | --------------- | -------------- | ----------- | -------- | ----------- | ---------------------- | --------------------- | ---------- |
-| **veRL**     | 字节跳动        | FSDP/Megatron  | vLLM        | 部分     | 千卡        | PPO/GRPO/DPO/SPIN/RS   | 9.8k                  | 极高       |
-| **OpenRLHF** | 开源社区        | DeepSpeed ZeRO | vLLM/SGLang | 否       | 百卡        | PPO/GRPO/DPO/KTO/SimPO | 5.2k                  | 高         |
-| **TRL**      | HuggingFace     | Accelerate     | 无原生      | 否       | 单机/小集群 | PPO/GRPO/DPO           | 11k                   | 高         |
-| **NeMo**     | NVIDIA          | Megatron-LM    | TRT-LLM     | 否       | 千卡        | PPO/DPO/SteerLM        | 1.8k                  | 中         |
-| **AReaL**    | Ant Group和清华 | FSDP           | vLLM/SGLang | 全异步   | 百-千卡     | PPO/GRPO + 异步        | 1.1k                  | 中         |
-| **AgentRL**  | THUDM/智谱      | FSDP/Ray       | SGLang      | 全异步   | 千卡        | GRPO + 多轮多任务      | 0.8k                  | 中         |
-| **LlamaRL**  | Meta            | Megatron       | 自研        | 全异步   | 万卡        | 内部 PPO 变体          | 0.5k                  | 低（内部） |
+| 工具         | 主要定位              | 适合什么时候学习                       |
+| ------------ | --------------------- | -------------------------------------- |
+| LlamaFactory | 统一的后训练实验入口  | 第一次运行 SFT、奖励模型、PPO 或 DPO   |
+| TRL          | Hugging Face 研究工具 | 阅读算法实现或制作小型教学实验         |
+| slime        | RL scaling            | 学习 Megatron、SGLang 和 RL 数据循环   |
+| veRL         | 分布式 RL 编排        | 完成本课程后续实战，理解训练与生成协作 |
+| OpenRLHF     | Ray/DeepSpeed RL      | 需要这一技术栈或比较工程方案           |
+| AReaL 等     | 异步与 Agentic RL     | rollout 耗时差别很大、同步等待严重时   |
 
 ### 选型决策树
 
 ```text
-你的训练规模？
-├── 单机/单卡（7B 以下）
-│   └── TRL（最简单，文档好）
-├── 小集群（8-32 卡，7B-30B）
-│   └── OpenRLHF（社区好，算法全）
-├── 中等集群（32-256 卡，30B-100B）
-│   ├── 同步任务（数学、代码 RLVR）→ veRL
-│   └── 异步任务（Agent、长 rollout）→ AReaL
-└── 大集群（256+ 卡，100B+）
-    ├── MoE + 长上下文 → veRL + Megatron
-    ├── 万亿参数 + 物理分离 → LlamaRL 风格
-    └── 多轮工具 + 自定义 rollout → AgentRL / slime
+你现在要解决什么问题？
+├── 第一次跑后训练
+│   └── LlamaFactory
+├── 学习本课程的规模化 RL 实战
+│   └── veRL
+├── 使用 Megatron + SGLang 放大 RL
+│   └── slime
+├── 使用 Ray + DeepSpeed + vLLM
+│   └── OpenRLHF
+└── 长时间工具或环境交互造成大量等待
+    └── 再比较异步 Agentic RL 方案
 ```
 
-实战中一个反复出现的模式是：**先用 TRL/OpenRLHF 做算法验证，再用 veRL 做规模放大**。算法正确性验证不需要大规模集群，TRL 单卡 30 分钟能跑通 GRPO。验证通过后再切到 veRL 做大规模训练，避免在工程问题上浪费算法迭代时间。
+学习顺序可以压缩成两步：先用 LlamaFactory 检查数据格式、奖励和训练目标，再根据已有技术栈选择 slime、veRL 或 OpenRLHF 放大训练。这样可以把算法问题与分布式系统问题分开定位。
+
+::::
+
+:::: details 进阶参考：双轨奖励设计
 
 ## 双轨奖励设计
 
-[14.2 节](./industrial-post-training) 已经提到，现代后训练把奖励分成两类——**Verifiable Reward**（可验证奖励）和 **Pairwise Preference Reward**（成对偏好奖励）。本节深入讨论二者的数学结构、适用边界和工业级的混合策略。
+[18.2 节](./industrial-post-training) 已经提到，现代后训练把奖励分成两类——**Verifiable Reward**（可验证奖励）和 **Pairwise Preference Reward**（成对偏好奖励）。本节深入讨论二者的数学结构、适用边界和工业级的混合策略。
 
 ### 两条奖励路线的本质差异
 
@@ -237,6 +278,10 @@ $$\tilde{r}_{\text{domain}} = \frac{r - \mu_{\text{domain}}}{\sigma_{\text{domai
 
 另一种做法是 **GRPO 的组内归一化**——同一 prompt 的 $G$ 个 rollout 内部做 z-score。这天然消除了跨 prompt 的尺度差异，是 GRPO 相比 PPO 的一个隐含优势。
 
+::::
+
+:::: details 进阶参考：训练成本估算
+
 ## 训练成本估算
 
 工业 LLM 训练的成本核算是融资、招聘、算力采购的决策依据。本节给出从预训练到 RL 的完整成本模型，并用 DeepSeek、Qwen、Llama 公开数据校准估算公式。
@@ -339,6 +384,10 @@ $$C_{\text{inference}} = \text{requests} \cdot \text{avg\_tokens} \cdot \frac{2 
 3. **混合精度训练**：BF16 训练比 FP32 快 2 倍；FP8（H100 支持）再快 1.5-2 倍。但低精度训练对稳定性要求更高，需要 QK-clip 等技巧。
 4. **Checkpoint 复用**：pretraining → SFT → RL 各阶段保留 checkpoint，避免从零重训。DeepSeek 的多阶段训练流水线就是基于 checkpoint 复用设计的。
 
+::::
+
+:::: details 进阶参考：系统设计与面试推导
+
 ## 中国对齐团队面试常见考点
 
 本节梳理 2025-2026 年智谱、字节 Seed、Moonshot、阿里通义、DeepSeek、腾讯混元等中国对齐团队面试中反复出现的核心考点。这些考点不是"考题集锦"，而是反映工业团队真正关心的能力维度——**算法推导能力、工程系统理解、训练资源推算**。
@@ -389,7 +438,7 @@ PPO 要训练 Critic 估计 $A_t$，但在 LLM 场景下 Critic 是和 Actor 同
 
 $$A_i = \frac{r_i - \text{mean}(r_1, \ldots, r_G)}{\text{std}(r_1, \ldots, r_G)}$$
 
-其中 $r_i$ 是第 $i$ 个 rollout 的 reward，$G$ 是组大小。这样省掉了 Critic 网络，advantage 直接从组内 reward 统计得到。详细推导见 [16.1 节 GRPO 核心机制](../chapter18_grpo/grpo-practice-and-mechanism)。
+其中 $r_i$ 是第 $i$ 个 rollout 的 reward，$G$ 是组大小。这样省掉了 Critic 网络，advantage 直接从组内 reward 统计得到。详细推导见 [15.1 节 GRPO 核心机制](../chapter18_grpo/grpo-practice-and-mechanism)。
 
 #### 面试加分项
 
@@ -431,7 +480,7 @@ $$P(o_w \succ o_l \mid q) = \sigma\left(\beta \log \frac{\pi^*(o_w \mid q)}{\pi_
 
 $$\mathcal{L}_{\text{DPO}} = -\mathbb{E}\left[\log \sigma\left(\beta \log \frac{\pi_\theta(o_w \mid q)}{\pi_{\text{ref}}(o_w \mid q)} - \beta \log \frac{\pi_\theta(o_l \mid q)}{\pi_{\text{ref}}(o_l \mid q)}\right)\right]$$
 
-详细推导见 [第 15 章 DPO 推导](../chapter17_dpo/intro)。
+详细推导见 [第 14 章 DPO 推导](../chapter17_dpo/intro)。
 
 #### DPO 家族对比
 
@@ -578,21 +627,16 @@ $$\text{成本} = 3300 \times 2 = \$6,600$$
 
 回答这类问题的核心是**系统性思维**——不只是"用 PPO 算法"，而是从数据到部署的全链路设计。
 
-## 本章总结
+::::
 
-第 14 章把视角从算法层面提升到工业系统层面：
+## 本节小结
 
-1. **训练框架对比**（17.1）：veRL、OpenRLHF、TRL、NeMo-Aligner 同步阵营 vs AReaL、AgentRL、SLIME、ROLL、LlamaRL 异步阵营。同步框架适合短 rollout 的 RLHF/GRPO；异步框架适合长 rollout 的 Agentic RL。
-2. **现代后训练流水线**（[14.2](./industrial-post-training)）：cold-start SFT → reasoning RL → agentic RL → general preference 回填，是 2025 年工业界的事实范式。
-3. **双轨奖励设计**（17.3）：Verifiable Reward（数学、代码、规则）与 Pairwise Preference Reward（开放对话、安全、风格）按任务类型混合，配合 z-score 归一化避免尺度冲突。
-4. **优化器与训练稳定性**（[14.3](./modern-industrial-practice)）：MuonClip、QK-clip、低精度训练是万亿参数模型的关键稳定性工具。
-5. **训练成本估算**（17.5）：预训练占 80%-90% 总成本，RL 阶段虽然算力占比小但决定模型能否上线。MoE 显著降本——DeepSeek-V3 用 671B MoE 只花了 2.664M H800 小时。
-6. **动手 veRL 代码 RL**（[16.8](../chapter18_grpo/verl-code-sandbox)）：三层 verifier（格式 + 编译 + 测试）是代码 RLVR 的标准做法。
-7. **中国对齐团队面试考点**（17.7）：PG → GRPO 推导链、DPO 家族、DeepSpeed vs Megatron、训练资源推算是高频考点，反映工业团队真正关心的能力维度。
+- 从单机实验放大到工业训练时，PPO、GRPO 和奖励模型的基本定义没有改变，执行它们需要更多设备与进程。
+- 训练框架负责生成、奖励计算、参数更新和权重同步之间的资源安排与数据流动。
+- LlamaFactory 适合先跑通后训练；slime、veRL 和 OpenRLHF 用不同技术栈处理规模化 RL 的数据流与资源编排。
+- 同步训练等待整批生成结束；异步训练持续消费已完成的数据，更适合耗时差别较大的长任务。
 
-这一章的真正价值不在于记住每个框架的细节——而在于建立**系统性判断力**：看到一个新模型或新论文，能立刻判断它用了什么训练栈、什么奖励设计、成本量级、训练稳定性挑战。这种判断力是从"读论文"到"能动手做工业级 RL"的关键一步。
-
-下一章 [第 15 章 DPO 家族](../chapter17_dpo/dpo-theory-and-family) 深入推导 DPO 及其变体；[第 14 章 14.4 分布式训练](./distributed-sync) 从系统架构层面解析 veRL/AReaL/LlamaRL 的工程设计。
+[18.2 工业后训练的完整流程](./industrial-post-training) 会继续说明这些步骤如何组成完整的后训练过程；[18.4 多机 RL 训练如何协同](./distributed-sync) 展开多机系统的实现细节；[18.5 大规模 RL 数据工程](./data-engineering) 则说明训练所需的任务、环境和轨迹怎样进入同一条数据生产线。
 
 ## 延伸阅读
 
