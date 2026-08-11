@@ -1,10 +1,10 @@
-# 16.4 Hybrid Thinking 与思考预算
+# 16.4 Hybrid Thinking 如何控制思考预算
 
 16.3 节展示了增加推理计算的三种方法，但简单翻译、事实问答和短代码通常不需要长推理链。若所有请求都使用同一套高预算，服务延迟和成本会随输出长度一起增加。
 
 **Hybrid Thinking** 让同一个模型同时支持直接回答与深度思考。本节先介绍两种模式怎样进入同一模型，再比较长思考与并行短回答，随后说明 long2short 压缩，最后讨论部署时的模式切换和预算控制。
 
-## 1. 让同一模型支持思考与直接回答
+## 1. 同一模型如何支持两种模式
 
 [DeepSeek V3.1](https://api-docs.deepseek.com/news/news250821)（2025.08）是 Hybrid Thinking 的早期工业实现。V3.1 的设计思路是：
 
@@ -55,7 +55,7 @@ response = client.chat.completions.create(
 
 但 thinking budget 也带来一个**算法挑战**：怎么让模型"在 budget 用完时优雅地停下来"？Qwen3 的做法是在 RL 训练中加入**长度惩罚**——超过 budget 的回答会被惩罚。这与 [DAPO 的 Overlong Reward Shaping](../chapter18_grpo/deepseek-dapo) 思路一致。
 
-## 2. 比较长思考与并行短回答
+## 2. 长思考和并行短回答如何选择
 
 2025 年 4 月，Ma et al. 发表了一篇有趣的研究——[Reasoning Models Can Be Effective Without Thinking](https://arxiv.org/abs/2504.09858)（常称 NoThinking）。这篇论文提出了一个反直觉的主张：**在很多任务上，"不思考 + Best-of-N" 比 "思考" 效果更好**。
 
@@ -94,7 +94,7 @@ Ma et al. 给出了几个解释：
 
 这个研究的意义不是否定 Thinking，而是揭示了**test-time compute 有多种花法，没有一种是最优的**——任务特征决定最优策略。
 
-## 3. 用 Long2Short 压缩推理链
+## 3. Long2Short 如何压缩推理链
 
 推理模型训练后期会出现一个普遍问题：**CoT 越来越长**。R1-Zero、o1、Qwen3 都报告了类似现象——训练步数越多，模型的回答越长，最终长度可以膨胀到 50K+ token。这有几个原因：
 
@@ -148,7 +148,7 @@ long2short 和 thinking budget 是互补的：
 推理阶段：thinking budget 设一个安全上限
 ```
 
-## 4. 把模式切换与预算控制用于部署
+## 4. 部署时如何控制模式与预算
 
 Hybrid Thinking 不是"加一个开关"这么简单。它带来几个新的算法问题：
 
@@ -184,4 +184,4 @@ DeepSeek V3.1、Qwen3、Kimi K2 都在这个方向上做了重要探索：
 - **Kimi k1.5**：long2short RL 主动压缩 CoT
 - **NoThinking 研究**：揭示了"不思考 + 投票"在某些任务上反超思考
 
-固定的模式开关仍然需要用户或路由器预先判断任务难度。[16.5 自适应思考](./adaptive-thinking) 进一步让模型根据输入动态决定推理深度。
+固定的模式开关仍然需要用户或路由器预先判断任务难度。[16.5 模型如何自适应思考](./adaptive-thinking) 进一步让模型根据输入动态决定推理深度。

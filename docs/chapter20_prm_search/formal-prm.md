@@ -1,4 +1,4 @@
-# 17.4 形式化 PRM Verifier
+# 17.4 形式化 Verifier 如何验证推理
 
 判别式和生成式 PRM 都可能继承标注者或评价模型的错误：
 
@@ -9,7 +9,7 @@
 
 本节先解释形式化验证的反馈为何确定，再看 AlphaProof、AlphaGeometry 和 DeepSeek-Prover-V2 怎样把语言模型与证明搜索结合，最后讨论形式化范围、数据与翻译成本。
 
-## 1. 形式化验证为什么能够提供确定反馈
+## 1. 为什么形式检查能提供确定反馈
 
 ### 1.1 形式化语言与自然语言的差别
 
@@ -63,7 +63,7 @@ Lean4 的特性让它成为理想的 PRM：
 - **数据稀缺**：Lean4 代码相对少，LLM 在 Lean4 上的预训练数据不足
 - **门槛高**：写 Lean4 代码需要专门训练，大部分数学家不熟悉
 
-## 2. 用 AlphaProof 和 AlphaGeometry 搜索证明
+## 2. AlphaProof 与 AlphaGeometry 如何搜索证明
 
 2024 年 7 月，DeepMind 宣布 [AlphaProof](https://deepmind.google/discover/blog/ai-solves-imo-problems-at-silver-medal-level/) 在国际数学奥林匹克（IMO）2024 上达到**银牌水平**——解决了 6 道题中的 4 道。这是形式化 PRM 路线的里程碑。
 
@@ -135,7 +135,7 @@ AlphaGeometry 2 的关键创新：
 
   2024.07 的报告中，AlphaGeometry 2 在 IMO 几何题上达到了金牌水平。
 
-## 3. 用 DeepSeek-Prover-V2 建立开源证明系统
+## 3. DeepSeek-Prover-V2 如何生成可检查证明
 
 [DeepSeek-Prover-V2](https://arxiv.org/abs/2504.21801)（2025.04）是 DeepSeek 开源的形式化 PRM 工作。它的目标是：
 
@@ -184,7 +184,7 @@ Prover-V2 在 MiniF2F（形式化数学 benchmark）上的成绩：
 
 论文报告其在 MiniF2F 上达到 88.9%。这个数字衡量的是特定形式化基准的通过率，说明模型和证明检查器的组合能够覆盖其中的大部分题目。
 
-## 4. 在确定性验证与适用范围之间取舍
+## 4. 形式化验证可以用到哪里
 
 形式化 PRM 的反馈更确定，但应用它需要满足以下条件：
 

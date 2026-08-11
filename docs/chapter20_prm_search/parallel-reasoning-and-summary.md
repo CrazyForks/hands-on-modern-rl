@@ -1,10 +1,10 @@
-# 17.6 并行与协同推理
+# 17.6 如何并行推理并汇总答案
 
 17.5 节沿着一棵搜索树逐步选择路径。另一种方法是在相同时间内生成多条推理，让不同路径相互补充，再由 verifier 或聚合模型选择结果。这样可以把更多计算放在并行广度上，减少等待单条长链的时间。
 
 本节先比较推理深度与并行广度，再介绍 PaCoRe 的协调方式，随后说明生成式奖励模型怎样评价与聚合答案，最后把不同 verifier 和推理策略放到同一套选择框架中。
 
-## 1. 在推理深度与并行广度之间分配算力
+## 1. 推理算力如何分配给深度与广度
 
 [第 16 章 Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling) 我们讨论过两种推理算力的花法：
 
@@ -73,7 +73,7 @@ def pacore_reward(prompt, target_answer):
 
 这种训练方式让**整个 PaCoRe 系统作为一个整体被 RL 优化**，而不是单独优化每条推理。
 
-## 2. 比较 PaCoRe、Deep Think 与 MCTS
+## 2. 三种推理结构如何选择
 
 PaCoRe 在 [AIME 2025](https://github.com/stepfun-ai/PaCoRe) 上的结果：
 
@@ -112,7 +112,7 @@ PaCoRe 的优势在于：
 - 中等难度推理（不需要深度树搜索）
 - 算力充足但模型改动困难
 
-## 3. 用生成式模型评价并聚合回答
+## 3. 生成式模型如何评价并汇总答案
 
 讨论 PaCoRe 时我们提到"协调器是一个 LLM"。这引出一个更广泛的概念——**GenRM（Generative Reward Model）**。
 
@@ -178,7 +178,7 @@ def self_reward_training(prompt, model):
 
 这种方法**完全摆脱了外部 RM**——模型自己既是 policy 又是 reward。优点是不需要 RM 训练，缺点是**自我评价可能强化已有的偏见**（模型认为自己好的，会被强化；模型不擅长的，会被弱化）。
 
-## 4. 组合多种 Verifier 与推理策略
+## 4. 如何组合 Verifier 与推理策略
 
 到 2026 年中，PRM 和 verifier 研究的几个趋势：
 

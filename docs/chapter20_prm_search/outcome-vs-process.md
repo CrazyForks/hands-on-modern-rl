@@ -1,4 +1,4 @@
-# 17.1 Outcome vs Process 奖励
+# 17.1 为什么需要过程奖励
 
 第 16 章说明了模型怎样增加推理长度与推理计算。推理链变长以后，最终答案只能说明整条轨迹是否成功，无法指出错误从哪一步开始。简单数学题可以直接核对答案；代码和多步 Agent 任务还需要知道哪一次修改或哪一个动作改变了结果。
 
@@ -8,7 +8,7 @@
 
 这就是 **稀疏奖励问题（sparse reward problem）**：奖励只在序列结尾出现，中间步骤得不到直接反馈。**过程奖励模型（Process Reward Model, PRM）** 对中间步骤进行评价，使训练和搜索能够定位更具体的成功与失败。
 
-## 1. 最终结果为什么不足以指导长推理
+## 1. 最终奖励为什么不够
 
 - **Outcome 奖励 vs Process 奖励**的本质区别是什么？
 - **判别式 PRM**（OpenAI 的经典路线）怎么工作？标注成本为什么是瓶颈？
@@ -114,7 +114,7 @@ Step 9: 所以 √2 是无理数  ✓
 
 这就是**稀疏奖励问题（sparse reward problem）**——奖励信号在时间维度上分布太稀疏，无法提供有效的学习信号。
 
-## 2. 把最终奖励分配给中间步骤
+## 2. 如何把奖励分配到中间步骤
 
 稀疏奖励问题在 RL 里有一个更正式的名字：**信用分配问题（credit assignment problem）**。
 
@@ -142,7 +142,7 @@ $$G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \ldots + \gamma^{T-t} r_T$$
 
 PRM 训练一个独立的 verifier，对每一步推理打分。与结尾的单个结果奖励相比，它提供更密集的反馈，使系统能够比较具体步骤。
 
-## 3. 形式化比较 Outcome Reward 与 Process Reward
+## 3. Outcome Reward 与 Process Reward 有何区别
 
 让我们用数学形式化两者的区别。
 
@@ -197,7 +197,7 @@ $$r_t = \text{PRM}(q, o, \text{step}(t))$$
 
 这种做法把稀疏 reward 变成了密集 reward，每个 token 都有清晰的训练信号。
 
-## 4. 根据任务长度选择过程奖励
+## 4. 什么时候需要过程奖励
 
 PRM 的价值在长 CoT 任务里最明显。考虑三个场景：
 
@@ -255,7 +255,7 @@ PRM 的工业实现有两条主要路线，对应不同的训练方法：
 
 模型：LLM + Lean4 verifier。
 
-这三条路线是接下来三节的主题：[17.2 判别式 PRM](./discriminative-prm)、[17.3 生成式 PRM](./generative-prm)、[17.4 形式化 PRM](./formal-prm)。
+这三条路线是接下来三节的主题：[17.2 判别式 PRM 如何评价推理步骤](./discriminative-prm)、[17.3 生成式 PRM 如何解释推理步骤](./generative-prm)、[17.4 形式化 Verifier 如何验证推理](./formal-prm)。
 
 ## 小结
 

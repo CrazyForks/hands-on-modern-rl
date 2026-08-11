@@ -1075,27 +1075,27 @@ const zhSidebar = {
           collapsed: false,
           items: [
             {
-              text: '16.1 推理模型的兴起',
+              text: '16.1 推理模型如何兴起',
               link: '/chapter19_reasoning/emergence-and-o1'
             },
             {
-              text: '16.2 R1-Zero 纯 RL 训练',
+              text: '16.2 R1-Zero 如何用纯 RL 学会推理',
               link: '/chapter19_reasoning/intro'
             },
             {
-              text: '16.3 Test-time Compute Scaling',
+              text: '16.3 Test-Time Scaling 如何提升推理',
               link: '/chapter19_reasoning/test-time-scaling'
             },
             {
-              text: '16.4 Hybrid Thinking 与思考预算',
+              text: '16.4 Hybrid Thinking 如何控制思考预算',
               link: '/chapter19_reasoning/hybrid-thinking'
             },
             {
-              text: '16.5 自适应思考',
+              text: '16.5 模型如何自适应思考',
               link: '/chapter19_reasoning/adaptive-thinking'
             },
             {
-              text: '16.6 推理链可读性与对齐',
+              text: '16.6 推理链如何展示与对齐',
               link: '/chapter19_reasoning/cot-visibility-alignment'
             }
           ]
@@ -1105,27 +1105,27 @@ const zhSidebar = {
           collapsed: false,
           items: [
             {
-              text: '17.1 Outcome vs Process 奖励',
+              text: '17.1 为什么需要过程奖励',
               link: '/chapter20_prm_search/outcome-vs-process'
             },
             {
-              text: '17.2 判别式 PRM',
+              text: '17.2 判别式 PRM 如何评价推理步骤',
               link: '/chapter20_prm_search/discriminative-prm'
             },
             {
-              text: '17.3 生成式 PRM',
+              text: '17.3 生成式 PRM 如何解释推理步骤',
               link: '/chapter20_prm_search/generative-prm'
             },
             {
-              text: '17.4 形式化 PRM Verifier',
+              text: '17.4 形式化 Verifier 如何验证推理',
               link: '/chapter20_prm_search/formal-prm'
             },
             {
-              text: '17.5 推理时搜索',
+              text: '17.5 如何在推理时搜索答案',
               link: '/chapter20_prm_search/inference-time-search'
             },
             {
-              text: '17.6 并行与协同推理',
+              text: '17.6 如何并行推理并汇总答案',
               link: '/chapter20_prm_search/parallel-reasoning-and-summary'
             }
           ]
@@ -1961,22 +1961,22 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '16.1 Emergence of Reasoning Models'
+              text: '16.1 How Reasoning Models Emerged'
             },
             {
-              text: '16.2 R1-Zero Pure RL Training'
+              text: '16.2 How R1-Zero Learns Reasoning with Pure RL'
             },
             {
-              text: '16.3 Test-Time Compute Scaling'
+              text: '16.3 How Test-Time Scaling Improves Reasoning'
             },
             {
-              text: '16.4 Hybrid Thinking and Thinking Budgets'
+              text: '16.4 How Hybrid Thinking Controls the Thinking Budget'
             },
             {
-              text: '16.5 Adaptive Thinking'
+              text: '16.5 How Models Adapt Their Thinking Depth'
             },
             {
-              text: '16.6 CoT Readability and Alignment'
+              text: '16.6 How to Present and Align Reasoning Traces'
             }
           ]
         },
@@ -1985,22 +1985,22 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '17.1 Outcome and Process Rewards'
+              text: '17.1 Why Process Rewards Are Needed'
             },
             {
-              text: '17.2 Discriminative PRM'
+              text: '17.2 How Discriminative PRMs Evaluate Reasoning Steps'
             },
             {
-              text: '17.3 Generative PRM'
+              text: '17.3 How Generative PRMs Explain Reasoning Steps'
             },
             {
-              text: '17.4 Formal PRM Verifier'
+              text: '17.4 How Formal Verifiers Check Reasoning'
             },
             {
-              text: '17.5 Inference-Time Search'
+              text: '17.5 How to Search for Answers at Inference Time'
             },
             {
-              text: '17.6 Parallel and Coordinated Reasoning'
+              text: '17.6 How to Reason in Parallel and Aggregate Answers'
             }
           ]
         },

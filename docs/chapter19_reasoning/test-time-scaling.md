@@ -1,8 +1,8 @@
-# 16.3 Test-time Compute Scaling
+# 16.3 Test-Time Scaling 如何提升推理
 
 16.2 节说明了 R1-Zero 怎样用结果奖励强化长推理。模型能够生成更长的推理链以后，还要决定一次任务究竟投入多少推理计算。[Snell et al.](https://arxiv.org/abs/2408.03314) 系统比较了训练计算与推理计算，并把问题表述为 **Test-time Compute Scaling**：在模型参数不变时，通过增加候选、修订或搜索提高当前任务的成功率。
 
-## 1. 在训练与推理之间分配算力
+## 1. 推理时为什么要增加计算
 
 传统 LLM 的算力分配是高度倾斜的：
 
@@ -40,7 +40,7 @@ Snell et al. 的关键问题是：**如果固定总预算（训练 + 推理）�
 
 所以推理模型的核心优势不是"参数更多"，而是**"算力分配更灵活"**。
 
-## 2. 三种增加推理计算的方法
+## 2. 推理计算可以花在哪里
 
 Snell et al. 把 test-time compute 的使用方式归纳为两类：
 
@@ -91,7 +91,7 @@ for _ in range(K):
 
 更复杂的方式是树搜索——把推理过程展开成一棵树，每个节点是一个中间推理步骤，用搜索算法（MCTS、beam search）找最优路径。这是 [第 17 章 PRM 与推理时搜索](../chapter20_prm_search/inference-time-search) 的核心内容，这里先不展开。
 
-## 3. 用 Deep Think 理解并行推理
+## 3. Deep Think 如何并行推理
 
 2025 年 10 月，Google 发布了 [Gemini 3 Pro Deep Think](https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/)——把 test-time compute scaling 推到了一个新的极端。Deep Think 的核心思想是：**在 MoE 模型上叠加一层"并行推理层"**。
 
@@ -124,7 +124,7 @@ Deep Think 在发布时的几个关键数字：
 
   3.1 Deep Think 在 ARC-AGI-2 上达到 91.2%，HLE 上达到 52.7%——再次刷新了 test-time scaling 的上限。
 
-## 4. 在质量、延迟与成本之间取舍
+## 4. 何时停止增加推理计算
 
 test-time compute scaling 不是免费的。每多花一倍推理算力，意味着：
 
@@ -141,7 +141,7 @@ test-time compute scaling 不是免费的。每多花一倍推理算力，意味
 | 数学竞赛 / 代码生成                    | 充分推理，几千到几万 token |
 | 科研推理（OpenAI o1-pro / Deep Think） | 极致推理，十万级 token     |
 
-这也构成了 [16.4 Hybrid Thinking 与思考预算](./hybrid-thinking) 的工程动机：根据任务难度选择推理模式和预算。
+这也构成了 [16.4 Hybrid Thinking 如何控制思考预算](./hybrid-thinking) 的工程动机：根据任务难度选择推理模式和预算。
 
 ### 4.1 Test-Time Scaling 何时饱和
 
