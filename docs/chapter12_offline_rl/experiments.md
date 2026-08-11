@@ -1,18 +1,20 @@
-# 10.3 离线 RL 实验与 LLM 视角
+# 10.3 离线 RL 与 LLM 数据
 
-> [10.2](./sequence-modeling) 把 RL 写成序列建模。本节把视角拉回 LLM 时代——你会发现 **DPO 本质上就是离线 RL 的特例**，理解这一点就能解释 LLM 后训练中的许多经验现象。
+[10.2](./sequence-modeling)把固定轨迹写成了序列建模问题。LLM 的偏好优化同样从固定数据出发：训练集已经给出提示、较好回答和较差回答，训练期间不能重新询问标注者这两个回答是否可靠。
 
-## LLM 时代的离线 RL 与 DPO 与偏好数据
+本节先解释 DPO 与带 KL 约束的离线优化之间的联系，再把偏好数据与经典离线轨迹逐项对应，随后说明序列建模怎样进入推理搜索，最后指出这种类比能够解释什么、又不能替代什么。
 
-至此读者可能已经意识到一个事实——**LLM 后训练的偏好数据集本质上就是一个离线 RL 数据集**。
+## 1. 把 DPO 放回离线 RL
 
-### DPO 作为隐式 Q-Learning
+LLM 偏好数据与离线 RL 数据共享一个关键约束：训练只能使用已经收集好的样本，不能依靠新的环境交互立即修正分布外行为。不过，两类数据保存的反馈粒度不同，不能直接使用同一套目标函数。
+
+### 1.1 DPO 作为隐式 Q-Learning
 
 [第 14 章 DPO](../chapter17_dpo/intro) 推导的 DPO 目标：
 
 $$\mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(x, y_w, y_l)}\left[\log \sigma\left(\beta \log \frac{\pi_\theta(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \beta \log \frac{\pi_\theta(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\right)\right]$$
 
-其形式上是分类损失。但 Rafailov et al. 2024（DPO 原作者）在后续论文 "From $r$ to $Q^*$" 里揭示了它的 RL 本质：**DPO 等价于一个隐式的、带 KL 约束的 Q-Learning**。
+这个目标写成了分类损失。Rafailov et al. 2024 在后续论文 "From $r$ to $Q^*$" 中进一步证明，DPO 的隐式奖励可以表示为带 KL 约束的 Q 函数。
 
 定义隐式优势函数：
 
@@ -30,11 +32,11 @@ $$\mathcal{L} = -\mathbb{E}\left[\log \sigma\left(\hat{A}(x, y_w) - \hat{A}(x, y
 
 - **DPO 是离线 RL**：训练时不与 reward model 或 environment 交互，只用固定的 $(x, y_w, y_l)$ 数据集
 - **DPO 的约束**：KL 到参考模型 $\pi_{\text{ref}}$，对应离线 RL 里的"不偏离行为策略太远"
-- **DPO 没有外推误差**：因为它根本不用 max 算子——它直接从偏好数据学相对值，每个 $(x, y_w, y_l)$ 都来自行为策略 $\pi_{\text{ref}}$（即 SFT 模型），训练时新策略 $\pi_\theta$ 偏离 $\pi_{\text{ref}}$ 的程度被 KL 项 $\beta$ 严格限制。这与 CQL/IQL 的"保守约束"在数学结构上完全同构
+- **DPO 避开了 Q-Learning 的 max 外推路径**：它直接从偏好数据学习相对关系，并用参考策略控制更新幅度。偏好数据覆盖不足时仍会产生分布外泛化问题，因此独立评测依然必要
 
 理解了这一对应，就能解释 LLM 后训练中许多经验现象：$\beta$ 太小 → $\pi_\theta$ 偏离 $\pi_{\text{ref}}$ 太远 → reward hacking（相当于离线 RL 中策略飞向 OOD 区域）；$\beta$ 太大 → 保守过头 → 学不到东西。这与离线 RL 中 $\alpha$ 调节 CQL 保守性的 trade-off 完全一致。
 
-### Preference Data 作为离线轨迹数据集
+## 2. 把偏好数据看作固定数据集
 
 把 LLM 偏好数据集和 [第 9 章](../chapter11_continuous_control/intro) 的 D4RL 离线数据集对比：
 
@@ -47,19 +49,19 @@ $$\mathcal{L} = -\mathbb{E}\left[\log \sigma\left(\hat{A}(x, y_w) - \hat{A}(x, y
 | 训练目标     | $\max Q^\pi$ s.t. $\pi \approx \pi_\beta$ | $\max$ 隐式 reward s.t. $\pi \approx \pi_{\text{ref}}$ |
 | 离线 RL 算法 | CQL / IQL / DT                            | DPO / IPO / KTO                                        |
 
-这种对应关系不是巧合——**DPO 本质上是离线 RL 在 LLM 上的特例**。理解了这一点，你就能理解为什么 LLM 后训练社区大量借鉴离线 RL 的工具：
+这组对应关系说明，DPO 可以放在离线 RL 的视角下理解。由此也能看清 LLM 后训练为什么会借鉴离线策略约束与数据回流方法：
 
 - **IPO（Identity Preference Optimization）**：把 DPO 的 softmax 改为 squared loss，相当于离线 RL 中改变保守正则形式
 - **KTO（Kahneman-Tversky Optimization）**：用单点（非偏好对）数据训练，相当于 advantage-weighted regression
-- **Iterative DPO**：多轮采数据再训，本质是离线到在线（offline-to-online）RL 的 LLM 版本
-- **RLHF with PPO**：本质上是用 RM 当环境做在线 RL，但每次采样仍受 KL 约束——和离线 RL 的"行为策略约束"一脉相承
+- **Iterative DPO**：多轮采集当前模型的回答再训练，使固定数据优化逐步转为 Offline-to-Online 更新
+- **RLHF with PPO**：把奖励模型提供的分数作为训练反馈，并用 KL 约束限制策略偏移；它重新采样当前策略的回答，因此不再是纯离线训练
 
-### 序列建模视角的回归
+## 3. 序列模型怎样连接推理与搜索
 
-DT 的思想在 LLM 时代获得了第二次生命。现代 LLM 本身就是序列模型，把 RL 后训练重新表述为"条件序列生成"几乎是自然的：
+LLM 本身就是序列模型，因此 DT 的轨迹表示可以继续用于推理与搜索任务：
 
 - **Process Reward Model + Search**（[第 17 章](../chapter20_prm_search/inference-time-search)）：把 reasoning trajectory 当作决策序列，PRM 作为 step-level reward，beam search 类似 Trajectory Transformer
-- **Expert Iteration / STaR**：用当前模型生成 trajectory，过滤高 reward 轨迹，再 SFT——本质是 DT 的 iterative 版本
+- **Expert Iteration / STaR**：用当前模型生成轨迹，过滤高奖励轨迹，再进行 SFT；它与 DT 一样依赖轨迹数据，但会通过多轮生成更新数据分布
 - **In-Context RL（Algorithm Distillation, Laskin et al. 2022）**：把整个 RL 学习历史作为 prompt，让 transformer 学会"在 context 里做 RL"——直接继承 DT 的"RL as sequence modeling" 哲学
 
 ```mermaid
@@ -71,19 +73,21 @@ graph LR
   D --> F[Iterative DPO / RLVR<br/>离线到在线]
 ```
 
-::: tip 一句话总结
-**离线 RL 是 LLM 后训练的母学科**。CQL/IQL 处理外推误差的智慧，DPO 用 KL 约束 + 偏好学习继承了下来；Decision Transformer 把 RL 重写为序列建模的洞察，让 RL 训练栈和 LLM 训练栈合二为一。理解本章，是理解 [第 11 章 模仿学习与反向 RL](../chapter13_imitation_meta_rl/bc-dagger)、[第 17 章 PRM 搜索](../chapter20_prm_search/inference-time-search)、以及 [第 20 章 Code World Model](../chapter23_rl_based_swe/world-model-and-deep-swe) 的前提。
-:::
+## 4. 离线视角能解释哪些后训练现象
+
+离线 RL 提供了理解 LLM 后训练的一组工具：CQL 与 IQL 说明固定数据上的策略改进为什么需要控制分布偏移，DPO 用参考策略和偏好关系约束更新，Decision Transformer 则展示了轨迹怎样进入序列模型。这些联系为[第 11 章模仿学习与逆向 RL](../chapter13_imitation_meta_rl/bc-dagger)、[第 17 章 PRM 搜索](../chapter20_prm_search/inference-time-search)以及[第 20 章 Code World Model](../chapter23_rl_based_swe/world-model-and-deep-swe)提供了共同的数据视角。
+
+这些方法的训练信号并不相同。经典离线 RL 通常保存逐步状态、动作和奖励；偏好优化只有回答之间的相对顺序；序列模型则依赖轨迹中已经出现的行为。把它们放在同一张图里，是为了比较固定数据怎样限制策略更新，不能把三种目标函数直接视为同一种算法。
 
 ## 本章总结
 
-1. **离线 RL 的核心矛盾是分布偏移**：固定数据集 + Q-Learning 的 max 算子 = 外推误差爆炸。所有算法都在解决"如何约束新策略不偏离数据分布"
+1. **固定数据会产生分布偏移**：Q-Learning 的 max 算子可能选中数据集外动作，使估值误差在多轮 Bellman 更新中累积
 2. **三大保守路线**：BCQ 约束动作空间、CQL 惩罚 OOD 的 Q 值、IQL 完全规避 max；以及工程化的 BC 正则路线（TD3+BC、AWAC）
-3. **Decision Transformer 是范式革命**：抛弃 Bellman，把 RL 写成条件序列生成。RTG 作为控制变量，GPT 架构直接处理轨迹
+3. **Decision Transformer 采用条件序列建模**：它不使用 Bellman 更新，而是把 RTG 作为控制变量，让 Transformer 直接处理轨迹
 4. **Trajectory Transformer + Diffuser** 进一步把"序列建模"推到联合轨迹分布建模与扩散生成
-5. **DPO 本质上是离线 RL**：偏好数据集 = 离线轨迹数据集，KL 约束 = 行为策略约束，隐式 Q-Learning = DPO 损失
+5. **DPO 可以从离线优化视角理解**：偏好数据是固定数据，参考策略限制更新幅度，隐式 Q-Learning 提供了一种解释其目标的方式
 
-下一章 [第 11 章 模仿学习、反向 RL 与元 RL](../chapter13_imitation_meta_rl/bc-dagger) 我们处理另一类"无 reward signal" 的设定——只能观察专家行为，如何反推 reward 或策略；这与本章的离线 RL、以及 LLM 的 SFT/模仿学习有深厚联系。
+下一章[第 11 章模仿学习、逆向 RL 与元 RL](../chapter13_imitation_meta_rl/bc-dagger)处理另一类缺少奖励信号的设定：只观察专家行为时，怎样学习策略或推断奖励。
 
 ## 延伸阅读
 

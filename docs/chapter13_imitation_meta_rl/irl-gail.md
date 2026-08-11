@@ -1,12 +1,14 @@
 # 11.2 逆向 RL 与 GAIL
 
-> [11.1](./bc-dagger) 讲了行为克隆——直接模仿专家动作。但 BC 有个根本限制：它学不到"专家为什么这么做"。本节走另一条路——**逆向 RL**：从专家轨迹反推一个奖励函数，再用标准 RL 算法在这个奖励上训练。这绕过了 BC 的分布漂移，也学到了更可迁移的奖励信号。
+[11.1](./bc-dagger)直接模仿专家在每个状态采取的动作。遇到专家数据没有覆盖的新状态时，策略仍然缺少判断依据。逆向 RL 改为从整条专家轨迹推断奖励，再用这个奖励训练策略。
 
-## 最大熵反向 RL
+本节先说明奖励为什么无法由示范唯一确定，再用最大熵原则选择一个可学习的奖励，随后介绍 GAIL 怎样用判别器绕开配分函数，最后比较三条模仿学习路线的代价与适用条件。
 
-反向 RL（Inverse RL）假设专家之所以优秀，是因为他在**优化某个隐藏的奖励函数**。与其直接模仿动作，不如**先反推出这个奖励函数**，再用普通 RL 求解。
+## 1. 为什么要从示范推断奖励
 
-### 反向 RL 的基本设定
+逆向 RL（Inverse RL）假设专家行为来自某个尚未观测到的奖励函数。训练先从轨迹推断这个奖励，再用普通 RL 求解对应策略。
+
+### 1.1 逆向 RL 的基本设定
 
 给定专家轨迹 $\mathcal{D}_{\text{expert}} = \{\tau_1, \ldots, \tau_M\}$，每条 $\tau = (s_0, a_0, \ldots, s_T)$。目标是学一个奖励函数 $r_\psi(s, a)$ 满足：
 
@@ -14,9 +16,9 @@ $$\text{专家策略在 } r_\psi \text{ 下是最优的}$$
 
 但这个条件**严重不唯一**——所有常数奖励 $r_\psi \equiv c$ 都满足。需要额外的**正则化**或**最大熵原理**来唯一确定 $r_\psi$。
 
-### MaxEnt IRL 的目标
+## 2. 用最大熵原则确定奖励
 
-Ziebart et al. 2008 提出最大熵反向 RL。假设专家策略服从**最大熵**分布（既匹配特征期望，又尽可能随机）：
+Ziebart et al. 2008 提出最大熵逆向 RL。它要求轨迹既匹配专家的特征期望，又在满足约束的轨迹之间保留尽可能高的熵：
 
 $$\pi(a \mid s) \propto \exp\left(Q^{\text{soft}}_{r_\psi}(s, a)\right)$$
 
@@ -34,7 +36,7 @@ $$\nabla_\psi \mathcal{L} = \mathbb{E}_{\tau \sim \text{expert}}\left[\sum_t \na
 
 直白的解读：**让专家访问的 $(s, a)$ 的奖励升高，让当前策略（按 $r_\psi$ 滚动的策略）访问的 $(s, a)$ 的奖励降低**。当两者特征期望一致时，梯度为零。
 
-### MaxEnt IRL 的难点
+### 2.1 配分函数为什么难以计算
 
 $\log Z(r_\psi)$ 在连续状态-动作空间下**不可解析**。三种主流近似：
 
@@ -59,11 +61,11 @@ def maxent_irl_step(reward_net, expert_states_actions, env_sampler, soft_q_plann
 
 MaxEnt IRL 的代价高昂：每次外层更新需要内层求解一个完整的 soft Q 问题。这使它难以扩展到高维问题（如视觉输入）。**GAIL** 用对抗训练避开显式 $Z$ 计算。
 
-## 生成对抗模仿学习
+## 3. 用 GAIL 直接匹配访问分布
 
-Generative Adversarial Imitation Learning（Ho & Ermon 2016）借用 GAN 的思想：把反向 RL 写成**判别器 $D_\phi$ vs 生成器 $\pi_\theta$** 的博弈。
+Generative Adversarial Imitation Learning（Ho & Ermon 2016）借用 GAN 的思想，把逆向 RL 写成判别器 $D_\phi$ 与策略 $\pi_\theta$ 之间的博弈。
 
-### GAIL 的目标
+### 3.1 判别器与策略怎样交替训练
 
 判别器区分"专家数据"和"策略数据"：
 
@@ -105,7 +107,7 @@ class GAIL:
             self.policy.ppo_update(states, actions, rewards, next_states)
 ```
 
-### GAIL 与 MaxEnt IRL 的等价性
+### 3.2 GAIL 与最大熵 IRL 的联系
 
 形式上，GAIL 是 MaxEnt IRL 在**奖励函数无约束**（任意神经网络）下的对偶问题。判别器 $D_\phi^*$ 的最优解为：
 
@@ -113,7 +115,7 @@ $$D_\phi^*(s, a) = \frac{p_{\text{expert}}(s, a)}{p_{\text{expert}}(s, a) + p_{\
 
 代入后，最优奖励正是 $r^*(s, a) = \log D^* - \log(1 - D^*) = \log \frac{p_{\text{expert}}}{p_{\pi_\theta}}$——即**对数似然比**。这与 MaxEnt IRL 推出的奖励一致，但 GAIL 不需要显式计算配分函数 $Z$。
 
-### 三大模仿学习路线对比
+## 4. 比较三条模仿学习路线
 
 | 维度             | BC  | MaxEnt IRL        | GAIL                |
 | ---------------- | --- | ----------------- | ------------------- |
@@ -124,15 +126,14 @@ $$D_\phi^*(s, a) = \frac{p_{\text{expert}}(s, a)}{p_{\text{expert}}(s, a) + p_{\
 | 扩展到高维       | 易  | 难                | 中                  |
 | LLM 中的对应     | SFT | —                 | DPO 隐式（见 14.6） |
 
-::: details GAIL 的训练不稳定性
+### 4.1 GAIL 的训练稳定性
+
 GAN 的通病：判别器过强时生成器梯度消失，过弱时学不到信号。实践中常用 Tricks：
 
 - 判别器梯度惩罚（Wasserstein GAIL）
 - 判别器更新比策略慢（每 5 步策略更新 1 步判别器）
 - 熵正则化系数 $\lambda$ 调到 0.1-1.0 防止策略坍缩
-  :::
-
-GAIL 在 MuJoCo 上接近专家水平，但需要数百万步环境交互——**样本效率仍是瓶颈**。这推动了对**离线模仿学习**的研究（如 DemoDICE、DWBC），把专家数据与次优数据结合，无需在线交互。
+  GAIL 在 MuJoCo 上接近专家水平，但需要数百万步环境交互——**样本效率仍是瓶颈**。这推动了对**离线模仿学习**的研究（如 DemoDICE、DWBC），把专家数据与次优数据结合，无需在线交互。
 
 ## 本节总结
 

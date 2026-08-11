@@ -1,12 +1,14 @@
 # 10.2 Decision Transformer、Trajectory Transformer 与 Diffuser
 
-> [10.1](./intro) 讲了离线 RL 在 Bellman 框架内的三大保守路线——BCQ/CQL/IQL。本节走另一条路：**彻底抛弃 Bellman**，把 RL 重新表述为**条件序列生成**。Decision Transformer 用 GPT 直接建模轨迹，Trajectory Transformer 用 beam search，Diffuser 用扩散模型——三者共同指向 "RL as sequence modeling" 的范式革命。
+[10.1](./intro)仍在 Bellman 框架中估计价值，只是限制策略或价值函数不要离开固定数据。Decision Transformer 提出了另一种做法：把状态、动作与回报排成序列，直接学习在给定目标回报时应该采取什么动作。
 
-## Decision Transformer 与 RL 作为序列建模
+本节按四步展开：先用 return-to-go 建立 Decision Transformer，再说明 Trajectory Transformer 怎样搜索完整轨迹，随后介绍 Diffuser 的条件生成，最后比较三种方法各自适合的任务。
 
-前面三节都在 Bellman 框架内做文章——约束动作、约束 Q、加 BC 正则。**Decision Transformer（Chen et al. 2021）彻底抛弃 Bellman**，把 RL 重新表述为**条件序列生成**问题，用 GPT 直接建模轨迹。
+## 1. 用目标回报训练 Decision Transformer
 
-### Return-to-Go 与 把回报作为条件
+[10.1](./intro)中的方法通过约束动作、压低数据集外的 Q 值或加入行为克隆正则来稳定 Bellman 更新。Decision Transformer（Chen et al. 2021）不再学习 Q 函数，而是把离线轨迹改写成条件序列生成问题。
+
+### 1.1 把 Return-to-Go 作为条件
 
 DT 的核心洞察是：在监督学习框架下，一条轨迹 $\tau = (s_1, a_1, r_1, s_2, a_2, r_2, \ldots, s_T, a_T, r_T)$ 里，每个动作 $a_t$ 都有一个**自然的目标**——从 $t$ 时刻起累计的回报：
 
@@ -72,7 +74,7 @@ class DecisionTransformer(nn.Module):
         return pred_a[-1]  # 取最后一个 timestep 的预测
 ```
 
-### 纯监督
+### 1.2 用监督学习预测动作
 
 DT 的训练损失就是连续动作回归的 MSE（或离散动作的交叉熵）：
 
@@ -80,7 +82,7 @@ $$\mathcal{L} = \mathbb{E}_{\tau \sim \mathcal{D}}\left[\sum_t \|\hat{a}_t - a_t
 
 **没有 Bellman，没有 Q-Learning，没有时序差分**。整个训练过程和训练 GPT 完全一样：扫描轨迹，做下一个 token 预测。这一性质让 DT 可以无缝接入 LLM 训练栈——数据加载、AdamW、cosine schedule、gradient checkpointing 全部沿用。
 
-### 用 RTG 作为控制变量
+### 1.3 推理时怎样使用目标回报
 
 DT 部署时不需要 argmax Q。你只要**指定一个目标 RTG**（比如该环境 expert 的分数），DT 自回归生成动作，使累计回报接近目标：
 
@@ -99,7 +101,7 @@ for t in range(max_steps):
 
 这个机制非常优雅——RTG 是一个**控制变量**，调高调低能生成不同性能水平的策略。实验上 DT 在 Atari、MuJoCo、Key-to-Door 上**达到或超越** CQL/IQL。
 
-### 为什么 DT 能 work？
+### 1.4 Decision Transformer 为什么能够工作
 
 这是离线 RL 社区最有争议的问题之一。传统 RL 视角里，**没有 Bellman 备份就不可能学到长期回报的最优策略**——因为监督信号只能从采到的轨迹来。DT 的回答是：**当数据集足够丰富时，轨迹本身已经隐含了最优性信息**。
 
@@ -119,18 +121,17 @@ $$\pi_\theta(a \mid s, \hat{R}) \approx \pi_\beta(a \mid s, \text{return} \appro
 
 这一观察催生了后续大量工作：online RL 中的 RL via supervised learning、in-context RL（Algorithm Distillation）、Star-Vector、Eyre et al. 的 "language modeling is all you need for RL" 等。
 
-::: details DT 的局限
+### 1.5 Decision Transformer 的局限
 
 1. **只能学到数据中存在的最优策略**——如果数据集里没有 expert 轨迹，再高的目标 RTG 也无法生成 expert 行为
 2. **stitching 能力差**——传统离线 RL 可以把两条次优轨迹的好的部分"缝合"成更优策略（subtrajectory stitching），DT 因为是纯监督，做不到这种组合泛化
 3. **RTG 选择敏感**——目标 RTG 设太高会生成不连贯动作，设太低则保守
-   :::
 
-## Trajectory Transformer 与 Diffuser
+## 2. 用 Trajectory Transformer 搜索轨迹
 
 DT 之后，"RL 作为序列建模" 这条路线迅速衍生。其中两个代表性工作：Trajectory Transformer 把整个轨迹建模为 token 序列、用 beam search 推理；Diffuser 用扩散模型直接生成完整轨迹。
 
-### Trajectory Transformer 与 离散化 + Beam Search
+### 2.1 离散化轨迹并使用 Beam Search
 
 Janner et al. 2021 把 RTG、state、action、reward 全部离散化成 token，然后训练一个标准 transformer 预测下一个 token：
 
@@ -142,7 +143,7 @@ $$p_\theta(\tau) = \prod_{t=1}^{T} p_\theta(s_t, a_t, r_t \mid s_{<t}, a_{<t}, r
 - Beam search 推理慢（要展开多个候选轨迹）
 - 优势：可以做 **planning**——在 search 时显式注入未来 reward 约束，相当于 implicit model-based RL
 
-### Diffuser 与 扩散模型生成轨迹
+## 3. 用 Diffuser 生成完整轨迹
 
 Janner et al. 2022 把扩散模型引入 RL。把一条轨迹 $\tau \in \mathbb{R}^{T \times (d_s + d_a)}$ 视为高维图像般的对象，训练一个扩散模型：
 
@@ -150,13 +151,13 @@ $$\min_\theta \; \mathbb{E}_{\tau, t, \epsilon}\left[\|\epsilon - \epsilon_\thet
 
 其中 $\tau_t$ 是轨迹在 timestep $t$ 加噪后的版本，$\epsilon_\theta$ 是去噪网络（通常是 1D temporal U-Net 或 transformer）。推理时从纯噪声开始逐步去噪，得到完整轨迹。
 
-Diffuser 的杀手锏是 **classifier-free guidance**——训练时随机丢弃条件（state、reward 函数），让模型同时学条件和无条件分布：
+Diffuser 使用 classifier-free guidance 控制生成方向。训练时随机丢弃状态或奖励条件，让模型同时学习条件分布和无条件分布：
 
 $$\tilde{\epsilon}_\theta = (1 + w) \cdot \epsilon_\theta(\tau_t, t, c) - w \cdot \epsilon_\theta(\tau_t, t)$$
 
-其中 $c$ 是条件（如"未来 reward 最大化"），$w$ 控制条件强度。这让 Diffuser 可以**用 reward 函数引导轨迹生成**——本质是把"价值函数最大化"重写成"概率模型采样"。
+其中 $c$ 是条件（如未来奖励最大化），$w$ 控制条件强度。推理时，奖励条件改变去噪方向，使高奖励轨迹获得更高的生成概率。优化由此从显式选择最大价值动作，变成从受奖励引导的轨迹分布中采样。
 
-### DT / TT / Diffuser 对比
+## 4. 比较三种序列建模方法
 
 | 维度                | Decision Transformer | Trajectory Transformer | Diffuser             |
 | ------------------- | -------------------- | ---------------------- | -------------------- |
@@ -170,6 +171,6 @@ $$\tilde{\epsilon}_\theta = (1 + w) \cdot \epsilon_\theta(\tau_t, t, c) - w \cdo
 
 ## 本节总结
 
-Decision Transformer 把 RL 写成条件序列生成——给定 return-to-go，自回归生成动作。这一范式革命让 RL 训练栈和 LLM 训练栈合二为一。Trajectory Transformer 进一步用 beam search 引入 planning，Diffuser 用扩散模型生成完整轨迹。
+Decision Transformer 在给定 return-to-go 时自回归生成动作，因此可以直接复用 Transformer 的监督训练方法。Trajectory Transformer 用 Beam Search 搜索完整轨迹，Diffuser 则通过迭代去噪生成轨迹。三者都依赖离线数据中已有的行为覆盖，只是表示轨迹和选择动作的方式不同。
 
-下一节 [10.3 离线 RL 实验与 LLM 视角](./experiments) 把视角拉回 LLM 时代——你会发现 DPO 本质上就是离线 RL 的特例。
+下一节 [10.3 离线 RL 与 LLM 数据](./experiments)把固定数据的视角带到偏好优化，比较 DPO、偏好数据和序列建模之间的联系与差别。

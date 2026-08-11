@@ -1,17 +1,21 @@
-# 12.3 分层 RL 与生成式世界模型引子
+# 12.3 分层 RL 与生成式世界模型
 
-> [12.2](./marl) 处理了多 agent 场景。本节处理第三种被刻意回避的情形——**任务 horizon 极长**（如机器人完成整个房屋清洁，需要 1000+ 步动作）。单层策略在这种长程任务上几乎学不到信号。**分层 RL** 把长程决策分解为 option 序列：高层策略选子目标，低层策略执行子目标。
+[12.2](./marl)通过集中训练协调多个智能体。本节回到单个智能体，但把任务时间拉长：机器人完成整套房屋清洁可能需要上千步动作，最终奖励很难指导前面的每一个动作。
 
-## 分层 RL 与 Options、FeUdal Networks 与 HIRO
+本节先说明层级为什么能够缩短决策跨度，再比较 Options、FeUdal Networks 与 HIRO，随后把生成式世界模型看作可学习环境，最后讨论探索、多智能体与分层方法怎样在新环境中重新组合。
 
-长 horizon 任务是 RL 的另一类硬骨头。考虑 _Atari Montezuma's Revenge_：智能体需要先拿钥匙、再开门、最后进下一关。直接用 PPO 训练，几千步后梯度信号已经被淹没。**分层 RL** 把决策分解成两层（或多层）：
+## 1. 用层级缩短长程任务的决策跨度
+
+长程任务会把最终奖励与早期动作隔开。以 _Atari Montezuma's Revenge_ 为例，智能体需要先拿钥匙、再开门、最后进入下一关；直接用 PPO 训练时，最终奖励很难准确分配到前面的动作。**分层 RL** 把决策分解成两层或多层：
 
 - **高层策略**：偶尔决策，输出"子目标"或"option"
 - **底层策略**：在高层给出的子目标下，执行原子动作直到子目标完成
 
 这样高层只关心稀疏的子目标序列，把长 horizon 切成短 horizon，梯度信号在每个子层内可传播。
 
-### Options 框架
+## 2. 比较三种分层强化学习方法
+
+### 2.1 Options：把一段策略封装成时间扩展动作
 
 Sutton, Precup & Singh 1999 的 **options** 是分层 RL 的形式化基础。一个 option $\omega = (\mathcal{I}_\omega, \pi_\omega, \beta_\omega)$ 由三部分组成：
 
@@ -23,16 +27,16 @@ Sutton, Precup & Singh 1999 的 **options** 是分层 RL 的形式化基础。�
 
 $$Q^\mu(s, \omega) = \mathbb{E}\left[\sum_{t=0}^{T-1}\gamma^t r_t + \gamma^T \max_{\omega'} Q^\mu(s_T, \omega')\right]$$
 
-其中 $T$ 是 option 终止时步。Options 框架的优美之处在于：高层可当成普通 MDP 学（用 SMDP-Q 学习），底层可以独立训（任何 model-free 算法）。
+其中 $T$ 是 option 的持续时间。高层可以在 SMDP 上学习选择 option，底层则分别训练各个 option 的内部策略。
 
-### FeUdal Networks 与 manager 输出方向，worker 执行
+### 2.2 FeUdal Networks：Manager 指方向，Worker 执行动作
 
 FeUdal Networks（Vezhnevets et al. 2017）把 options 做成端到端可学习。两个网络：
 
 - **Manager** $M_\theta$：每 $c$ 步输出一个隐藏空间方向向量 $g_t \in \mathbb{R}^k$（不直接是子目标）
 - **Worker** $W_\phi$：在 $c$ 步窗口内，每个原子步输出动作 $\pi_\phi(a \mid s; g_t)$，目标分布方向由 $g_t$ 调制
 
-Manager 的训练目标很巧妙：让 $g_t$ 预测**未来 $c$ 步的隐藏状态变化方向**：
+Manager 通过预测未来 $c$ 步的隐藏状态变化方向学习目标向量 $g_t$：
 
 $$\mathcal{L}_M = -\langle g_t,\ \hat{z}_{t+c} - \hat{z}_t\rangle$$
 
@@ -40,7 +44,7 @@ $$\mathcal{L}_M = -\langle g_t,\ \hat{z}_{t+c} - \hat{z}_t\rangle$$
 
 FeUdal 在 _Montezuma's Revenge_ 上首次让端到端深度 RL 拿到正分数，但训练不稳定、对超参敏感，工程复现困难。
 
-### 异策略分层 RL
+### 2.3 HIRO：用异策略数据学习连续子目标
 
 Data-Efficient Hierarchical Reinforcement Learning (HIRO, Nachum et al. 2018) 是 FeUdal 的现代化改进，关键创新是**off-policy 训练 + 目标转移**：
 
@@ -69,7 +73,7 @@ for step in range(total_steps):
     update(high_level_policy, high_buffer, goal_transition=transition_fn)
 ```
 
-### 分层 RL 算法对比
+### 2.4 比较 Options、FeUdal 与 HIRO
 
 | 算法    | 高层输出     | 底层目标    | 训练方式          | 主要问题      |
 | ------- | ------------ | ----------- | ----------------- | ------------- |
@@ -77,15 +81,15 @@ for step in range(total_steps):
 | FeUdal  | 隐藏方向 $g$ | worker 内在 | on-policy，端到端 | 训练不稳定    |
 | HIRO    | 状态位移     | 状态匹配    | off-policy        | 目标转移设计  |
 
-::: warning 分层 RL 的实际困境
+### 2.5 分层 RL 的实际困难
+
 分层 RL 听起来优雅，但工业落地少。原因：(1) 层次结构本身是强归纳偏置，错配会反向伤害性能；(2) 高层与底层耦合训练易陷入"互相欺骗"局部解——Manager 给无意义方向，Worker 学着忽略它；(3) LLM 时代的"分层"已经从神经网络架构转移到 prompt 层（plan-then-act、ReAct），更易调试。但思想仍深刻影响 agentic RL（[第 19 章](../chapter22_agentic/tool-use-and-trajectory)）和 [第 26 章 多智能体](../chapter32_selfplay/llm-multi-agent-rl/)。
-:::
 
-## 生成式世界模型作为 RL 环境
+## 3. 把生成式世界模型作为训练环境
 
-前三节的方法都在"如何让智能体更高效地探索既有环境"上下功夫。最后一节换视角：**当环境本身也是学习的产物**，探索范式会如何变化？
+前面的分层方法假设环境已经存在，训练只需要学习策略。生成式世界模型进一步把环境也变成学习对象：模型根据当前状态和动作预测后续状态，策略可以在这些生成轨迹中训练或规划。
 
-### 从 Dreamer 到 Genie
+### 3.1 从 Dreamer 到 Genie
 
 [第 9 章 Dreamer V3](../chapter11_continuous_control/intro#_12-7-dreamer-v3-世界模型的新世代) 已经展示了"在世界模型里训练 actor-critic"的可行性：先用真实数据训一个 RSSM 世界模型，再在想象轨迹里优化策略。Dreamer 的世界模型仍是任务相关的（在某个 Atari 游戏或 MuJoCo 环境上训）。
 
@@ -101,11 +105,11 @@ $$z_t = \text{LatentAction}(x_t, x_{t+1}),\quad x_{t+1} = \text{Decoder}(x_t, z_
 
 学到的 $z_t$ 可作为 RL 的动作空间，使得在 Genie 生成的环境中训练的 agent 能迁移到真实控制任务。这是 model-based RL（[第 9 章](../chapter11_continuous_control/intro#_12-5-model-based-rl-学习环境模型)）+ 视频生成模型 + 探索-利用理论的交汇点。
 
-### 探索、多智能体、分层在新范式下的角色
+## 4. 探索、协作与分层怎样使用生成环境
 
-把世界模型当作可生成环境后，本章三主题重新组合：
+把世界模型作为可生成环境后，本章的三类方法分别作用在环境的不同位置：
 
-1. **探索**：内在奖励可以作用在生成环境的隐藏空间上，而不是像素空间——ICM 的"前向预测误差"本质就是世界模型的训练 loss
+1. **探索**：内在奖励可以作用在生成环境的隐藏空间上；ICM 的前向预测误差与世界模型的状态预测损失具有相近结构
 2. **多智能体**：Genie 类模型可生成包含 NPC 的环境，多智能体可在生成环境中做 self-play（[第 26 章 self-play](../chapter32_selfplay/self-play-outlook/)）
 3. **分层**：高层策略可以直接输出"潜在子目标"，由世界模型解码出环境状态变化，相当于 option 的隐式学习
 
@@ -113,13 +117,13 @@ $$z_t = \text{LatentAction}(x_t, x_{t+1}),\quad x_{t+1} = \text{Decoder}(x_t, z_
 
 ## 本章总结
 
-本章覆盖了经典深度 RL 假设被破坏后的三条救火路线：
+本章讨论了经典单智能体、稠密奖励设定之外的三类问题：
 
 1. **奖励稀疏 → 内在奖励**：ICM 用前向预测误差，RND 用随机网络蒸馏；NGU 把短期 episodic 与长期 RND 结合，Agent57 自适应切换探索-利用，是 Atari 57 上首个全游戏超人类的算法
-2. **多智能体非平稳 → CTDE**：MADDPG 给每个智能体配集中 critic，MAPPO 共享 critic + on-policy clip，是 SMAC、Hanabi 的事实标准
+2. **多智能体非平稳 → CTDE**：MADDPG 给每个智能体配集中 Critic，MAPPO 使用共享 Critic 与 On-Policy 裁剪，是 SMAC、Hanabi 等合作任务的常用强基线
 3. **长 horizon → 分层**：Options 框架、FeUdal Networks 的端到端 manager-worker、HIRO 的 off-policy 目标转移，让高层只关心子目标序列
 
-这三条路线在 LLM 时代再次汇合：agentic RL 的工具调用本质是 option、多 agent 协作本质是 CTDE、LLM 内嵌的世界知识本质是 Genie 式生成环境。下一章 [第 13 章 RLHF 训练流水线](../chapter15_rlhf/base-model-to-assistant) 进入大模型对齐主线，那里的"环境"是 LLM 自身，但本章的探索、多智能体、分层思想将贯穿后续所有 LLM RL 章节。
+这三条路线也为后面的 LLM 强化学习提供了工具：工具调用可以按时间扩展动作分析，多智能体协作需要处理联合训练与分散执行，世界模型则可以生成可交互的训练环境。下一章[第 13 章 RLHF 训练流水线](../chapter15_rlhf/base-model-to-assistant)进入大模型对齐主线，探索、协作与分层决策会在后续 Agent 章节再次出现。
 
 ## 延伸阅读
 
