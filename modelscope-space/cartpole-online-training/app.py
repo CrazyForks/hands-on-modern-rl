@@ -59,9 +59,9 @@ def reward_figure(steps: list[int], rewards: list[float]):
     """Build a compact reward chart suitable for Gradio streaming updates."""
     fig, ax = plt.subplots(figsize=(8, 4.2))
     ax.plot(steps, rewards, color="#4f46e5", marker="o", linewidth=2)
-    ax.axhline(475, color="#16a34a", linestyle="--", linewidth=1.2, label="解决阈值 475")
-    ax.set(xlabel="训练步数", ylabel="平均奖励", ylim=(0, 510))
-    ax.set_title("PPO 在 CartPole-v1 上的评估奖励")
+    ax.axhline(475, color="#16a34a", linestyle="--", linewidth=1.2, label="Solved threshold: 475")
+    ax.set(xlabel="Training steps", ylabel="Mean reward", ylim=(0, 510))
+    ax.set_title("PPO evaluation reward on CartPole-v1")
     ax.grid(alpha=0.22)
     ax.legend(loc="lower right")
     fig.tight_layout()
