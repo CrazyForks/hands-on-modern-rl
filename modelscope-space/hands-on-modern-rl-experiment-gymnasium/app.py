@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 from collections import defaultdict
+import ctypes.util
 import html
 import importlib
 import json
@@ -16,6 +17,13 @@ import warnings
 from pathlib import Path
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
+if sys.platform.startswith("linux") and ctypes.util.find_library("OSMesa"):
+    # Prefer Mesa's CPU renderer when the Studio image provides it. Guarding
+    # the setting preserves Gymnasium-Robotics registration on base images
+    # where the optional system library is unavailable.
+    os.environ.setdefault("MUJOCO_GL", "osmesa")
+    os.environ.setdefault("PYOPENGL_PLATFORM", "osmesa")
+
 import gradio as gr
 import gymnasium as gym
 import imageio.v2 as imageio
