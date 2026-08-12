@@ -31,7 +31,7 @@ COLAB_URL = (
     "blob/main/notebooks/cartpole-ppo.ipynb"
 )
 SCRIPT_URL = (
-    "https://modelscope.cn/studios/walkinglab/cartpole-online-training/"
+    "https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole/"
     "file/view/master/train.py"
 )
 LOGO_URL = (

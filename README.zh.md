@@ -16,9 +16,9 @@
   </p>
 
   <p>
-    <a href="https://modelscope.cn/studios/walkinglab/cartpole-online-training">ModelScope 一键训练</a> ·
+    <a href="https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole">ModelScope 一键训练</a> ·
     <a href="https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/notebooks/cartpole-ppo.ipynb">在 Colab 中打开</a> ·
-    <a href="https://modelscope.cn/studios/walkinglab/cartpole-online-training/file/view/master/train.py">ModelScope 训练脚本</a>
+    <a href="https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole/file/view/master/train.py">ModelScope 训练脚本</a>
   </p>
 
   <p>
