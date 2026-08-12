@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import os
+import re
 import time
 from pathlib import Path
 
@@ -34,10 +37,7 @@ SCRIPT_URL = (
     "https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole/"
     "file/view/master/train.py"
 )
-LOGO_URL = (
-    "https://raw.githubusercontent.com/walkinglabs/hands-on-modern-rl/"
-    "main/docs/public/readme/readmelogo.png"
-)
+ANSI_ESCAPE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
 
 
 def evaluate(model: PPO, episodes: int = 5) -> tuple[float, float]:
@@ -68,6 +68,36 @@ def reward_figure(steps: list[int], rewards: list[float]):
     return fig
 
 
+def clean_output(text: str) -> str:
+    """Remove terminal control characters before showing library output."""
+    return ANSI_ESCAPE.sub("", text).strip()
+
+
+def log_line(started_at: float, level: str, message: str) -> str:
+    """Format a compact console line with elapsed time."""
+    elapsed = time.perf_counter() - started_at
+    return f"{elapsed:7.1f}s  {level:<7} {message}"
+
+
+def status_card(state: str, title: str, detail: str) -> str:
+    """Render the current run state as a small visual card."""
+    return f"""
+    <div class="run-state run-state--{state}">
+      <span class="run-state__dot"></span>
+      <div><strong>{title}</strong><small>{detail}</small></div>
+    </div>
+    """
+
+
+def metric_card(label: str, value: str, detail: str) -> str:
+    """Render the latest evaluation result."""
+    return f"""
+    <div class="live-metric">
+      <span>{label}</span><strong>{value}</strong><small>{detail}</small>
+    </div>
+    """
+
+
 def record_policy(model: PPO) -> tuple[str, float]:
     """Render one deterministic episode and save it as a browser-friendly GIF."""
     env = gym.make("CartPole-v1", render_mode="rgb_array")
@@ -93,250 +123,325 @@ def train(total_timesteps: int):
     """Train in chunks so the browser receives live progress and reward updates."""
     total_timesteps = int(total_timesteps)
     chunk_size = 2_000
+    started_at = time.perf_counter()
+    logs = [
+        "CartPole PPO training console",
+        "=" * 72,
+        log_line(started_at, "CONFIG", "environment=CartPole-v1  algorithm=PPO  device=CPU"),
+        log_line(started_at, "CONFIG", f"timesteps={total_timesteps}  seed={SEED}  eval_episodes=5"),
+    ]
     env = gym.make("CartPole-v1")
     env.reset(seed=SEED)
-    model = PPO(
-        "MlpPolicy",
-        env,
-        seed=SEED,
-        verbose=0,
-        device="cpu",
-        n_steps=1_024,
-        batch_size=64,
-        learning_rate=3e-4,
-    )
+    library_output = io.StringIO()
+    with contextlib.redirect_stdout(library_output), contextlib.redirect_stderr(library_output):
+        model = PPO(
+            "MlpPolicy",
+            env,
+            seed=SEED,
+            verbose=1,
+            device="cpu",
+            n_steps=1_024,
+            batch_size=64,
+            learning_rate=3e-4,
+        )
+    initialization_output = clean_output(library_output.getvalue())
+    if initialization_output:
+        logs.extend(["", "PPO initialization", initialization_output])
 
     steps: list[int] = [0]
     mean_rewards: list[float] = []
     initial_mean, initial_std = evaluate(model)
     mean_rewards.append(initial_mean)
-    started_at = time.perf_counter()
+    logs.extend(
+        [
+            "",
+            log_line(
+                started_at,
+                "EVAL",
+                f"step=0  mean_reward={initial_mean:.1f}  std={initial_std:.1f}",
+            ),
+            log_line(started_at, "TRAIN", "collecting the first rollout"),
+        ]
+    )
 
     yield (
-        "训练已启动：先收集环境交互，再更新策略参数。",
+        status_card("running", "训练进行中", f"0 / {total_timesteps:,} steps"),
+        metric_card("Mean reward", f"{initial_mean:.1f}", f"Standard deviation {initial_std:.1f}"),
         reward_figure(steps, mean_rewards),
         None,
-        f"初始策略：{initial_mean:.1f} ± {initial_std:.1f}",
+        None,
+        "\n".join(logs),
     )
 
     trained = 0
     while trained < total_timesteps:
         current_chunk = min(chunk_size, total_timesteps - trained)
-        model.learn(
-            total_timesteps=current_chunk,
-            reset_num_timesteps=False,
-            progress_bar=False,
-        )
+        library_output = io.StringIO()
+        with contextlib.redirect_stdout(library_output), contextlib.redirect_stderr(library_output):
+            model.learn(
+                total_timesteps=current_chunk,
+                reset_num_timesteps=False,
+                progress_bar=False,
+            )
         trained += current_chunk
+        ppo_output = clean_output(library_output.getvalue())
+        if ppo_output:
+            logs.extend(["", f"PPO update · step {trained:,}", ppo_output])
         mean_reward, std_reward = evaluate(model)
         steps.append(trained)
         mean_rewards.append(mean_reward)
         elapsed = time.perf_counter() - started_at
-        status = (
-            f"训练中：{trained:,}/{total_timesteps:,} 步（{trained / total_timesteps:.0%}），"
-            f"耗时 {elapsed:.1f} 秒"
+        logs.append(
+            log_line(
+                started_at,
+                "EVAL",
+                f"step={trained}  mean_reward={mean_reward:.1f}  std={std_reward:.1f}",
+            )
         )
         yield (
-            status,
+            status_card(
+                "running",
+                "训练进行中",
+                f"{trained:,} / {total_timesteps:,} steps · {trained / total_timesteps:.0%} · {elapsed:.1f}s",
+            ),
+            metric_card("Mean reward", f"{mean_reward:.1f}", f"Standard deviation {std_reward:.1f}"),
             reward_figure(steps, mean_rewards),
             None,
-            f"当前评估：{mean_reward:.1f} ± {std_reward:.1f}",
+            None,
+            "\n".join(logs),
         )
 
     model_path = ARTIFACT_DIR / "ppo-cartpole"
     model.save(model_path)
+    model_file = str(model_path.with_suffix(".zip"))
+    logs.append(log_line(started_at, "SAVE", f"model={model_file}"))
     gif_path, demo_score = record_policy(model)
+    logs.append(log_line(started_at, "RENDER", f"animation={gif_path}  episode_reward={demo_score:.0f}"))
     elapsed = time.perf_counter() - started_at
     final_mean, final_std = evaluate(model, episodes=10)
     env.close()
+    logs.extend(
+        [
+            log_line(
+                started_at,
+                "FINAL",
+                f"episodes=10  mean_reward={final_mean:.1f}  std={final_std:.1f}",
+            ),
+            log_line(started_at, "DONE", f"training completed in {elapsed:.1f}s"),
+        ]
+    )
 
     yield (
-        f"训练完成：共 {total_timesteps:,} 步，耗时 {elapsed:.1f} 秒。",
+        status_card("complete", "训练完成", f"{total_timesteps:,} steps · {elapsed:.1f}s"),
+        metric_card("Final mean reward", f"{final_mean:.1f}", f"10 episodes · standard deviation {final_std:.1f}"),
         reward_figure(steps, mean_rewards),
         gif_path,
-        (
-            f"10 回合平均奖励：{final_mean:.1f} ± {final_std:.1f}；"
-            f"右侧动画回合得分：{demo_score:.0f}/500。"
-        ),
+        model_file,
+        "\n".join(logs),
     )
 
 
 CSS = """
-.gradio-container {
-  max-width: 1240px !important;
-  margin: 0 auto !important;
-  padding: 24px 22px 44px !important;
-  background: #f7f8fc;
+:root {
+  --ink: #172033;
+  --muted: #68748a;
+  --line: #e4e8f0;
+  --paper: #ffffff;
+  --canvas: #f4f6fa;
+  --brand: #5b5ce2;
+  --brand-dark: #4446be;
+  --green: #13a36f;
 }
-.app-shell { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; }
+.gradio-container {
+  max-width: 1180px !important;
+  margin: 0 auto !important;
+  padding: 28px 22px 52px !important;
+  background: var(--canvas);
+}
+.app-shell { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--ink); }
 .hero {
   position: relative;
   overflow: hidden;
-  padding: 34px 38px;
-  border: 1px solid rgba(129, 140, 248, .22);
-  border-radius: 24px;
+  padding: 38px 42px 34px;
+  border: 1px solid rgba(129, 140, 248, .2);
+  border-radius: 26px;
   color: #f8fafc;
   background:
-    radial-gradient(circle at 82% 5%, rgba(129, 140, 248, .35), transparent 32%),
-    radial-gradient(circle at 95% 90%, rgba(34, 211, 238, .16), transparent 28%),
-    linear-gradient(135deg, #07162f 0%, #132450 55%, #273181 100%);
-  box-shadow: 0 18px 50px rgba(15, 23, 42, .16);
+    radial-gradient(circle at 88% 8%, rgba(125, 127, 255, .42), transparent 31%),
+    radial-gradient(circle at 92% 92%, rgba(61, 207, 170, .18), transparent 30%),
+    linear-gradient(132deg, #11182c 0%, #25265d 58%, #4546a4 100%);
+  box-shadow: 0 22px 54px rgba(25, 32, 56, .16);
 }
 .hero::after {
   content: "";
   position: absolute;
-  width: 250px;
-  height: 250px;
-  right: -92px;
-  top: -112px;
-  border: 1px solid rgba(255,255,255,.14);
+  width: 290px;
+  height: 290px;
+  right: -104px;
+  top: -136px;
+  border: 1px solid rgba(255,255,255,.12);
   border-radius: 50%;
 }
-.project-mark {
-  width: 270px;
-  max-width: 70%;
-  height: auto;
-  margin: 0 0 22px;
-  filter: brightness(0) invert(1);
-  opacity: .94;
-}
-.chapter-kicker {
+.hero-topline { display: flex; align-items: center; gap: 11px; margin-bottom: 22px; }
+.experiment-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-  padding: 7px 12px;
-  border: 1px solid rgba(199, 210, 254, .32);
+  padding: 6px 11px;
+  border: 1px solid rgba(221, 224, 255, .3);
   border-radius: 999px;
-  color: #c7d2fe;
-  background: rgba(255, 255, 255, .08);
-  font-size: 13px;
+  color: #eef0ff;
+  background: rgba(255,255,255,.1);
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: .04em;
+  letter-spacing: .06em;
 }
+.hero-course { color: #b9c0d4; font-size: 13px; font-weight: 650; }
 .hero h1 {
-  margin: 0 0 10px;
+  max-width: 760px;
+  margin: 0 0 12px;
   color: #ffffff;
-  font-size: clamp(30px, 5vw, 46px);
-  line-height: 1.12;
-  letter-spacing: -.03em;
+  font-size: clamp(32px, 5vw, 48px);
+  line-height: 1.1;
+  letter-spacing: -.035em;
 }
 .hero-copy {
-  max-width: 760px;
+  max-width: 700px;
   margin: 0;
-  color: #cbd5e1;
-  font-size: 16px;
-  line-height: 1.75;
+  color: #cdd3e2;
+  font-size: 15px;
+  line-height: 1.7;
 }
-.hero-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.hero-links { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 25px; }
 .hero-link {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
-  padding: 0 15px;
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 10px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 9px;
   color: #eef2ff !important;
   background: rgba(255,255,255,.08);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 650;
   text-decoration: none !important;
   transition: transform .16s ease, background .16s ease;
 }
 .hero-link:hover { transform: translateY(-1px); background: rgba(255,255,255,.15); }
 .hero-link.primary { color: #172554 !important; background: #ffffff; border-color: #ffffff; }
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin: 16px 0 22px;
+.lab-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin: 17px 0 22px;
+  padding: 13px 18px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: rgba(255,255,255,.84);
+  color: var(--muted);
+  font-size: 13px;
+  box-shadow: 0 6px 20px rgba(18, 25, 43, .035);
 }
-.stat-card {
-  padding: 16px 18px;
-  border: 1px solid #e4e7f0;
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 6px 20px rgba(15, 23, 42, .045);
-}
-.stat-label { margin-bottom: 5px; color: #64748b; font-size: 12px; font-weight: 650; }
-.stat-value { color: #0f172a; font-size: 20px; font-weight: 780; letter-spacing: -.02em; }
-.section-title { margin: 3px 0 5px; color: #111827; font-size: 22px; font-weight: 780; }
-.section-copy { margin: 0 0 14px; color: #64748b; font-size: 14px; line-height: 1.7; }
-.control-card, .result-card, .lesson-card {
-  border: 1px solid #e2e5ef !important;
-  border-radius: 18px !important;
+.lab-strip strong { margin-left: 5px; color: var(--ink); font-weight: 750; }
+.panel-title { margin: 0 0 5px; color: var(--ink); font-size: 19px; font-weight: 780; letter-spacing: -.015em; }
+.panel-copy { margin: 0 0 17px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.control-card, .chart-card, .output-card, .console-card {
+  border: 1px solid var(--line) !important;
+  border-radius: 17px !important;
   background: #ffffff !important;
-  box-shadow: 0 8px 28px rgba(15, 23, 42, .055) !important;
+  box-shadow: 0 9px 26px rgba(20, 28, 48, .05) !important;
 }
 .control-card { padding: 22px !important; }
-.result-card { padding: 14px 16px !important; }
-.lesson-card { margin-top: 16px; padding: 20px 22px; }
+.chart-card { padding: 18px 18px 8px !important; }
+.output-card { margin-top: 14px !important; padding: 18px !important; }
+.console-card { margin-top: 14px !important; padding: 0 !important; overflow: hidden; }
 .primary-btn {
-  min-height: 50px !important;
+  min-height: 48px !important;
   border: 0 !important;
-  border-radius: 12px !important;
-  background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
-  box-shadow: 0 8px 22px rgba(79, 70, 229, .25) !important;
-  font-size: 16px !important;
+  border-radius: 11px !important;
+  background: linear-gradient(135deg, var(--brand-dark), #6969ec) !important;
+  box-shadow: 0 8px 20px rgba(76, 77, 202, .22) !important;
+  font-size: 15px !important;
   font-weight: 750 !important;
 }
-.status-box, .metric-box {
-  padding: 12px 14px !important;
-  border-radius: 11px !important;
-  background: #f7f8ff !important;
+.run-state, .live-metric {
+  box-sizing: border-box;
+  min-height: 78px;
+  margin-top: 10px;
+  padding: 14px 15px;
+  border: 1px solid #e6e8f3;
+  border-radius: 12px;
+  background: #f8f9fd;
 }
-.status-box { border-left: 3px solid #6366f1 !important; }
-.metric-box { border-left: 3px solid #22c55e !important; }
-.flow-list { display: grid; gap: 10px; margin-top: 16px; }
-.flow-item { display: flex; align-items: flex-start; gap: 10px; color: #475569; font-size: 13px; line-height: 1.55; }
-.flow-index {
-  display: inline-grid;
-  flex: 0 0 24px;
-  width: 24px;
-  height: 24px;
-  place-items: center;
-  border-radius: 7px;
-  color: #4338ca;
-  background: #eef2ff;
-  font-weight: 750;
+.run-state { display: flex; align-items: center; gap: 11px; }
+.run-state__dot { width: 9px; height: 9px; border-radius: 50%; background: #98a2b3; box-shadow: 0 0 0 5px rgba(152,162,179,.12); }
+.run-state--running .run-state__dot { background: var(--brand); box-shadow: 0 0 0 5px rgba(91,92,226,.12); animation: pulse 1.5s infinite; }
+.run-state--complete .run-state__dot { background: var(--green); box-shadow: 0 0 0 5px rgba(19,163,111,.12); }
+.run-state strong, .live-metric strong { display: block; color: var(--ink); font-size: 15px; }
+.run-state small, .live-metric small { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
+.live-metric span { display: block; margin-bottom: 3px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.live-metric strong { color: var(--green); font-size: 24px; letter-spacing: -.025em; }
+@keyframes pulse { 50% { opacity: .5; } }
+.console-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 16px;
+  border-bottom: 1px solid #263044;
+  color: #d9e0eb;
+  background: #151c2b;
+  font-size: 13px;
+  font-weight: 700;
 }
-.lesson-card h3 { margin: 0 0 7px; color: #0f172a; font-size: 17px; }
-.lesson-card p { margin: 0; color: #64748b; font-size: 14px; line-height: 1.7; }
-.lesson-card a { color: #4f46e5 !important; font-weight: 650; }
+.console-dot { width: 8px; height: 8px; border-radius: 50%; background: #24c689; box-shadow: 0 0 0 4px rgba(36,198,137,.12); }
+.training-console, .training-console > div { border: 0 !important; border-radius: 0 !important; background: #0f1623 !important; }
+.training-console textarea {
+  min-height: 350px !important;
+  padding: 17px 18px !important;
+  border: 0 !important;
+  color: #cbd5e1 !important;
+  background: #0f1623 !important;
+  font: 12px/1.58 "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
+  resize: vertical !important;
+}
+.artifact-note { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.footer-note a { color: var(--brand) !important; font-weight: 650; text-decoration: none !important; }
 .footer-note { margin-top: 18px; text-align: center; color: #94a3b8; font-size: 12px; }
 @media (max-width: 760px) {
   .gradio-container { padding: 12px 10px 30px !important; }
-  .hero { padding: 26px 22px; border-radius: 18px; }
-  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero { padding: 27px 22px 25px; border-radius: 19px; }
+  .hero-topline { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .lab-strip { gap: 8px 16px; }
 }
 """
 
 
-with gr.Blocks(css=CSS, title="第 1 章配套实验 · CartPole 在线训练") as demo:
+with gr.Blocks(css=CSS, title="实验 01 · CartPole 在线训练") as demo:
     gr.HTML(
         f"""
         <main class="app-shell">
           <section class="hero">
-            <img class="project-mark" src="{LOGO_URL}" alt="Hands-On Modern RL" />
-            <div class="chapter-kicker">配套实验 · 第 1 章 · CartPole 入门</div>
-            <h1>1.3 PPO 训练可视化</h1>
+            <div class="hero-topline">
+              <span class="experiment-badge">EXPERIMENT 01</span>
+              <span class="hero-course">《动手学现代强化学习》· 第 1 章配套</span>
+            </div>
+            <h1>CartPole 在线训练实验</h1>
             <p class="hero-copy">
-              在浏览器中完成一次可观察的强化学习训练：让 PPO 智能体从随机控制开始，
-              通过环境交互逐步学会保持倒立摆平衡。整个实验只使用 CPU，无需配置本地环境。
+              使用 PPO 从零训练倒立摆策略。启动后可以实时查看奖励曲线、PPO 输出和评估记录，
+              训练结束后下载模型并播放策略动画。全程使用 CPU。
             </p>
             <nav class="hero-links" aria-label="项目入口">
-              <a class="hero-link primary" href="{PROJECT_URL}" target="_blank" rel="noreferrer">GitHub 项目 ↗</a>
-              <a class="hero-link" href="{COURSE_URL}" target="_blank" rel="noreferrer">课程网站 ↗</a>
-              <a class="hero-link" href="{CHAPTER_URL}" target="_blank" rel="noreferrer">阅读第 1 章 ↗</a>
-              <a class="hero-link" href="{COLAB_URL}" target="_blank" rel="noreferrer">在 Colab 运行 ↗</a>
-              <a class="hero-link" href="{SCRIPT_URL}" target="_blank" rel="noreferrer">查看 train.py ↗</a>
+              <a class="hero-link primary" href="{CHAPTER_URL}" target="_blank" rel="noreferrer">阅读配套章节</a>
+              <a class="hero-link" href="{COLAB_URL}" target="_blank" rel="noreferrer">Colab Notebook</a>
+              <a class="hero-link" href="{SCRIPT_URL}" target="_blank" rel="noreferrer">训练脚本</a>
+              <a class="hero-link" href="{PROJECT_URL}" target="_blank" rel="noreferrer">GitHub 项目</a>
             </nav>
           </section>
-          <section class="stat-grid" aria-label="实验信息">
-            <div class="stat-card"><div class="stat-label">环境</div><div class="stat-value">CartPole-v1</div></div>
-            <div class="stat-card"><div class="stat-label">算法</div><div class="stat-value">PPO</div></div>
-            <div class="stat-card"><div class="stat-label">动作空间</div><div class="stat-value">左 / 右</div></div>
-            <div class="stat-card"><div class="stat-label">目标奖励</div><div class="stat-value">500</div></div>
+          <section class="lab-strip" aria-label="实验配置">
+            <span>环境 <strong>CartPole-v1</strong></span>
+            <span>算法 <strong>PPO</strong></span>
+            <span>设备 <strong>CPU</strong></span>
+            <span>解决阈值 <strong>475</strong></span>
+            <span>满分 <strong>500</strong></span>
           </section>
         </main>
         """
@@ -346,8 +451,8 @@ with gr.Blocks(css=CSS, title="第 1 章配套实验 · CartPole 在线训练") 
         with gr.Column(scale=1, min_width=300, elem_classes="control-card"):
             gr.HTML(
                 """
-                <h2 class="section-title">运行实验</h2>
-                <p class="section-copy">选择训练步数并启动。训练期间，右侧奖励曲线会每 2,000 步更新一次。</p>
+                <h2 class="panel-title">训练设置</h2>
+                <p class="panel-copy">选择总交互步数。系统每训练 2,000 步评估一次策略。</p>
                 """
             )
             timesteps = gr.Slider(
@@ -356,50 +461,55 @@ with gr.Blocks(css=CSS, title="第 1 章配套实验 · CartPole 在线训练") 
                 value=30_000,
                 step=5_000,
                 label="训练步数",
-                info="默认设置通常可在普通 CPU 上较快完成。",
+                info="建议首次使用 30,000 步",
             )
             start = gr.Button("开始训练", variant="primary", elem_classes="primary-btn")
-            status = gr.Markdown("**等待开始** · 点击按钮后持续更新训练进度。", elem_classes="status-box")
-            metrics = gr.Markdown("**评估结果** · 尚未开始评估。", elem_classes="metric-box")
+            status = gr.HTML(
+                status_card("idle", "等待开始", "设置训练步数后启动实验")
+            )
+            metrics = gr.HTML(
+                metric_card("Mean reward", "—", "训练开始后显示评估结果")
+            )
+        with gr.Column(scale=2, elem_classes="chart-card"):
             gr.HTML(
                 """
-                <div class="flow-list">
-                  <div class="flow-item"><span class="flow-index">1</span><span>智能体观察小车位置、速度、杆角度与角速度。</span></div>
-                  <div class="flow-item"><span class="flow-index">2</span><span>策略选择向左或向右推动小车，并收集交互轨迹。</span></div>
-                  <div class="flow-item"><span class="flow-index">3</span><span>PPO 更新策略；每 2,000 步独立评估 5 个回合。</span></div>
-                  <div class="flow-item"><span class="flow-index">4</span><span>训练结束后生成奖励曲线、策略动画与模型文件。</span></div>
-                </div>
+                <h2 class="panel-title">奖励曲线</h2>
+                <p class="panel-copy">纵轴为确定性策略的平均奖励，绿色虚线表示 475 分解决阈值。</p>
                 """
             )
-        with gr.Column(scale=2, elem_classes="result-card"):
+            curve = gr.Plot(show_label=False)
+
+    with gr.Group(elem_classes="console-card"):
+        gr.HTML('<div class="console-head"><span class="console-dot"></span>实时训练日志</div>')
+        console = gr.Textbox(
+            value="等待训练任务...",
+            lines=18,
+            max_lines=28,
+            interactive=False,
+            show_label=False,
+            elem_classes="training-console",
+        )
+
+    with gr.Row(elem_classes="output-card"):
+        with gr.Column(scale=2):
             gr.HTML(
                 """
-                <h2 class="section-title">观察学习过程</h2>
-                <p class="section-copy">曲线展示确定性策略的平均奖励；虚线 475 是 CartPole-v1 的常用解决阈值。</p>
+                <h2 class="panel-title">训练结果</h2>
+                <p class="artifact-note">任务完成后，这里会显示策略动画并提供模型文件。</p>
                 """
             )
-            curve = gr.Plot(label="奖励曲线")
-            animation = gr.Image(label="训练后策略演示", type="filepath")
+            animation = gr.Image(label="策略动画", type="filepath")
+        with gr.Column(scale=1):
+            model_download = gr.File(label="下载 PPO 模型", interactive=False)
 
     gr.HTML(
-        f"""
-        <section class="lesson-card">
-          <h3>这是《动手学现代强化学习》的第 1 章配套实验</h3>
-          <p>
-            实验对应课程的 <a href="{CHAPTER_URL}" target="_blank" rel="noreferrer">1.3 PPO 训练可视化</a>。
-            完整源码、后续章节与实验代码收录在
-            <a href="{PROJECT_URL}" target="_blank" rel="noreferrer">walkinglabs/hands-on-modern-rl</a>。
-            如果当前环境排队，也可以直接使用 <a href="{COLAB_URL}" target="_blank" rel="noreferrer">Colab Notebook</a>。
-          </p>
-        </section>
-        <div class="footer-note">Hands-On Modern RL · WalkingLabs · 开源强化学习课程</div>
-        """
+        f'<div class="footer-note">实验 01 · <a href="{COURSE_URL}" target="_blank" rel="noreferrer">Hands-On Modern RL</a> · WalkingLabs</div>'
     )
 
     start.click(
         fn=train,
         inputs=timesteps,
-        outputs=[status, curve, animation, metrics],
+        outputs=[status, metrics, curve, animation, model_download, console],
         concurrency_limit=1,
     )
 
