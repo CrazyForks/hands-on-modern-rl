@@ -560,7 +560,7 @@ TEXT = {
         "log": "Live training log",
         "log_waiting": "Waiting for a training run...",
         "preview": "Learned policy preview",
-        "preview_copy": "Tabular tasks show the learned policy; control tasks produce a replay after training.",
+        "preview_copy": "Every run ends with a policy map, replay GIF, or result image. This panel never finishes empty.",
         "artifact": "Download run summary",
         "seconds": "s",
     },
@@ -595,7 +595,7 @@ TEXT = {
         "log": "实时训练日志",
         "log_waiting": "等待训练任务...",
         "preview": "训练策略预览",
-        "preview_copy": "表格任务显示学习后的策略；控制任务训练结束后生成回放。",
+        "preview_copy": "每次运行都会得到策略图、回放 GIF 或结果图，训练结束后这里不会留空。",
         "artifact": "下载运行摘要",
         "seconds": "秒",
     },
@@ -685,6 +685,51 @@ def learning_figure(x: list[float], y: list[float], title: str, ylabel: str):
     return fig
 
 
+def result_preview_image(
+    experiment: str,
+    status: str,
+    metric_value: str,
+    metric_label: str,
+    filename: str | None = None,
+    x: list[float] | None = None,
+    y: list[float] | None = None,
+    note: str = "",
+) -> str:
+    """Create a durable result preview whenever an environment has no replay."""
+    cfg = experiment_config(experiment)
+    slug = re.sub(r"[^a-z0-9]+", "-", experiment.lower()).strip("-")
+    path = ARTIFACT_DIR / (filename or f"{slug}-result.png")
+    fig = plt.figure(figsize=(8.8, 4.8), facecolor="#f7f8fc")
+    grid = fig.add_gridspec(1, 2, width_ratios=[.9, 1.5], wspace=.16)
+    info = fig.add_subplot(grid[0, 0]); plot = fig.add_subplot(grid[0, 1])
+    info.set_facecolor("#20245b"); info.set_xticks([]); info.set_yticks([])
+    for spine in info.spines.values(): spine.set_visible(False)
+    info.text(.09, .88, status.upper(), color="#a5b4fc", fontsize=10, fontweight="bold", transform=info.transAxes)
+    info.text(.09, .71, metric_value, color="white", fontsize=27, fontweight="bold", transform=info.transAxes, wrap=True)
+    info.text(.09, .61, metric_label, color="#cbd5e1", fontsize=10, transform=info.transAxes, wrap=True)
+    info.text(.09, .39, cfg["environment"], color="white", fontsize=13, fontweight="bold", transform=info.transAxes, wrap=True)
+    info.text(.09, .29, f"{cfg['algorithm']} · CPU", color="#cbd5e1", fontsize=10, transform=info.transAxes)
+    info.text(.09, .08, note[:150], color="#aeb7ca", fontsize=9, transform=info.transAxes, wrap=True)
+    if x and y:
+        plot.plot(x, y, color="#5b5ce2", linewidth=2.4)
+        plot.scatter([x[-1]], [y[-1]], color="#13a36f", s=45, zorder=3)
+        plot.set_xlabel("Training progress"); plot.set_ylabel(metric_label); plot.grid(alpha=.2)
+        plot.set_title("Learned policy result", loc="left", fontweight="bold", color="#172033")
+    else:
+        plot.axis("off")
+        plot.text(.5, .59, "RESULT PREVIEW", ha="center", va="center", color="#5b5ce2", fontsize=19, fontweight="bold")
+        plot.text(.5, .43, experiment, ha="center", va="center", color="#172033", fontsize=13, wrap=True)
+        plot.text(.5, .30, "A policy map, replay GIF, or result image\nwill replace this panel after training.", ha="center", va="center", color="#68748a", fontsize=10, linespacing=1.5)
+    fig.savefig(path, dpi=150, bbox_inches="tight", facecolor=fig.get_facecolor())
+    plt.close(fig)
+    return str(path)
+
+
+def pending_preview(experiment: str, status: str = "Ready") -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", experiment.lower()).strip("-")
+    return result_preview_image(experiment, status, "CPU", "training target", filename=f"{slug}-pending.png", note=experiment_goal(experiment))
+
+
 def policy_grid_image(
     grid: list[str], policy: dict[tuple[int, int], str], title: str, filename: str,
     values: dict[tuple[int, int], float] | None = None,
@@ -738,7 +783,7 @@ def run_bandit(budget: int, alpha: float, epsilon: float, seed: int, language: s
         if step % chunk == 0 or step == budget:
             avg = float(np.mean(rewards))
             logs.append(elapsed_line(started, "TRAIN", f"step={step}/{budget}  avg_reward={avg:.3f}  best_estimate=arm-{int(np.argmax(q)) + 1}"))
-            yield status_card("running", copy_for(language)["running"], f"{step:,}/{budget:,} steps", language), metric_card(f"{avg:.3f}", f"estimated best arm: {int(np.argmax(q)) + 1}", language), learning_figure(list(range(1, step + 1)), (np.cumsum(rewards) / np.arange(1, step + 1)).tolist(), "Bandit cumulative average reward", "Average reward"), None, None, console_panel("\n".join(logs), language)
+            yield status_card("running", copy_for(language)["running"], f"{step:,}/{budget:,} steps", language), metric_card(f"{avg:.3f}", f"estimated best arm: {int(np.argmax(q)) + 1}", language), learning_figure(list(range(1, step + 1)), (np.cumsum(rewards) / np.arange(1, step + 1)).tolist(), "Bandit cumulative average reward", "Average reward"), pending_preview(BANDIT, "Training"), None, console_panel("\n".join(logs), language)
     fig, ax = plt.subplots(figsize=(6, 4))
     positions = np.arange(1, 5)
     ax.bar(positions - 0.16, probabilities, 0.32, label="True probability", color="#93c5fd")
@@ -783,7 +828,7 @@ def run_gridworld(budget: int, alpha: float, gamma: float, epsilon: float, seed:
         if episode % chunk == 0 or episode == budget:
             recent = float(np.mean(rewards[-min(50, len(rewards)):]))
             logs.append(elapsed_line(started, "TRAIN", f"episode={episode}/{budget} recent_reward={recent:.3f}"))
-            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{recent:.3f}", "mean reward over recent episodes", language), learning_figure(list(range(1, episode + 1)), rewards, "GridWorld episode reward", "Episode reward"), None, None, console_panel("\n".join(logs), language)
+            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{recent:.3f}", "mean reward over recent episodes", language), learning_figure(list(range(1, episode + 1)), rewards, "GridWorld episode reward", "Episode reward"), pending_preview(GRIDWORLD, "Training"), None, console_panel("\n".join(logs), language)
     policy = {(r, c): ARROWS[int(np.argmax(q[r, c]))] for r in range(4) for c in range(4) if (r, c) not in {(1, 1), (3, 3)}}
     values = {(r, c): float(q[r, c].max()) for r in range(4) for c in range(4)}
     preview = policy_grid_image(["S...", ".T..", "....", "...G"], policy, "Learned GridWorld policy", "gridworld-policy.png", values)
@@ -808,7 +853,7 @@ def run_frozenlake(budget: int, alpha: float, gamma: float, epsilon: float, seed
             rate = float(np.mean(successes[-min(500, len(successes)):]))
             logs.append(elapsed_line(started, "TRAIN", f"episode={episode}/{budget} epsilon={current_eps:.3f} recent_success={rate:.1%}"))
             curve = (np.cumsum(successes) / np.arange(1, len(successes) + 1)).tolist()
-            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{rate:.1%}", "recent success rate", language), learning_figure(list(range(1, episode + 1)), curve, "FrozenLake cumulative success rate", "Success rate"), None, None, console_panel("\n".join(logs), language)
+            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{rate:.1%}", "recent success rate", language), learning_figure(list(range(1, episode + 1)), curve, "FrozenLake cumulative success rate", "Success rate"), pending_preview(FROZENLAKE, "Training"), None, console_panel("\n".join(logs), language)
     env.close(); desc = ["SFFF", "FHFH", "FFFH", "HFFG"]; policy = {(s // 4, s % 4): ARROWS[int(np.argmax(q[s]))] for s in range(16) if desc[s // 4][s % 4] not in "HG"}
     preview = policy_grid_image(desc, policy, "Learned policy on slippery FrozenLake", "frozenlake-policy.png")
     summary = save_summary("frozenlake", {"experiment": "FrozenLake", "q_values": q.tolist(), "success_rate": float(np.mean(successes[-500:])), "parameters": {"budget": budget, "alpha": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
@@ -861,7 +906,7 @@ def run_blackjack(budget: int, alpha: float, gamma: float, epsilon: float, seed:
             win_rate = float(np.mean(np.asarray(rewards[-min(5000, len(rewards)):]) > 0))
             logs.append(elapsed_line(started, "TRAIN", f"episode={episode}/{budget} epsilon={current_eps:.3f} recent_win_rate={win_rate:.1%}"))
             cumulative = (np.cumsum(rewards) / np.arange(1, len(rewards) + 1)).tolist()
-            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{win_rate:.1%}", "recent win rate", language), learning_figure(list(range(1, episode + 1)), cumulative, "Blackjack cumulative mean return", "Mean return"), None, None, console_panel("\n".join(logs), language)
+            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{win_rate:.1%}", "recent win rate", language), learning_figure(list(range(1, episode + 1)), cumulative, "Blackjack cumulative mean return", "Mean return"), pending_preview(BLACKJACK, "Training"), None, console_panel("\n".join(logs), language)
     env.close(); preview = blackjack_policy_image(q, "blackjack-policy.png")
     serialized_q = {str(state): values.tolist() for state, values in q.items()}
     summary = save_summary("blackjack", {"experiment": BLACKJACK, "q_values": serialized_q, "win_rate": float(np.mean(np.asarray(rewards[-5000:]) > 0)), "parameters": {"budget": budget, "alpha": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
@@ -870,14 +915,22 @@ def run_blackjack(budget: int, alpha: float, gamma: float, epsilon: float, seed:
 
 
 def record_discrete_policy(env_id: str, q: np.ndarray, seed: int, filename: str, max_steps: int) -> str:
-    env = gym.make(env_id, render_mode="rgb_array"); state, _ = env.reset(seed=seed); frames = []
-    for step in range(max_steps):
-        if step % 2 == 0:
-            frames.append(env.render())
-        state, _, terminated, truncated, _ = env.step(int(np.argmax(q[int(state)])))
-        if terminated or truncated:
-            frames.append(env.render()); break
-    env.close(); path = ARTIFACT_DIR / filename; imageio.mimsave(path, frames, duration=1 / 15, loop=0); return str(path)
+    env = gym.make(env_id, render_mode="rgb_array"); frames = []
+    try:
+        state, _ = env.reset(seed=seed)
+        for step in range(max_steps):
+            if step % 2 == 0:
+                frame = env.render()
+                if frame is not None: frames.append(frame)
+            state, _, terminated, truncated, _ = env.step(int(np.argmax(q[int(state)])))
+            if terminated or truncated:
+                frame = env.render()
+                if frame is not None: frames.append(frame)
+                break
+    finally:
+        env.close()
+    if not frames: raise RuntimeError("Environment returned no RGB frames")
+    path = ARTIFACT_DIR / filename; imageio.mimsave(path, frames, duration=1 / 15, loop=0); return str(path)
 
 
 def run_discrete_control(experiment: str, env_id: str, method: str, budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
@@ -899,11 +952,17 @@ def run_discrete_control(experiment: str, env_id: str, method: str, budget: int,
         if episode % chunk == 0 or episode == budget:
             recent = float(np.mean(rewards[-min(100, len(rewards)):]))
             logs.append(elapsed_line(started, "TRAIN", f"episode={episode}/{budget} epsilon={current_eps:.3f} recent_reward={recent:.1f}"))
-            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{recent:.1f}", "recent mean episode reward", language), learning_figure(list(range(1, episode + 1)), rewards, f"{experiment} episode reward", "Episode reward"), None, None, console_panel("\n".join(logs), language)
+            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{recent:.1f}", "recent mean episode reward", language), learning_figure(list(range(1, episode + 1)), rewards, f"{experiment} episode reward", "Episode reward"), pending_preview(experiment, "Training"), None, console_panel("\n".join(logs), language)
     env.close(); slug = "cliffwalking" if env_id.startswith("Cliff") else "taxi"
-    gif = record_discrete_policy(env_id, q, seed + 10000, f"{slug}-trained.gif", max_steps)
+    try:
+        gif = record_discrete_policy(env_id, q, seed + 10000, f"{slug}-trained.gif", max_steps)
+        preview_kind = "replay GIF"
+    except Exception as exc:
+        gif = result_preview_image(experiment, "Training complete", f"{np.mean(rewards[-100:]):.1f}", "Final mean reward", x=list(range(1, budget + 1)), y=rewards, note=f"Replay unavailable: {type(exc).__name__}")
+        preview_kind = "result image"
+        logs.append(elapsed_line(started, "WARN", f"replay_unavailable={type(exc).__name__}: {exc}"))
     summary = save_summary(slug, {"experiment": experiment, "q_values": q.tolist(), "parameters": {"budget": budget, "alpha": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
-    logs.append(elapsed_line(started, "DONE", f"replay={gif} artifact={summary}"))
+    logs.append(elapsed_line(started, "DONE", f"preview={preview_kind} path={gif} artifact={summary}"))
     yield status_card("complete", copy_for(language)["complete"], f"{budget:,} episodes · {time.perf_counter() - started:.1f}s", language), metric_card(f"{np.mean(rewards[-100:]):.1f}", "final 100-episode mean reward", language), learning_figure(list(range(1, budget + 1)), rewards, f"{experiment} episode reward", "Episode reward"), gif, summary, console_panel("\n".join(logs), language)
 
 
@@ -914,11 +973,18 @@ def mountain_state(obs: np.ndarray, bins=(24, 20)) -> tuple[int, int]:
 
 
 def record_tabular_control(env_id: str, policy, seed: int, filename: str, max_steps: int = 500) -> str:
-    env = gym.make(env_id, render_mode="rgb_array"); obs, _ = env.reset(seed=seed); frames = []
-    for _ in range(max_steps):
-        frames.append(env.render()); action = policy(obs); obs, _, terminated, truncated, _ = env.step(action)
-        if terminated or truncated: break
-    env.close(); path = ARTIFACT_DIR / filename; imageio.mimsave(path, frames, duration=1 / 30, loop=0); return str(path)
+    env = gym.make(env_id, render_mode="rgb_array"); frames = []
+    try:
+        obs, _ = env.reset(seed=seed)
+        for _ in range(max_steps):
+            frame = env.render()
+            if frame is not None: frames.append(frame)
+            action = policy(obs); obs, _, terminated, truncated, _ = env.step(action)
+            if terminated or truncated: break
+    finally:
+        env.close()
+    if not frames: raise RuntimeError("Environment returned no RGB frames")
+    path = ARTIFACT_DIR / filename; imageio.mimsave(path, frames, duration=1 / 30, loop=0); return str(path)
 
 
 def run_mountaincar(budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
@@ -939,21 +1005,34 @@ def run_mountaincar(budget: int, alpha: float, gamma: float, epsilon: float, see
         if episode % chunk == 0 or episode == budget:
             recent = float(np.mean(rewards[-min(100, len(rewards)):]))
             logs.append(elapsed_line(started, "TRAIN", f"episode={episode}/{budget} epsilon={current_eps:.3f} recent_reward={recent:.1f}"))
-            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{recent:.1f}", "recent mean episode reward", language), learning_figure(list(range(1, episode + 1)), rewards, "MountainCar episode reward", "Episode reward"), None, None, console_panel("\n".join(logs), language)
-    env.close(); gif = record_tabular_control("MountainCar-v0", lambda obs: int(np.argmax(q[mountain_state(obs)])), seed + 10000, "mountaincar-trained.gif", 200)
+            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{recent:.1f}", "recent mean episode reward", language), learning_figure(list(range(1, episode + 1)), rewards, "MountainCar episode reward", "Episode reward"), pending_preview(MOUNTAINCAR, "Training"), None, console_panel("\n".join(logs), language)
+    env.close()
+    try:
+        gif = record_tabular_control("MountainCar-v0", lambda obs: int(np.argmax(q[mountain_state(obs)])), seed + 10000, "mountaincar-trained.gif", 200)
+        preview_kind = "replay GIF"
+    except Exception as exc:
+        gif = result_preview_image(MOUNTAINCAR, "Training complete", f"{np.mean(rewards[-100:]):.1f}", "Final mean reward", x=list(range(1, budget + 1)), y=rewards, note=f"Replay unavailable: {type(exc).__name__}")
+        preview_kind = "result image"
+        logs.append(elapsed_line(started, "WARN", f"replay_unavailable={type(exc).__name__}: {exc}"))
     summary = save_summary("mountaincar", {"experiment": "MountainCar", "q_values": q.tolist(), "parameters": {"budget": budget, "alpha": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
-    logs.append(elapsed_line(started, "DONE", f"replay={gif} artifact={summary}"))
+    logs.append(elapsed_line(started, "DONE", f"preview={preview_kind} path={gif} artifact={summary}"))
     yield status_card("complete", copy_for(language)["complete"], f"{budget:,} episodes · {time.perf_counter() - started:.1f}s", language), metric_card(f"{np.mean(rewards[-100:]):.1f}", "final 100-episode mean reward", language), learning_figure(list(range(1, budget + 1)), rewards, "MountainCar episode reward", "Episode reward"), gif, summary, console_panel("\n".join(logs), language)
 
 
 def record_model(model, env_id: str, seed: int, filename: str, max_steps: int) -> str:
-    env = gym.make(env_id, render_mode="rgb_array"); obs, _ = env.reset(seed=seed); frames = []
-    for step in range(max_steps):
-        if step % 2 == 0:
-            frames.append(env.render())
-        action, _ = model.predict(obs, deterministic=True); obs, _, terminated, truncated, _ = env.step(action)
-        if terminated or truncated: break
-    env.close(); path = ARTIFACT_DIR / filename; imageio.mimsave(path, frames, duration=1 / 15, loop=0); return str(path)
+    env = gym.make(env_id, render_mode="rgb_array"); frames = []
+    try:
+        obs, _ = env.reset(seed=seed)
+        for step in range(max_steps):
+            if step % 2 == 0:
+                frame = env.render()
+                if frame is not None: frames.append(frame)
+            action, _ = model.predict(obs, deterministic=True); obs, _, terminated, truncated, _ = env.step(action)
+            if terminated or truncated: break
+    finally:
+        env.close()
+    if not frames: raise RuntimeError("Environment returned no RGB frames")
+    path = ARTIFACT_DIR / filename; imageio.mimsave(path, frames, duration=1 / 15, loop=0); return str(path)
 
 
 def run_deep_control(experiment: str, env_id: str, algorithm: str, budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
@@ -976,14 +1055,16 @@ def run_deep_control(experiment: str, env_id: str, algorithm: str, budget: int, 
         step = min(chunk, budget - trained); model.learn(total_timesteps=step, reset_num_timesteps=False, progress_bar=False); trained += step
         eval_env = gym.make(env_id); values, _ = evaluate_policy(model, eval_env, n_eval_episodes=3, deterministic=True, return_episode_rewards=True, warn=False); eval_env.close(); mean = float(np.mean(values)); xs.append(trained); rewards.append(mean)
         logs.append(elapsed_line(started, "EVAL", f"step={trained}/{budget} mean_reward={mean:.1f}"))
-        yield status_card("running", copy_for(language)["running"], f"{trained:,}/{budget:,} steps", language), metric_card(f"{mean:.1f}", "3-episode evaluation reward", language), learning_figure(xs, rewards, f"{experiment} evaluation reward", "Mean reward"), None, None, console_panel("\n".join(logs), language)
+        yield status_card("running", copy_for(language)["running"], f"{trained:,}/{budget:,} steps", language), metric_card(f"{mean:.1f}", "3-episode evaluation reward", language), learning_figure(xs, rewards, f"{experiment} evaluation reward", "Mean reward"), pending_preview(experiment, "Training"), None, console_panel("\n".join(logs), language)
     slug = re.sub(r"[^a-z0-9]+", "-", f"{env_id}-{algorithm}".lower()).strip("-"); model_path = ARTIFACT_DIR / slug; model.save(model_path); env.close()
     try:
         gif = record_model(model, env_id, seed + 10000, f"{slug}-trained.gif", 500 if env_id in {"CartPole-v1", "Acrobot-v1"} else 999)
+        preview_kind = "replay GIF"
     except Exception as exc:
-        gif = None; logs.append(elapsed_line(started, "WARN", f"replay_unavailable={type(exc).__name__}: {exc}"))
+        gif = result_preview_image(experiment, "Training complete", f"{rewards[-1]:.1f}", "Final evaluation reward", x=xs, y=rewards, note=f"Replay unavailable: {type(exc).__name__}")
+        preview_kind = "result image"; logs.append(elapsed_line(started, "WARN", f"replay_unavailable={type(exc).__name__}: {exc}"))
     summary = save_summary(slug, {"experiment": experiment, "evaluation_steps": xs, "evaluation_rewards": rewards, "model": str(model_path.with_suffix('.zip')), "parameters": {"budget": budget, "learning_rate": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
-    logs.append(elapsed_line(started, "DONE", f"replay={gif} model={model_path}.zip artifact={summary}"))
+    logs.append(elapsed_line(started, "DONE", f"preview={preview_kind} path={gif} model={model_path}.zip artifact={summary}"))
     yield status_card("complete", copy_for(language)["complete"], f"{budget:,} steps · {time.perf_counter() - started:.1f}s", language), metric_card(f"{rewards[-1]:.1f}", "final evaluation reward", language), learning_figure(xs, rewards, f"{experiment} evaluation reward", "Mean reward"), gif, summary, console_panel("\n".join(logs), language)
 
 
@@ -998,7 +1079,7 @@ def error_figure(title: str, message: str):
 def run_catalog_experiment(experiment: str, budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
     env_id = catalog_env_id(experiment); started = time.perf_counter()
     logs = [f"{env_id} automatic training console", "=" * 72, elapsed_line(started, "REGISTER", f"environment={env_id} family={experiment.split(' · ', 1)[0]}"), elapsed_line(started, "CONFIG", f"budget={budget} learning_rate={alpha:g} gamma={gamma:g} epsilon={epsilon:g} seed={seed}")]
-    yield status_card("running", copy_for(language)["running"], "Inspecting environment and action space", language), metric_card("AUTO", "selecting a compatible baseline", language), error_figure(env_id, "Inspecting environment..."), None, None, console_panel("\n".join(logs), language)
+    yield status_card("running", copy_for(language)["running"], "Inspecting environment and action space", language), metric_card("AUTO", "selecting a compatible baseline", language), error_figure(env_id, "Inspecting environment..."), pending_preview(experiment, "Inspecting"), None, console_panel("\n".join(logs), language)
     env = None
     try:
         env = gym.make(env_id)
@@ -1013,7 +1094,7 @@ def run_catalog_experiment(experiment: str, budget: int, alpha: float, gamma: fl
         else:
             raise ValueError(f"Unsupported action space for the automatic baseline: {action_space}")
         logs.append(elapsed_line(started, "AUTO", f"selected_algorithm={algorithm}")); env.close(); env = None
-        yield status_card("running", copy_for(language)["running"], f"Auto selected {algorithm}", language), metric_card(algorithm, f"action space: {action_space}", language), error_figure(env_id, f"Starting {algorithm} training..."), None, None, console_panel("\n".join(logs), language)
+        yield status_card("running", copy_for(language)["running"], f"Auto selected {algorithm}", language), metric_card(algorithm, f"action space: {action_space}", language), error_figure(env_id, f"Starting {algorithm} training..."), pending_preview(experiment, f"Starting {algorithm}"), None, console_panel("\n".join(logs), language)
         for status, metric, curve, preview, artifact, console in run_deep_control(experiment, env_id, algorithm, budget, alpha, gamma, epsilon, seed, language):
             deep_text = re.search(r'<pre class="console-text">(.*?)</pre>', console, re.DOTALL)
             combined = "\n".join(logs) + ("\n\n" + html.unescape(deep_text.group(1)) if deep_text else "")
@@ -1023,30 +1104,38 @@ def run_catalog_experiment(experiment: str, budget: int, alpha: float, gamma: fl
             env.close()
         message = f"{type(exc).__name__}: {exc}"; logs.append(elapsed_line(started, "ERROR", message)); logs.append(elapsed_line(started, "HINT", "All maintained runtimes are preinstalled. This registered ID may require a retired legacy engine; choose its current environment version."))
         summary = save_summary(env_id, {"experiment": experiment, "environment": env_id, "status": "registered-but-unavailable", "error": message, "parameters": {"budget": budget, "learning_rate": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
-        yield status_card("idle", "Legacy environment", "Choose the current maintained version", language), metric_card("LEGACY", "see the latest log lines", language), error_figure(env_id, message), None, summary, console_panel("\n".join(logs), language)
+        diagnostic = result_preview_image(experiment, "Diagnostic", "LEGACY", "environment status", note=message)
+        yield status_card("idle", "Legacy environment", "Choose the current maintained version", language), metric_card("LEGACY", "see the latest log lines", language), error_figure(env_id, message), diagnostic, summary, console_panel("\n".join(logs), language)
 
 
 def train(experiment: str, budget: float, alpha: float, gamma: float, epsilon: float, seed: float, language: str):
     budget, seed = int(budget), int(seed)
-    if is_catalog_experiment(experiment):
-        yield from run_catalog_experiment(experiment, budget, alpha, gamma, epsilon, seed, language)
-    elif experiment == BANDIT:
-        yield from run_bandit(budget, alpha, epsilon, seed, language)
-    elif experiment == BLACKJACK:
-        yield from run_blackjack(budget, alpha, gamma, epsilon, seed, language)
-    elif experiment == GRIDWORLD:
-        yield from run_gridworld(budget, alpha, gamma, epsilon, seed, language)
-    elif experiment == FROZENLAKE:
-        yield from run_frozenlake(budget, alpha, gamma, epsilon, seed, language)
-    elif experiment == CLIFF:
-        yield from run_discrete_control(CLIFF, "CliffWalking-v1", "SARSA", budget, alpha, gamma, epsilon, seed, language)
-    elif experiment == TAXI:
-        yield from run_discrete_control(TAXI, "Taxi-v4", "Q-Learning", budget, alpha, gamma, epsilon, seed, language)
-    elif experiment == MOUNTAINCAR:
-        yield from run_mountaincar(budget, alpha, gamma, epsilon, seed, language)
-    else:
-        env_id = EXPERIMENTS[experiment]["environment"]
-        yield from run_deep_control(experiment, env_id, EXPERIMENTS[experiment]["algorithm"], budget, alpha, gamma, epsilon, seed, language)
+    try:
+        if is_catalog_experiment(experiment):
+            yield from run_catalog_experiment(experiment, budget, alpha, gamma, epsilon, seed, language)
+        elif experiment == BANDIT:
+            yield from run_bandit(budget, alpha, epsilon, seed, language)
+        elif experiment == BLACKJACK:
+            yield from run_blackjack(budget, alpha, gamma, epsilon, seed, language)
+        elif experiment == GRIDWORLD:
+            yield from run_gridworld(budget, alpha, gamma, epsilon, seed, language)
+        elif experiment == FROZENLAKE:
+            yield from run_frozenlake(budget, alpha, gamma, epsilon, seed, language)
+        elif experiment == CLIFF:
+            yield from run_discrete_control(CLIFF, "CliffWalking-v1", "SARSA", budget, alpha, gamma, epsilon, seed, language)
+        elif experiment == TAXI:
+            yield from run_discrete_control(TAXI, "Taxi-v4", "Q-Learning", budget, alpha, gamma, epsilon, seed, language)
+        elif experiment == MOUNTAINCAR:
+            yield from run_mountaincar(budget, alpha, gamma, epsilon, seed, language)
+        else:
+            env_id = EXPERIMENTS[experiment]["environment"]
+            yield from run_deep_control(experiment, env_id, EXPERIMENTS[experiment]["algorithm"], budget, alpha, gamma, epsilon, seed, language)
+    except Exception as exc:
+        message = f"{type(exc).__name__}: {exc}"
+        diagnostic = result_preview_image(experiment, "Run stopped", "ERROR", "training result", note=message)
+        summary = save_summary(experiment, {"experiment": experiment, "status": "failed", "error": message, "parameters": {"budget": budget, "learning_rate": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
+        logs = [f"{experiment} training console", "=" * 72, elapsed_line(time.perf_counter(), "ERROR", message), "RESULT  A diagnostic preview and JSON summary were produced."]
+        yield status_card("idle", "Training stopped", "Diagnostic result produced", language), metric_card("ERROR", "see the latest log lines", language), error_figure(experiment, message), diagnostic, summary, console_panel("\n".join(logs), language)
 
 
 def slider_update(label: str, spec: tuple[float, float, float, float], visible: bool = True):
@@ -1066,7 +1155,7 @@ def select_experiment(experiment: str, language: str):
         status_card("idle", copy["ready"], copy["ready_detail"], language),
         metric_card("—", copy["metric_waiting"], language),
         console_panel(copy["log_waiting"], language),
-        None,
+        pending_preview(experiment),
         None,
     )
 
@@ -1181,7 +1270,7 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
     with gr.Row(elem_classes="output-card"):
         with gr.Column(scale=2):
             preview_header = gr.HTML(panel_html(copy["preview"], copy["preview_copy"], "artifact-note"))
-            preview = gr.Image(show_label=False, interactive=False)
+            preview = gr.Image(value=pending_preview(DEFAULT_EXPERIMENT), show_label=False, interactive=False)
         with gr.Column(scale=1):
             artifact = gr.File(label=copy["artifact"], interactive=False)
 
