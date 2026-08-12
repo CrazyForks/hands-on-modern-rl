@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import contextlib
 import io
 import os
@@ -25,6 +26,8 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 ARTIFACT_DIR = Path("artifacts")
 ARTIFACT_DIR.mkdir(exist_ok=True)
+LOGO_PATH = Path(__file__).parent / "assets" / "readmelogo.png"
+LOGO_DATA_URI = f"data:image/png;base64,{base64.b64encode(LOGO_PATH.read_bytes()).decode()}"
 SEED = 42
 PROJECT_URL = "https://github.com/walkinglabs/hands-on-modern-rl"
 COURSE_URL = "https://walkinglabs.github.io/hands-on-modern-rl/"
@@ -279,6 +282,17 @@ CSS = """
   border: 1px solid rgba(255,255,255,.12);
   border-radius: 50%;
 }
+.project-mark {
+  display: block;
+  width: 290px;
+  max-width: 72%;
+  height: auto;
+  margin: 0 0 22px;
+  padding: 9px 13px;
+  border-radius: 11px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(8, 15, 35, .2);
+}
 .hero-topline { display: flex; align-items: center; gap: 11px; margin-bottom: 22px; }
 .experiment-badge {
   display: inline-flex;
@@ -417,6 +431,7 @@ with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
         f"""
         <main class="app-shell">
           <section class="hero">
+            <img class="project-mark" src="{LOGO_DATA_URI}" alt="Hands-On Modern RL" />
             <div class="hero-topline">
               <span class="experiment-badge">EXPERIMENT 01</span>
               <span class="hero-course">《动手学现代强化学习》· 第 1 章配套</span>
