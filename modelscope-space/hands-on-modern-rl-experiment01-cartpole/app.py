@@ -459,70 +459,57 @@ CSS = """
 }
 .language-bar {
   align-items: center !important;
-  gap: 18px !important;
-  margin: 0 0 14px !important;
-  padding: 13px 15px 13px 18px !important;
-  border: 2px solid #c7c9ff !important;
-  border-radius: 15px !important;
-  background: linear-gradient(100deg, #f0f1ff 0%, #ffffff 72%) !important;
-  box-shadow: 0 8px 24px rgba(68, 70, 190, .10) !important;
-}
-.language-label, .language-label > div {
-  min-width: 0 !important;
-  margin: 0 !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  min-height: 42px !important;
+  margin: 0 0 12px !important;
   padding: 0 !important;
   border: 0 !important;
   background: transparent !important;
+  box-shadow: none !important;
 }
-.language-intro { display: flex; align-items: center; gap: 12px; color: var(--ink); }
-.language-icon {
-  display: grid;
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  place-items: center;
-  border-radius: 10px;
-  color: #ffffff;
-  background: linear-gradient(135deg, var(--brand-dark), #6969ec);
-  box-shadow: 0 5px 14px rgba(68, 70, 190, .22);
-  font-size: 12px;
+.language-bar::before {
+  content: "LANGUAGE";
+  color: #7a8497;
+  font-size: 10px;
   font-weight: 800;
+  letter-spacing: .14em;
 }
-.language-intro strong { display: block; font-size: 15px; line-height: 1.3; }
-.language-intro span:last-child { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
 .language-switch {
-  flex: 0 0 310px !important;
-  width: 310px !important;
-  margin: 0 0 0 auto !important;
-  padding: 5px !important;
-  border: 1px solid #b9bcff !important;
-  border-radius: 12px !important;
-  background: #e8e9ff !important;
-  box-shadow: inset 0 1px 2px rgba(68, 70, 190, .08) !important;
+  flex: 0 0 240px !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  margin: 0 !important;
+  padding: 3px !important;
+  border: 1px solid #d9deea !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(23, 32, 51, .07) !important;
 }
-.language-switch > div { gap: 5px !important; }
+.language-switch > div { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 3px !important; }
 .language-switch label { display: flex !important; flex: 1 1 0 !important; cursor: pointer !important; }
+.language-switch input { display: none !important; }
 .language-switch label span {
   box-sizing: border-box !important;
   width: 100% !important;
-  min-height: 38px !important;
+  min-height: 34px !important;
   justify-content: center !important;
-  padding: 8px 17px !important;
-  border-radius: 8px !important;
+  padding: 7px 13px !important;
+  border-radius: 7px !important;
   border: 1px solid transparent !important;
-  color: #555e73 !important;
+  color: #657087 !important;
   background: transparent !important;
-  font-size: 14px !important;
-  font-weight: 750 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
   transition: color .16s ease, background .16s ease, box-shadow .16s ease !important;
 }
-.language-switch label:hover span { color: var(--brand-dark) !important; background: rgba(255,255,255,.58) !important; }
+.language-switch label:hover span { color: var(--brand-dark) !important; background: #f4f5ff !important; }
 .language-switch label:has(input:checked) span,
 .language-switch input:checked + span {
-  border-color: rgba(91, 92, 226, .16) !important;
-  color: #3032a5 !important;
-  background: #ffffff !important;
-  box-shadow: 0 3px 10px rgba(68, 70, 190, .16) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #5153d6, #6969ec) !important;
+  box-shadow: 0 3px 8px rgba(68, 70, 190, .22) !important;
 }
 .language-switch label:focus-within span {
   outline: 3px solid rgba(91, 92, 226, .20) !important;
@@ -752,8 +739,8 @@ CSS = """
 .footer-note { margin-top: 18px; text-align: center; color: #94a3b8; font-size: 12px; }
 @media (max-width: 760px) {
   .gradio-container { padding: 12px 10px 30px !important; }
-  .language-bar { align-items: stretch !important; flex-direction: column !important; gap: 10px !important; }
-  .language-switch { flex: 1 1 auto !important; width: 100% !important; margin: 0 !important; }
+  .language-bar { justify-content: space-between !important; }
+  .language-switch { flex: 0 1 230px !important; width: 230px !important; min-width: 0 !important; }
   .hero { padding: 27px 22px 25px; border-radius: 19px; }
   .hero-topline { align-items: flex-start; flex-direction: column; gap: 8px; }
   .lab-strip { gap: 8px 16px; }
@@ -812,10 +799,6 @@ AUTO_SCROLL_JS = """
 
 with gr.Blocks(title="Experiment 01 · CartPole Online Training") as demo:
     with gr.Row(elem_classes="language-bar"):
-        gr.HTML(
-            '<div class="language-intro"><span class="language-icon">EN</span><div><strong>Interface language</strong><span>Switch between English and Chinese</span></div></div>',
-            elem_classes="language-label",
-        )
         language = gr.Radio(
             choices=[("English", "English"), ("中文", "中文")],
             value=DEFAULT_LANGUAGE,
