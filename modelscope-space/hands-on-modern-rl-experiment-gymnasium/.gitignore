@@ -1,3 +1,5 @@
 artifacts/
+!assets/previews/
+!assets/previews/**
 __pycache__/
 *.pyc

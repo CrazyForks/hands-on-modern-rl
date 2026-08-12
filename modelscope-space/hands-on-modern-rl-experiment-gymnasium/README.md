@@ -27,7 +27,7 @@ license: apache-2.0
 
 完整目录中的 Auto 项会检查动作空间：离散动作使用 DQN，连续动作使用 SAC，其他兼容动作空间使用 PPO。ALE 0.12 自带 ROM，无需在页面中下载；MuJoCo 与 Robotics 使用当前维护的 Python 绑定。目录也保留 Gymnasium 注册表中的历史版本，但建议优先选择当前版本（例如 MuJoCo v5、Fetch v4），避免已废弃的 `mujoco-py` 运行时。
 
-每次运行都会在 **Learned policy preview** 区域留下可见结果：表格任务生成策略图或热图，可渲染控制任务生成策略回放 GIF；环境无法输出 RGB 帧时自动生成包含最终指标和学习轨迹的结果 PNG。训练或历史环境初始化失败时也会生成诊断结果图和 JSON 摘要，不会让预览区域空白。
+页面会先为 12 个精选任务显示随代码部署的真实训练示例：表格任务使用策略图或热图，可渲染控制任务使用策略回放 GIF。训练过程中保留当前预览，训练完成后再用本次新生成的 GIF、策略图或结果 PNG 替换它。环境无法输出 RGB 帧时自动生成包含最终指标和学习轨迹的结果 PNG；训练或历史环境初始化失败时也会生成诊断结果图和 JSON 摘要。
 
 课程项目：<https://github.com/walkinglabs/hands-on-modern-rl>
 
