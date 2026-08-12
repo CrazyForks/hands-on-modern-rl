@@ -23,7 +23,6 @@ license: apache-2.0
 - [在当前创空间中训练](https://modelscope.cn/studios/walkinglab/hands-on-modern-rl-experiment01-cartpole)
 - [阅读配套章节：1.3 PPO 训练可视化](https://walkinglabs.github.io/hands-on-modern-rl/chapter01_cartpole/training)
 - [直接在 ModelScope 中运行 Notebook](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/notebooks/cartpole-ppo.ipynb)
-- [直接在 Colab 中运行 Notebook](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/notebooks/cartpole-ppo.ipynb)
 - [查看可直接运行的 `train.py`](https://modelscope.cn/studios/walkinglab/hands-on-modern-rl-experiment01-cartpole/file/view/master/train.py)
 
 ## 本地运行

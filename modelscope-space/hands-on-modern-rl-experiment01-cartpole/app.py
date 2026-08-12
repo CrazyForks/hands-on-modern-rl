@@ -35,7 +35,6 @@ COURSE_URL = "https://walkinglabs.github.io/hands-on-modern-rl/"
 CHAPTER_URL = f"{COURSE_URL}chapter01_cartpole/training"
 NOTEBOOK_GITHUB_PATH = "walkinglabs/hands-on-modern-rl/blob/main/notebooks/cartpole-ppo.ipynb"
 MODELSCOPE_NOTEBOOK_URL = f"https://modelscope.cn/notebook/share/github/{NOTEBOOK_GITHUB_PATH}"
-COLAB_NOTEBOOK_URL = f"https://colab.research.google.com/github/{NOTEBOOK_GITHUB_PATH}"
 SCRIPT_URL = (
     "https://modelscope.cn/studios/walkinglab/hands-on-modern-rl-experiment01-cartpole/"
     "file/view/master/train.py"
@@ -50,9 +49,6 @@ UI_TEXT = {
         "description": "使用 PPO 从零训练倒立摆策略。启动后可以实时查看奖励曲线、PPO 输出和评估记录，训练结束后下载模型并播放策略动画。全程使用 CPU。",
         "chapter": "阅读配套章节",
         "notebook": "Notebook",
-        "notebook_aria": "在线运行 Notebook",
-        "modelscope": "ModelScope",
-        "colab": "Colab",
         "script": "训练脚本",
         "project": "GitHub 项目",
         "environment": "环境",
@@ -97,9 +93,6 @@ UI_TEXT = {
         "description": "Train a CartPole policy from scratch with PPO. Follow the reward curve, PPO output, and evaluations in real time, then download the model and replay the trained policy. Runs entirely on CPU.",
         "chapter": "Read companion chapter",
         "notebook": "Notebook",
-        "notebook_aria": "Run the notebook online",
-        "modelscope": "ModelScope",
-        "colab": "Colab",
         "script": "Training script",
         "project": "GitHub project",
         "environment": "Environment",
@@ -386,11 +379,7 @@ def hero_html(language: str) -> str:
         <p class="hero-copy">{copy['description']}</p>
         <nav class="hero-links" aria-label="Project links">
           <a class="hero-link primary" href="{CHAPTER_URL}" target="_blank" rel="noreferrer">{copy['chapter']}</a>
-          <span class="notebook-launcher" role="group" aria-label="{copy['notebook_aria']}">
-            <span class="notebook-label">{copy['notebook']}</span>
-            <a class="notebook-option modelscope" href="{MODELSCOPE_NOTEBOOK_URL}" target="_blank" rel="noreferrer">{copy['modelscope']} <span aria-hidden="true">↗</span></a>
-            <a class="notebook-option colab" href="{COLAB_NOTEBOOK_URL}" target="_blank" rel="noreferrer">{copy['colab']} <span aria-hidden="true">↗</span></a>
-          </span>
+          <a class="hero-link" href="{MODELSCOPE_NOTEBOOK_URL}" target="_blank" rel="noreferrer">{copy['notebook']}</a>
           <a class="hero-link" href="{SCRIPT_URL}" target="_blank" rel="noreferrer">{copy['script']}</a>
           <a class="hero-link" href="{PROJECT_URL}" target="_blank" rel="noreferrer">{copy['project']}</a>
         </nav>
@@ -620,37 +609,6 @@ CSS = """
 }
 .hero-link:hover { transform: translateY(-1px); background: rgba(255,255,255,.15); }
 .hero-link.primary { color: #172554 !important; background: #ffffff; border-color: #ffffff; }
-.notebook-launcher {
-  display: inline-flex;
-  min-height: 38px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.22);
-  border-radius: 9px;
-  background: rgba(255,255,255,.08);
-}
-.notebook-label,
-.notebook-option {
-  display: inline-flex;
-  align-items: center;
-  padding: 0 12px;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.notebook-label {
-  color: #172554;
-  background: #ffffff;
-}
-.notebook-option {
-  gap: 4px;
-  border-left: 1px solid rgba(255,255,255,.18);
-  color: #eef2ff !important;
-  text-decoration: none !important;
-  transition: color .16s ease, background .16s ease;
-}
-.notebook-option:hover { color: #ffffff !important; background: rgba(255,255,255,.16); }
-.notebook-option.modelscope:hover { background: rgba(74, 144, 255, .28); }
-.notebook-option.colab:hover { background: rgba(249, 171, 0, .25); }
 .lab-strip {
   display: flex;
   flex-wrap: wrap;
