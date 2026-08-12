@@ -16,6 +16,12 @@
   </p>
 
   <p>
+    <a href="https://modelscope.cn/studios/walkinglab/cartpole-online-training">Train on ModelScope</a> ·
+    <a href="https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/notebooks/cartpole-ppo.ipynb">Open in Colab</a> ·
+    <a href="https://modelscope.cn/studios/walkinglab/cartpole-online-training/file/view/master/train.py">ModelScope Script</a>
+  </p>
+
+  <p>
     <a href="#discussion-group-wechat">Discussion Group (WeChat)</a>
   </p>
 

@@ -1,5 +1,11 @@
 # 强化学习导论
 
+::: tip 先训练一次 CartPole
+- **[ModelScope 创空间：浏览器一键训练](https://modelscope.cn/studios/walkinglab/cartpole-online-training)**：无需安装环境，点击“开始训练”后直接观察奖励曲线和策略动画。
+- **[Google Colab：打开 GitHub Notebook](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/notebooks/cartpole-ppo.ipynb)**：按顺序运行代码单元，可以修改训练步数并保留实验结果。
+- **[ModelScope：直接查看训练脚本](https://modelscope.cn/studios/walkinglab/cartpole-online-training/file/view/master/train.py)**：在 ModelScope Notebook 或本地终端运行 `python train.py --timesteps 30000`。
+:::
+
 ::: warning 📣 公告
 感谢大家对教程的支持！近期将会有版本更新，目前很多内容还在整理和完善中，请大家多点耐心。也欢迎大家多提建议。
 :::
@@ -24,11 +30,7 @@ CartPole 是强化学习教学中的经典入门示例：一根杆子通过关�
   <em>图：CartPole 倒立摆环境。小车通过左右移动来保持杆子竖直平衡。图源：<a href="https://gymnasium.farama.org/environments/classic_control/cart_pole/" target="_blank" rel="noopener noreferrer">Gymnasium</a></em>
 </div>
 
-在进入正文之前，建议先通过下列任一方式完成一次训练：
-
-- **浏览器一键体验**（部署中）：无需本地环境，直接在网页中启动训练。主源 ModelScope 创空间、副源 HuggingFace Space（链接即将上线）。
-- **本地跑通训练**：使用 CPU 在 30 秒内完成训练，完整流程（含 `pip install`、运行脚本、看板查看方法）见 [第 1 章 · CartPole 入门](../chapter01_cartpole/principles)。
-- **视觉预览**：上图为 CartPole 的运行画面，"小车左右移动 → 杆子保持竖直"即为训练目标；训练初期 reward 通常在 20 附近震荡，约 30 秒后稳定上升至 500 满分。
+在进入正文之前，建议先使用页面开头的任一在线入口完成一次训练。本地流程（含 `pip install`、运行脚本、看板查看方法）见 [第 1 章 · CartPole 入门](../chapter01_cartpole/principles)。训练初期奖励通常在 20 附近震荡，训练后会逐步接近 500 分；上图中的“小车左右移动 → 杆子保持竖直”就是策略要学会的行为。
 
 本节的目标仅在于跑通训练、观察学习现象；具体的代码实现与算法原理将在第 1 章中展开。
 
