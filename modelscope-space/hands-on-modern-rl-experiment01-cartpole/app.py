@@ -759,6 +759,55 @@ CSS = """
 }
 """
 
+AUTO_SCROLL_JS = """
+() => {
+  const consoleSelector = "#live-training-console .console-text";
+  let activeConsole = null;
+  let followLatest = true;
+  let savedScrollTop = 0;
+  let internalScroll = false;
+  let updateScheduled = false;
+
+  const updateConsolePosition = () => {
+    updateScheduled = false;
+    const consoleElement = document.querySelector(consoleSelector);
+    if (!consoleElement) return;
+
+    if (consoleElement !== activeConsole) {
+      activeConsole = consoleElement;
+      activeConsole.addEventListener("scroll", () => {
+        if (internalScroll) return;
+        const bottomGap = activeConsole.scrollHeight - activeConsole.clientHeight - activeConsole.scrollTop;
+        followLatest = bottomGap <= 24;
+        savedScrollTop = activeConsole.scrollTop;
+      }, { passive: true });
+    }
+
+    internalScroll = true;
+    if (followLatest) {
+      activeConsole.scrollTop = activeConsole.scrollHeight;
+    } else {
+      const maximumScrollTop = Math.max(0, activeConsole.scrollHeight - activeConsole.clientHeight);
+      activeConsole.scrollTop = Math.min(savedScrollTop, maximumScrollTop);
+    }
+    requestAnimationFrame(() => { internalScroll = false; });
+  };
+
+  const scheduleConsoleUpdate = () => {
+    if (updateScheduled) return;
+    updateScheduled = true;
+    requestAnimationFrame(updateConsolePosition);
+  };
+
+  new MutationObserver(scheduleConsoleUpdate).observe(document.body, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  });
+  scheduleConsoleUpdate();
+}
+"""
+
 
 with gr.Blocks(title="Experiment 01 · CartPole Online Training") as demo:
     with gr.Row(elem_classes="language-bar"):
@@ -800,6 +849,7 @@ with gr.Blocks(title="Experiment 01 · CartPole Online Training") as demo:
             curve = gr.Plot(show_label=False)
             console = gr.HTML(
                 console_panel(DEFAULT_COPY["console_waiting"], DEFAULT_LANGUAGE),
+                elem_id="live-training-console",
                 elem_classes="console-output",
             )
 
@@ -843,4 +893,4 @@ with gr.Blocks(title="Experiment 01 · CartPole Online Training") as demo:
 
 
 if __name__ == "__main__":
-    demo.queue(default_concurrency_limit=1).launch(css=CSS)
+    demo.queue(default_concurrency_limit=1).launch(css=CSS, js=AUTO_SCROLL_JS)
