@@ -48,11 +48,11 @@ Dyna 把模型当成"额外数据生成器"，每次真实交互后做 $N$ 次�
 
 ### Dyna 的关键限制
 
-Dyna 假设模型是确定性的——用 $(s, a)$ 直接预测 $s'$。这在离散环境（GridWorld）里有效，但在连续物理环境（MuJoCo）里模型误差累积：
+Dyna 并不要求模型是确定性的；上面的代码只是用直接预测 $s'$ 的确定性模型简化了示例。在连续物理环境（MuJoCo）里，反复把模型的预测结果作为下一步输入会累积误差。若单步模型误差不超过 $\epsilon$，真实动力学关于状态的 Lipschitz 常数为 $L$（这是一个衡量函数变化速率的数，一个函数的 Lipschitz 常数等于它的导数的上确界），则同一动作序列下的状态误差满足
 
-$$\|s_T^{\text{predicted}} - s_T^{\text{true}}\| \sim \mathcal{O}(\epsilon^T)$$
+$$e_{t+1} \leq L e_t + \epsilon, \qquad e_T \leq \epsilon \sum_{i=0}^{T-1} L^i,$$
 
-其中 $\epsilon$ 是单步预测误差。当 $\epsilon = 0.1, T = 10$ 时，预测误差达到 $10^{10}$——完全不可用。这就是为什么后续工作（PETS、MBPO）都在解决"模型误差如何量化"。
+其中 $e_t=\|s_t^{\text{predicted}}-s_t^{\text{true}}\|$。当 $L=1$ 时，上界随 rollout 长度 $T$ 线性增长；当 $L>1$ 时，上界可能按几何级数增长，而这显然是我们不希望看到的。这就是为什么后续工作（PETS、MBPO）都在解决"模型误差如何量化"。PETS 用概率集成估计模型不确定性，MBPO 则缩短模型 rollout，都是为了降低这种误差对规划或策略学习的影响。
 
 ## 概率集成轨迹采样
 
@@ -124,7 +124,7 @@ Model-Based Policy Optimization（Janner et al. 2019）的核心创新：**用�
 
 ### 短 horizon rollout
 
-MBPO 的关键参数是 rollout 长度 $k$。论文证明：当单步模型误差为 $\epsilon$ 时，$k$ 步 rollout 的累积误差 $\leq k \epsilon$，可控。
+MBPO 的关键参数是 rollout 长度 $k$。增大 $k$ 可以生成更多模型数据，也会放大模型偏差；因此 MBPO 从真实数据中的状态出发，只生成较短的模型 rollout。
 
 ```python
 # 短 horizon rollout 与 模型误差可控
