@@ -457,34 +457,39 @@ CSS = """
   padding: 28px 22px 52px !important;
   background: var(--canvas);
 }
+.hero-stack {
+  position: relative !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
 .language-bar {
+  position: absolute !important;
+  z-index: 5 !important;
+  top: 18px !important;
+  right: 20px !important;
   align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 10px !important;
-  min-height: 42px !important;
-  margin: 0 0 12px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
 }
-.language-bar::before {
-  content: "LANGUAGE";
-  color: #7a8497;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .14em;
-}
 .language-switch {
-  flex: 0 0 240px !important;
-  width: 240px !important;
-  min-width: 240px !important;
+  flex: 0 0 216px !important;
+  width: 216px !important;
+  min-width: 216px !important;
   margin: 0 !important;
   padding: 3px !important;
-  border: 1px solid #d9deea !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
   border-radius: 10px !important;
-  background: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(23, 32, 51, .07) !important;
+  background: rgba(14, 20, 46, .58) !important;
+  box-shadow: 0 7px 20px rgba(5, 8, 24, .22) !important;
+  backdrop-filter: blur(12px) !important;
 }
 .language-switch > div { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 3px !important; }
 .language-switch label { display: flex !important; flex: 1 1 0 !important; cursor: pointer !important; }
@@ -497,19 +502,19 @@ CSS = """
   padding: 7px 13px !important;
   border-radius: 7px !important;
   border: 1px solid transparent !important;
-  color: #657087 !important;
+  color: rgba(255,255,255,.72) !important;
   background: transparent !important;
   font-size: 13px !important;
   font-weight: 700 !important;
   transition: color .16s ease, background .16s ease, box-shadow .16s ease !important;
 }
-.language-switch label:hover span { color: var(--brand-dark) !important; background: #f4f5ff !important; }
+.language-switch label:hover span { color: #ffffff !important; background: rgba(255,255,255,.10) !important; }
 .language-switch label:has(input:checked) span,
 .language-switch input:checked + span {
   border-color: transparent !important;
   color: #ffffff !important;
-  background: linear-gradient(135deg, #5153d6, #6969ec) !important;
-  box-shadow: 0 3px 8px rgba(68, 70, 190, .22) !important;
+  background: linear-gradient(135deg, #6667e8, #7778f2) !important;
+  box-shadow: 0 3px 9px rgba(13, 15, 55, .28) !important;
 }
 .language-switch label:focus-within span {
   outline: 3px solid rgba(91, 92, 226, .20) !important;
@@ -739,9 +744,9 @@ CSS = """
 .footer-note { margin-top: 18px; text-align: center; color: #94a3b8; font-size: 12px; }
 @media (max-width: 760px) {
   .gradio-container { padding: 12px 10px 30px !important; }
-  .language-bar { justify-content: space-between !important; }
-  .language-switch { flex: 0 1 230px !important; width: 230px !important; min-width: 0 !important; }
-  .hero { padding: 27px 22px 25px; border-radius: 19px; }
+  .language-bar { top: 14px !important; right: 14px !important; }
+  .language-switch { flex: 0 0 196px !important; width: 196px !important; min-width: 196px !important; }
+  .hero { padding: 70px 22px 25px; border-radius: 19px; }
   .hero-topline { align-items: flex-start; flex-direction: column; gap: 8px; }
   .lab-strip { gap: 8px 16px; }
 }
@@ -798,15 +803,16 @@ AUTO_SCROLL_JS = """
 
 
 with gr.Blocks(title="Experiment 01 · CartPole Online Training") as demo:
-    with gr.Row(elem_classes="language-bar"):
-        language = gr.Radio(
-            choices=[("English", "English"), ("中文", "中文")],
-            value=DEFAULT_LANGUAGE,
-            label="Language",
-            show_label=False,
-            elem_classes="language-switch",
-        )
-    hero = gr.HTML(hero_html(DEFAULT_LANGUAGE))
+    with gr.Column(elem_classes="hero-stack"):
+        hero = gr.HTML(hero_html(DEFAULT_LANGUAGE))
+        with gr.Row(elem_classes="language-bar"):
+            language = gr.Radio(
+                choices=[("English", "English"), ("中文", "中文")],
+                value=DEFAULT_LANGUAGE,
+                label="Language",
+                show_label=False,
+                elem_classes="language-switch",
+            )
 
     with gr.Row():
         with gr.Column(scale=1, min_width=300, elem_classes="control-card"):
