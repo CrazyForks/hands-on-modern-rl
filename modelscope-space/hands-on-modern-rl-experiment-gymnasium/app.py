@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import base64
+from collections import defaultdict
 import html
 import json
-import math
 import os
-import random
 import time
 from pathlib import Path
 
@@ -18,7 +17,7 @@ import gymnasium as gym
 import imageio.v2 as imageio
 import matplotlib
 import numpy as np
-from stable_baselines3 import PPO
+from stable_baselines3 import DQN, PPO, SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 
 matplotlib.use("Agg")
@@ -33,12 +32,32 @@ LOGO_DATA_URI = f"data:image/png;base64,{base64.b64encode(LOGO_PATH.read_bytes()
 
 PROJECT_URL = "https://github.com/walkinglabs/hands-on-modern-rl"
 COURSE_URL = "https://walkinglabs.github.io/hands-on-modern-rl/"
+BANDIT = "Bandit · ε-greedy"
+BLACKJACK = "Blackjack · Monte Carlo"
+GRIDWORLD = "GridWorld · Q-Learning"
+FROZENLAKE = "FrozenLake · Q-Learning"
+CLIFF = "CliffWalking · SARSA"
+TAXI = "Taxi · Q-Learning"
+CARTPOLE_DQN = "CartPole · DQN"
+CARTPOLE_PPO = "CartPole · PPO"
+MOUNTAINCAR = "MountainCar · Tabular Q"
+ACROBOT = "Acrobot · PPO"
+PENDULUM = "Pendulum · PPO"
+MOUNTAINCAR_CONTINUOUS = "MountainCarContinuous · SAC"
+
 CHAPTER_URLS = {
-    "Bandit": f"{COURSE_URL}chapter03_mdp/bandit",
-    "GridWorld": f"{COURSE_URL}chapter03_mdp/value-experiment",
-    "FrozenLake": f"{COURSE_URL}chapter03_mdp/value-experiment",
-    "MountainCar": f"{COURSE_URL}chapter07_dqn/from-q-to-dqn",
-    "Pendulum": f"{COURSE_URL}chapter09_actor_critic/pendulum",
+    BANDIT: f"{COURSE_URL}chapter03_mdp/bandit",
+    BLACKJACK: f"{COURSE_URL}chapter04_tabular",
+    GRIDWORLD: f"{COURSE_URL}chapter03_mdp/value-experiment",
+    FROZENLAKE: f"{COURSE_URL}chapter04_tabular",
+    CLIFF: f"{COURSE_URL}chapter04_tabular",
+    TAXI: f"{COURSE_URL}chapter04_tabular",
+    CARTPOLE_DQN: f"{COURSE_URL}chapter07_dqn/from-q-to-dqn",
+    CARTPOLE_PPO: f"{COURSE_URL}chapter09_actor_critic",
+    MOUNTAINCAR: f"{COURSE_URL}chapter07_dqn/from-q-to-dqn",
+    ACROBOT: f"{COURSE_URL}chapter09_actor_critic",
+    PENDULUM: f"{COURSE_URL}chapter09_actor_critic/pendulum",
+    MOUNTAINCAR_CONTINUOUS: f"{COURSE_URL}chapter11_continuous_control",
 }
 SCRIPT_URL = (
     "https://modelscope.cn/studios/walkinglab/hands-on-modern-rl-experiment-gymnasium/"
@@ -47,42 +66,122 @@ SCRIPT_URL = (
 
 
 EXPERIMENTS = {
-    "Bandit": {
+    BANDIT: {
+        "environment": "4-armed Bernoulli bandit",
+        "family": "Bandit",
         "algorithm": "ε-greedy",
-        "budget": (200, 5000, 1000, 100),
+        "budget": (200, 10000, 2000, 200),
         "alpha": (0.01, 1.0, 0.1, 0.01),
         "gamma": (0.0, 1.0, 0.0, 0.05),
         "epsilon": (0.0, 1.0, 0.1, 0.01),
         "gamma_visible": False,
     },
-    "GridWorld": {
+    BLACKJACK: {
+        "environment": "Blackjack-v1",
+        "family": "Toy Text",
+        "algorithm": "First-visit Monte Carlo",
+        "budget": (5000, 100000, 30000, 5000),
+        "alpha": (0.001, 0.2, 0.02, 0.001),
+        "gamma": (0.0, 1.0, 1.0, 0.01),
+        "epsilon": (0.0, 1.0, 0.2, 0.01),
+        "gamma_visible": True,
+    },
+    GRIDWORLD: {
+        "environment": "Custom 4×4 GridWorld",
+        "family": "Tabular",
         "algorithm": "Q-Learning",
-        "budget": (100, 3000, 600, 100),
+        "budget": (100, 5000, 1000, 100),
         "alpha": (0.01, 1.0, 0.15, 0.01),
         "gamma": (0.0, 1.0, 0.95, 0.01),
         "epsilon": (0.0, 1.0, 0.2, 0.01),
         "gamma_visible": True,
     },
-    "FrozenLake": {
+    FROZENLAKE: {
+        "environment": "FrozenLake-v1",
+        "family": "Toy Text",
         "algorithm": "Q-Learning",
-        "budget": (500, 20000, 6000, 500),
+        "budget": (1000, 30000, 10000, 1000),
         "alpha": (0.01, 1.0, 0.2, 0.01),
         "gamma": (0.0, 1.0, 0.99, 0.01),
         "epsilon": (0.0, 1.0, 1.0, 0.01),
         "gamma_visible": True,
     },
-    "MountainCar": {
+    CLIFF: {
+        "environment": "CliffWalking-v1",
+        "family": "Toy Text",
+        "algorithm": "SARSA",
+        "budget": (200, 5000, 1500, 100),
+        "alpha": (0.01, 1.0, 0.5, 0.01),
+        "gamma": (0.0, 1.0, 1.0, 0.01),
+        "epsilon": (0.0, 1.0, 0.1, 0.01),
+        "gamma_visible": True,
+    },
+    TAXI: {
+        "environment": "Taxi-v4",
+        "family": "Toy Text",
+        "algorithm": "Q-Learning",
+        "budget": (1000, 30000, 8000, 1000),
+        "alpha": (0.01, 1.0, 0.2, 0.01),
+        "gamma": (0.0, 1.0, 0.95, 0.01),
+        "epsilon": (0.0, 1.0, 1.0, 0.01),
+        "gamma_visible": True,
+    },
+    CARTPOLE_DQN: {
+        "environment": "CartPole-v1",
+        "family": "Classic Control",
+        "algorithm": "DQN",
+        "budget": (5000, 100000, 30000, 5000),
+        "alpha": (0.00001, 0.001, 0.0001, 0.00001),
+        "gamma": (0.8, 1.0, 0.99, 0.01),
+        "epsilon": (0.0, 1.0, 1.0, 0.05),
+        "gamma_visible": True,
+    },
+    CARTPOLE_PPO: {
+        "environment": "CartPole-v1",
+        "family": "Classic Control",
+        "algorithm": "PPO",
+        "budget": (5000, 100000, 30000, 5000),
+        "alpha": (0.00001, 0.003, 0.0003, 0.00001),
+        "gamma": (0.8, 1.0, 0.99, 0.01),
+        "epsilon": (0.0, 0.05, 0.0, 0.005),
+        "gamma_visible": True,
+    },
+    MOUNTAINCAR: {
+        "environment": "MountainCar-v0",
+        "family": "Classic Control",
         "algorithm": "Tabular Q-Learning",
-        "budget": (500, 12000, 4000, 500),
+        "budget": (1000, 20000, 6000, 1000),
         "alpha": (0.01, 1.0, 0.12, 0.01),
         "gamma": (0.0, 1.0, 0.99, 0.01),
         "epsilon": (0.0, 1.0, 1.0, 0.01),
         "gamma_visible": True,
     },
-    "Pendulum": {
+    ACROBOT: {
+        "environment": "Acrobot-v1",
+        "family": "Classic Control",
         "algorithm": "PPO",
-        "budget": (5000, 80000, 30000, 5000),
+        "budget": (5000, 100000, 30000, 5000),
+        "alpha": (0.00001, 0.003, 0.0003, 0.00001),
+        "gamma": (0.8, 1.0, 0.99, 0.01),
+        "epsilon": (0.0, 0.05, 0.0, 0.005),
+        "gamma_visible": True,
+    },
+    PENDULUM: {
+        "environment": "Pendulum-v1",
+        "family": "Classic Control",
+        "algorithm": "PPO",
+        "budget": (5000, 100000, 30000, 5000),
         "alpha": (0.0001, 0.003, 0.0003, 0.0001),
+        "gamma": (0.8, 1.0, 0.99, 0.01),
+        "epsilon": (0.0, 0.05, 0.0, 0.005),
+        "gamma_visible": True,
+    },
+    MOUNTAINCAR_CONTINUOUS: {
+        "environment": "MountainCarContinuous-v0",
+        "family": "Classic Control",
+        "algorithm": "SAC",
+        "budget": (5000, 100000, 30000, 5000),
+        "alpha": (0.00001, 0.003, 0.0003, 0.00001),
         "gamma": (0.8, 1.0, 0.99, 0.01),
         "epsilon": (0.0, 0.05, 0.0, 0.005),
         "gamma_visible": True,
@@ -94,7 +193,7 @@ TEXT = {
     "English": {
         "course": "Hands-On Modern RL · CPU experiment collection",
         "title": "Gymnasium Training Playground",
-        "description": "Switch between five compact reinforcement-learning tasks, tune the important parameters, and follow each policy as it learns on CPU.",
+        "description": "Explore 12 CPU-friendly experiments covering bandits, Toy Text, classic control, tabular learning, DQN, PPO, and SAC.",
         "chapter": "Companion chapter",
         "script": "Training source",
         "project": "GitHub project",
@@ -104,7 +203,7 @@ TEXT = {
         "settings_copy": "Choose a task and adjust its training recipe. Defaults are tuned for a quick first run.",
         "experiment": "Experiment",
         "budget": "Training budget",
-        "budget_info": "Episodes for tabular tasks; environment steps for Pendulum",
+        "budget_info": "Episodes for tabular tasks; environment steps for DQN, PPO, and SAC",
         "alpha": "Learning rate",
         "gamma": "Discount factor γ",
         "epsilon": "Exploration ε",
@@ -129,7 +228,7 @@ TEXT = {
     "中文": {
         "course": "《动手学现代强化学习》· CPU 实验合集",
         "title": "Gymnasium 在线训练游乐场",
-        "description": "在五个轻量强化学习任务之间切换，调整关键参数，并在 CPU 上实时观察策略的学习过程。",
+        "description": "在 12 个轻量实验间切换，覆盖多臂老虎机、Toy Text、经典控制、表格方法、DQN、PPO 与 SAC。",
         "chapter": "阅读配套章节",
         "script": "训练源码",
         "project": "GitHub 项目",
@@ -139,7 +238,7 @@ TEXT = {
         "settings_copy": "选择任务并调整训练配方。默认值适合首次快速体验。",
         "experiment": "实验",
         "budget": "训练预算",
-        "budget_info": "表格任务使用回合数；Pendulum 使用环境步数",
+        "budget_info": "表格任务使用回合数；DQN、PPO 与 SAC 使用环境步数",
         "alpha": "学习率",
         "gamma": "折扣因子 γ",
         "epsilon": "探索率 ε",
@@ -203,7 +302,7 @@ def panel_html(title: str, text: str, cls: str = "panel-copy") -> str:
     return f'<h2 class="panel-title">{title}</h2><p class="{cls}">{text}</p>'
 
 
-def hero_html(language: str, experiment: str = "Bandit") -> str:
+def hero_html(language: str, experiment: str = BANDIT) -> str:
     copy = copy_for(language)
     chapter_url = CHAPTER_URLS[experiment]
     return f"""
@@ -220,9 +319,9 @@ def hero_html(language: str, experiment: str = "Bandit") -> str:
         </nav>
       </section>
       <section class="lab-strip">
-        <span>{copy['experiments']} <strong>5</strong></span>
+        <span>{copy['experiments']} <strong>{len(EXPERIMENTS)}</strong></span>
         <span>{copy['device']} <strong>CPU</strong></span>
-        <span>Environment <strong>{experiment}</strong></span>
+        <span>Environment <strong>{EXPERIMENTS[experiment]['environment']}</strong></span>
         <span>Algorithm <strong>{EXPERIMENTS[experiment]['algorithm']}</strong></span>
       </section>
     </main>
@@ -275,7 +374,8 @@ def policy_grid_image(
 
 
 def save_summary(experiment: str, payload: dict) -> str:
-    path = ARTIFACT_DIR / f"{experiment.lower()}-run-summary.json"
+    slug = experiment.lower().replace(" ", "-").replace("·", "-")
+    path = ARTIFACT_DIR / f"{slug}-run-summary.json"
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
     return str(path)
 
@@ -377,6 +477,96 @@ def run_frozenlake(budget: int, alpha: float, gamma: float, epsilon: float, seed
     yield status_card("complete", copy_for(language)["complete"], f"{budget:,} episodes · {time.perf_counter() - started:.1f}s", language), metric_card(f"{np.mean(successes[-500:]):.1%}", "final 500-episode success rate", language), learning_figure(list(range(1, budget + 1)), curve, "FrozenLake cumulative success rate", "Success rate"), preview, summary, console_panel("\n".join(logs), language)
 
 
+def blackjack_policy_image(q: dict, filename: str) -> str:
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 4.3), sharex=True, sharey=True)
+    for usable_ace, ax in enumerate(axes):
+        policy = np.zeros((10, 10))
+        for player_sum in range(12, 22):
+            for dealer_card in range(1, 11):
+                policy[player_sum - 12, dealer_card - 1] = int(np.argmax(q[(player_sum, dealer_card, bool(usable_ace))]))
+        image = ax.imshow(policy, origin="lower", cmap="coolwarm", vmin=0, vmax=1, aspect="auto")
+        ax.set_title("Usable ace" if usable_ace else "No usable ace")
+        ax.set_xlabel("Dealer showing")
+        ax.set_xticks(range(10), range(1, 11))
+        ax.set_yticks(range(10), range(12, 22))
+    axes[0].set_ylabel("Player sum")
+    colorbar = fig.colorbar(image, ax=axes, ticks=[0, 1], shrink=.82)
+    colorbar.ax.set_yticklabels(["Stick", "Hit"])
+    fig.suptitle("Blackjack Monte Carlo policy", fontweight="bold")
+    path = ARTIFACT_DIR / filename
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    return str(path)
+
+
+def run_blackjack(budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
+    started = time.perf_counter(); rng = np.random.default_rng(seed); env = gym.make("Blackjack-v1", sab=True)
+    q = defaultdict(lambda: np.zeros(2, dtype=float)); rewards = []
+    logs = ["Blackjack first-visit Monte Carlo console", "=" * 72, elapsed_line(started, "CONFIG", f"episodes={budget} alpha={alpha:g} gamma={gamma:g} epsilon_start={epsilon:g}")]
+    chunk = max(500, budget // 20)
+    for episode in range(1, budget + 1):
+        state, _ = env.reset(seed=seed + episode); trajectory = []; done = False
+        current_eps = max(0.02, epsilon * (1 - episode / budget))
+        while not done:
+            action = int(rng.integers(2)) if rng.random() < current_eps else int(rng.choice(np.flatnonzero(q[state] == q[state].max())))
+            nxt, reward, terminated, truncated, _ = env.step(action)
+            trajectory.append((state, action, float(reward))); state = nxt; done = terminated or truncated
+        rewards.append(float(reward)); returns = 0.0; visited = set()
+        for old_state, action, reward_step in reversed(trajectory):
+            returns = reward_step + gamma * returns
+            key = (old_state, action)
+            if key not in visited:
+                q[old_state][action] += alpha * (returns - q[old_state][action]); visited.add(key)
+        if episode % chunk == 0 or episode == budget:
+            win_rate = float(np.mean(np.asarray(rewards[-min(5000, len(rewards)):]) > 0))
+            logs.append(elapsed_line(started, "TRAIN", f"episode={episode}/{budget} epsilon={current_eps:.3f} recent_win_rate={win_rate:.1%}"))
+            cumulative = (np.cumsum(rewards) / np.arange(1, len(rewards) + 1)).tolist()
+            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{win_rate:.1%}", "recent win rate", language), learning_figure(list(range(1, episode + 1)), cumulative, "Blackjack cumulative mean return", "Mean return"), None, None, console_panel("\n".join(logs), language)
+    env.close(); preview = blackjack_policy_image(q, "blackjack-policy.png")
+    serialized_q = {str(state): values.tolist() for state, values in q.items()}
+    summary = save_summary("blackjack", {"experiment": BLACKJACK, "q_values": serialized_q, "win_rate": float(np.mean(np.asarray(rewards[-5000:]) > 0)), "parameters": {"budget": budget, "alpha": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
+    logs.append(elapsed_line(started, "DONE", f"states={len(q)} artifact={summary}")); cumulative = (np.cumsum(rewards) / np.arange(1, len(rewards) + 1)).tolist()
+    yield status_card("complete", copy_for(language)["complete"], f"{budget:,} episodes · {time.perf_counter() - started:.1f}s", language), metric_card(f"{np.mean(np.asarray(rewards[-5000:]) > 0):.1%}", "final 5,000-episode win rate", language), learning_figure(list(range(1, budget + 1)), cumulative, "Blackjack cumulative mean return", "Mean return"), preview, summary, console_panel("\n".join(logs), language)
+
+
+def record_discrete_policy(env_id: str, q: np.ndarray, seed: int, filename: str, max_steps: int) -> str:
+    env = gym.make(env_id, render_mode="rgb_array"); state, _ = env.reset(seed=seed); frames = []
+    for step in range(max_steps):
+        if step % 2 == 0:
+            frames.append(env.render())
+        state, _, terminated, truncated, _ = env.step(int(np.argmax(q[int(state)])))
+        if terminated or truncated:
+            frames.append(env.render()); break
+    env.close(); path = ARTIFACT_DIR / filename; imageio.mimsave(path, frames, duration=1 / 15, loop=0); return str(path)
+
+
+def run_discrete_control(experiment: str, env_id: str, method: str, budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
+    started = time.perf_counter(); rng = np.random.default_rng(seed); env = gym.make(env_id)
+    q = np.zeros((env.observation_space.n, env.action_space.n)); rewards = []
+    logs = [f"{experiment} training console", "=" * 72, elapsed_line(started, "CONFIG", f"method={method} episodes={budget} alpha={alpha:g} gamma={gamma:g} epsilon_start={epsilon:g}")]
+    chunk = max(50, budget // 20); max_steps = 1000 if env_id.startswith("Cliff") else 200
+    for episode in range(1, budget + 1):
+        state, _ = env.reset(seed=seed + episode); current_eps = max(0.02, epsilon * (1 - episode / budget))
+        action = int(rng.integers(env.action_space.n)) if rng.random() < current_eps else int(rng.choice(np.flatnonzero(q[state] == q[state].max())))
+        total = 0.0
+        for _ in range(max_steps):
+            nxt, reward, terminated, truncated, _ = env.step(action); done = terminated or truncated
+            nxt_action = int(rng.integers(env.action_space.n)) if rng.random() < current_eps else int(rng.choice(np.flatnonzero(q[nxt] == q[nxt].max())))
+            target = reward if done else reward + gamma * (q[nxt, nxt_action] if method == "SARSA" else q[nxt].max())
+            q[state, action] += alpha * (target - q[state, action]); total += float(reward); state, action = nxt, nxt_action
+            if done: break
+        rewards.append(total)
+        if episode % chunk == 0 or episode == budget:
+            recent = float(np.mean(rewards[-min(100, len(rewards)):]))
+            logs.append(elapsed_line(started, "TRAIN", f"episode={episode}/{budget} epsilon={current_eps:.3f} recent_reward={recent:.1f}"))
+            yield status_card("running", copy_for(language)["running"], f"{episode:,}/{budget:,} episodes", language), metric_card(f"{recent:.1f}", "recent mean episode reward", language), learning_figure(list(range(1, episode + 1)), rewards, f"{experiment} episode reward", "Episode reward"), None, None, console_panel("\n".join(logs), language)
+    env.close(); slug = "cliffwalking" if env_id.startswith("Cliff") else "taxi"
+    gif = record_discrete_policy(env_id, q, seed + 10000, f"{slug}-trained.gif", max_steps)
+    summary = save_summary(slug, {"experiment": experiment, "q_values": q.tolist(), "parameters": {"budget": budget, "alpha": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
+    logs.append(elapsed_line(started, "DONE", f"replay={gif} artifact={summary}"))
+    yield status_card("complete", copy_for(language)["complete"], f"{budget:,} episodes · {time.perf_counter() - started:.1f}s", language), metric_card(f"{np.mean(rewards[-100:]):.1f}", "final 100-episode mean reward", language), learning_figure(list(range(1, budget + 1)), rewards, f"{experiment} episode reward", "Episode reward"), gif, summary, console_panel("\n".join(logs), language)
+
+
 def mountain_state(obs: np.ndarray, bins=(24, 20)) -> tuple[int, int]:
     low = np.array([-1.2, -0.07]); high = np.array([0.6, 0.07]); scaled = (np.asarray(obs) - low) / (high - low)
     indices = np.floor(scaled * np.array(bins)).astype(int)
@@ -416,41 +606,57 @@ def run_mountaincar(budget: int, alpha: float, gamma: float, epsilon: float, see
     yield status_card("complete", copy_for(language)["complete"], f"{budget:,} episodes · {time.perf_counter() - started:.1f}s", language), metric_card(f"{np.mean(rewards[-100:]):.1f}", "final 100-episode mean reward", language), learning_figure(list(range(1, budget + 1)), rewards, "MountainCar episode reward", "Episode reward"), gif, summary, console_panel("\n".join(logs), language)
 
 
-def record_ppo(model: PPO, seed: int) -> str:
-    env = gym.make("Pendulum-v1", render_mode="rgb_array"); obs, _ = env.reset(seed=seed); frames = []
-    for _ in range(200):
-        frames.append(env.render()); action, _ = model.predict(obs, deterministic=True); obs, _, terminated, truncated, _ = env.step(action)
+def record_model(model, env_id: str, seed: int, filename: str, max_steps: int) -> str:
+    env = gym.make(env_id, render_mode="rgb_array"); obs, _ = env.reset(seed=seed); frames = []
+    for step in range(max_steps):
+        if step % 2 == 0:
+            frames.append(env.render())
+        action, _ = model.predict(obs, deterministic=True); obs, _, terminated, truncated, _ = env.step(action)
         if terminated or truncated: break
-    env.close(); path = ARTIFACT_DIR / "pendulum-trained.gif"; imageio.mimsave(path, frames, duration=1 / 30, loop=0); return str(path)
+    env.close(); path = ARTIFACT_DIR / filename; imageio.mimsave(path, frames, duration=1 / 15, loop=0); return str(path)
 
 
-def run_pendulum(budget: int, alpha: float, gamma: float, seed: int, language: str):
-    started = time.perf_counter(); env = gym.make("Pendulum-v1"); model = PPO("MlpPolicy", env, learning_rate=alpha, gamma=gamma, n_steps=1024, batch_size=64, seed=seed, device="cpu", verbose=0)
-    logs = ["Pendulum PPO training console", "=" * 72, elapsed_line(started, "CONFIG", f"timesteps={budget} learning_rate={alpha:g} gamma={gamma:g} seed={seed} device=cpu")]
+def run_deep_control(experiment: str, env_id: str, algorithm: str, budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
+    started = time.perf_counter(); env = gym.make(env_id)
+    if algorithm == "DQN":
+        model = DQN("MlpPolicy", env, learning_rate=alpha, gamma=gamma, learning_starts=min(1000, max(100, budget // 10)), buffer_size=max(10000, budget), exploration_initial_eps=epsilon, exploration_final_eps=0.05, seed=seed, device="cpu", verbose=0)
+    elif algorithm == "SAC":
+        model = SAC("MlpPolicy", env, learning_rate=alpha, gamma=gamma, learning_starts=min(1000, max(100, budget // 10)), buffer_size=max(10000, budget), batch_size=64, seed=seed, device="cpu", verbose=0)
+    else:
+        model = PPO("MlpPolicy", env, learning_rate=alpha, gamma=gamma, n_steps=min(1024, max(128, budget)), batch_size=64, seed=seed, device="cpu", verbose=0)
+    logs = [f"{experiment} training console", "=" * 72, elapsed_line(started, "CONFIG", f"environment={env_id} algorithm={algorithm} timesteps={budget} learning_rate={alpha:g} gamma={gamma:g} seed={seed} device=cpu")]
     xs, rewards = [], []; chunk = 5000; trained = 0
     while trained < budget:
         step = min(chunk, budget - trained); model.learn(total_timesteps=step, reset_num_timesteps=False, progress_bar=False); trained += step
-        eval_env = gym.make("Pendulum-v1"); values, _ = evaluate_policy(model, eval_env, n_eval_episodes=3, deterministic=True, return_episode_rewards=True, warn=False); eval_env.close(); mean = float(np.mean(values)); xs.append(trained); rewards.append(mean)
+        eval_env = gym.make(env_id); values, _ = evaluate_policy(model, eval_env, n_eval_episodes=3, deterministic=True, return_episode_rewards=True, warn=False); eval_env.close(); mean = float(np.mean(values)); xs.append(trained); rewards.append(mean)
         logs.append(elapsed_line(started, "EVAL", f"step={trained}/{budget} mean_reward={mean:.1f}"))
-        yield status_card("running", copy_for(language)["running"], f"{trained:,}/{budget:,} steps", language), metric_card(f"{mean:.1f}", "3-episode evaluation reward", language), learning_figure(xs, rewards, "Pendulum PPO evaluation reward", "Mean reward"), None, None, console_panel("\n".join(logs), language)
-    model_path = ARTIFACT_DIR / "pendulum-ppo"; model.save(model_path); env.close(); gif = record_ppo(model, seed + 10000)
-    summary = save_summary("pendulum", {"experiment": "Pendulum", "evaluation_steps": xs, "evaluation_rewards": rewards, "model": str(model_path.with_suffix('.zip')), "parameters": {"budget": budget, "learning_rate": alpha, "gamma": gamma, "seed": seed}})
+        yield status_card("running", copy_for(language)["running"], f"{trained:,}/{budget:,} steps", language), metric_card(f"{mean:.1f}", "3-episode evaluation reward", language), learning_figure(xs, rewards, f"{experiment} evaluation reward", "Mean reward"), None, None, console_panel("\n".join(logs), language)
+    slug = env_id.split("-")[0].lower() + "-" + algorithm.lower(); model_path = ARTIFACT_DIR / slug; model.save(model_path); env.close()
+    gif = record_model(model, env_id, seed + 10000, f"{slug}-trained.gif", 500 if env_id in {"CartPole-v1", "Acrobot-v1"} else 999)
+    summary = save_summary(slug, {"experiment": experiment, "evaluation_steps": xs, "evaluation_rewards": rewards, "model": str(model_path.with_suffix('.zip')), "parameters": {"budget": budget, "learning_rate": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
     logs.append(elapsed_line(started, "DONE", f"replay={gif} model={model_path}.zip artifact={summary}"))
-    yield status_card("complete", copy_for(language)["complete"], f"{budget:,} steps · {time.perf_counter() - started:.1f}s", language), metric_card(f"{rewards[-1]:.1f}", "final evaluation reward", language), learning_figure(xs, rewards, "Pendulum PPO evaluation reward", "Mean reward"), gif, summary, console_panel("\n".join(logs), language)
+    yield status_card("complete", copy_for(language)["complete"], f"{budget:,} steps · {time.perf_counter() - started:.1f}s", language), metric_card(f"{rewards[-1]:.1f}", "final evaluation reward", language), learning_figure(xs, rewards, f"{experiment} evaluation reward", "Mean reward"), gif, summary, console_panel("\n".join(logs), language)
 
 
 def train(experiment: str, budget: float, alpha: float, gamma: float, epsilon: float, seed: float, language: str):
     budget, seed = int(budget), int(seed)
-    if experiment == "Bandit":
+    if experiment == BANDIT:
         yield from run_bandit(budget, alpha, epsilon, seed, language)
-    elif experiment == "GridWorld":
+    elif experiment == BLACKJACK:
+        yield from run_blackjack(budget, alpha, gamma, epsilon, seed, language)
+    elif experiment == GRIDWORLD:
         yield from run_gridworld(budget, alpha, gamma, epsilon, seed, language)
-    elif experiment == "FrozenLake":
+    elif experiment == FROZENLAKE:
         yield from run_frozenlake(budget, alpha, gamma, epsilon, seed, language)
-    elif experiment == "MountainCar":
+    elif experiment == CLIFF:
+        yield from run_discrete_control(CLIFF, "CliffWalking-v1", "SARSA", budget, alpha, gamma, epsilon, seed, language)
+    elif experiment == TAXI:
+        yield from run_discrete_control(TAXI, "Taxi-v4", "Q-Learning", budget, alpha, gamma, epsilon, seed, language)
+    elif experiment == MOUNTAINCAR:
         yield from run_mountaincar(budget, alpha, gamma, epsilon, seed, language)
     else:
-        yield from run_pendulum(budget, alpha, gamma, seed, language)
+        env_id = EXPERIMENTS[experiment]["environment"]
+        yield from run_deep_control(experiment, env_id, EXPERIMENTS[experiment]["algorithm"], budget, alpha, gamma, epsilon, seed, language)
 
 
 def slider_update(label: str, spec: tuple[float, float, float, float], visible: bool = True):
@@ -465,7 +671,7 @@ def select_experiment(experiment: str, language: str):
         slider_update(copy["budget"], cfg["budget"]),
         slider_update(copy["alpha"], cfg["alpha"]),
         slider_update(copy["gamma"], cfg["gamma"], cfg["gamma_visible"]),
-        slider_update(copy["epsilon"], cfg["epsilon"], experiment != "Pendulum"),
+        slider_update(copy["epsilon"], cfg["epsilon"], cfg["algorithm"] not in {"PPO", "SAC"}),
         status_card("idle", copy["ready"], copy["ready_detail"], language),
         metric_card("—", copy["metric_waiting"], language),
         console_panel(copy["log_waiting"], language),
@@ -479,7 +685,7 @@ def switch_language(language: str, experiment: str, seed: float):
     return (
         hero_html(language, experiment), panel_html(copy["settings"], copy["settings_copy"]),
         gr.Dropdown(choices=list(EXPERIMENTS), value=experiment, label=copy["experiment"]), slider_update(copy["budget"], cfg["budget"]), slider_update(copy["alpha"], cfg["alpha"]),
-        slider_update(copy["gamma"], cfg["gamma"], cfg["gamma_visible"]), slider_update(copy["epsilon"], cfg["epsilon"], experiment != "Pendulum"),
+        slider_update(copy["gamma"], cfg["gamma"], cfg["gamma_visible"]), slider_update(copy["epsilon"], cfg["epsilon"], cfg["algorithm"] not in {"PPO", "SAC"}),
         gr.Number(value=seed, precision=0, label=copy["seed"]), gr.Button(value=copy["start"]), status_card("idle", copy["ready"], copy["ready_detail"], language),
         metric_card("—", copy["metric_waiting"], language), panel_html(copy["curve"], copy["curve_copy"]), console_panel(copy["log_waiting"], language),
         panel_html(copy["preview"], copy["preview_copy"], "artifact-note"), gr.File(label=copy["artifact"]),
@@ -537,7 +743,7 @@ AUTO_SCROLL_JS = """
 
 
 DEFAULT_LANGUAGE = "English"
-DEFAULT_EXPERIMENT = "Bandit"
+DEFAULT_EXPERIMENT = BANDIT
 copy = copy_for(DEFAULT_LANGUAGE)
 cfg = EXPERIMENTS[DEFAULT_EXPERIMENT]
 
@@ -551,8 +757,8 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
         with gr.Column(scale=1, min_width=310, elem_classes="control-card"):
             settings_header = gr.HTML(panel_html(copy["settings"], copy["settings_copy"]))
             experiment = gr.Dropdown(choices=list(EXPERIMENTS), value=DEFAULT_EXPERIMENT, label=copy["experiment"], interactive=True)
-            budget = gr.Slider(minimum=cfg["budget"][0], maximum=cfg["budget"][1], value=cfg["budget"][2], step=cfg["budget"][3], label=copy["budget"], info=copy["budget_info"])
-            alpha = gr.Slider(minimum=cfg["alpha"][0], maximum=cfg["alpha"][1], value=cfg["alpha"][2], step=cfg["alpha"][3], label=copy["alpha"])
+            budget = gr.Slider(minimum=200, maximum=100000, value=cfg["budget"][2], step=100, label=copy["budget"], info=copy["budget_info"])
+            alpha = gr.Slider(minimum=.00001, maximum=1, value=cfg["alpha"][2], step=.00001, label=copy["alpha"])
             gamma = gr.Slider(minimum=0, maximum=1, value=0, step=.05, label=copy["gamma"], visible=False)
             epsilon = gr.Slider(minimum=0, maximum=1, value=.1, step=.01, label=copy["epsilon"])
             seed = gr.Number(value=42, precision=0, label=copy["seed"])
