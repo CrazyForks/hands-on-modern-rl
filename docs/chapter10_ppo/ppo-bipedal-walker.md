@@ -2,6 +2,8 @@
 
 > **本节目标**：训练 PPO 控制二足机器人在随机地形上行走，理解连续动作空间下的策略学习与离散动作的本质区别。
 
+> **学习路径**：[8.1 TRPO 与信任域约束](./trust-region-clipping) → [8.2 PPO-Clip](./intro) → [8.3 GAE](./gae-reward-model) → **8.5 PPO 控制 BipedalWalker**
+
 > **本节代码**：[ppo_bipedal_walker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_ppo/ppo_bipedal_walker.py) · [render_bipedal_walker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_ppo/render_bipedal_walker.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_ppo/requirements.txt)
 
 前面几章我们已经用 CartPole 和 LunarLander 看过离散动作任务：策略只需要在几个动作里选一个。但现实中的控制问题——机器人关节扭矩、汽车油门刹车、无人机旋翼转速——通常都是**连续动作空间**。PPO 的一个核心优势是原生处理连续动作：策略网络直接输出高斯分布的均值和标准差，从中采样得到连续动作，不需要把动作空间离散化。BipedalWalker-v3 就是这样一个连续控制任务。

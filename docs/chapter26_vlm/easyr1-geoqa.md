@@ -1,8 +1,12 @@
 # 23.4 动手：GeoQA 几何推理
 
-23.3 节我们手写了 VLM GRPO 训练循环——几十行代码，跑在合成数据上。这一节我们换一个姿势：用工业级框架 [EasyR1](https://github.com/hiyouga/EasyR1)，在真实数据集 GeoQA-8K 上训练 VLM 做几何推理。
+> **本节目标**：用 EasyR1 在 GeoQA-8K 上训练视觉语言模型，完成数据准备、奖励函数配置、GRPO 训练、checkpoint 合并和几何题评测。
 
-手写循环帮你理解原理；EasyR1 帮你跑真实验。两者的关系类似第 1 章手写 CartPole 和用 Stable Baselines3 的区别——算法一样，但框架帮你处理了分布式训练、显存优化、数据流管理等工程细节。
+> **学习路径**：[23.3 多模态 GRPO](./vlm-grpo-hands-on) → **23.4 GeoQA 几何推理**
+
+> **本节资源**：[EasyR1](https://github.com/hiyouga/EasyR1) · [GeoQA-8K 数据集](https://huggingface.co/datasets/leonardPKU/GEOQA_8K_R1V)
+
+23.3 节已经用合成图形手写了 VLM GRPO 训练循环。现在保留相同的奖励和组内优势思路，换用 EasyR1 管理真实数据、分布式训练、显存优化和 checkpoint。实验结果要同时检查训练奖励与独立测试集准确率，避免只凭训练曲线判断几何推理能力。
 
 ## EasyR1 简介
 
@@ -656,7 +660,7 @@ EasyR1 帮你省掉的工作量：vLLM rollout 的集成、FSDP 分布式训练�
 4. **调 `format_weight`**：从默认的 0.5 改为 0.1 或 0.9，观察格式奖励权重对推理质量的影响
 5. **增加 rollout.n**：从 5 增加到 8 或 16，观察 GRPO 组内比较的 advantage 估计是否更稳定
 
-## 本章总结
+## 本节小结
 
 本章从"手写几十行 GRPO 训练 VLM"推进到"用工业框架在真实数据集上训练"。沿途我们讨论了视觉奖励的信用分配难题、视觉幻觉的应对策略、以及从 VisPlay 到多模态 Agent 的前沿框架。
 

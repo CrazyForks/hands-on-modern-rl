@@ -747,7 +747,7 @@ const zhSidebar = {
               link: '/chapter03_mdp/value-q'
             },
             {
-              text: '3.3 动手：价值函数数值实验',
+              text: '3.3 动手：价值迭代与 Q-Learning',
               link: '/chapter03_mdp/value-experiment'
             }
           ]

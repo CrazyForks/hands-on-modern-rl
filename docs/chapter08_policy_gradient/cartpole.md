@@ -2,6 +2,8 @@
 
 > **本节目标**：用 REINFORCE 训练 `CartPole-v1`，观察策略梯度在高方差环境中的训练过程，理解"好结果强化动作概率"这件事在真实控制任务中的表现。
 
+> **学习路径**：[6.1 策略梯度定理](./policy-gradient) → [6.4 摇骰子赌博机](./dice-game) → **6.5 REINFORCE 控制 CartPole**
+
 > **本节代码**：[reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
 
 上一节推导了策略梯度定理和 REINFORCE 算法。赌博机例子展示了最简情况——无状态、单步、只有两个动作。现在换一个更有代表性的任务：`CartPole-v1`。小车可以向左或向右推，目标是让杆子尽量久地保持竖直。每坚持一个时间步，环境给 `+1` 奖励；杆子倒得太厉害或者小车离开边界，episode 结束。
@@ -104,5 +106,11 @@ DQN 的经验回放池可以反复使用旧数据。REINFORCE 的梯度估计中
 ## 回到方差问题
 
 CartPole 实验说明 REINFORCE 能学，但学得不够稳。根源在于 $G_t$ 的方差太大。策略梯度定理有一个奇妙的性质：可以在梯度估计中减去一个不依赖于动作的基线 $b(s_t)$，把更新信号从 $G_t$ 改成 $G_t - b(s_t)$，既不改变梯度的期望方向，又能大幅降低方差。
+
+## 本节小结
+
+- REINFORCE 使用完整轨迹的折扣回报更新动作概率，不需要 Q 网络或经验回放。
+- CartPole 的奖励曲线能够上升，但不同随机种子之间仍会有明显波动。
+- 高方差来自用整段后续回报评价单个动作，下一节将用状态基线降低这种噪声。
 
 下一节解释这个基线背后的数学原理：[策略梯度的改进](./pg-improvements)。

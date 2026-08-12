@@ -2,13 +2,15 @@
 
 > **本节目标**：用 A2C 训练 `Pendulum-v1`，理解连续动作 Actor-Critic 为什么要输出高斯分布，以及 Critic 如何帮助 Actor 在连续控制中稳定学习。
 
+> **学习路径**：[7.1 优势函数](./advantage-function) → [7.2 Actor-Critic](./actor-critic) → **7.3 Pendulum 连续控制**
+
 > **本节代码**：[actor_critic_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/actor_critic_pendulum.py) · [render_pendulum.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/render_pendulum.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/requirements.txt)
 
 前面我们用 CartPole、LunarLander 这类任务理解了“从几个动作里选一个”的强化学习。这样的动作空间很适合 DQN，也很适合用 Softmax 策略来解释：向左、向右、点火、不点火，每个动作都有一个明确的概率。
 
 现在问题变了。`Pendulum-v1` 不是让智能体在几个按钮中做选择，而是让它给摆杆施加一个连续力矩。这个力矩可以是 -2，也可以是 0.17，还可以是 1.843。动作不再是几个离散格子，而是一整段实数区间 $[-2, 2]$。这正是 Actor-Critic 在本章必须解决的新问题：**当动作有无穷多个候选值时，策略应该怎样表达“我想做什么动作”？**
 
-## 7.3.1 任务直觉 与 不是选按钮，而是控制力矩
+## 7.3.1 任务直觉：控制连续力矩
 
 Pendulum 的场景很简单：一根杆子挂在转轴上，智能体每一步可以给它一个力矩，目标是把杆子摆到正上方，并尽量保持在那里。
 
@@ -58,7 +60,7 @@ $$
 
 因此，真正的问题不是“DQN 要不要多几个输出头”，而是：**连续控制需要一个能直接生成连续动作的策略。**
 
-## 7.3.3 连续 Actor 与 输出一个高斯分布
+## 7.3.3 连续 Actor：输出高斯分布
 
 离散策略输出的是每个动作的概率，例如：
 
@@ -185,7 +187,7 @@ python code/chapter06_actor_critic/render_pendulum.py \
   --output output/pendulum_actor_critic.gif
 ```
 
-## 7.3.6 实验结果 与 先学会摆上去，再学会稳住
+## 7.3.6 实验结果：先摆到高处，再保持稳定
 
 一次 300k 时间步训练的结果如下。由于 A2C 仍然是 on-policy Actor-Critic，数据用完即丢，单次实验波动会比后面第 8 章的 PPO 更明显；我们重点看滑动平均的趋势，而不是某一个回合的高低。
 
@@ -211,7 +213,7 @@ python code/chapter06_actor_critic/render_pendulum.py \
 
 Pendulum 的学习不像 CartPole 那样很快出现满分，因为这里的动作既要有方向，又要有幅度。力矩太小，摆不上去；力矩太大，越过顶端后又会冲过去。连续控制的难点就在这里：策略不是选择“左/右”，而是在每一步选择一个合适的力度。
 
-## 7.3.7 策略熵 与 探索怎样逐渐收窄
+## 7.3.7 策略熵：探索怎样逐渐收窄
 
 高斯策略的一个好处是，我们可以直接观察探索强度。标准差 $\sigma$ 越大，动作采样越分散；策略熵越高，说明动作分布越随机。
 
@@ -227,7 +229,7 @@ Pendulum 的学习不像 CartPole 那样很快出现满分，因为这里的动�
 
 本节配置里 `ent_coef=0.0`，不是说熵不重要，而是 Pendulum 的高斯策略本身已经有采样噪声。若换成更难的连续控制任务，适当加入熵正则通常会更稳。
 
-## 7.3.8 损失曲线 与 Actor 和 Critic 各自在做什么
+## 7.3.8 损失曲线：Actor 和 Critic 各自在做什么
 
 奖励曲线告诉我们“表现是否变好”，损失曲线则帮助我们理解训练是否稳定。
 
@@ -269,7 +271,7 @@ $$
 | `num_envs`      | `8`      | 太少采样慢，太多单机开销增加          |
 | `VecNormalize`  | 启用     | 不启用时 Critic 更难拟合原始回报尺度  |
 
-## 7.3.10 本节小结
+## 本节小结
 
 Pendulum 把我们从离散动作带到了连续动作。真正的变化不是环境更复杂，而是策略表示变了：Actor 不再输出几个动作的 Softmax 概率，而是输出高斯分布的均值和标准差，然后从分布中采样连续力矩。
 

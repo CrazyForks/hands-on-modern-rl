@@ -1,8 +1,12 @@
 # 19.8 动手：使用 rLLM 训练 DeepCoder Agent
 
-前面几节讨论了 Agentic RL 的概念框架——rollout、信用分配、工具调用、评测体系。现在是动手时间：**用一个工业级框架（rLLM），从头到尾跑通"代码生成 Agent 的 RL 训练"全流程——从数据长什么样，到训练怎么跑，到结果怎么判断好还是不好。**
+> **本节目标**：用 rLLM 跑通代码 Agent 的数据准备、沙箱验证、GRPO 训练和 LiveCodeBench 评测，并比较训练前后的 Pass@1。
 
-本节的实验对象是 **DeepCoder**——Berkeley Sky Lab 出品的代码推理模型，其 14B 版本在 LiveCodeBench 上达到 60.6% Pass@1，匹配 OpenAI o3-mini。我们要做的是：用 rLLM 框架复现它的评测和训练流程，看 RL 训练前后模型到底变好了多少、变好在哪。
+> **学习路径**：[19.1 Agentic RL 基础](./overview) → [19.3 轨迹信用分配](./credit-assignment) → [19.6 Code Interpreter RL](./industrial-practice) → **19.8 DeepCoder Agent**
+
+> **本节资源**：[rLLM 仓库](https://github.com/rllm-org/rllm) · [DeepCoder flow](https://github.com/rllm-org/rllm/blob/main/cookbooks/deepcoder/deepcoder_flow.py) · [评测脚本](https://github.com/rllm-org/rllm/blob/main/cookbooks/deepcoder/deepcoder_eval.py)
+
+前面已经介绍了 rollout、信用分配、工具调用和评测。现在用 rLLM 把这些环节连成一条代码训练管线：模型生成候选程序，沙箱运行测试，测试结果形成奖励，GRPO 更新策略，LiveCodeBench 再检验泛化能力。本节以 3B 模型作为可操作起点，核心结果是训练前后的 Pass@1，而非单个样例是否偶然通过。
 
 ### RL 训练前后对比
 
@@ -1229,6 +1233,12 @@ Task travel_012: reward=0.52
 ```
 
 这样就能快速定位：哪些 episode 最差、差在哪（是格式问题、预算问题、还是整体质量问题），然后针对性地改进 reward 或增加训练数据。
+
+## 本节小结
+
+- DeepCoder 管线把代码生成、沙箱测试、可验证奖励和 GRPO 更新连成一个 Agentic RL 任务。
+- 训练前后都要在同一版本的 LiveCodeBench 上计算 Pass@1，单个成功样例不能代表整体提升。
+- 排查训练问题时应保留 episode 级 reward 分解，区分格式、预算、执行和测试失败。
 
 ## 参考资料
 

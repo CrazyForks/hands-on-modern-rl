@@ -2,11 +2,13 @@
 
 > **本节目标**：用 A2C 训练 `BipedalWalker-v3`，观察 Actor-Critic 处理高维连续控制的能力与局限——并理解为什么下一章需要 PPO。
 
+> **学习路径**：[7.2 Actor-Critic](./actor-critic) → [7.3 Pendulum 连续控制](./pendulum) → **7.5 BipedalWalker 双足行走**
+
 > **本节代码**：[actor_critic_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/actor_critic_bipedalwalker.py) · [render_bipedalwalker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/render_bipedalwalker.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter06_actor_critic/requirements.txt)
 
 上一节的 Pendulum 只有 1 维连续动作、3 维状态。BipedalWalker 把复杂度提升了一个量级：24 维状态（关节角度、角速度、地面接触传感器等），4 维连续动作（髋关节和膝关节各两个），目标是让一个双足机器人学会走路。
 
-## 7.5.1 环境 与 BipedalWalker-v3
+## 7.5.1 BipedalWalker-v3 环境
 
 ```
         O          ← 头部
@@ -94,7 +96,7 @@ model = A2C(
 | `actor_critic_bipedalwalker_entropy.png` | 策略熵损失曲线        |
 | `actor_critic_bipedalwalker_loss.png`    | Actor/Critic 损失曲线 |
 
-## 7.5.3 训练结果 与 先站稳，再挣扎着学走
+## 7.5.3 训练结果：先站稳，再学习行走
 
 一次 3M 时间步训练的结果如下。A2C 的训练曲线比 PPO 更 noisy、更不稳定——这正是 Actor-Critic 不加裁剪时的典型表现。
 
@@ -177,7 +179,7 @@ python code/chapter06_actor_critic/render_bipedalwalker.py \
 | 2M       | -66.4    | 97.0   | 极不稳定：约 15% 回合能走，其余摔倒  |
 | 3M       | 221.8    | 107.6  | 大多数回合 270+，但仍有 10-15% 摔倒  |
 
-## 7.5.5 A2C vs PPO 与 同一个任务，不同的稳定性
+## 7.5.5 A2C 与 PPO：同一个任务，不同的稳定性
 
 本节和第 8 章 8.5 节使用了完全相同的环境（BipedalWalker-v3），但分别用 A2C 和 PPO 训练。对比两个实验的结果：
 

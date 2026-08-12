@@ -1,6 +1,12 @@
 # 1.3 动手：PPO 训练可视化
 
-> [1.1](./principles) 讲了 CartPole 的物理模型和 PPO 算法的核心思想。本节动手实战：跑一次完整的 PPO 训练，理解每个超参数的影响，并用可视化工具分析训练过程。
+> **本节目标**：在 `CartPole-v1` 上完成一次 PPO 训练，用奖励曲线、策略回放和训练指标判断小车是否学会保持平衡。
+
+> **学习路径**：[1.1 CartPole 控制原理](./principles) → [1.2 奖励与训练指标](./metrics) → **1.3 PPO 训练可视化**
+
+> **本节代码**：[Stable-Baselines3 版本](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/1-ppo_cartpole.py) · [纯 PyTorch 版本](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/2-pytorch_ppo.py) · [曲线绘制](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/plot_curves.py) · [依赖](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/requirements.txt)
+
+前两节已经说明了 CartPole 的状态、动作和奖励，也解释了训练曲线中的回报与回合长度。现在把这些概念放进一次完整训练：策略先用随机权重控制小车，再通过反复采样和更新，逐渐把杆子保持在竖直位置。
 
 ## 训练流程概览
 
@@ -24,7 +30,7 @@ PPO 训练 CartPole 的完整流程：
 
 ## 完整训练代码
 
-下面是一个最小化的 PPO + CartPole 实现。完整可运行代码在 `code/chapter01_cartpole/train_ppo.py`。
+下面是一个最小化的 PPO + CartPole 实现。完整可运行版本见 `code/chapter01_cartpole/2-pytorch_ppo.py`。
 
 ```python
 import torch
@@ -285,7 +291,7 @@ plot_experiments(results)
 - `clip=0.1`：收敛慢但稳定
 - `clip=0.3`：收敛快但有抖动
 
-## 本节总结
+## 本节小结
 
 PPO 训练 CartPole 是 RL 入门最经典的"hello world"。本节给出了完整可运行的 PPO 实现，覆盖了 rollout 收集、GAE 优势估计、PPO Clip 更新、超参数调优、TensorBoard 可视化的全流程。
 

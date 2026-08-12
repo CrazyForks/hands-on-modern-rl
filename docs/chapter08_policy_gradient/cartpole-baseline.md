@@ -2,6 +2,8 @@
 
 > **本节目标**：在 `CartPole-v1` 上对比原始 REINFORCE 和 REINFORCE + Value Baseline，观察 $V(s)$ 如何让策略梯度训练更快、更稳。
 
+> **学习路径**：[6.5 REINFORCE 控制 CartPole](./cartpole) → [6.6 价值基线实验](./baseline-experiment) → **6.7 带价值基线的策略梯度**
+
 > **本节代码**：[reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
 
 前两节分别跑了 vanilla REINFORCE 和推导了基线降方差的数学原理。本节把两者放在一起对比，看看 $G_t - V(s_t)$ 相比 $G_t$ 的实际效果。
@@ -125,6 +127,12 @@ policy_loss = -(log_probs * advantages).mean()
 
 **误读三：有价值基线就是 Actor-Critic。**
 本节仍然是 REINFORCE with Value Baseline。它要等一个完整 episode 结束，用 Monte Carlo 回报 $G_t$ 更新。下一章的 Actor-Critic 会进一步用 TD 目标替代完整回报，做到每一步都可以更新。
+
+## 本节小结
+
+- 原始 REINFORCE 直接使用 $G_t$ 更新策略，单条轨迹的偶然性会带来较大方差。
+- 价值网络估计 $V(s_t)$，优势 $G_t-V(s_t)$ 衡量实际结果相对当前状态预期的好坏。
+- 判断基线是否有效，要同时比较奖励曲线、梯度方差和策略回放。
 
 ## 练习
 

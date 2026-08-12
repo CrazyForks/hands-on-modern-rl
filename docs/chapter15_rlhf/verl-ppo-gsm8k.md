@@ -1,8 +1,12 @@
 # 13.7 动手：使用 veRL 和 PPO 训练 GSM8K
 
-13.4 节我们讲了 PPO-RLHF 的四模型协作原理——Actor、Reference、Reward Model、Critic 各自的角色，以及 KL 惩罚、token-level reward、advantage 估计的数学关系。这一节我们换一个姿势：用工业级框架 [veRL](https://github.com/volcengine/verl)，在 GSM8K 数学推理数据集上跑通 PPO 训练。
+> **本节目标**：用 veRL 在 GSM8K 上跑通一次 PPO 训练，读懂 rollout、规则奖励、优势估计和模型更新之间的数据流，并比较训练前后的数学题准确率。
 
-手写伪代码帮你理解原理；veRL 帮你跑真实验。两者的关系类似第 8 章用 Stable Baselines3 跑 PPO——算法一样，但框架帮你处理了分布式调度、显存优化、推理加速等工程细节。
+> **学习路径**：[13.4 强化学习微调](./standard-rlhf-pipeline) → [13.5 大规模训练工程](./extended-practice) → [13.6 对齐评测](./evaluation) → **13.7 veRL 训练 GSM8K**
+
+> **本节代码**：[单卡训练脚本](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh) · [8 卡训练脚本](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_8gpu.sh) · [奖励函数](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/gsm8k_reward.py)
+
+13.4 节已经解释了 Actor、Reference、Reward Model 和 Critic 怎样协作。现在把这些角色交给 [veRL](https://github.com/volcengine/verl) 调度，在 GSM8K 上完成一次真实训练。框架负责分布式调度、显存管理和批量推理，本节关注四个可验证环节：数据格式是否正确、答案奖励是否可靠、训练指标是否稳定、准确率是否提高。
 
 ## veRL 简介
 
@@ -159,7 +163,7 @@ for split in ["train", "test"]:
 
 GSM8K 的 reward 不需要训练 Reward Model——直接用规则验证答案即可。这和 13.4 节讲的 RLHF 不同：RLHF 用 RM 提供偏好信号，而数学推理用**可验证奖励**（verifiable reward）。15.3 节会详细讨论 RLVR 范式，这里先用一个简单的实现。
 
-本仓库已经提供了课程适配版本：[`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py)。如果你在 veRL 仓库内操作，也可以按下面内容创建同名文件：
+本仓库已经提供了课程适配版本：[`code/chapter08_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/gsm8k_reward.py)。如果你在 veRL 仓库内操作，也可以按下面内容创建同名文件：
 
 ```python
 # gsm8k_reward.py
@@ -234,7 +238,7 @@ def compute_score(reward_input: dict[str, Any], **kwargs) -> dict[str, float]:
 
 ## 单卡训练脚本
 
-基于 veRL 官方的 PPO 脚本，本仓库已经提供了适配单卡 + 0.5B 模型的启动脚本：[`code/chapter15_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh)。完整内容如下：
+基于 veRL 官方的 PPO 脚本，本仓库已经提供了适配单卡 + 0.5B 模型的启动脚本：[`code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh)。完整内容如下：
 
 ```bash
 #!/bin/bash
@@ -592,7 +596,7 @@ bash run_qwen2.5_0.5b_ppo_single_gpu.sh
 
 ## Reward 函数进阶
 
-上面的 `gsm8k_reward.py` 只使用了 0/1 的 accuracy reward。在真实训练中，通常还会加入格式奖励来引导模型输出规范。本仓库提供了进阶版本：[`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py)。
+上面的 `gsm8k_reward.py` 只使用了 0/1 的 accuracy reward。在真实训练中，通常还会加入格式奖励来引导模型输出规范。本仓库提供了进阶版本：[`code/chapter08_rlhf/verl_gsm8k/gsm8k_reward_advanced.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/gsm8k_reward_advanced.py)。
 
 ```python
 # gsm8k_reward_advanced.py
@@ -722,7 +726,7 @@ actor_rollout_ref.actor.clip_ratio=0.2     # 标准裁剪范围
 | 回答越来越长但 accuracy 不涨 | 长度 hack             | 检查 reward 是否和长度相关      |
 | 训练速度极慢                 | vLLM 显存不够         | 降低 `ROLLOUT_GPU_MEM_UTIL`     |
 
-## 和 13.4 节的对照总结
+## 本节小结
 
 本节用 veRL 跑的 PPO 训练，和 13.4 节讲的 PPO-RLHF 原理完全一致，但有三点工程层面的差异值得注意：
 
@@ -748,11 +752,11 @@ actor_rollout_ref.actor.clip_ratio=0.2     # 标准裁剪范围
 
 | 文件                                                                                                                                                                                                 | 作用                          |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| [`code/chapter15_rlhf/verl_gsm8k/README.md`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/README.md)                                                   | 外部 veRL 索引与使用说明      |
-| [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py)                                       | 基础 0/1 accuracy reward      |
-| [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py)                     | accuracy + format 组合 reward |
-| [`code/chapter15_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh) | 单卡 0.5B PPO 启动脚本        |
-| [`code/chapter15_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_8gpu.sh`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_8gpu.sh)             | 单机 8 卡 PPO 启动脚本        |
+| [`code/chapter08_rlhf/verl_gsm8k/README.md`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/README.md)                                                   | 外部 veRL 索引与使用说明      |
+| [`code/chapter08_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/gsm8k_reward.py)                                       | 基础 0/1 accuracy reward      |
+| [`code/chapter08_rlhf/verl_gsm8k/gsm8k_reward_advanced.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/gsm8k_reward_advanced.py)                     | accuracy + format 组合 reward |
+| [`code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh) | 单卡 0.5B PPO 启动脚本        |
+| [`code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_8gpu.sh`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_8gpu.sh)             | 单机 8 卡 PPO 启动脚本        |
 
 ## 练习
 

@@ -5,64 +5,15 @@ outline:
 
 # 5.5 动手：视觉游戏项目
 
-前面几节已经把 DQN 的三个核心部件分开讨论过：
-Q 网络估计动作价值，
-经验回放打散样本相关性，
-目标网络稳定 TD Target。
-4.3 已经把这些部件放进 LunarLander 中观察：
-先看真实训练、评估回报和回放动画，
-再看训练曲线、Q 值和消融实验。
-到这里，低维状态任务已经完成了它的教学任务：
-它让我们看清 DQN 如何在 8 个数字和 4 个离散动作之间学习动作价值。
+> **本节目标**：训练 DQN 直接读取 Pong 游戏画面，并用评估曲线与多个 checkpoint 回放判断策略是否真正学会接球和得分。
 
-本节要解决的是下一个问题：
-如果状态不再是一组已经整理好的数字，
-而是一帧帧游戏画面，
-DQN 还需要改变什么？
+> **学习路径**：[5.1 从 Q-Learning 到 DQN](./from-q-to-dqn) → [5.4 LunarLander 实验](./lunar-lander) → **5.5 视觉游戏项目**
 
-答案不是重写 TD Target。
-从 LunarLander 到 Atari，
-核心公式仍然是一步 TD 更新，
-真正变化的是状态表示和训练条件：
-MLP 要换成 CNN，
-单帧要变成帧堆叠，
-短实验要变成带评估、checkpoint 和可视化回放的长实验。
-最后，ViZDoom、宝可梦和 Minecraft 用于说明边界：
-动作离散并不意味着朴素 DQN 一定适合。
+> **本节代码**：[训练脚本](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/dqn_atari_sb3.py) · [曲线导出](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/export_dqn_curves.py) · [回放渲染](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/render_atari.py) · [依赖](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/requirements.txt)
 
-**本节导读**
+上一节的 LunarLander 会直接给出位置、速度和角度等 8 个数字，Q 网络只需根据这些物理量选择动作。Pong 只提供游戏画面：球在哪里、正向哪边飞、球拍是否来得及移动，都要由网络从像素中判断。
 
-**核心内容**
-
-- 用 LunarLander 作为参照，解释从低维状态迁移到像素输入时，真正新增的问题是表示学习和训练条件，而不是 TD Target 本身。
-- 说明 CNN、帧堆叠、Atari wrapper、延迟学习和评估回调分别解决什么问题。
-- 给出一个真实可训练的 Pong DQN 实验，并用曲线和多个 checkpoint GIF 展示策略从失败到会玩的变化。
-- 给出一套选择 DQN 任务的判断标准：Atari、Classic Control、LunarLander、GridWorld、小型 2D 游戏和自定义离散动作任务。
-- 在附录中用 ViZDoom、宝可梦和 Minecraft 作为边界案例，理解部分可观测、稀疏奖励和长时规划为什么会让朴素 DQN 变吃力。
-
-**核心公式**
-
-$$
-y_i = r_i + \gamma(1-d_i)\max_{a'}Q(s'_i,a';\theta^-)
-\quad \text{（用目标网络构造 TD Target）}
-$$
-
-$$
-\mathcal{L}(\theta)
-=
-\frac{1}{B}\sum_{i=1}^{B}
-\left(y_i-Q(s_i,a_i;\theta)\right)^2
-\quad \text{（一批样本上的均方 TD Error）}
-$$
-
-第一行构造目标值：
-一条经验给当前动作提供了一个学习目标。
-第二行计算误差：
-当前 Q 网络给出的 $Q(s_i,a_i;\theta)$
-与目标值之间相差多少。
-经验回放决定这批样本从哪里来，
-目标网络决定 $y_i$ 使用哪套参数计算，
-梯度下降则推动 $\theta$ 向误差更小的方向移动。
+DQN 的更新规则没有改变。输入端需要增加图像预处理、帧堆叠和 CNN，训练端则需要更长的探索、周期评估和 checkpoint 保存。下面先说明屏幕怎样变成状态，再运行一套完整的 Pong 训练。
 
 ## 5.5.1 从低维状态到屏幕像素
 
@@ -170,7 +121,7 @@ MLP 与 CNN 的区别在于输入假设。MLP 假设每个输入维度已经是�
 
 TD 学习的骨架没有变；变复杂的是状态表示和训练条件。教学片段可以说明原理，但要把实验按完整的 Atari 流程跑起来，还需要补上环境预处理、评估和保存等实验环节。
 
-## 5.5.3 Pong 与 一个完整的 Atari 实验
+## 5.5.3 Pong：一个完整的 Atari 实验
 
 在继续看 Pong 之前，
 需要先把"Atari"这个词说清楚。
@@ -681,7 +632,7 @@ MineDojo 进一步把 Minecraft 组织成开放式任务平台，包含物品收
 
 所以，DQN 可以训练 Minecraft 中被约束好的离散子任务；若目标是从零获得钻石甚至完整通关，就需要把任务拆成层级目标，引入演示、世界模型或更强的规划机制。这与宝可梦附录的结论相似，但 Minecraft 更进一步：它不仅奖励远，动作和状态也更加开放。
 
-## 本节收获
+## 本节小结
 
 - 从 LunarLander 到 Atari，核心公式不变，变化的是状态表示：MLP 处理向量，CNN 处理像素，帧堆叠提供运动信息。
 - Pong 的成功标准不是球拍会动，而是多局确定性评估平均回报持续脱离 `-21`、接近 `0` 并最终超过 `0`。

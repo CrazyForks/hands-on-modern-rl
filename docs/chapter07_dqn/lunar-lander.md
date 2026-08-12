@@ -2,6 +2,8 @@
 
 > **本节目标**：从一个可复现实验开始，训练 DQN 控制 `LunarLander-v3`，并用评估曲线、回放 GIF 和失败诊断判断策略到底学到了什么。
 
+> **学习路径**：[5.1 从 Q-Learning 到 DQN](./from-q-to-dqn) → [5.2 DQN 改进方法](./dqn-family) → **5.4 LunarLander 与 Atari**
+
 > **本节代码**：[dqn_gym_sb3.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/dqn_gym_sb3.py) · [export_dqn_curves.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/export_dqn_curves.py) · [render_lunarlander_split.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/render_lunarlander_split.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/requirements.txt)
 
 ## 5.4.1 运行 LunarLander 训练
@@ -162,7 +164,7 @@ print(f"最差一轮: {np.min(returns):.1f}")
 
 这个基线告诉我们：如果 DQN 的评估回报仍然长期停在 `-200` 附近，就不能说它学会了降落。只有当评估均值稳定离开随机水平，并在回放中表现出减速、修正姿态和接近落地区域的行为时，才说明策略正在形成。
 
-## 5.4.4 典型回放 与 高分、中等与失败
+## 5.4.4 典型回放：高分、中等与失败
 
 现在回到三段回放。测试时应关闭探索，只按 Q 值最大的动作行动；否则评估结果会混入随机动作，无法判断网络本身学得如何。下面三段 GIF 来自同一个训练后的模型，但使用了不同的 reset seed，因此展示的是同一策略在不同初始扰动下的表现。
 

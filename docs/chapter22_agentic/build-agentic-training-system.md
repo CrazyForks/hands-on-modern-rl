@@ -1,12 +1,12 @@
 # 19.10 动手：从零实现 Agentic RL 训练系统
 
-在 19.1 节和 19.2 节中，我们讨论了 Agentic RL 的决策框架和环境交互的设计思想；在 19.3 节至 19.5 节中，我们分析了 OpenRLHF、veRL、Relax 等框架的架构。本节将从这些讨论出发，用可运行的代码把这些概念变成具体实现。
+> **本节目标**：用不超过 500 行的代码实现一个 Agentic RL 训练系统，让语言模型能够编写代码、执行、读取错误并继续修改。
 
-具体来说，我们将训练一个语言模型 Agent，使其能够自主解决编程题：看到题目后自行编写代码、执行代码、读取输出，如果报错则修改代码并重新执行，直到给出正确答案。整个系统控制在 500 行以内，使用 CPU 即可运行。
+> **学习路径**：[19.1 Agentic RL 基础](./overview) → [19.8 DeepCoder Agent](./rllm-deepcoder-lab) → [19.9 金融分析 Agent](./rllm-finqa-lab) → **19.10 从零实现训练系统**
 
-本节实现参照了 [hyunwoongko/nanoRLHF](https://github.com/hyunwoongko/nanoRLHF) 的思路——用最少的代码还原核心结构。但我们的目标不只是"跑通"，而是**理解训练系统的结构是如何从训练循环本身自然推导出来的**。读完本节后再阅读 veRL 或 Relax 的源码，会对这些框架的抽象层有更清晰的理解。
+> **本节代码**：[完整实现目录](https://github.com/walkinglabs/hands-on-modern-rl/tree/main/docs/chapter22_agentic/code) · [trainer.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/docs/chapter22_agentic/code/trainer.py)
 
-本节的完整实现代码可以在本书 GitHub 仓库查看：`https://github.com/walkinglabs/hands-on-modern-rl/tree/main/docs/chapter22_agentic/code/`。
+前面几节分别从框架和案例理解了 Agentic RL。现在从一个 episode 出发搭建最小系统：模型生成代码，执行环境返回标准输出或错误，模型根据新观测继续行动，最终奖励再用于更新策略。CPU 即可运行这个教学版本；验收时要检查多轮轨迹是否完整、执行结果是否回传、奖励是否对应测试结果、参数是否真正更新。
 
 ## Agentic RL 训练系统的 Infra 基础
 
@@ -825,6 +825,8 @@ history = trainer.fit(prompts, n_steps=30)
 3. **加更多工具**：在 `SandboxEnv` 中加入搜索工具（mock 版本即可），让模型学会在代码执行和搜索之间做选择
 4. **异步 rollout**：用 `multiprocessing` 把 rollout 和 train 拆到不同进程，用 `Queue` 传递轨迹数据，观察 GPU 利用率的变化
 
----
+## 本节小结
 
-本节实现了一个最小但完整的 Agentic RL 训练系统。回顾整个过程，其核心结构可以概括为：**将 Agent Loop（19.1）和环境交互（19.2）嵌套进一个 rollout → reward → train 的 RL 循环中**。Relax、veRL 等生产框架的所有复杂性，都来自于将这个骨架扩展到多机多卡、高吞吐、长时间运行的生产环境。
+- Agentic rollout 必须保存模型动作、工具返回、终止条件和最终奖励，才能还原完整决策轨迹。
+- Environment、Policy、RolloutWorker 和 Trainer 分别负责执行、生成、交互和更新，组件边界来自训练循环本身。
+- 生产框架在这个骨架上继续增加并行推理、分布式训练、沙箱隔离、容错和持久化。

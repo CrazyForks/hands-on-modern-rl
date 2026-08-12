@@ -2,27 +2,13 @@
 
 > **本节目标**：用 `CartPole-v1` 对比原始 REINFORCE 和带价值基线（Value Baseline, VB）的 REINFORCE，观察 $V(s)$ 如何让策略梯度训练更快、更稳。
 
+> **学习路径**：[6.4 摇骰子赌博机](./dice-game) → [6.5 REINFORCE 控制 CartPole](./cartpole) → **6.6 价值基线控制 CartPole**
+
 > **本节代码**：[reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)
 
-前两节已经说明了 REINFORCE 的基本思想：
-如果一段轨迹得到高回报，
-就提高这段轨迹中动作的概率。
-这个思想很直接，
-但它有一个明显缺点：
-同一个策略在不同回合里可能得到很不一样的回报，
-于是梯度更新会被运气牵着走。
+前两节已经用 REINFORCE 训练过赌博机和 CartPole。完整回报可以指导策略更新，同一策略在不同回合中却可能得到差异很大的回报，使梯度受到偶然轨迹影响。
 
-本节不再用无状态赌博机作为主实验。
-赌博机适合解释公式，
-但它太抽象，
-很难看出“策略到底学会了什么”。
-我们换成 `CartPole-v1`：
-小车可以向左或向右推，
-目标是让杆子尽量久地保持竖直。
-这仍然是离散动作任务，
-但它有清楚的画面和失败方式：
-推晚了，杆子会倒；
-推反了，小车会把杆子越带越偏。
+本节保持 CartPole 环境、策略网络和训练预算不变，只增加一个估计 $V(s)$ 的价值网络。这样可以把性能差异归因于基线，并通过奖励曲线、梯度方差和回放共同判断它是否有效。
 
 ## 6.6.1 Value Baseline 从哪里来
 
@@ -360,7 +346,7 @@ CartPole 每一步仍然只给 `+1`。
 下一章的 Actor-Critic 会进一步用 TD 目标替代完整回报，
 做到每一步都可以更新。
 
-## 小结
+## 本节小结
 
 - CartPole 比赌博机更适合展示价值基线的作用，因为它有状态、有失败形态，也能通过回合长度直观看出策略好坏。
 - 原始 REINFORCE 使用 $G_t$ 更新策略，容易被单个 episode 的运气误导。

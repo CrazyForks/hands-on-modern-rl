@@ -1,427 +1,504 @@
-"""
-第3章：4×4 GridWorld Q-Learning 实验
-在网格世界中学习最优路径，直观理解 Q 值和贝尔曼方程
+"""4 x 4 GridWorld：价值迭代与 Q-Learning 的可复现实验。
+
+脚本只使用 Python 标准库，运行后生成：
+
+- ``results.json``：环境、价值表、最优策略和多随机种子统计；
+- ``learning_curves.csv``：每回合奖励的跨种子均值与标准差；
+- ``gridworld-environment.svg``：实验环境、动作与奖励约定；
+- ``gridworld-value-iteration.svg``：价值传播过程与最优策略；
+- ``gridworld-q-learning.svg``：Q-Learning 曲线与探索率对照实验。
 
 运行方式：
-    python gridworld_q_learning.py
+
+    python3 gridworld_q_learning.py --output-dir output/value-experiment
+
+教材图片可用 ``--assets-dir`` 同时导出到指定目录。
 """
 
-import os
-import numpy as np
-import matplotlib.pyplot as plt
+from __future__ import annotations
 
-# 创建输出目录
-os.makedirs("output", exist_ok=True)
+import argparse
+import csv
+import html
+import json
+import random
+from dataclasses import dataclass
+from pathlib import Path
+from statistics import fmean, pstdev
+from typing import Callable
 
 
-# ==========================================
-# 第一部分：GridWorld 环境
-# ==========================================
-class GridWorld:
+State = tuple[int, int]
+
+GRID_SIZE = 4
+START: State = (0, 0)
+TRAP: State = (1, 1)
+GOAL: State = (3, 3)
+TERMINALS = {TRAP, GOAL}
+
+# 动作编号与显示顺序始终保持一致。
+ACTIONS: tuple[tuple[str, State], ...] = (
+    ("上", (-1, 0)),
+    ("下", (1, 0)),
+    ("左", (0, -1)),
+    ("右", (0, 1)),
+)
+ARROWS = ("↑", "↓", "←", "→")
+
+STEP_REWARD = -0.01
+TRAP_REWARD = -1.0
+GOAL_REWARD = 1.0
+GAMMA = 0.95
+ALPHA = 0.15
+EPISODES = 500
+N_SEEDS = 30
+MAX_STEPS = 100
+
+
+def all_states() -> list[State]:
+    return [(row, col) for row in range(GRID_SIZE) for col in range(GRID_SIZE)]
+
+
+def transition(state: State, action: int) -> tuple[State, float, bool]:
+    """执行一步确定性转移。
+
+    奖励写在“进入下一状态”的转移上。进入目标或陷阱后回合结束，
+    因而终止状态没有后续价值；这避免把终点奖励计算两次。
     """
-    4×4 网格世界环境
 
-    网格布局（4行4列）：
-        0,0  0,1  0,2  0,3
-        1,0  1,1  1,2  1,3
-        2,0  2,1  2,2  2,3
-        3,0  3,1  3,2  3,3
+    if state in TERMINALS:
+        return state, 0.0, True
 
-    - 起点：(0, 0)
-    - 终点：(3, 3)，到达获得 +10 奖励
-    - 障碍物：(1, 1) 和 (2, 2)，撞到获得 -5 惩罚
-    - 每走一步：-1 奖励（鼓励尽快到达终点）
-    - 撞墙：-5 奖励（位置不变）
+    dr, dc = ACTIONS[action][1]
+    next_state = (state[0] + dr, state[1] + dc)
+    if not (0 <= next_state[0] < GRID_SIZE and 0 <= next_state[1] < GRID_SIZE):
+        next_state = state
 
-    动作空间：
-        0 = 上 (↑), 1 = 下 (↓), 2 = 左 (←), 3 = 右 (→)
-    """
-
-    def __init__(self):
-        self.rows = 4
-        self.cols = 4
-        self.start = (0, 0)
-        self.goal = (3, 3)
-        self.obstacles = [(1, 1), (2, 2)]
-        self.n_actions = 4  # 上、下、左、右
-        self.action_names = ['上(↑)', '下(↓)', '左(←)', '右(→)']
-        self.reset()
-
-    def reset(self):
-        """重置环境到起点，返回初始状态"""
-        self.agent_pos = self.start
-        return self.agent_pos
-
-    def step(self, action):
-        """
-        执行动作，返回 (下一状态, 奖励, 是否结束)
-
-        动作映射：
-            0 = 上 → 行 -1
-            1 = 下 → 行 +1
-            2 = 左 → 列 -1
-            3 = 右 → 列 +1
-        """
-        row, col = self.agent_pos
-
-        # 根据动作计算新位置
-        if action == 0:    # 上
-            new_pos = (row - 1, col)
-        elif action == 1:  # 下
-            new_pos = (row + 1, col)
-        elif action == 2:  # 左
-            new_pos = (row, col - 1)
-        elif action == 3:  # 右
-            new_pos = (row, col + 1)
-        else:
-            raise ValueError(f"无效动作: {action}")
-
-        # 检查是否撞墙（出界）
-        new_row, new_col = new_pos
-        if new_row < 0 or new_row >= self.rows or new_col < 0 or new_col >= self.cols:
-            # 撞墙：位置不变，给予惩罚
-            return self.agent_pos, -5, False
-
-        # 检查是否撞到障碍物
-        if new_pos in self.obstacles:
-            # 撞障碍物：位置不变，给予惩罚
-            return self.agent_pos, -5, False
-
-        # 合法移动：更新位置
-        self.agent_pos = new_pos
-
-        # 检查是否到达终点
-        if self.agent_pos == self.goal:
-            return self.agent_pos, 10, True  # 到达终点，+10 奖励
-
-        # 普通移动：-1 奖励（鼓励尽快到达）
-        return self.agent_pos, -1, False
+    if next_state == GOAL:
+        return next_state, GOAL_REWARD, True
+    if next_state == TRAP:
+        return next_state, TRAP_REWARD, True
+    return next_state, STEP_REWARD, False
 
 
-# ==========================================
-# 第二部分：Q-Learning 算法
-# ==========================================
-def epsilon_greedy(Q, state, epsilon, n_actions):
-    """
-    ε-贪心动作选择策略
+def action_value(values: dict[State, float], state: State, action: int) -> float:
+    next_state, reward, done = transition(state, action)
+    return reward if done else reward + GAMMA * values[next_state]
 
-    以 ε 的概率随机探索，以 1-ε 的概率选择当前 Q 值最大的动作。
-    这是 Q-Learning 中平衡"探索"与"利用"的标准方法。
-    """
-    if np.random.random() < epsilon:
-        return np.random.randint(n_actions)  # 探索：随机选动作
+
+def value_iteration(tolerance: float = 1e-12) -> tuple[dict[State, float], list[dict[State, float]]]:
+    """同步价值迭代，history[0] 是全零初始化。"""
+
+    values = {state: 0.0 for state in all_states()}
+    history = [values.copy()]
+
+    for _ in range(1_000):
+        updated = values.copy()
+        for state in all_states():
+            if state not in TERMINALS:
+                updated[state] = max(
+                    action_value(values, state, action)
+                    for action in range(len(ACTIONS))
+                )
+        delta = max(abs(updated[state] - values[state]) for state in all_states())
+        values = updated
+        history.append(values.copy())
+        if delta < tolerance:
+            break
     else:
-        return np.argmax(Q[state])  # 利用：选 Q 值最大的动作
+        raise RuntimeError("价值迭代未在 1000 轮内收敛")
+
+    return values, history
 
 
-def train_q_learning(env, n_episodes=500, alpha=0.1, gamma=0.95,
-                     epsilon_start=1.0, epsilon_end=0.01, epsilon_decay=0.995):
-    """
-    Q-Learning 训练
+def optimal_actions(values: dict[State, float], state: State) -> list[int]:
+    if state in TERMINALS:
+        return []
+    candidates = [action_value(values, state, action) for action in range(len(ACTIONS))]
+    best = max(candidates)
+    return [index for index, value in enumerate(candidates) if abs(value - best) < 1e-10]
 
-    Q-Learning 的核心更新公式（贝尔曼最优方程的迭代形式）：
-        Q(s, a) ← Q(s, a) + α * [r + γ * max_a' Q(s', a') - Q(s, a)]
 
-    其中：
-        - s: 当前状态
-        - a: 当前动作
-        - r: 获得的奖励
-        - s': 下一个状态
-        - α: 学习率（控制更新步长）
-        - γ: 折扣因子（未来奖励的重要程度）
-        - max_a' Q(s', a'): 下一个状态的最大 Q 值
+def linear_epsilon(episode: int, start: float = 1.0, end: float = 0.05) -> float:
+    progress = min(episode / (EPISODES - 1), 1.0)
+    return start + progress * (end - start)
 
-    参数：
-        n_episodes: 训练回合数
-        alpha: 学习率
-        gamma: 折扣因子
-        epsilon_start: 初始探索率
-        epsilon_end: 最低探索率
-        epsilon_decay: 探索率衰减因子
-    """
-    # 初始化 Q 表：所有 Q 值设为 0
-    # Q[state][action] = 估计的最优动作价值
-    Q = np.zeros((env.rows, env.cols, env.n_actions))
 
-    # 记录训练过程中的数据
-    episode_rewards = []  # 每回合的累计奖励
-    episode_steps = []    # 每回合的步数
-    epsilon = epsilon_start
+def constant_epsilon(value: float) -> Callable[[int], float]:
+    return lambda _episode: value
 
-    print("=" * 60)
-    print("  Q-Learning 训练")
-    print("=" * 60)
-    print(f"  学习率 α = {alpha}")
-    print(f"  折扣因子 γ = {gamma}")
-    print(f"  初始探索率 ε = {epsilon_start}")
-    print(f"  训练回合数 = {n_episodes}")
-    print("-" * 60)
 
-    for episode in range(n_episodes):
-        state = env.reset()
-        total_reward = 0
-        steps = 0
-        done = False
+@dataclass
+class TrainingRun:
+    rewards: list[float]
+    steps: list[int]
+    q_values: list[list[list[float]]]
 
-        while not done:
-            # 1. 用 ε-贪心策略选择动作
-            action = epsilon_greedy(Q, state, epsilon, env.n_actions)
 
-            # 2. 执行动作，观察奖励和下一状态
-            next_state, reward, done = env.step(action)
+def zero_q_table() -> list[list[list[float]]]:
+    return [
+        [[0.0 for _ in ACTIONS] for _ in range(GRID_SIZE)]
+        for _ in range(GRID_SIZE)
+    ]
 
-            # 3. Q-Learning 更新（核心公式）
-            #    注意：这里用的是 max_a' Q(s', a')，不关心实际采取了什么策略
-            #    这就是 Q-Learning "off-policy" 的特点
-            best_next_q = np.max(Q[next_state])
-            td_target = reward + gamma * best_next_q
-            td_error = td_target - Q[state][action]
-            Q[state][action] += alpha * td_error
 
-            # 4. 转移到下一状态
+def best_action_indices(q_values: list[list[list[float]]], state: State) -> list[int]:
+    row = q_values[state[0]][state[1]]
+    best = max(row)
+    return [index for index, value in enumerate(row) if abs(value - best) < 1e-12]
+
+
+def train_q_learning(seed: int, epsilon_schedule: Callable[[int], float]) -> TrainingRun:
+    rng = random.Random(seed)
+    q_values = zero_q_table()
+    rewards: list[float] = []
+    steps_per_episode: list[int] = []
+
+    for episode in range(EPISODES):
+        state = START
+        episode_reward = 0.0
+        epsilon = epsilon_schedule(episode)
+
+        for step in range(1, MAX_STEPS + 1):
+            if rng.random() < epsilon:
+                action = rng.randrange(len(ACTIONS))
+            else:
+                action = rng.choice(best_action_indices(q_values, state))
+
+            next_state, reward, done = transition(state, action)
+            next_best = 0.0 if done else max(q_values[next_state[0]][next_state[1]])
+            old_value = q_values[state[0]][state[1]][action]
+            td_target = reward + GAMMA * next_best
+            q_values[state[0]][state[1]][action] += ALPHA * (td_target - old_value)
+
+            episode_reward += reward
             state = next_state
-            total_reward += reward
-            steps += 1
-
-            # 安全阀：防止无限循环
-            if steps > 200:
+            if done:
                 break
 
-        # 衰减探索率
-        epsilon = max(epsilon_end, epsilon * epsilon_decay)
+        rewards.append(episode_reward)
+        steps_per_episode.append(step)
 
-        episode_rewards.append(total_reward)
-        episode_steps.append(steps)
-
-        # 每 100 回合打印一次进度
-        if (episode + 1) % 100 == 0:
-            avg_reward = np.mean(episode_rewards[-100:])
-            avg_steps = np.mean(episode_steps[-100:])
-            print(f"  回合 {episode + 1:4d} | "
-                  f"近100回合平均奖励: {avg_reward:7.2f} | "
-                  f"平均步数: {avg_steps:5.1f} | "
-                  f"ε: {epsilon:.4f}")
-
-    print("-" * 60)
-    return Q, episode_rewards, episode_steps
+    return TrainingRun(rewards, steps_per_episode, q_values)
 
 
-# ==========================================
-# 第三部分：结果可视化
-# ==========================================
-def print_q_table(Q, env):
-    """
-    打印格式化的 Q 表
+def greedy_evaluation(q_values: list[list[list[float]]]) -> dict[str, float]:
+    """确定性环境中的一次贪心评估；并列动作按动作编号稳定选择。"""
 
-    Q 表展示了每个状态下每个动作的 Q 值（估计的最优动作价值）。
-    Q 值越高，说明在该状态下执行该动作的预期累计奖励越大。
-    """
-    print("\n" + "=" * 60)
-    print("  最终 Q 表")
-    print("=" * 60)
-    print(f"{'状态':<10s}", end="")
-    for name in env.action_names:
-        print(f"{name:<12s}", end="")
-    print(f"{'最优动作':<12s}")
-    print("-" * 60)
-
-    for r in range(env.rows):
-        for c in range(env.cols):
-            state = (r, c)
-            if state in env.obstacles:
-                print(f"({r},{c}) 障碍  ", end="")
-                print("    ---      ---      ---      ---     障碍物")
-                continue
-            if state == env.goal:
-                print(f"({r},{c}) 终点  ", end="")
-                print("    ---      ---      ---      ---     终点")
-                continue
-
-            print(f"({r},{c})       ", end="")
-            for a in range(env.n_actions):
-                print(f"{Q[r][c][a]:>8.2f}   ", end="")
-            best_action = np.argmax(Q[r][c])
-            print(f"  {env.action_names[best_action]}")
-
-    print("-" * 60)
-
-
-def extract_optimal_path(Q, env):
-    """
-    从 Q 表中提取最优路径
-
-    在每个状态选择 Q 值最大的动作，根据网格规则计算下一状态。
-    不依赖环境的 step() 函数，避免环境状态被意外修改。
-    """
-    # 动作对应的位移：0=上, 1=下, 2=左, 3=右
-    deltas = {0: (-1, 0), 1: (1, 0), 2: (0, -1), 3: (0, 1)}
-
-    state = env.start
+    state = START
+    total_reward = 0.0
     path = [state]
-    visited = set()
-
-    while state != env.goal:
-        if state in visited:
-            break  # 防止死循环
-        visited.add(state)
-        action = np.argmax(Q[state])
-        dr, dc = deltas[action]
-        new_state = (state[0] + dr, state[1] + dc)
-
-        # 检查新位置是否合法（不越界、不是障碍物）
-        if (0 <= new_state[0] < env.rows and 0 <= new_state[1] < env.cols
-                and new_state not in env.obstacles):
-            state = new_state
-        # 如果越界或撞障碍物，状态不变（可能导致死循环，由 visited 保护）
+    for step in range(1, MAX_STEPS + 1):
+        action = best_action_indices(q_values, state)[0]
+        next_state, reward, done = transition(state, action)
+        total_reward += reward
+        state = next_state
         path.append(state)
-        if state == env.goal:
-            break
-
-    return path
-
-
-def visualize_results(Q, episode_rewards, env):
-    """
-    可视化 Q-Learning 的学习结果
-    - 图1：每个动作的 Q 值热力图
-    - 图2：最优路径在网格上的展示
-    - 图3：每回合累计奖励的变化曲线
-    """
-    plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
-    plt.rcParams['axes.unicode_minus'] = False
-
-    fig = plt.figure(figsize=(16, 12))
-
-    # ------------------------------------------
-    # 图1：四个动作的 Q 值热力图
-    # ------------------------------------------
-    action_names_short = ['上(↑)', '下(↓)', '左(←)', '右(→)']
-
-    for i in range(4):
-        ax = fig.add_subplot(2, 3, i + 1)
-        q_values = Q[:, :, i]  # 取出某个动作在所有状态的 Q 值
-
-        im = ax.imshow(q_values, cmap='RdYlGn', aspect='equal')
-        # 在每个格子上标注 Q 值
-        for r in range(env.rows):
-            for c in range(env.cols):
-                if (r, c) in env.obstacles:
-                    ax.text(c, r, 'X', ha='center', va='center',
-                            fontsize=14, fontweight='bold', color='black')
-                elif (r, c) == env.goal:
-                    ax.text(c, r, 'G', ha='center', va='center',
-                            fontsize=14, fontweight='bold', color='blue')
-                else:
-                    ax.text(c, r, f'{q_values[r, c]:.1f}', ha='center', va='center',
-                            fontsize=9)
-        ax.set_title(f'Q(s, {action_names_short[i]})', fontsize=12)
-        ax.set_xticks(range(env.cols))
-        ax.set_yticks(range(env.rows))
-        ax.set_xticklabels(range(env.cols))
-        ax.set_yticklabels(range(env.rows))
-        plt.colorbar(im, ax=ax, shrink=0.8)
-
-    # ------------------------------------------
-    # 图2：最优路径可视化
-    # ------------------------------------------
-    ax_path = fig.add_subplot(2, 3, 5)
-    # 绘制网格底色
-    grid = np.zeros((env.rows, env.cols))
-    for obs in env.obstacles:
-        grid[obs] = -1
-    grid[env.goal] = 2
-
-    ax_path.imshow(grid, cmap='Set3', aspect='equal', vmin=-2, vmax=3)
-
-    # 提取并绘制最优路径
-    path = extract_optimal_path(Q, env)
-    path_rows = [p[0] for p in path]
-    path_cols = [p[1] for p in path]
-    ax_path.plot(path_cols, path_rows, 'b-o', linewidth=2.5, markersize=10)
-
-    # 标注起点、终点、障碍物
-    ax_path.text(0, 0, 'S', ha='center', va='center', fontsize=16,
-                 fontweight='bold', color='green')
-    ax_path.text(3, 3, 'G', ha='center', va='center', fontsize=16,
-                 fontweight='bold', color='red')
-    for obs in env.obstacles:
-        ax_path.text(obs[1], obs[0], 'X', ha='center', va='center',
-                     fontsize=16, fontweight='bold', color='black')
-
-    # 在路径上标注步数
-    for idx, (r, c) in enumerate(path):
-        ax_path.text(c, r, str(idx), ha='center', va='center',
-                     fontsize=8, color='white',
-                     bbox=dict(boxstyle='round,pad=0.2', fc='blue', alpha=0.5))
-
-    ax_path.set_title('最优路径', fontsize=12)
-    ax_path.set_xticks(range(env.cols))
-    ax_path.set_yticks(range(env.rows))
-    ax_path.set_xticklabels(range(env.cols))
-    ax_path.set_yticklabels(range(env.rows))
-    ax_path.grid(True, alpha=0.3)
-
-    # ------------------------------------------
-    # 图3：训练奖励曲线
-    # ------------------------------------------
-    ax_reward = fig.add_subplot(2, 3, 6)
-    ax_reward.plot(episode_rewards, alpha=0.3, color='lightblue', label='单回合奖励')
-    # 计算滑动平均
-    window = 20
-    if len(episode_rewards) >= window:
-        moving_avg = np.convolve(episode_rewards,
-                                 np.ones(window) / window, mode='valid')
-        ax_reward.plot(range(window - 1, len(episode_rewards)),
-                       moving_avg, color='blue', linewidth=2,
-                       label=f'{window}回合滑动平均')
-    ax_reward.set_xlabel('回合', fontsize=11)
-    ax_reward.set_ylabel('累计奖励', fontsize=11)
-    ax_reward.set_title('训练奖励曲线', fontsize=12)
-    ax_reward.legend(fontsize=9)
-    ax_reward.grid(True, alpha=0.3)
-
-    plt.tight_layout()
-    plt.savefig('output/gridworld_q_learning_results.png', dpi=150, bbox_inches='tight')
-    print("\n图表已保存至 output/gridworld_q_learning_results.png")
-    plt.show()
+        if done:
+            return {
+                "success": float(state == GOAL),
+                "steps": float(step),
+                "reward": total_reward,
+                "path": path,
+            }
+    return {"success": 0.0, "steps": float(MAX_STEPS), "reward": total_reward, "path": path}
 
 
-# ==========================================
-# 第四部分：主程序
-# ==========================================
-def main():
-    """主函数：创建环境 → 训练 → 打印 Q 表 → 可视化"""
+def aggregate_runs(runs: list[TrainingRun]) -> dict[str, list[float]]:
+    reward_mean = [fmean(run.rewards[i] for run in runs) for i in range(EPISODES)]
+    reward_std = [pstdev(run.rewards[i] for run in runs) for i in range(EPISODES)]
+    step_mean = [fmean(run.steps[i] for run in runs) for i in range(EPISODES)]
+    return {"reward_mean": reward_mean, "reward_std": reward_std, "step_mean": step_mean}
 
-    # 创建 GridWorld 环境
-    env = GridWorld()
-    print("GridWorld 环境创建完成")
-    print(f"  起点: {env.start}")
-    print(f"  终点: {env.goal}")
-    print(f"  障碍物: {env.obstacles}")
-    print(f"  动作空间: {env.action_names}")
 
-    # 训练 Q-Learning
-    Q, episode_rewards, episode_steps = train_q_learning(env, n_episodes=500)
+def moving_average(values: list[float], window: int = 20) -> list[float]:
+    result = []
+    for index in range(len(values)):
+        left = max(0, index - window + 1)
+        result.append(fmean(values[left:index + 1]))
+    return result
 
-    # 打印最终 Q 表
-    print_q_table(Q, env)
 
-    # 提取并打印最优路径
-    path = extract_optimal_path(Q, env)
-    print(f"\n最优路径: {' → '.join([str(p) for p in path])}")
-    print(f"路径长度: {len(path) - 1} 步")
+def run_schedule(name: str, schedule: Callable[[int], float]) -> dict[str, object]:
+    runs = [train_q_learning(seed, schedule) for seed in range(N_SEEDS)]
+    aggregate = aggregate_runs(runs)
+    evaluations = [greedy_evaluation(run.q_values) for run in runs]
+    return {
+        "name": name,
+        "runs": runs,
+        "aggregate": aggregate,
+        "last_100_reward": fmean(
+            reward for run in runs for reward in run.rewards[-100:]
+        ),
+        "success_rate": fmean(result["success"] for result in evaluations),
+        "evaluation_steps": fmean(result["steps"] for result in evaluations),
+        "evaluation_reward": fmean(result["reward"] for result in evaluations),
+    }
 
-    # 计算最优路径的总奖励
-    total_r = 0
-    for i in range(len(path) - 1):
-        if i < len(path) - 2:
-            total_r += -1  # 普通步骤：-1
-        else:
-            total_r += 10  # 到达终点的最后一步：+10
-    print(f"最优路径总奖励: {total_r}")
 
-    # 可视化结果
-    visualize_results(Q, episode_rewards, env)
+def svg_text(x: float, y: float, text: str, size: int = 16, **attrs: object) -> str:
+    attributes = " ".join(f'{key.replace("_", "-")}="{value}"' for key, value in attrs.items())
+    return f'<text x="{x}" y="{y}" font-size="{size}" {attributes}>{html.escape(text)}</text>'
+
+
+def value_color(value: float) -> str:
+    normalized = max(0.0, min(1.0, (value + 0.05) / 1.05))
+    red = round(244 - 105 * normalized)
+    green = round(247 - 54 * normalized)
+    blue = round(250 - 2 * normalized)
+    return f"rgb({red},{green},{blue})"
+
+
+def draw_grid(
+    values: dict[State, float], x: int, y: int, title: str,
+    policy: dict[State, list[int]] | None = None,
+) -> str:
+    cell = 58
+    parts = [svg_text(x + 2 * cell, y - 18, title, 18, text_anchor="middle", font_weight="600")]
+    for row in range(GRID_SIZE):
+        for col in range(GRID_SIZE):
+            state = (row, col)
+            px, py = x + col * cell, y + row * cell
+            fill = "#fee2e2" if state == TRAP else "#dcfce7" if state == GOAL else value_color(values[state])
+            parts.append(
+                f'<rect x="{px}" y="{py}" width="{cell}" height="{cell}" '
+                f'fill="{fill}" stroke="#64748b" stroke-width="1"/>'
+            )
+            if state == START:
+                parts.append(svg_text(px + 7, py + 16, "S", 12, fill="#475569", font_weight="700"))
+            if state == TRAP:
+                label = "X"
+            elif state == GOAL:
+                label = "G"
+            elif policy is not None:
+                label = "".join(ARROWS[action] for action in policy[state])
+            else:
+                label = f"{values[state]:.3f}"
+            parts.append(svg_text(px + cell / 2, py + 36, label, 16, text_anchor="middle", fill="#0f172a", font_weight="600"))
+    return "".join(parts)
+
+
+def render_environment_svg(path: Path) -> None:
+    """绘制教材开场使用的纯环境图。"""
+
+    width, height = 1120, 430
+    grid_x, grid_y, cell = 330, 70, 72
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
+        '<defs>',
+        '<filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.10"/></filter>',
+        '</defs>',
+        '<rect width="100%" height="100%" rx="24" fill="#f8fafc"/>',
+        '<g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Songti SC,Noto Sans CJK SC,sans-serif">',
+        f'<rect x="{grid_x - 18}" y="{grid_y - 18}" width="{4 * cell + 36}" height="{4 * cell + 36}" rx="18" fill="#ffffff" filter="url(#shadow)"/>',
+    ]
+
+    for row in range(GRID_SIZE):
+        for col in range(GRID_SIZE):
+            state = (row, col)
+            x, y = grid_x + col * cell, grid_y + row * cell
+            if state == START:
+                fill, stroke = "#dbeafe", "#2563eb"
+            elif state == TRAP:
+                fill, stroke = "#fee2e2", "#dc2626"
+            elif state == GOAL:
+                fill, stroke = "#dcfce7", "#16a34a"
+            else:
+                fill, stroke = "#ffffff", "#94a3b8"
+            parts.append(f'<rect x="{x}" y="{y}" width="{cell}" height="{cell}" fill="{fill}" stroke="{stroke}" stroke-width="{2 if state in {START, TRAP, GOAL} else 1}"/>')
+            parts.append(svg_text(x + 9, y + 17, f"({row},{col})", 11, fill="#64748b"))
+            if state == START:
+                parts.append(svg_text(x + cell / 2, y + 45, "S", 24, text_anchor="middle", font_weight="800", fill="#1d4ed8"))
+            elif state == TRAP:
+                parts.append(svg_text(x + cell / 2, y + 45, "X", 24, text_anchor="middle", font_weight="800", fill="#b91c1c"))
+            elif state == GOAL:
+                parts.append(svg_text(x + cell / 2, y + 45, "G", 24, text_anchor="middle", font_weight="800", fill="#15803d"))
+
+    # 图只定义状态空间和动作空间。奖励与折扣放在正文中。
+    parts.append(svg_text(grid_x + 4 * cell + 92, grid_y + 152, "↑", 34, text_anchor="middle", font_weight="600", fill="#334155"))
+    parts.append(svg_text(grid_x + 4 * cell + 92, grid_y + 230, "↓", 34, text_anchor="middle", font_weight="600", fill="#334155"))
+    parts.append(svg_text(grid_x + 4 * cell + 52, grid_y + 191, "←", 34, text_anchor="middle", font_weight="600", fill="#334155"))
+    parts.append(svg_text(grid_x + 4 * cell + 132, grid_y + 191, "→", 34, text_anchor="middle", font_weight="600", fill="#334155"))
+
+    parts.append('</g></svg>')
+    path.write_text("".join(parts), encoding="utf-8")
+
+
+def render_value_svg(history: list[dict[State, float]], values: dict[State, float], path: Path) -> None:
+    snapshots = [0, 1, 3, min(6, len(history) - 1)]
+    width, height = 1120, 610
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
+        '<rect width="100%" height="100%" fill="#ffffff"/>',
+        '<g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Songti SC,Noto Sans CJK SC,sans-serif">',
+        svg_text(560, 38, f"γ = {GAMMA}", 18, text_anchor="middle", font_weight="600", fill="#475569"),
+    ]
+    for index, sweep in enumerate(snapshots):
+        parts.append(draw_grid(history[sweep], 40 + index * 270, 95, f"V_{sweep}"))
+
+    policy = {state: optimal_actions(values, state) for state in all_states() if state not in TERMINALS}
+    parts.append(draw_grid(values, 175, 390, "V*"))
+    parts.append(draw_grid(values, 710, 390, "π*", policy))
+    parts.append('</g></svg>')
+    path.write_text("".join(parts), encoding="utf-8")
+
+
+def line_points(values: list[float], x: float, y: float, width: float, height: float, y_min: float, y_max: float) -> str:
+    points = []
+    for index, value in enumerate(values):
+        px = x + index / (len(values) - 1) * width
+        py = y + (y_max - value) / (y_max - y_min) * height
+        points.append(f"{px:.1f},{py:.1f}")
+    return " ".join(points)
+
+
+def render_learning_svg(schedule_results: list[dict[str, object]], path: Path) -> None:
+    width, height = 1120, 520
+    chart_x, chart_y, chart_w, chart_h = 85, 55, 930, 380
+    y_min, y_max = -1.25, 1.05
+    colors = ["#2563eb", "#d97706", "#7c3aed"]
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
+        '<rect width="100%" height="100%" fill="#ffffff"/>',
+        '<g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Songti SC,Noto Sans CJK SC,sans-serif">',
+    ]
+
+    for tick in [-1.0, -0.5, 0.0, 0.5, 1.0]:
+        py = chart_y + (y_max - tick) / (y_max - y_min) * chart_h
+        parts.append(f'<line x1="{chart_x}" y1="{py}" x2="{chart_x + chart_w}" y2="{py}" stroke="#e2e8f0"/>')
+        parts.append(svg_text(chart_x - 12, py + 5, f"{tick:.1f}", 13, text_anchor="end", fill="#64748b"))
+    for tick in [0, 100, 200, 300, 400, 500]:
+        px = chart_x + tick / EPISODES * chart_w
+        parts.append(f'<line x1="{px}" y1="{chart_y + chart_h}" x2="{px}" y2="{chart_y + chart_h + 6}" stroke="#64748b"/>')
+        parts.append(svg_text(px, chart_y + chart_h + 25, str(tick), 13, text_anchor="middle", fill="#64748b"))
+    parts.append(f'<line x1="{chart_x}" y1="{chart_y}" x2="{chart_x}" y2="{chart_y + chart_h}" stroke="#334155"/>')
+    parts.append(f'<line x1="{chart_x}" y1="{chart_y + chart_h}" x2="{chart_x + chart_w}" y2="{chart_y + chart_h}" stroke="#334155"/>')
+    parts.append(svg_text(chart_x + chart_w / 2, chart_y + chart_h + 52, "k", 18, text_anchor="middle", font_style="italic", fill="#334155"))
+    parts.append(svg_text(28, chart_y + chart_h / 2, "R̄", 19, text_anchor="middle", font_style="italic", fill="#334155", transform=f"rotate(-90 28 {chart_y + chart_h / 2})"))
+
+    for result, color in zip(schedule_results, colors):
+        aggregate = result["aggregate"]
+        smooth = moving_average(aggregate["reward_mean"], 20)
+        parts.append(
+            f'<polyline points="{line_points(smooth, chart_x, chart_y, chart_w, chart_h, y_min, y_max)}" '
+            f'fill="none" stroke="{color}" stroke-width="3"/>'
+        )
+
+    card_x = 710
+    legend_labels = ("ε: 1.00 → 0.05", "ε = 0.05", "ε = 0.30")
+    for index, (result, color) in enumerate(zip(schedule_results, colors)):
+        y = 78 + index * 34
+        parts.append(f'<line x1="{card_x}" y1="{y}" x2="{card_x + 32}" y2="{y}" stroke="{color}" stroke-width="4"/>')
+        parts.append(svg_text(card_x + 43, y + 5, legend_labels[index], 15, font_weight="600", fill="#0f172a"))
+    parts.append('</g></svg>')
+    path.write_text("".join(parts), encoding="utf-8")
+
+
+def serializable_values(values: dict[State, float]) -> list[list[float]]:
+    return [[values[(row, col)] for col in range(GRID_SIZE)] for row in range(GRID_SIZE)]
+
+
+def copy_assets(source_dir: Path, assets_dir: Path | None) -> None:
+    if assets_dir is None:
+        return
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    for filename in (
+        "gridworld-environment.svg",
+        "gridworld-value-iteration.svg",
+        "gridworld-q-learning.svg",
+    ):
+        (assets_dir / filename).write_bytes((source_dir / filename).read_bytes())
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output-dir", type=Path, default=Path("output/value-experiment"))
+    parser.add_argument("--assets-dir", type=Path)
+    args = parser.parse_args()
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+
+    values, history = value_iteration()
+    assert abs(values[START] - 0.728537125) < 1e-9
+    assert len(history) - 1 == 7
+    schedules = [
+        ("ε: 1.00 → 0.05", linear_epsilon),
+        ("固定 ε = 0.05", constant_epsilon(0.05)),
+        ("固定 ε = 0.30", constant_epsilon(0.30)),
+    ]
+    schedule_results = [run_schedule(name, schedule) for name, schedule in schedules]
+    assert all(result["success_rate"] == 1.0 for result in schedule_results)
+    assert all(result["evaluation_steps"] == 6.0 for result in schedule_results)
+
+    render_environment_svg(args.output_dir / "gridworld-environment.svg")
+    render_value_svg(history, values, args.output_dir / "gridworld-value-iteration.svg")
+    render_learning_svg(schedule_results, args.output_dir / "gridworld-q-learning.svg")
+
+    baseline = schedule_results[0]
+    with (args.output_dir / "learning_curves.csv").open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["episode", "reward_mean", "reward_std", "steps_mean"])
+        aggregate = baseline["aggregate"]
+        for episode in range(EPISODES):
+            writer.writerow([
+                episode + 1,
+                f"{aggregate['reward_mean'][episode]:.6f}",
+                f"{aggregate['reward_std'][episode]:.6f}",
+                f"{aggregate['step_mean'][episode]:.6f}",
+            ])
+
+    results = {
+        "environment": {
+            "grid_size": GRID_SIZE,
+            "start": START,
+            "trap": TRAP,
+            "goal": GOAL,
+            "step_reward": STEP_REWARD,
+            "trap_reward": TRAP_REWARD,
+            "goal_reward": GOAL_REWARD,
+            "gamma": GAMMA,
+        },
+        "value_iteration": {
+            "converged_sweeps": len(history) - 1,
+            "values": serializable_values(values),
+            "snapshots": {
+                str(sweep): serializable_values(history[sweep])
+                for sweep in [0, 1, 3, min(6, len(history) - 1)]
+            },
+            "optimal_policy": {
+                f"{state[0]},{state[1]}": [ARROWS[action] for action in optimal_actions(values, state)]
+                for state in all_states() if state not in TERMINALS
+            },
+        },
+        "q_learning": {
+            "episodes": EPISODES,
+            "seeds": N_SEEDS,
+            "alpha": ALPHA,
+            "schedules": [
+                {
+                    "name": result["name"],
+                    "last_100_reward": result["last_100_reward"],
+                    "success_rate": result["success_rate"],
+                    "evaluation_steps": result["evaluation_steps"],
+                    "evaluation_reward": result["evaluation_reward"],
+                }
+                for result in schedule_results
+            ],
+        },
+    }
+    (args.output_dir / "results.json").write_text(
+        json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    copy_assets(args.output_dir, args.assets_dir)
+
+    print(f"价值迭代在 {len(history) - 1} 轮后收敛")
+    print(f"V*(0,0) = {values[START]:.6f}")
+    for result in schedule_results:
+        print(
+            f"{result['name']}: 末100回合奖励={result['last_100_reward']:.3f}, "
+            f"贪心成功率={result['success_rate'] * 100:.0f}%, "
+            f"贪心步数={result['evaluation_steps']:.1f}"
+        )
+    print(f"结果已写入 {args.output_dir}")
 
 
 if __name__ == "__main__":

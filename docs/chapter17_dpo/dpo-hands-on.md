@@ -1,6 +1,12 @@
 # 14.4 动手：DPO 对齐实验
 
-回顾[第 14 章](../chapter17_dpo/intro)，你已经用 DPO 让模型学会了在用户观点有误时礼貌地反驳。但那次实验只是"跑通流程"，我们还没有深入分析训练过程本身。这一节我们换一个更有挑战性的场景——对齐一个"阴阳怪气"的模型，并仔细观察训练指标的每一个起伏。
+> **本节目标**：用成对偏好数据训练一个小型语言模型减少讽刺表达，并通过训练指标和训练前后回答判断 DPO 是否产生了预期偏好。
+
+> **学习路径**：[14.1 DPO 目标函数](./intro) → [14.2 训练与评测指标](./metrics) → [14.3 DPO 改进方法](./dpo-theory-and-family) → **14.4 DPO 对齐实验**
+
+> **本节代码**：[数据生成](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/1-generate_data.py) · [训练前测试](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/2-test_before.py) · [DPO 训练](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/3-train_dpo.py) · [训练后测试](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/4-test_after.py)
+
+前面已经推导了 DPO 如何提高 chosen 回答相对于 rejected 回答的概率。这里换成一个容易观察的任务：每条数据都把礼貌回答作为 chosen，把带有讽刺和攻击性的回答作为 rejected。实验按“准备数据 → 训练前测试 → DPO 训练 → 训练后测试”运行，最终要检查模型是否在保留回答内容的同时减少不友好的语气。
 
 ## 偏好数据准备
 
@@ -213,5 +219,11 @@ flowchart LR
 另外一种可能是 **Reward Hacking 的隐蔽形式**——模型学会了某些表面特征（如回答更长、更礼貌的措辞），而不是真正理解了回答的质量。这需要通过人工评估或更强的自动化评估来发现。
 
 </details>
+
+## 本节小结
+
+- DPO 直接利用 chosen/rejected 偏好对，提高模型对 chosen 回答的相对概率。
+- `rewards/margins` 和 `rewards/accuracies` 反映训练集偏好是否被学到，独立提示上的生成结果检验能否泛化。
+- $\beta$ 控制模型偏离参考策略的幅度；训练数据过少时，即使训练指标很好，也可能只是记住了偏好对。
 
 训练指标只是表象，真正的魔法藏在 DPO 的数学推导中。为什么"改个 Loss 就能绕过整个 PPO 循环"？为什么不需要 Reward Model 也能训练？让我们深入数学——[DPO 数学推导](./dpo-theory-and-family)。

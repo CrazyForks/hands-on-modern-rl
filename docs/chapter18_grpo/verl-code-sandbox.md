@@ -1,10 +1,12 @@
 # 15.8 动手：使用 veRL 训练代码生成
 
-上一节讲 OPD 时，我们把 teacher 当成密集奖励来源。本节回到 RLVR 的路线，换一个更硬的场景：**代码生成**。
+> **本节目标**：把代码执行验证器接入 veRL，用测试通过率训练代码模型，并完成数据准备、沙箱检查、PPO 训练和训练前后评测。
 
-代码题和数学题一样有一个关键优势：答案不是靠人主观打分，而是可以运行测试来验证。能通过测试，就给正奖励；不能通过，就给低奖励或零奖励。和数学 RLVR 相比，代码任务的 reward 更硬——不仅看输出对不对，还要把模型生成的代码真正跑起来。
+> **学习路径**：[15.3 RLVR 奖励](./rlvr) → [13.7 veRL 训练 GSM8K](../chapter15_rlhf/verl-ppo-gsm8k) → **15.8 veRL 训练代码生成**
 
-本节用 veRL 在代码生成任务上跑通 PPO 训练。13.7 节已经在 GSM8K 数学题上用过 veRL，本节换到代码题，最大的变化是 reward 函数：数学只需要抽取最终数字做对比，代码必须把模型输出执行一遍。
+> **本节代码**：[数据准备](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter18_grpo/verl_code_rlvr/prepare_data.py) · [代码奖励](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter18_grpo/verl_code_rlvr/code_reward.py) · [单卡训练脚本](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter18_grpo/verl_code_rlvr/run_qwen_coder_ppo_single_gpu.sh)
+
+13.7 节已经用 veRL 训练数学模型，只需抽取最终数字并与标准答案比较。代码任务多了一步：模型生成的程序必须进入隔离环境，经过语法检查、执行和单元测试，测试通过率再变成奖励。下面沿用同一套 veRL 训练框架，只替换数据处理和奖励链路。
 
 本节参考了火山引擎的 veRL Code Sandbox 教程[^volcengine-verl-code-sandbox]，具体参考了以下内容：
 
@@ -32,7 +34,7 @@ flowchart LR
 
 普通聊天任务很难定义"正确答案"。同一句回复，可能有人喜欢简洁，有人喜欢详细，Reward Model 也可能被模型钻空子。
 
-代码任务简单很多。比如题目要求写一个 `two_sum(nums, target)`：
+代码任务可以由测试程序给出明确反馈。比如题目要求写一个 `two_sum(nums, target)`：
 
 ```python
 def two_sum(nums, target):
@@ -496,14 +498,14 @@ evalscope eval \
 
 学习率、clip_ratio、GAE 参数等**不需要改**——它们是算法参数，不随硬件规模变化。
 
-## 和 10.5 DeepCoder 实验的关系
+## 和 19.8 DeepCoder 实验的关系
 
 本节和 [19.8](../chapter22_agentic/rllm-deepcoder-lab) 讲的是同一个大方向：用 sandbox reward 训练代码模型。区别在于关注点不同：
 
-| 小节     | 框架 | 重点                                      |
-| -------- | ---- | ----------------------------------------- |
-| 9.7 本节 | veRL | 把代码 verifier 接进 PPO/GRPO 训练框架    |
-| 10.5     | rLLM | 用 DeepCoder cookbook 跑完整 Agentic 实验 |
+| 小节      | 框架 | 重点                                      |
+| --------- | ---- | ----------------------------------------- |
+| 15.8 本节 | veRL | 把代码 verifier 接进 PPO/GRPO 训练框架    |
+| 19.8      | rLLM | 用 DeepCoder cookbook 跑完整 Agentic 实验 |
 
 如果你想先跑通一个端到端案例，优先看 10.5。如果你已经熟悉 veRL，想把数学 RLVR 扩展到代码任务，就沿着本节的 data、reward、trainer 三个接口补齐。
 
@@ -518,5 +520,11 @@ evalscope eval \
 - 如果加入格式奖励，权重不要超过测试通过奖励。
 
 代码生成 RL 的好处是反馈硬、可复现；难点是工程边界更复杂。把 verifier 写稳，比调 PPO/GRPO 超参更重要。
+
+## 本节小结
+
+- 代码 RLVR 的奖励来自实际执行和测试通过率，格式与语法奖励只用于补充早期信号。
+- 本地子进程必须设置超时和资源限制；训练集与评测集必须隔离。
+- 判断训练效果要比较基座模型与训练后模型的独立 Pass@1，并按编译、运行和测试失败分类诊断。
 
 [^volcengine-verl-code-sandbox]: 火山引擎，"veRL Code Sandbox 代码生成强化学习"，https://www.volcengine.com/docs/6460/1756203
