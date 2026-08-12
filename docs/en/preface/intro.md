@@ -4,6 +4,12 @@ title: Course Overview
 
 # Introduction to RL
 
+::: tip Train CartPole before you start
+- **[ModelScope Studio: train in the browser](https://modelscope.cn/studios/walkinglab/cartpole-online-training)**: start PPO training without installing a local environment, then inspect the reward curve and policy animation.
+- **[Google Colab: open the GitHub notebook](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/notebooks/cartpole-ppo.ipynb)**: run the cells in order, change the training steps, and keep the resulting artifacts.
+- **[ModelScope: open the training script](https://modelscope.cn/studios/walkinglab/cartpole-online-training/file/view/master/train.py)**: run `python train.py --timesteps 30000` in a ModelScope Notebook or a local terminal.
+:::
+
 ::: warning 📣 Announcement
 We sincerely thank everyone for your support of this tutorial! A new version is coming soon. Many sections are still being organized and refined, so we appreciate your patience. Suggestions and feedback are always welcome!
 :::

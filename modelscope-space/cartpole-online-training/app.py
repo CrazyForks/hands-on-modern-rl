@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import os
 import time
 from pathlib import Path
+
+os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 
 import gymnasium as gym
 import gradio as gr

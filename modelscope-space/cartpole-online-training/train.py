@@ -8,8 +8,11 @@ Run in a ModelScope Notebook or locally:
 from __future__ import annotations
 
 import argparse
+import os
 import time
 from pathlib import Path
+
+os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 
 import gymnasium as gym
 import imageio.v2 as imageio
