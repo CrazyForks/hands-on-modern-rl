@@ -80,20 +80,25 @@ def log_line(started_at: float, level: str, message: str) -> str:
 
 
 def status_card(state: str, title: str, detail: str) -> str:
-    """Render the current run state as a small visual card."""
+    """Render a compact run-status summary without nested borders."""
     return f"""
     <div class="run-state run-state--{state}">
-      <span class="run-state__dot"></span>
-      <div><strong>{title}</strong><small>{detail}</small></div>
+      <span class="run-state__dot" aria-hidden="true"></span>
+      <div class="run-state__body">
+        <span class="summary-label">训练状态</span>
+        <strong>{title}</strong>
+        <small>{detail}</small>
+      </div>
     </div>
     """
 
 
 def metric_card(label: str, value: str, detail: str) -> str:
-    """Render the latest evaluation result."""
+    """Render the latest evaluation result as a compact summary."""
     return f"""
     <div class="live-metric">
-      <span>{label}</span><strong>{value}</strong><small>{detail}</small>
+      <span class="summary-label">{label}</span>
+      <div class="metric-reading"><strong>{value}</strong><small>{detail}</small></div>
     </div>
     """
 
@@ -165,8 +170,8 @@ def train(total_timesteps: int):
     )
 
     yield (
-        status_card("running", "训练进行中", f"0 / {total_timesteps:,} steps"),
-        metric_card("Mean reward", f"{initial_mean:.1f}", f"Standard deviation {initial_std:.1f}"),
+        status_card("running", "训练进行中", f"0 / {total_timesteps:,} 步"),
+        metric_card("平均奖励", f"{initial_mean:.1f}", f"标准差 {initial_std:.1f}"),
         reward_figure(steps, mean_rewards),
         None,
         None,
@@ -202,9 +207,9 @@ def train(total_timesteps: int):
             status_card(
                 "running",
                 "训练进行中",
-                f"{trained:,} / {total_timesteps:,} steps · {trained / total_timesteps:.0%} · {elapsed:.1f}s",
+                f"{trained:,} / {total_timesteps:,} 步 · {trained / total_timesteps:.0%} · {elapsed:.1f} 秒",
             ),
-            metric_card("Mean reward", f"{mean_reward:.1f}", f"Standard deviation {std_reward:.1f}"),
+            metric_card("平均奖励", f"{mean_reward:.1f}", f"标准差 {std_reward:.1f}"),
             reward_figure(steps, mean_rewards),
             None,
             None,
@@ -232,8 +237,8 @@ def train(total_timesteps: int):
     )
 
     yield (
-        status_card("complete", "训练完成", f"{total_timesteps:,} steps · {elapsed:.1f}s"),
-        metric_card("Final mean reward", f"{final_mean:.1f}", f"10 episodes · standard deviation {final_std:.1f}"),
+        status_card("complete", "训练完成", f"{total_timesteps:,} 步 · {elapsed:.1f} 秒"),
+        metric_card("最终平均奖励", f"{final_mean:.1f}", f"10 回合 · 标准差 {final_std:.1f}"),
         reward_figure(steps, mean_rewards),
         gif_path,
         model_file,
@@ -374,24 +379,54 @@ CSS = """
   font-size: 15px !important;
   font-weight: 750 !important;
 }
+.status-output, .metric-output {
+  min-width: 0 !important;
+  margin: 10px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.status-output > div, .metric-output > div {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
 .run-state, .live-metric {
   box-sizing: border-box;
-  min-height: 78px;
-  margin-top: 10px;
-  padding: 14px 15px;
-  border: 1px solid #e6e8f3;
-  border-radius: 12px;
-  background: #f8f9fd;
+  min-height: 88px;
+  padding: 15px 16px;
+  border: 0;
+  border-radius: 13px;
+  background: #f5f6fa;
 }
-.run-state { display: flex; align-items: center; gap: 11px; }
-.run-state__dot { width: 9px; height: 9px; border-radius: 50%; background: #98a2b3; box-shadow: 0 0 0 5px rgba(152,162,179,.12); }
-.run-state--running .run-state__dot { background: var(--brand); box-shadow: 0 0 0 5px rgba(91,92,226,.12); animation: pulse 1.5s infinite; }
-.run-state--complete .run-state__dot { background: var(--green); box-shadow: 0 0 0 5px rgba(19,163,111,.12); }
-.run-state strong, .live-metric strong { display: block; color: var(--ink); font-size: 15px; }
-.run-state small, .live-metric small { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; }
-.live-metric span { display: block; margin-bottom: 3px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
-.live-metric strong { color: var(--green); font-size: 24px; letter-spacing: -.025em; }
-@keyframes pulse { 50% { opacity: .5; } }
+.run-state { display: flex; align-items: center; gap: 13px; }
+.run-state__dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #98a2b3;
+}
+.run-state--running .run-state__dot { background: var(--brand); }
+.run-state--complete .run-state__dot { background: var(--green); }
+.run-state__body { min-width: 0; }
+.summary-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #8993a5;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .055em;
+}
+.run-state strong { display: block; color: var(--ink); font-size: 15px; line-height: 1.35; }
+.run-state small, .live-metric small { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.live-metric { display: flex; flex-direction: column; justify-content: center; }
+.metric-reading { display: flex; align-items: baseline; gap: 9px; }
+.live-metric strong { color: var(--ink); font-size: 23px; line-height: 1; letter-spacing: -.025em; }
+.live-metric small { margin: 0; }
 .console-head {
   display: flex;
   align-items: center;
@@ -477,10 +512,12 @@ with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
             )
             start = gr.Button("开始训练", variant="primary", elem_classes="primary-btn")
             status = gr.HTML(
-                status_card("idle", "等待开始", "设置训练步数后启动实验")
+                status_card("idle", "等待开始", "设置训练步数后启动实验"),
+                elem_classes="status-output",
             )
             metrics = gr.HTML(
-                metric_card("Mean reward", "—", "训练开始后显示评估结果")
+                metric_card("平均奖励", "—", "训练开始后显示评估结果"),
+                elem_classes="metric-output",
             )
         with gr.Column(scale=2, elem_classes="chart-card"):
             gr.HTML(
