@@ -131,6 +131,8 @@ UI_TEXT = {
         "finished": "training completed",
     },
 }
+DEFAULT_LANGUAGE = "English"
+DEFAULT_COPY = UI_TEXT[DEFAULT_LANGUAGE]
 
 
 def text_for(language: str) -> dict[str, str]:
@@ -480,8 +482,9 @@ CSS = """
   place-items: center;
   border-radius: 10px;
   color: #ffffff;
-  background: var(--brand-dark);
-  font-size: 15px;
+  background: linear-gradient(135deg, var(--brand-dark), #6969ec);
+  box-shadow: 0 5px 14px rgba(68, 70, 190, .22);
+  font-size: 12px;
   font-weight: 800;
 }
 .language-intro strong { display: block; font-size: 15px; line-height: 1.3; }
@@ -505,8 +508,24 @@ CSS = """
   justify-content: center !important;
   padding: 8px 17px !important;
   border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  color: #555e73 !important;
+  background: transparent !important;
   font-size: 14px !important;
   font-weight: 750 !important;
+  transition: color .16s ease, background .16s ease, box-shadow .16s ease !important;
+}
+.language-switch label:hover span { color: var(--brand-dark) !important; background: rgba(255,255,255,.58) !important; }
+.language-switch label:has(input:checked) span,
+.language-switch input:checked + span {
+  border-color: rgba(91, 92, 226, .16) !important;
+  color: #3032a5 !important;
+  background: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(68, 70, 190, .16) !important;
+}
+.language-switch label:focus-within span {
+  outline: 3px solid rgba(91, 92, 226, .20) !important;
+  outline-offset: 1px !important;
 }
 .app-shell { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--ink); }
 .hero {
@@ -741,59 +760,59 @@ CSS = """
 """
 
 
-with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
+with gr.Blocks(title="Experiment 01 · CartPole Online Training") as demo:
     with gr.Row(elem_classes="language-bar"):
         gr.HTML(
-            '<div class="language-intro"><span class="language-icon">文</span><div><strong>选择界面语言</strong><span>Choose interface language</span></div></div>',
+            '<div class="language-intro"><span class="language-icon">EN</span><div><strong>Interface language</strong><span>Switch between English and Chinese</span></div></div>',
             elem_classes="language-label",
         )
         language = gr.Radio(
-            choices=[("中文界面", "中文"), ("English UI", "English")],
-            value="中文",
+            choices=[("English", "English"), ("中文", "中文")],
+            value=DEFAULT_LANGUAGE,
             label="Language",
             show_label=False,
             elem_classes="language-switch",
         )
-    hero = gr.HTML(hero_html("中文"))
+    hero = gr.HTML(hero_html(DEFAULT_LANGUAGE))
 
     with gr.Row():
         with gr.Column(scale=1, min_width=300, elem_classes="control-card"):
-            settings_header = gr.HTML(panel_html(UI_TEXT["中文"]["settings_title"], UI_TEXT["中文"]["settings_copy"]))
+            settings_header = gr.HTML(panel_html(DEFAULT_COPY["settings_title"], DEFAULT_COPY["settings_copy"]))
             timesteps = gr.Slider(
                 minimum=10_000,
                 maximum=50_000,
                 value=30_000,
                 step=5_000,
-                label="训练步数",
-                info="建议首次使用 30,000 步",
+                label=DEFAULT_COPY["steps_label"],
+                info=DEFAULT_COPY["steps_info"],
             )
-            start = gr.Button("开始训练", variant="primary", elem_classes="primary-btn")
+            start = gr.Button(DEFAULT_COPY["start"], variant="primary", elem_classes="primary-btn")
             status = gr.HTML(
-                status_card("idle", "等待开始", "设置训练步数后启动实验"),
+                status_card("idle", DEFAULT_COPY["idle"], DEFAULT_COPY["idle_detail"], DEFAULT_LANGUAGE),
                 elem_classes="status-output",
             )
             metrics = gr.HTML(
-                metric_card("平均奖励", "—", "训练开始后显示评估结果"),
+                metric_card(DEFAULT_COPY["mean_reward"], "—", DEFAULT_COPY["metric_waiting"]),
                 elem_classes="metric-output",
             )
         with gr.Column(scale=2, elem_classes="chart-card"):
-            chart_header = gr.HTML(panel_html(UI_TEXT["中文"]["chart_title"], UI_TEXT["中文"]["chart_copy"]))
+            chart_header = gr.HTML(panel_html(DEFAULT_COPY["chart_title"], DEFAULT_COPY["chart_copy"]))
             curve = gr.Plot(show_label=False)
             console = gr.HTML(
-                console_panel(UI_TEXT["中文"]["console_waiting"], "中文"),
+                console_panel(DEFAULT_COPY["console_waiting"], DEFAULT_LANGUAGE),
                 elem_classes="console-output",
             )
 
     with gr.Row(elem_classes="output-card"):
         with gr.Column(scale=2):
             results_header = gr.HTML(
-                panel_html(UI_TEXT["中文"]["results_title"], UI_TEXT["中文"]["results_copy"], "artifact-note")
+                panel_html(DEFAULT_COPY["results_title"], DEFAULT_COPY["results_copy"], "artifact-note")
             )
-            animation = gr.Image(label="策略动画", type="filepath")
+            animation = gr.Image(label=DEFAULT_COPY["animation"], type="filepath")
         with gr.Column(scale=1):
-            model_download = gr.File(label="下载 PPO 模型", interactive=False)
+            model_download = gr.File(label=DEFAULT_COPY["download"], interactive=False)
 
-    footer = gr.HTML(footer_html("中文"))
+    footer = gr.HTML(footer_html(DEFAULT_LANGUAGE))
 
     language.change(
         fn=switch_language,
