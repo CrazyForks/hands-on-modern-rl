@@ -454,23 +454,59 @@ CSS = """
   padding: 28px 22px 52px !important;
   background: var(--canvas);
 }
-.language-switch {
-  width: fit-content !important;
-  margin: 0 0 12px auto !important;
-  padding: 3px !important;
-  border: 1px solid var(--line) !important;
-  border-radius: 10px !important;
-  background: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(20, 28, 48, .04) !important;
+.language-bar {
+  align-items: center !important;
+  gap: 18px !important;
+  margin: 0 0 14px !important;
+  padding: 13px 15px 13px 18px !important;
+  border: 2px solid #c7c9ff !important;
+  border-radius: 15px !important;
+  background: linear-gradient(100deg, #f0f1ff 0%, #ffffff 72%) !important;
+  box-shadow: 0 8px 24px rgba(68, 70, 190, .10) !important;
 }
-.language-switch label { display: none !important; }
-.language-switch > div { gap: 3px !important; }
+.language-label, .language-label > div {
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+.language-intro { display: flex; align-items: center; gap: 12px; color: var(--ink); }
+.language-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  color: #ffffff;
+  background: var(--brand-dark);
+  font-size: 15px;
+  font-weight: 800;
+}
+.language-intro strong { display: block; font-size: 15px; line-height: 1.3; }
+.language-intro span:last-child { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; }
+.language-switch {
+  flex: 0 0 310px !important;
+  width: 310px !important;
+  margin: 0 0 0 auto !important;
+  padding: 5px !important;
+  border: 1px solid #b9bcff !important;
+  border-radius: 12px !important;
+  background: #e8e9ff !important;
+  box-shadow: inset 0 1px 2px rgba(68, 70, 190, .08) !important;
+}
+.language-switch > div { gap: 5px !important; }
+.language-switch label { display: flex !important; flex: 1 1 0 !important; cursor: pointer !important; }
 .language-switch label span {
-  min-height: 30px !important;
-  padding: 5px 12px !important;
-  border-radius: 7px !important;
-  font-size: 12px !important;
-  font-weight: 700 !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-height: 38px !important;
+  justify-content: center !important;
+  padding: 8px 17px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-weight: 750 !important;
 }
 .app-shell { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--ink); }
 .hero {
@@ -696,22 +732,28 @@ CSS = """
 .footer-note { margin-top: 18px; text-align: center; color: #94a3b8; font-size: 12px; }
 @media (max-width: 760px) {
   .gradio-container { padding: 12px 10px 30px !important; }
+  .language-bar { align-items: stretch !important; flex-direction: column !important; gap: 10px !important; }
+  .language-switch { flex: 1 1 auto !important; width: 100% !important; margin: 0 !important; }
   .hero { padding: 27px 22px 25px; border-radius: 19px; }
   .hero-topline { align-items: flex-start; flex-direction: column; gap: 8px; }
   .lab-strip { gap: 8px 16px; }
-  .language-switch { margin-right: 2px !important; }
 }
 """
 
 
 with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
-    language = gr.Radio(
-        choices=["中文", "English"],
-        value="中文",
-        label="Language",
-        show_label=False,
-        elem_classes="language-switch",
-    )
+    with gr.Row(elem_classes="language-bar"):
+        gr.HTML(
+            '<div class="language-intro"><span class="language-icon">文</span><div><strong>选择界面语言</strong><span>Choose interface language</span></div></div>',
+            elem_classes="language-label",
+        )
+        language = gr.Radio(
+            choices=[("中文界面", "中文"), ("English UI", "English")],
+            value="中文",
+            label="Language",
+            show_label=False,
+            elem_classes="language-switch",
+        )
     hero = gr.HTML(hero_html("中文"))
 
     with gr.Row():
