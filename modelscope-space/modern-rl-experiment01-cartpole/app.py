@@ -415,7 +415,7 @@ CSS = """
 """
 
 
-with gr.Blocks(css=CSS, title="实验 01 · CartPole 在线训练") as demo:
+with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
     gr.HTML(
         f"""
         <main class="app-shell">
@@ -515,4 +515,4 @@ with gr.Blocks(css=CSS, title="实验 01 · CartPole 在线训练") as demo:
 
 
 if __name__ == "__main__":
-    demo.queue(default_concurrency_limit=1).launch()
+    demo.queue(default_concurrency_limit=1).launch(css=CSS)
