@@ -34,7 +34,7 @@ COURSE_URL = "https://walkinglabs.github.io/hands-on-modern-rl/"
 CHAPTER_URL = f"{COURSE_URL}chapter01_cartpole/training"
 MODELSCOPE_NOTEBOOK_URL = "https://modelscope.cn/my/mynotebook"
 SCRIPT_URL = (
-    "https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole/"
+    "https://modelscope.cn/studios/walkinglab/hands-on-modern-rl-experiment01-cartpole/"
     "file/view/master/train.py"
 )
 ANSI_ESCAPE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")

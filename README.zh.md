@@ -16,9 +16,9 @@
   </p>
 
   <p>
-    <a href="https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole">ModelScope 一键训练</a> ·
+    <a href="https://modelscope.cn/studios/walkinglab/hands-on-modern-rl-experiment01-cartpole">ModelScope 一键训练</a> ·
     <a href="https://modelscope.cn/my/mynotebook">在魔搭 Notebook 中打开</a> ·
-    <a href="https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole/file/view/master/train.py">ModelScope 训练脚本</a>
+    <a href="https://modelscope.cn/studios/walkinglab/hands-on-modern-rl-experiment01-cartpole/file/view/master/train.py">ModelScope 训练脚本</a>
   </p>
 
   <p>
