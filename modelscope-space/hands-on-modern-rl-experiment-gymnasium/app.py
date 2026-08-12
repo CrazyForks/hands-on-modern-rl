@@ -575,6 +575,9 @@ TEXT = {
         "epsilon": "Exploration ε",
         "seed": "Random seed",
         "start": "Start training",
+        "start_running": "Running…",
+        "wait_title": "Run active · please keep this page open",
+        "wait_detail": "Initializing the environment and model, training the policy, then rendering the result. This indicator stays active until every stage finishes.",
         "ready": "Ready to train",
         "ready_detail": "Review the task brief, adjust parameters, then start the CPU run",
         "running": "Training in progress",
@@ -610,6 +613,9 @@ TEXT = {
         "epsilon": "探索率 ε",
         "seed": "随机种子",
         "start": "开始训练",
+        "start_running": "运行中…",
+        "wait_title": "任务正在运行 · 请保持页面打开",
+        "wait_detail": "正在初始化环境与模型、训练策略并生成结果回放。所有阶段完成前，这里会一直显示等待状态。",
         "ready": "等待训练",
         "ready_detail": "先阅读任务说明，调整参数，再启动 CPU 训练",
         "running": "训练进行中",
@@ -662,6 +668,32 @@ def metric_card(value: str, detail: str, language: str) -> str:
       <div class="metric-reading"><strong>{value}</strong><small>{detail}</small></div>
     </div>
     """
+
+
+def waiting_panel(language: str) -> str:
+    copy = copy_for(language)
+    elapsed_label = "elapsed" if language == "English" else "已等待"
+    return f"""
+    <section class="run-wait" role="status" aria-live="polite">
+      <span class="run-wait__spinner" aria-hidden="true"></span>
+      <div class="run-wait__copy">
+        <strong>{copy['wait_title']}</strong>
+        <small>{copy['wait_detail']}</small>
+        <em class="run-wait__elapsed" data-start-ms="{int(time.time() * 1000)}" data-label="{elapsed_label}">0s {elapsed_label}</em>
+      </div>
+      <span class="run-wait__pulse" aria-hidden="true"><i></i></span>
+    </section>
+    """
+
+
+def begin_run(language: str):
+    copy = copy_for(language)
+    return gr.HTML(value=waiting_panel(language), visible=True), gr.Button(value=copy["start_running"], interactive=False)
+
+
+def finish_run(language: str):
+    copy = copy_for(language)
+    return gr.HTML(value="", visible=False), gr.Button(value=copy["start"], interactive=True)
 
 
 def panel_html(title: str, text: str, cls: str = "panel-copy") -> str:
@@ -1116,9 +1148,9 @@ def run_deep_control(experiment: str, env_id: str, algorithm: str, budget: int, 
     yield status_card("complete", copy_for(language)["complete"], f"{budget:,} steps · {time.perf_counter() - started:.1f}s", language), metric_card(f"{rewards[-1]:.1f}", "final evaluation reward", language), learning_figure(xs, rewards, f"{experiment} evaluation reward", "Mean reward"), gif, summary, console_panel("\n".join(logs), language)
 
 
-def error_figure(title: str, message: str):
+def error_figure(title: str, message: str, heading: str = "Run stopped"):
     fig, ax = plt.subplots(figsize=(8.2, 4.0)); ax.axis("off")
-    ax.text(.5, .62, "Environment registered", ha="center", va="center", fontsize=20, fontweight="bold", color="#27324a")
+    ax.text(.5, .62, heading, ha="center", va="center", fontsize=20, fontweight="bold", color="#27324a")
     ax.text(.5, .43, title, ha="center", va="center", fontsize=13, color="#5b5ce2")
     ax.text(.5, .25, message[:180], ha="center", va="center", fontsize=10, color="#68748a", wrap=True)
     fig.tight_layout(); return fig
@@ -1127,7 +1159,7 @@ def error_figure(title: str, message: str):
 def run_catalog_experiment(experiment: str, budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
     env_id = catalog_env_id(experiment); started = time.perf_counter()
     logs = [f"{env_id} automatic training console", "=" * 72, elapsed_line(started, "REGISTER", f"environment={env_id} family={experiment.split(' · ', 1)[0]}"), elapsed_line(started, "CONFIG", f"budget={budget} learning_rate={alpha:g} gamma={gamma:g} epsilon={epsilon:g} seed={seed}")]
-    yield status_card("running", copy_for(language)["running"], "Inspecting environment and action space", language), metric_card("AUTO", "selecting a compatible baseline", language), error_figure(env_id, "Inspecting environment..."), gr.skip(), None, console_panel("\n".join(logs), language)
+    yield status_card("running", copy_for(language)["running"], "Inspecting environment and action space", language), metric_card("AUTO", "selecting a compatible baseline", language), error_figure(env_id, "Inspecting environment and action space...", "Preparing environment"), gr.skip(), None, console_panel("\n".join(logs), language)
     env = None
     try:
         env = gym.make(env_id)
@@ -1142,7 +1174,7 @@ def run_catalog_experiment(experiment: str, budget: int, alpha: float, gamma: fl
         else:
             raise ValueError(f"Unsupported action space for the automatic baseline: {action_space}")
         logs.append(elapsed_line(started, "AUTO", f"selected_algorithm={algorithm}")); env.close(); env = None
-        yield status_card("running", copy_for(language)["running"], f"Auto selected {algorithm}", language), metric_card(algorithm, f"action space: {action_space}", language), error_figure(env_id, f"Starting {algorithm} training..."), gr.skip(), None, console_panel("\n".join(logs), language)
+        yield status_card("running", copy_for(language)["running"], f"Auto selected {algorithm}", language), metric_card(algorithm, f"action space: {action_space}", language), error_figure(env_id, f"Initializing the {algorithm} model...", "Starting training"), gr.skip(), None, console_panel("\n".join(logs), language)
         for status, metric, curve, preview, artifact, console in run_deep_control(experiment, env_id, algorithm, budget, alpha, gamma, epsilon, seed, language):
             deep_text = re.search(r'<pre class="console-text">(.*?)</pre>', console, re.DOTALL)
             combined = "\n".join(logs) + ("\n\n" + html.unescape(deep_text.group(1)) if deep_text else "")
@@ -1239,7 +1271,7 @@ CSS = """
 .catalog-card{margin:0 0 18px!important;padding:22px!important;border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.catalog-tools{align-items:end!important}.catalog-family{min-width:420px!important}.catalog-search{min-width:280px!important}.catalog-meta{color:var(--muted);font-size:12px;font-weight:700}.catalog-pager{justify-content:flex-end!important;gap:8px!important}.catalog-pager button{max-width:110px!important;border-radius:9px!important}.experiment-gallery{max-height:720px;overflow:auto;padding:4px!important}.experiment-gallery .grid-wrap{gap:12px!important}.experiment-gallery button,.experiment-gallery .thumbnail-item{overflow:hidden!important;border:1px solid var(--line)!important;border-radius:14px!important;background:#fff!important;box-shadow:0 7px 18px rgba(18,25,43,.045)!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important}.experiment-gallery button:hover,.experiment-gallery .thumbnail-item:hover{transform:translateY(-2px);border-color:#a5b4fc!important;box-shadow:0 12px 25px rgba(50,55,120,.12)!important}.experiment-gallery img{aspect-ratio:2/1!important;object-fit:cover!important}.experiment-gallery .caption,.experiment-gallery .label{white-space:pre-line!important;color:var(--ink)!important;font-size:11px!important;line-height:1.45!important;text-align:left!important}.selected-experiment input{font-weight:750!important;color:var(--brand)!important;background:#f5f5ff!important}
 .task-brief{display:grid;grid-template-columns:minmax(210px,34%) 1fr;gap:20px;margin:0 0 18px;padding:14px;border:1px solid #dfe3f5;border-radius:15px;background:linear-gradient(135deg,#fafaff,#f6fbff)}.task-brief__visual{display:flex;align-items:center;overflow:hidden;border-radius:11px;background:#171b3f}.task-brief__visual img{display:block;width:100%;height:auto;max-height:250px;min-height:190px;object-fit:contain;border-radius:11px}.task-brief__body{padding:9px 9px 7px}.task-kicker{color:var(--brand);font-size:10px;font-weight:850;letter-spacing:.12em}.task-brief h3{margin:6px 0;color:var(--ink);font-size:23px}.task-brief p{margin:0 0 13px;color:var(--muted);font-size:13px;line-height:1.6}.task-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.task-facts span{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:11px;overflow-wrap:anywhere}.task-facts b{display:block;margin-bottom:3px;color:#8a94a8;font-size:9px;letter-spacing:.09em;text-transform:uppercase}.task-hint{margin-top:12px!important;margin-bottom:0!important;font-weight:650;color:#4b5563!important}
 .control-card,.chart-card,.output-card{border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.control-card,.chart-card{padding:22px!important}.output-card{margin-top:16px!important;padding:22px!important}.panel-title{margin:0 0 5px;color:var(--ink);font-size:19px}.panel-copy,.artifact-note{margin:0 0 17px;color:var(--muted);font-size:13px;line-height:1.6}.policy-preview{min-height:360px!important;border:1px solid var(--line)!important;border-radius:13px!important;background:#f8f9fc!important;overflow:hidden!important}.policy-preview .image-container,.policy-preview [data-testid="image"]{min-height:360px!important;background:#f8f9fc!important}.policy-preview img{display:block!important;width:100%!important;height:100%!important;min-height:360px!important;max-height:560px!important;object-fit:contain!important;background:#f8f9fc!important}
-.primary-btn{min-height:46px!important;border:0!important;border-radius:11px!important;background:linear-gradient(135deg,#5153d6,#6969ec)!important;font-weight:750!important}.run-state,.live-metric{display:flex;gap:12px;margin-top:14px;padding:14px 15px;border-radius:13px;background:#f8f9fc}.run-state__dot{width:9px;height:9px;margin-top:6px;border-radius:50%;background:#94a3b8}.run-state--running .run-state__dot{background:#5b5ce2;box-shadow:0 0 0 5px rgba(91,92,226,.13)}.run-state--complete .run-state__dot{background:#13a36f}.run-state strong,.run-state small,.summary-label{display:block}.summary-label{color:#8a94a8;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.run-state strong{margin-top:3px;color:var(--ink);font-size:14px}.run-state small,.live-metric small{margin-top:3px;color:var(--muted);font-size:12px}.metric-reading{display:flex;align-items:baseline;gap:9px;margin-top:4px}.metric-reading strong{color:var(--ink);font-size:24px}
+.primary-btn{min-height:46px!important;border:0!important;border-radius:11px!important;background:linear-gradient(135deg,#5153d6,#6969ec)!important;font-weight:750!important}.primary-btn:disabled{opacity:.8!important;cursor:wait!important}.run-wait{position:relative;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;overflow:hidden;margin:0 0 16px;padding:14px 16px 17px;border:1px solid #c7d2fe;border-radius:13px;background:linear-gradient(135deg,#f5f5ff,#f0f7ff);box-shadow:0 8px 24px rgba(79,70,229,.08)}.run-wait__spinner{width:24px;height:24px;border:3px solid #d9ddff;border-top-color:#5b5ce2;border-radius:50%;animation:run-spin .8s linear infinite}.run-wait__copy strong,.run-wait__copy small{display:block}.run-wait__copy strong{color:#292d65;font-size:13px}.run-wait__copy small{margin-top:4px;color:#68748a;font-size:11px;line-height:1.5}.run-wait__elapsed{display:inline-block;margin-top:7px;color:#5b5ce2;font-size:11px;font-style:normal;font-weight:750}.run-wait__pulse{position:absolute;right:0;bottom:0;left:0;height:3px;background:#e0e7ff}.run-wait__pulse i{display:block;width:38%;height:100%;border-radius:999px;background:linear-gradient(90deg,transparent,#6366f1,#22c55e,transparent);animation:run-pulse 1.4s ease-in-out infinite}@keyframes run-spin{to{transform:rotate(360deg)}}@keyframes run-pulse{0%{transform:translateX(-110%)}100%{transform:translateX(285%)}}.run-state,.live-metric{display:flex;gap:12px;margin-top:14px;padding:14px 15px;border-radius:13px;background:#f8f9fc}.run-state__dot{width:9px;height:9px;margin-top:6px;border-radius:50%;background:#94a3b8}.run-state--running .run-state__dot{background:#5b5ce2;box-shadow:0 0 0 5px rgba(91,92,226,.13);animation:run-dot 1.2s ease-in-out infinite}@keyframes run-dot{50%{box-shadow:0 0 0 9px rgba(91,92,226,.04)}}.run-state--complete .run-state__dot{background:#13a36f}.run-state strong,.run-state small,.summary-label{display:block}.summary-label{color:#8a94a8;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.run-state strong{margin-top:3px;color:var(--ink);font-size:14px}.run-state small,.live-metric small{margin-top:3px;color:var(--muted);font-size:12px}.metric-reading{display:flex;align-items:baseline;gap:9px;margin-top:4px}.metric-reading strong{color:var(--ink);font-size:24px}
 .console-panel{overflow:hidden;margin-top:18px;border:1px solid #202b3d;border-radius:13px;background:#0f1623}.console-head{display:flex;align-items:center;gap:9px;padding:11px 15px;border-bottom:1px solid #263244;color:#e2e8f0;font-size:12px;font-weight:750}.console-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.12)}.console-text{box-sizing:border-box;height:300px;margin:0;padding:17px 18px;overflow:auto;white-space:pre;color:#cbd5e1!important;background:#0f1623!important;font:12px/1.58 "SFMono-Regular",Consolas,monospace!important;scrollbar-gutter:stable}.footer-note{margin-top:18px;text-align:center;color:#94a3b8;font-size:12px}.footer-note a{color:var(--brand)!important;text-decoration:none!important;font-weight:650}
 @media(max-width:760px){.gradio-container{padding:12px 10px 30px!important}.language-bar{top:14px!important;right:14px!important}.language-switch{width:196px!important;min-width:196px!important}.hero{padding:70px 22px 25px;border-radius:19px}.hero-topline{align-items:flex-start;flex-direction:column}.project-mark{max-width:70%}.catalog-family,.catalog-search{min-width:100%!important}.experiment-gallery{max-height:580px}.task-brief{grid-template-columns:1fr}.task-brief__visual img{min-height:160px}.task-facts{grid-template-columns:1fr}.policy-preview,.policy-preview .image-container,.policy-preview [data-testid="image"],.policy-preview img{min-height:230px!important}.policy-preview img{max-height:420px!important}}
 """
@@ -1264,10 +1296,16 @@ AUTO_SCROLL_JS = """
     internal = true;
     if (follow) active.scrollTop = active.scrollHeight;
     else active.scrollTop = Math.min(saved, Math.max(0, active.scrollHeight - active.clientHeight));
+    const timer = document.querySelector(".run-wait__elapsed");
+    if (timer) {
+      const elapsed = Math.max(0, Math.floor((Date.now() - Number(timer.dataset.startMs)) / 1000));
+      timer.textContent = `${elapsed}s ${timer.dataset.label}`;
+    }
     requestAnimationFrame(() => { internal = false; });
   };
   const schedule = () => { if (!scheduled) { scheduled = true; requestAnimationFrame(update); } };
   new MutationObserver(schedule).observe(document.body, {childList:true, subtree:true, characterData:true});
+  setInterval(schedule, 1000);
   schedule();
 }
 """
@@ -1314,6 +1352,7 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
             metric = gr.HTML(metric_card("—", copy["metric_waiting"], DEFAULT_LANGUAGE))
         with gr.Column(scale=2, elem_classes="chart-card"):
             chart_header = gr.HTML(panel_html(copy["curve"], copy["curve_copy"]))
+            wait_state = gr.HTML(value="", visible=False)
             curve = gr.Plot(show_label=False)
             console = gr.HTML(console_panel(copy["log_waiting"], DEFAULT_LANGUAGE), elem_id="live-training-console")
 
@@ -1333,7 +1372,9 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
     gallery.select(choose_card, inputs=[visible_experiments], outputs=[experiment], queue=False)
     experiment.change(select_experiment, inputs=[experiment, language], outputs=[hero, task_info, budget, alpha, gamma, epsilon, status, metric, console, preview, artifact], queue=False)
     language.change(switch_language, inputs=[language, experiment, seed], outputs=[hero, settings_header, task_info, budget, alpha, gamma, epsilon, seed, start, status, metric, chart_header, console, preview_header, artifact], queue=False)
-    start.click(train, inputs=[experiment, budget, alpha, gamma, epsilon, seed, language], outputs=[status, metric, curve, preview, artifact, console], concurrency_limit=1)
+    run_event = start.click(begin_run, inputs=[language], outputs=[wait_state, start], queue=False)
+    run_event = run_event.then(train, inputs=[experiment, budget, alpha, gamma, epsilon, seed, language], outputs=[status, metric, curve, preview, artifact, console], concurrency_limit=1)
+    run_event.then(finish_run, inputs=[language], outputs=[wait_state, start], queue=False)
 
 
 if __name__ == "__main__":
