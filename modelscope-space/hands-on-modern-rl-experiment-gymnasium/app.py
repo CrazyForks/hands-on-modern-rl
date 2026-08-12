@@ -245,6 +245,8 @@ def discover_environment_catalog() -> list[str]:
 
 CATALOG_EXPERIMENTS = discover_environment_catalog()
 EXPERIMENT_CHOICES = list(EXPERIMENTS) + CATALOG_EXPERIMENTS
+CARD_PAGE_SIZE = 36
+FAMILY_ORDER = ["Curated", "Toy Text", "Classic Control", "Box2D", "Atari / ALE", "MuJoCo", "Robotics", "JAX Phys2D", "JAX Tabular", "Other"]
 
 
 def is_catalog_experiment(experiment: str) -> bool:
@@ -271,6 +273,88 @@ def catalog_config(experiment: str) -> dict:
 
 def experiment_config(experiment: str) -> dict:
     return catalog_config(experiment) if is_catalog_experiment(experiment) else EXPERIMENTS[experiment]
+
+
+FAMILY_VISUALS = {
+    "Curated": ("#5b5ce2", "◆", "TUNED"), "Bandit": ("#7c3aed", "▥", "EXPLORE"),
+    "Toy Text": ("#0f9f74", "▦", "TABULAR"), "Tabular": ("#0f9f74", "▦", "VALUES"),
+    "Classic Control": ("#2563eb", "⚖", "CONTROL"), "Box2D": ("#ea580c", "⌁", "PHYSICS"),
+    "Atari / ALE": ("#db2777", "▦", "PIXELS"), "MuJoCo": ("#0891b2", "⌁", "LOCOMOTION"),
+    "Robotics": ("#4f46e5", "⌁", "GOAL"), "JAX Phys2D": ("#16a34a", "⚡", "JAX"),
+    "JAX Tabular": ("#16a34a", "▦", "JAX"), "Other": ("#64748b", "◇", "ENV"),
+}
+
+
+def family_visual(family: str) -> str:
+    color, mark, label = FAMILY_VISUALS.get(family, FAMILY_VISUALS["Other"])
+    safe = re.sub(r"[^a-z0-9]+", "-", family.lower()).strip("-")
+    path = ARTIFACT_DIR / f"family-{safe}.svg"
+    if not path.exists():
+        path.write_text(f'''<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{color}"/><stop offset="1" stop-color="#111827"/></linearGradient></defs>
+<rect width="640" height="320" rx="30" fill="url(#g)"/><circle cx="520" cy="58" r="105" fill="#fff" opacity=".09"/>
+<path d="M70 235 C145 115 205 260 290 145 S430 235 555 92" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" opacity=".72"/>
+<circle cx="70" cy="235" r="13" fill="#fff"/><circle cx="290" cy="145" r="13" fill="#fff"/><circle cx="555" cy="92" r="13" fill="#fff"/>
+<text x="54" y="92" fill="#fff" font-size="58" font-family="Arial" font-weight="700">{mark}</text>
+<text x="54" y="142" fill="#fff" font-size="24" font-family="Arial" font-weight="700" letter-spacing="4">{label}</text></svg>''', encoding="utf-8")
+    return str(path)
+
+
+def experiment_goal(experiment: str) -> str:
+    env_id = experiment_config(experiment)["environment"]
+    goals = {
+        "Blackjack-v1": "Beat the dealer without exceeding 21", "FrozenLake-v1": "Reach the goal across slippery ice",
+        "CliffWalking-v1": "Cross safely without falling from the cliff", "Taxi-v4": "Pick up and deliver the passenger",
+        "CartPole-v1": "Keep the pole balanced", "MountainCar-v0": "Build momentum to climb the hill",
+        "MountainCarContinuous-v0": "Climb the hill with continuous force", "Acrobot-v1": "Swing the end link above the target",
+        "Pendulum-v1": "Swing up and stabilize the pendulum", "LunarLander-v3": "Land between the flags",
+    }
+    if env_id in goals: return goals[env_id]
+    family = experiment_config(experiment)["family"]
+    return {
+        "Atari / ALE": "Learn control directly from game pixels", "MuJoCo": "Learn continuous physics control",
+        "Robotics": "Reach or manipulate a goal", "Box2D": "Learn control in a 2D physics task",
+        "Toy Text": "Learn a policy in a compact discrete world", "JAX Phys2D": "Run a JAX physics control task",
+        "JAX Tabular": "Run a JAX tabular task", "Bandit": "Balance exploration and exploitation",
+        "Tabular": "Propagate values through a small world",
+    }.get(family, "Explore a registered Gymnasium task")
+
+
+def card_caption(experiment: str) -> str:
+    cfg = experiment_config(experiment); title = experiment.split(" · ")[0] if not is_catalog_experiment(experiment) else cfg["environment"]
+    return f"{title}\n{experiment_goal(experiment)}\n{cfg['family']} · {cfg['algorithm']}"
+
+
+def card_items(experiments: list[str]) -> list[tuple[str, str]]:
+    return [(family_visual("Curated" if item in EXPERIMENTS else experiment_config(item)["family"]), card_caption(item)) for item in experiments]
+
+
+def filter_choices(query: str, family: str) -> list[str]:
+    query = (query or "").strip().lower()
+    source = EXPERIMENT_CHOICES
+    if family == "Curated": source = list(EXPERIMENTS)
+    elif family != "All": source = [item for item in source if experiment_config(item)["family"] == family]
+    if query:
+        source = [item for item in source if query in (item + " " + experiment_goal(item) + " " + experiment_config(item)["algorithm"]).lower()]
+    return source
+
+
+def catalog_page(query: str, family: str, page: int):
+    matches = filter_choices(query, family); pages = max(1, (len(matches) + CARD_PAGE_SIZE - 1) // CARD_PAGE_SIZE); page = max(0, min(int(page), pages - 1))
+    visible = matches[page * CARD_PAGE_SIZE:(page + 1) * CARD_PAGE_SIZE]
+    return card_items(visible), visible, page, f"{len(matches):,} experiments · Page {page + 1}/{pages}"
+
+
+def reset_catalog(query: str, family: str):
+    return catalog_page(query, family, 0)
+
+
+def move_catalog(query: str, family: str, page: int, direction: int):
+    return catalog_page(query, family, int(page) + direction)
+
+
+def choose_card(visible: list[str], event: gr.SelectData):
+    return visible[event.index]
 
 
 TEXT = {
@@ -819,8 +903,7 @@ def switch_language(language: str, experiment: str, seed: float):
     copy = copy_for(language); cfg = experiment_config(experiment)
     return (
         hero_html(language, experiment), panel_html(copy["settings"], copy["settings_copy"]),
-        gr.Dropdown(choices=EXPERIMENT_CHOICES, value=experiment, label=copy["experiment"]), slider_update(copy["budget"], cfg["budget"]), slider_update(copy["alpha"], cfg["alpha"]),
-        slider_update(copy["gamma"], cfg["gamma"], cfg["gamma_visible"]), slider_update(copy["epsilon"], cfg["epsilon"], cfg["algorithm"] not in {"PPO", "SAC"}),
+        slider_update(copy["budget"], cfg["budget"]), slider_update(copy["alpha"], cfg["alpha"]), slider_update(copy["gamma"], cfg["gamma"], cfg["gamma_visible"]), slider_update(copy["epsilon"], cfg["epsilon"], cfg["algorithm"] not in {"PPO", "SAC"}),
         gr.Number(value=seed, precision=0, label=copy["seed"]), gr.Button(value=copy["start"]), status_card("idle", copy["ready"], copy["ready_detail"], language),
         metric_card("—", copy["metric_waiting"], language), panel_html(copy["curve"], copy["curve_copy"]), console_panel(copy["log_waiting"], language),
         panel_html(copy["preview"], copy["preview_copy"], "artifact-note"), gr.File(label=copy["artifact"]),
@@ -842,10 +925,11 @@ CSS = """
 .hero-topline{display:flex;align-items:center;gap:11px;margin-bottom:22px}.experiment-badge{padding:6px 11px;border:1px solid rgba(221,224,255,.3);border-radius:999px;background:rgba(255,255,255,.1);font-size:12px;font-weight:700;letter-spacing:.06em}.hero-course{color:#b9c0d4;font-size:13px;font-weight:650}
 .hero h1{max-width:760px;margin:0 0 12px;color:#fff;font-size:clamp(32px,5vw,48px);line-height:1.1;letter-spacing:-.035em}.hero-copy{max-width:760px;margin:0;color:#cdd3e2;font-size:15px;line-height:1.7}.hero-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.hero-link{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border:1px solid rgba(255,255,255,.18);border-radius:9px;color:#eef2ff!important;background:rgba(255,255,255,.08);font-size:13px;font-weight:650;text-decoration:none!important}.hero-link.primary{color:#172554!important;background:#fff;border-color:#fff}
 .lab-strip{display:flex;flex-wrap:wrap;gap:8px 22px;margin:17px 0 22px;padding:13px 18px;border:1px solid var(--line);border-radius:13px;background:#fff;color:var(--muted);font-size:13px;box-shadow:0 6px 20px rgba(18,25,43,.035)}.lab-strip strong{margin-left:5px;color:var(--ink)}
+.catalog-card{margin:0 0 18px!important;padding:22px!important;border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.catalog-tools{align-items:end!important}.catalog-family{min-width:420px!important}.catalog-search{min-width:280px!important}.catalog-meta{color:var(--muted);font-size:12px;font-weight:700}.catalog-pager{justify-content:flex-end!important;gap:8px!important}.catalog-pager button{max-width:110px!important;border-radius:9px!important}.experiment-gallery{max-height:720px;overflow:auto;padding:4px!important}.experiment-gallery .grid-wrap{gap:12px!important}.experiment-gallery button,.experiment-gallery .thumbnail-item{overflow:hidden!important;border:1px solid var(--line)!important;border-radius:14px!important;background:#fff!important;box-shadow:0 7px 18px rgba(18,25,43,.045)!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important}.experiment-gallery button:hover,.experiment-gallery .thumbnail-item:hover{transform:translateY(-2px);border-color:#a5b4fc!important;box-shadow:0 12px 25px rgba(50,55,120,.12)!important}.experiment-gallery img{aspect-ratio:2/1!important;object-fit:cover!important}.experiment-gallery .caption,.experiment-gallery .label{white-space:pre-line!important;color:var(--ink)!important;font-size:11px!important;line-height:1.45!important;text-align:left!important}.selected-experiment input{font-weight:750!important;color:var(--brand)!important;background:#f5f5ff!important}
 .control-card,.chart-card,.output-card{border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.control-card,.chart-card{padding:22px!important}.output-card{margin-top:16px!important;padding:22px!important}.panel-title{margin:0 0 5px;color:var(--ink);font-size:19px}.panel-copy,.artifact-note{margin:0 0 17px;color:var(--muted);font-size:13px;line-height:1.6}
 .primary-btn{min-height:46px!important;border:0!important;border-radius:11px!important;background:linear-gradient(135deg,#5153d6,#6969ec)!important;font-weight:750!important}.run-state,.live-metric{display:flex;gap:12px;margin-top:14px;padding:14px 15px;border-radius:13px;background:#f8f9fc}.run-state__dot{width:9px;height:9px;margin-top:6px;border-radius:50%;background:#94a3b8}.run-state--running .run-state__dot{background:#5b5ce2;box-shadow:0 0 0 5px rgba(91,92,226,.13)}.run-state--complete .run-state__dot{background:#13a36f}.run-state strong,.run-state small,.summary-label{display:block}.summary-label{color:#8a94a8;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.run-state strong{margin-top:3px;color:var(--ink);font-size:14px}.run-state small,.live-metric small{margin-top:3px;color:var(--muted);font-size:12px}.metric-reading{display:flex;align-items:baseline;gap:9px;margin-top:4px}.metric-reading strong{color:var(--ink);font-size:24px}
 .console-panel{overflow:hidden;margin-top:18px;border:1px solid #202b3d;border-radius:13px;background:#0f1623}.console-head{display:flex;align-items:center;gap:9px;padding:11px 15px;border-bottom:1px solid #263244;color:#e2e8f0;font-size:12px;font-weight:750}.console-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.12)}.console-text{box-sizing:border-box;height:300px;margin:0;padding:17px 18px;overflow:auto;white-space:pre;color:#cbd5e1!important;background:#0f1623!important;font:12px/1.58 "SFMono-Regular",Consolas,monospace!important;scrollbar-gutter:stable}.footer-note{margin-top:18px;text-align:center;color:#94a3b8;font-size:12px}.footer-note a{color:var(--brand)!important;text-decoration:none!important;font-weight:650}
-@media(max-width:760px){.gradio-container{padding:12px 10px 30px!important}.language-bar{top:14px!important;right:14px!important}.language-switch{width:196px!important;min-width:196px!important}.hero{padding:70px 22px 25px;border-radius:19px}.hero-topline{align-items:flex-start;flex-direction:column}.project-mark{max-width:70%}}
+@media(max-width:760px){.gradio-container{padding:12px 10px 30px!important}.language-bar{top:14px!important;right:14px!important}.language-switch{width:196px!important;min-width:196px!important}.hero{padding:70px 22px 25px;border-radius:19px}.hero-topline{align-items:flex-start;flex-direction:column}.project-mark{max-width:70%}.catalog-family,.catalog-search{min-width:100%!important}.experiment-gallery{max-height:580px}}
 """
 
 
@@ -881,6 +965,7 @@ DEFAULT_LANGUAGE = "English"
 DEFAULT_EXPERIMENT = BANDIT
 copy = copy_for(DEFAULT_LANGUAGE)
 cfg = EXPERIMENTS[DEFAULT_EXPERIMENT]
+initial_cards, initial_visible, initial_page, initial_meta = catalog_page("", "Curated", 0)
 
 with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
     with gr.Column(elem_classes="hero-stack"):
@@ -888,10 +973,23 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
         with gr.Row(elem_classes="language-bar"):
             language = gr.Radio(choices=[("English", "English"), ("中文", "中文")], value=DEFAULT_LANGUAGE, show_label=False, elem_classes="language-switch")
 
+    with gr.Column(elem_classes="catalog-card"):
+        gr.HTML('<h2 class="panel-title">Choose an experiment</h2><p class="panel-copy">Click a visual card. Search or filter the full registry when you want to explore beyond the curated set.</p>')
+        with gr.Row(elem_classes="catalog-tools"):
+            search = gr.Textbox(label="Search environments", placeholder="Try Pong, robot, lander, continuous...", scale=2, elem_classes="catalog-search")
+            family = gr.Radio(choices=["All"] + FAMILY_ORDER, value="Curated", label="Category", scale=3, elem_classes="catalog-family")
+        gallery = gr.Gallery(value=initial_cards, label=None, columns=4, rows=3, object_fit="cover", height="auto", allow_preview=False, elem_classes="experiment-gallery")
+        visible_experiments = gr.State(initial_visible)
+        catalog_page_state = gr.State(initial_page)
+        with gr.Row(elem_classes="catalog-pager"):
+            catalog_meta = gr.Markdown(initial_meta, elem_classes="catalog-meta")
+            previous_page = gr.Button("← Previous", size="sm")
+            next_page = gr.Button("Next →", size="sm")
+
     with gr.Row():
         with gr.Column(scale=1, min_width=310, elem_classes="control-card"):
             settings_header = gr.HTML(panel_html(copy["settings"], copy["settings_copy"]))
-            experiment = gr.Dropdown(choices=EXPERIMENT_CHOICES, value=DEFAULT_EXPERIMENT, label=copy["experiment"], interactive=True, filterable=True)
+            experiment = gr.Textbox(value=DEFAULT_EXPERIMENT, label="Selected experiment", interactive=False, elem_classes="selected-experiment")
             budget = gr.Slider(minimum=200, maximum=100000, value=cfg["budget"][2], step=100, label=copy["budget"], info=copy["budget_info"])
             alpha = gr.Slider(minimum=.00001, maximum=1, value=cfg["alpha"][2], step=.00001, label=copy["alpha"])
             gamma = gr.Slider(minimum=0, maximum=1, value=0, step=.05, label=copy["gamma"], visible=False)
@@ -914,8 +1012,13 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
 
     gr.HTML(footer_html())
 
+    search.change(reset_catalog, inputs=[search, family], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False)
+    family.change(reset_catalog, inputs=[search, family], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False)
+    previous_page.click(lambda q, f, p: move_catalog(q, f, p, -1), inputs=[search, family, catalog_page_state], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False)
+    next_page.click(lambda q, f, p: move_catalog(q, f, p, 1), inputs=[search, family, catalog_page_state], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False)
+    gallery.select(choose_card, inputs=[visible_experiments], outputs=[experiment], queue=False)
     experiment.change(select_experiment, inputs=[experiment, language], outputs=[hero, budget, alpha, gamma, epsilon, status, metric, console, preview, artifact], queue=False)
-    language.change(switch_language, inputs=[language, experiment, seed], outputs=[hero, settings_header, experiment, budget, alpha, gamma, epsilon, seed, start, status, metric, chart_header, console, preview_header, artifact], queue=False)
+    language.change(switch_language, inputs=[language, experiment, seed], outputs=[hero, settings_header, budget, alpha, gamma, epsilon, seed, start, status, metric, chart_header, console, preview_header, artifact], queue=False)
     start.click(train, inputs=[experiment, budget, alpha, gamma, epsilon, seed, language], outputs=[status, metric, curve, preview, artifact, console], concurrency_limit=1)
 
 
