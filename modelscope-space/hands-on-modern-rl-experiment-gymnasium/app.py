@@ -10,6 +10,7 @@ import json
 import os
 import re
 import time
+import warnings
 from pathlib import Path
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
@@ -207,6 +208,40 @@ def load_optional_registries() -> list[str]:
 
 OPTIONAL_REGISTRIES = load_optional_registries()
 INTERNAL_ENV_PREFIXES = ("GymV21Environment", "GymV26Environment")
+
+RUNTIME_PROBES = {
+    "Toy Text": "FrozenLake-v1",
+    "Classic Control": "CartPole-v1",
+    "Box2D": "LunarLander-v3",
+    "Atari / ALE": "ALE/Pong-v5",
+    "MuJoCo": "Ant-v5",
+    "Robotics": "FetchReach-v4",
+    "JAX Phys2D": "phys2d/CartPole-v1",
+    "JAX Tabular": "tabular/Blackjack-v0",
+}
+
+
+def preload_runtimes() -> dict[str, str]:
+    """Load native engines and representative assets before the UI opens."""
+    results = {}
+    for family, env_id in RUNTIME_PROBES.items():
+        env = None
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                env = gym.make(env_id)
+                env.reset(seed=0)
+            results[family] = "Ready · preinstalled"
+        except Exception as exc:
+            results[family] = f"Unavailable · {type(exc).__name__}"
+        finally:
+            if env is not None:
+                env.close()
+    return results
+
+
+RUNTIME_STATUS = preload_runtimes()
+RUNTIME_READY = sum(value.startswith("Ready") for value in RUNTIME_STATUS.values())
 
 
 def env_family(env_id: str, entry_point) -> str:
@@ -477,15 +512,15 @@ def infer_algorithm(action_space, configured: str) -> str:
 
 def task_brief(experiment: str, language: str) -> str:
     cfg = experiment_config(experiment); env_id = cfg["environment"]
-    observation, action, algorithm, availability = "Custom", "Custom", cfg["algorithm"], "Ready"
+    observation, action, algorithm, availability = "Custom", "Custom", cfg["algorithm"], "Ready · built in"
     if env_id == "4-armed Bernoulli bandit": observation, action = "Estimated arm values", "Choose one of 4 arms"
     elif env_id == "Custom 4×4 GridWorld": observation, action = "Grid cell", "Up / Down / Left / Right"
     else:
         env = None
         try:
-            env = gym.make(env_id); observation = space_text(env.observation_space); action = space_text(env.action_space); algorithm = infer_algorithm(env.action_space, cfg["algorithm"])
+            env = gym.make(env_id); observation = space_text(env.observation_space); action = space_text(env.action_space); algorithm = infer_algorithm(env.action_space, cfg["algorithm"]); availability = "Ready · preinstalled"
         except Exception as exc:
-            availability = f"Registered · {type(exc).__name__} during setup"
+            availability = f"Legacy / unavailable · {type(exc).__name__}"
         finally:
             if env is not None: env.close()
     if language == "中文":
@@ -625,7 +660,7 @@ def hero_html(language: str, experiment: str = BANDIT) -> str:
       </section>
       <section class="lab-strip">
         <span>{copy['experiments']} <strong>{len(EXPERIMENT_CHOICES)}</strong></span>
-        <span>{copy['device']} <strong>CPU</strong></span>
+        <span>Runtimes <strong>{RUNTIME_READY}/{len(RUNTIME_PROBES)} READY</strong></span>
         <span>Environment <strong>{cfg['environment']}</strong></span>
         <span>Algorithm <strong>{cfg['algorithm']}</strong></span>
       </section>
@@ -986,9 +1021,9 @@ def run_catalog_experiment(experiment: str, budget: int, alpha: float, gamma: fl
     except Exception as exc:
         if env is not None:
             env.close()
-        message = f"{type(exc).__name__}: {exc}"; logs.append(elapsed_line(started, "ERROR", message)); logs.append(elapsed_line(started, "HINT", "The environment remains registered. Install its optional package, ROM, or runtime dependency and try again."))
+        message = f"{type(exc).__name__}: {exc}"; logs.append(elapsed_line(started, "ERROR", message)); logs.append(elapsed_line(started, "HINT", "All maintained runtimes are preinstalled. This registered ID may require a retired legacy engine; choose its current environment version."))
         summary = save_summary(env_id, {"experiment": experiment, "environment": env_id, "status": "registered-but-unavailable", "error": message, "parameters": {"budget": budget, "learning_rate": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
-        yield status_card("idle", "Environment registered", "Runtime dependency required", language), metric_card("SETUP", "see the latest log lines", language), error_figure(env_id, message), None, summary, console_panel("\n".join(logs), language)
+        yield status_card("idle", "Legacy environment", "Choose the current maintained version", language), metric_card("LEGACY", "see the latest log lines", language), error_figure(env_id, message), None, summary, console_panel("\n".join(logs), language)
 
 
 def train(experiment: str, budget: float, alpha: float, gamma: float, epsilon: float, seed: float, language: str):

@@ -12,7 +12,7 @@ license: apache-2.0
 
 # Hands-On Modern RL · Gymnasium CPU Playground
 
-《动手学现代强化学习》的在线训练合集。页面自动注册 Gymnasium 核心环境以及已安装的 Atari/ALE、MuJoCo、Box2D 和 Robotics 扩展环境，并保留 12 个经过调优的 CPU 快速训练配方。
+《动手学现代强化学习》的在线训练合集。创空间在构建阶段预装 Gymnasium 的 Atari/ALE、Box2D、Classic Control、JAX、MuJoCo、Toy Text 和 Robotics 运行时；页面启动时会预热各主要套件，并保留 12 个经过调优的 CPU 快速训练配方。
 
 首批实验：
 
@@ -25,7 +25,7 @@ license: apache-2.0
 - Acrobot、Pendulum：PPO
 - MountainCarContinuous：SAC 连续动作控制
 
-完整目录中的 Auto 项会检查动作空间：离散动作使用 DQN，连续动作使用 SAC，其他兼容动作空间使用 PPO。缺少 ROM 或运行时依赖时，环境仍保留在目录中，错误与安装提示会显示在曲线下方的实时日志里，不会让页面整体退出。
+完整目录中的 Auto 项会检查动作空间：离散动作使用 DQN，连续动作使用 SAC，其他兼容动作空间使用 PPO。ALE 0.12 自带 ROM，无需在页面中下载；MuJoCo 与 Robotics 使用当前维护的 Python 绑定。目录也保留 Gymnasium 注册表中的历史版本，但建议优先选择当前版本（例如 MuJoCo v5、Fetch v4），避免已废弃的 `mujoco-py` 运行时。
 
 课程项目：<https://github.com/walkinglabs/hands-on-modern-rl>
 
