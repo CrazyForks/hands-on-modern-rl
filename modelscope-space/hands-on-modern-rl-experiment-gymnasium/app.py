@@ -352,6 +352,7 @@ CARD_BACKGROUNDS = {
     "Box2D": "box2d.webp", "Atari / ALE": "atari.webp", "MuJoCo": "mujoco.webp",
     "JAX Phys2D": "box2d.webp", "Robotics": "robotics.webp", "Other": "tabular.webp",
 }
+CARD_RENDER_VERSION = "v2"
 
 
 def card_font(size: int, bold: bool = False):
@@ -371,6 +372,46 @@ def fit_card_text(draw: ImageDraw.ImageDraw, text: str, max_width: int, start_si
         if draw.textbbox((0, 0), text, font=font)[2] <= max_width:
             return font
     return card_font(minimum, bold=True)
+
+
+def card_title_layout(draw: ImageDraw.ImageDraw, text: str, max_width: int = 660):
+    """Fit a complete environment ID into one, two, or three readable lines."""
+    def width(value: str, font) -> int:
+        return draw.textbbox((0, 0), value, font=font)[2]
+
+    for size in range(36, 23, -1):
+        font = card_font(size, bold=True)
+        if width(text, font) <= max_width:
+            return [text], font
+
+    preferred = {match.end() for match in re.finditer(r"[\s/_-]+", text)}
+    preferred.update(match.start() for match in re.finditer(r"(?<=[a-z0-9])(?=[A-Z])", text))
+    preferred = sorted(index for index in preferred if 2 <= index <= len(text) - 2)
+    candidates = preferred or list(range(2, len(text) - 1))
+
+    def best_lines(count: int, font):
+        splits = [(cut,) for cut in candidates] if count == 2 else [
+            (left, right) for left in candidates for right in candidates if left + 2 <= right
+        ]
+        valid = []
+        for split in splits:
+            points = (0, *split, len(text))
+            lines = [text[points[i]:points[i + 1]] for i in range(count)]
+            widths = [width(line, font) for line in lines]
+            if max(widths) <= max_width:
+                valid.append((max(widths) - min(widths), max(widths), lines))
+        return min(valid, default=None)
+
+    for count, start_size, minimum in ((2, 34, 17), (3, 28, 12)):
+        for size in range(start_size, minimum - 1, -1):
+            font = card_font(size, bold=True)
+            layout = best_lines(count, font)
+            if layout:
+                return layout[2], font
+
+    font = card_font(12, bold=True)
+    cut = max(1, len(text) // 3)
+    return [text[:cut], text[cut:cut * 2], text[cut * 2:]], font
 
 
 def card_scene_label(env_id: str, family: str) -> str:
@@ -430,21 +471,24 @@ def semantic_scene(env_id: str, family: str) -> tuple[str, str]:
 def experiment_visual(experiment: str) -> str:
     cfg = experiment_config(experiment); family = cfg["family"]; env_id = cfg["environment"]
     safe = re.sub(r"[^a-z0-9]+", "-", experiment.lower()).strip("-")
-    path = ARTIFACT_DIR / f"card-{safe}.webp"
+    path = ARTIFACT_DIR / f"card-{CARD_RENDER_VERSION}-{safe}.webp"
     source = CARD_BACKGROUND_DIR / CARD_BACKGROUNDS.get(family, "tabular.webp")
     if path.exists() and path.stat().st_mtime >= source.stat().st_mtime:
         return str(path)
     image = ImageOps.fit(Image.open(source).convert("RGB"), (720, 360), method=Image.Resampling.LANCZOS)
     shade = Image.new("RGBA", image.size, (0, 0, 0, 0)); shade_draw = ImageDraw.Draw(shade)
-    shade_draw.rectangle((0, 0, 720, 112), fill=(7, 12, 35, 188))
+    shade_draw.rectangle((0, 0, 720, 138), fill=(7, 12, 35, 202))
     shade_draw.rectangle((0, 272, 720, 360), fill=(7, 12, 35, 205))
     image = Image.alpha_composite(image.convert("RGBA"), shade)
     draw = ImageDraw.Draw(image)
     title = env_id.replace("ALE/", "")
     algorithm = cfg["algorithm"].replace("Auto: inspect action space", "AUTO")
-    title_font = fit_card_text(draw, title, 660, 36)
-    draw.text((30, 23), title, font=title_font, fill="white", stroke_width=1, stroke_fill=(0, 0, 0, 90))
-    draw.text((31, 74), family.upper(), font=card_font(17, bold=True), fill=(180, 194, 255), spacing=3)
+    title_lines, title_font = card_title_layout(draw, title)
+    title_text = "\n".join(title_lines)
+    title_box = draw.multiline_textbbox((30, 13), title_text, font=title_font, spacing=0, stroke_width=1)
+    draw.multiline_text((30, 13), title_text, font=title_font, spacing=0, fill="white", stroke_width=1, stroke_fill=(0, 0, 0, 90))
+    family_y = min(116, title_box[3] + 7)
+    draw.text((31, family_y), family.upper(), font=card_font(15, bold=True), fill=(180, 194, 255))
     label = card_scene_label(env_id, family)
     draw.rounded_rectangle((28, 294, 225, 339), radius=22, fill=(25, 31, 65, 255), outline=(145, 163, 255, 255), width=1)
     draw.text((53, 306), label, font=card_font(17, bold=True), fill="white")
@@ -459,7 +503,7 @@ def experiment_visual(experiment: str) -> str:
 
 def visual_data_uri(experiment: str) -> str:
     payload = Path(experiment_visual(experiment)).read_bytes()
-    return f"data:image/svg+xml;base64,{base64.b64encode(payload).decode()}"
+    return f"data:image/webp;base64,{base64.b64encode(payload).decode()}"
 
 
 def experiment_goal(experiment: str) -> str:
@@ -1312,7 +1356,7 @@ CSS = """
 .hero-topline{display:flex;align-items:center;gap:11px;margin-bottom:22px}.experiment-badge{padding:6px 11px;border:1px solid #fff;border-radius:999px;color:#25265d;background:#fff;box-shadow:0 4px 12px rgba(8,15,35,.16);font-size:12px;font-weight:800;letter-spacing:.06em}.hero-course{color:#b9c0d4;font-size:13px;font-weight:650}
 .hero h1{max-width:760px;margin:0 0 12px;color:#fff;font-size:clamp(32px,5vw,48px);line-height:1.1;letter-spacing:-.035em}.hero-copy{max-width:760px;margin:0;color:#cdd3e2;font-size:15px;line-height:1.7}.hero-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.hero-link{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border:1px solid rgba(255,255,255,.18);border-radius:9px;color:#eef2ff!important;background:rgba(255,255,255,.08);font-size:13px;font-weight:650;text-decoration:none!important}.hero-link.primary{color:#172554!important;background:#fff;border-color:#fff}
 .lab-strip{display:flex;flex-wrap:wrap;gap:8px 22px;margin:17px 0 22px;padding:13px 18px;border:1px solid var(--line);border-radius:13px;background:#fff;color:var(--muted);font-size:13px;box-shadow:0 6px 20px rgba(18,25,43,.035)}.lab-strip strong{margin-left:5px;color:var(--ink)}
-.catalog-card{margin:0 0 18px!important;padding:22px!important;border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.catalog-tools{align-items:end!important}.catalog-family{min-width:420px!important}.catalog-search{min-width:280px!important}.catalog-meta{color:var(--muted);font-size:12px;font-weight:700}.catalog-pager{justify-content:flex-end!important;gap:8px!important}.catalog-pager button{max-width:110px!important;border-radius:9px!important}.experiment-gallery{max-height:720px;overflow:auto;padding:4px!important}.experiment-gallery .grid-wrap{gap:12px!important}.experiment-gallery button,.experiment-gallery .thumbnail-item{overflow:hidden!important;border:1px solid var(--line)!important;border-radius:14px!important;background:#fff!important;box-shadow:0 7px 18px rgba(18,25,43,.045)!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important}.experiment-gallery button:hover,.experiment-gallery .thumbnail-item:hover{transform:translateY(-2px);border-color:#a5b4fc!important;box-shadow:0 12px 25px rgba(50,55,120,.12)!important}.experiment-gallery img{aspect-ratio:2/1!important;object-fit:cover!important}.experiment-gallery .caption,.experiment-gallery .label{white-space:pre-line!important;color:var(--ink)!important;font-size:11px!important;line-height:1.45!important;text-align:left!important}.selected-experiment input{font-weight:750!important;color:var(--brand)!important;background:#f5f5ff!important}
+.catalog-card{margin:0 0 18px!important;padding:22px!important;border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.catalog-tools{align-items:end!important}.catalog-family{min-width:420px!important}.catalog-search{min-width:280px!important}.catalog-meta{color:var(--muted);font-size:12px;font-weight:700}.catalog-pager{justify-content:flex-end!important;gap:8px!important}.catalog-pager button{max-width:110px!important;border-radius:9px!important}.experiment-gallery{max-height:720px;overflow:auto;padding:4px!important}.experiment-gallery .grid-wrap{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))!important;gap:12px!important}.experiment-gallery button,.experiment-gallery .thumbnail-item{min-width:0!important;overflow:hidden!important;border:1px solid var(--line)!important;border-radius:14px!important;background:#fff!important;box-shadow:0 7px 18px rgba(18,25,43,.045)!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important}.experiment-gallery button:hover,.experiment-gallery .thumbnail-item:hover{transform:translateY(-2px);border-color:#a5b4fc!important;box-shadow:0 12px 25px rgba(50,55,120,.12)!important}.experiment-gallery .image-container,.experiment-gallery [data-testid="image"]{width:100%!important;height:auto!important;aspect-ratio:2/1!important;background:#0b1230!important;overflow:hidden!important}.experiment-gallery img{display:block!important;width:100%!important;height:100%!important;aspect-ratio:2/1!important;object-fit:contain!important;object-position:center!important}.experiment-gallery .caption,.experiment-gallery .label{display:block!important;min-height:34px!important;overflow:visible!important;text-overflow:clip!important;white-space:normal!important;overflow-wrap:anywhere!important;color:var(--ink)!important;font-size:11px!important;line-height:1.45!important;text-align:left!important}.selected-experiment input{font-weight:750!important;color:var(--brand)!important;background:#f5f5ff!important}
 .task-brief{display:grid;grid-template-columns:minmax(210px,34%) 1fr;gap:20px;margin:0 0 18px;padding:14px;border:1px solid #dfe3f5;border-radius:15px;background:linear-gradient(135deg,#fafaff,#f6fbff)}.task-brief__visual{display:flex;align-items:center;overflow:hidden;border-radius:11px;background:#171b3f}.task-brief__visual img{display:block;width:100%;height:auto;max-height:250px;min-height:190px;object-fit:contain;border-radius:11px}.task-brief__body{padding:9px 9px 7px}.task-kicker{color:var(--brand);font-size:10px;font-weight:850;letter-spacing:.12em}.task-brief h3{margin:6px 0;color:var(--ink);font-size:23px}.task-brief p{margin:0 0 13px;color:var(--muted);font-size:13px;line-height:1.6}.task-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.task-facts span{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:11px;overflow-wrap:anywhere}.task-facts b{display:block;margin-bottom:3px;color:#8a94a8;font-size:9px;letter-spacing:.09em;text-transform:uppercase}.task-hint{margin-top:12px!important;margin-bottom:0!important;font-weight:650;color:#4b5563!important}
 .control-card,.chart-card,.output-card{border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.control-card,.chart-card{padding:22px!important}.output-card{margin-top:16px!important;padding:22px!important}.panel-title{margin:0 0 5px;color:var(--ink);font-size:19px}.panel-copy,.artifact-note{margin:0 0 17px;color:var(--muted);font-size:13px;line-height:1.6}.policy-preview{min-height:360px!important;border:1px solid var(--line)!important;border-radius:13px!important;background:#f8f9fc!important;overflow:hidden!important}.policy-preview .image-container,.policy-preview [data-testid="image"]{min-height:360px!important;background:#f8f9fc!important}.policy-preview img{display:block!important;width:100%!important;height:100%!important;min-height:360px!important;max-height:560px!important;object-fit:contain!important;background:#f8f9fc!important}
 .primary-btn{min-height:46px!important;border:0!important;border-radius:11px!important;background:linear-gradient(135deg,#5153d6,#6969ec)!important;font-weight:750!important}.primary-btn:disabled{opacity:.8!important;cursor:wait!important}.run-wait{position:relative;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;overflow:hidden;margin:0 0 16px;padding:14px 16px 17px;border:1px solid #c7d2fe;border-radius:13px;background:linear-gradient(135deg,#f5f5ff,#f0f7ff);box-shadow:0 8px 24px rgba(79,70,229,.08)}.run-wait__spinner{width:24px;height:24px;border:3px solid #d9ddff;border-top-color:#5b5ce2;border-radius:50%;animation:run-spin .8s linear infinite}.run-wait__copy strong,.run-wait__copy small{display:block}.run-wait__copy strong{color:#292d65;font-size:13px}.run-wait__copy small{margin-top:4px;color:#68748a;font-size:11px;line-height:1.5}.run-wait__elapsed{display:inline-block;margin-top:7px;color:#5b5ce2;font-size:11px;font-style:normal;font-weight:750}.run-wait__pulse{position:absolute;right:0;bottom:0;left:0;height:3px;background:#e0e7ff}.run-wait__pulse i{display:block;width:38%;height:100%;border-radius:999px;background:linear-gradient(90deg,transparent,#6366f1,#22c55e,transparent);animation:run-pulse 1.4s ease-in-out infinite}@keyframes run-spin{to{transform:rotate(360deg)}}@keyframes run-pulse{0%{transform:translateX(-110%)}100%{transform:translateX(285%)}}.run-state,.live-metric{display:flex;gap:12px;margin-top:14px;padding:14px 15px;border-radius:13px;background:#f8f9fc}.run-state__dot{width:9px;height:9px;margin-top:6px;border-radius:50%;background:#94a3b8}.run-state--running .run-state__dot{background:#5b5ce2;box-shadow:0 0 0 5px rgba(91,92,226,.13);animation:run-dot 1.2s ease-in-out infinite}@keyframes run-dot{50%{box-shadow:0 0 0 9px rgba(91,92,226,.04)}}.run-state--complete .run-state__dot{background:#13a36f}.run-state strong,.run-state small,.summary-label{display:block}.summary-label{color:#8a94a8;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.run-state strong{margin-top:3px;color:var(--ink);font-size:14px}.run-state small,.live-metric small{margin-top:3px;color:var(--muted);font-size:12px}.metric-reading{display:flex;align-items:baseline;gap:9px;margin-top:4px}.metric-reading strong{color:var(--ink);font-size:24px}
