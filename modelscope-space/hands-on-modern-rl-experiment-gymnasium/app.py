@@ -9,12 +9,13 @@ import importlib
 import json
 import os
 import re
+import sys
+import textwrap
 import time
 import warnings
 from pathlib import Path
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
-
 import gradio as gr
 import gymnasium as gym
 import imageio.v2 as imageio
@@ -369,6 +370,8 @@ def semantic_scene(env_id: str, family: str) -> tuple[str, str]:
         return '<path d="M85 165C155 100 220 235 285 165S405 100 465 165" fill="none" stroke-width="25"/><circle cx="85" cy="165" r="17"/><path d="M80 247c90-30 160 25 250-5s110 12 145 4" fill="none" opacity=".3"/>', "SWIM"
     if "cheetah" in name or "ant" in name:
         return '<path d="M150 163h184l48 42M164 165l-58 75M215 168l-28 82M296 168l35 79M338 162l80 69" fill="none" stroke-width="17"/><circle cx="358" cy="137" r="25"/><path d="M85 260h380"/>', "LOCOMOTION"
+    if "hammer" in name:
+        return '<rect x="82" y="224" width="150" height="26" rx="8"/><circle cx="140" cy="211" r="19"/><path d="M140 204l64-62 62 36 42-40" fill="none" stroke-width="19"/><circle cx="204" cy="142" r="16"/><circle cx="266" cy="178" r="16"/><path d="M299 127l68-68M346 48l39 39M318 108l39 39"/><path d="M401 172v76M376 248h50"/><circle cx="401" cy="163" r="10"/>', "HAMMER"
     if any(word in name for word in ("reach", "push", "slide", "pick", "place", "door", "hammer", "hand", "robot", "franka")) or family == "Robotics":
         return '<rect x="92" y="226" width="105" height="27" rx="8"/><circle cx="145" cy="213" r="20"/><path d="M145 207l65-74 75 37 54-68" fill="none" stroke-width="20"/><circle cx="210" cy="133" r="17"/><circle cx="285" cy="170" r="17"/><path d="M330 91l24 24M350 84l24 24"/><circle cx="414" cy="205" r="31" stroke-dasharray="9 9" fill="none"/>', "REACH"
     if "pong" in name:
@@ -710,27 +713,31 @@ def result_preview_image(
     x: list[float] | None = None,
     y: list[float] | None = None,
     note: str = "",
+    algorithm: str | None = None,
 ) -> str:
     """Create a durable result preview whenever an environment has no replay."""
     cfg = experiment_config(experiment)
     slug = re.sub(r"[^a-z0-9]+", "-", experiment.lower()).strip("-")
     path = ARTIFACT_DIR / (filename or f"{slug}-result.png")
-    fig = plt.figure(figsize=(8.8, 4.8), facecolor="#f7f8fc")
-    grid = fig.add_gridspec(1, 2, width_ratios=[.9, 1.5], wspace=.16)
+    fig = plt.figure(figsize=(9.6, 5.0), facecolor="#f7f8fc")
+    grid = fig.add_gridspec(1, 2, width_ratios=[1.08, 1.72], wspace=.34)
     info = fig.add_subplot(grid[0, 0]); plot = fig.add_subplot(grid[0, 1])
     info.set_facecolor("#20245b"); info.set_xticks([]); info.set_yticks([])
     for spine in info.spines.values(): spine.set_visible(False)
     info.text(.09, .88, status.upper(), color="#a5b4fc", fontsize=10, fontweight="bold", transform=info.transAxes)
     info.text(.09, .71, metric_value, color="white", fontsize=27, fontweight="bold", transform=info.transAxes, wrap=True)
     info.text(.09, .61, metric_label, color="#cbd5e1", fontsize=10, transform=info.transAxes, wrap=True)
-    info.text(.09, .39, cfg["environment"], color="white", fontsize=13, fontweight="bold", transform=info.transAxes, wrap=True)
-    info.text(.09, .29, f"{cfg['algorithm']} · CPU", color="#cbd5e1", fontsize=10, transform=info.transAxes)
-    info.text(.09, .08, note[:150], color="#aeb7ca", fontsize=9, transform=info.transAxes, wrap=True)
+    environment_label = textwrap.fill(cfg["environment"], width=21, break_long_words=False)
+    algorithm_label = textwrap.fill(f"{algorithm or cfg['algorithm']} · CPU", width=24, break_long_words=False)
+    note_label = textwrap.fill(note[:130], width=32, break_long_words=False)
+    info.text(.09, .43, environment_label, color="white", fontsize=12, fontweight="bold", linespacing=1.25, transform=info.transAxes)
+    info.text(.09, .27, algorithm_label, color="#cbd5e1", fontsize=9.5, linespacing=1.25, transform=info.transAxes)
+    info.text(.09, .07, note_label, color="#aeb7ca", fontsize=8.5, linespacing=1.2, transform=info.transAxes)
     if x and y:
         plot.plot(x, y, color="#5b5ce2", linewidth=2.4)
         plot.scatter([x[-1]], [y[-1]], color="#13a36f", s=45, zorder=3)
         plot.set_xlabel("Training progress"); plot.set_ylabel(metric_label); plot.grid(alpha=.2)
-        plot.set_title("Learned policy result", loc="left", fontweight="bold", color="#172033")
+        plot.set_title("Training result", loc="left", fontweight="bold", color="#172033")
     else:
         plot.axis("off")
         plot.text(.5, .59, "RESULT PREVIEW", ha="center", va="center", color="#5b5ce2", fontsize=19, fontweight="bold")
@@ -1044,19 +1051,27 @@ def run_mountaincar(budget: int, alpha: float, gamma: float, epsilon: float, see
 
 
 def record_model(model, env_id: str, seed: int, filename: str, max_steps: int) -> str:
-    env = gym.make(env_id, render_mode="rgb_array"); frames = []
+    """Record a deterministic policy using the configured headless renderer."""
+    env = gym.make(env_id, render_mode="rgb_array")
+    frames = []
     try:
         obs, _ = env.reset(seed=seed)
         for step in range(max_steps):
             if step % 2 == 0:
                 frame = env.render()
-                if frame is not None: frames.append(frame)
-            action, _ = model.predict(obs, deterministic=True); obs, _, terminated, truncated, _ = env.step(action)
-            if terminated or truncated: break
+                if isinstance(frame, np.ndarray) and frame.ndim == 3:
+                    frames.append(frame)
+            action, _ = model.predict(obs, deterministic=True)
+            obs, _, terminated, truncated, _ = env.step(action)
+            if terminated or truncated:
+                break
     finally:
         env.close()
-    if not frames: raise RuntimeError("Environment returned no RGB frames")
-    path = ARTIFACT_DIR / filename; imageio.mimsave(path, frames, duration=1 / 15, loop=0); return str(path)
+    if not frames:
+        raise RuntimeError("Environment returned no RGB frames")
+    path = ARTIFACT_DIR / filename
+    imageio.mimsave(path, frames, duration=1 / 15, loop=0)
+    return str(path)
 
 
 def run_deep_control(experiment: str, env_id: str, algorithm: str, budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
@@ -1085,8 +1100,9 @@ def run_deep_control(experiment: str, env_id: str, algorithm: str, budget: int, 
         gif = record_model(model, env_id, seed + 10000, f"{slug}-trained.gif", 500 if env_id in {"CartPole-v1", "Acrobot-v1"} else 999)
         preview_kind = "replay GIF"
     except Exception as exc:
-        gif = result_preview_image(experiment, "Training complete", f"{rewards[-1]:.1f}", "Final evaluation reward", x=xs, y=rewards, note=f"Replay unavailable: {type(exc).__name__}")
-        preview_kind = "result image"; logs.append(elapsed_line(started, "WARN", f"replay_unavailable={type(exc).__name__}: {exc}"))
+        gif = result_preview_image(experiment, "Training complete", f"{rewards[-1]:.1f}", "Final evaluation reward", x=xs, y=rewards, note="Training succeeded. Replay is unavailable in this CPU container.", algorithm=algorithm)
+        preview_kind = "result image"
+        logs.append(elapsed_line(started, "WARN", "training_succeeded=true replay_unavailable=headless renderer is not available in this CPU container"))
     summary = save_summary(slug, {"experiment": experiment, "evaluation_steps": xs, "evaluation_rewards": rewards, "model": str(model_path.with_suffix('.zip')), "parameters": {"budget": budget, "learning_rate": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
     logs.append(elapsed_line(started, "DONE", f"preview={preview_kind} path={gif} model={model_path}.zip artifact={summary}"))
     yield status_card("complete", copy_for(language)["complete"], f"{budget:,} steps · {time.perf_counter() - started:.1f}s", language), metric_card(f"{rewards[-1]:.1f}", "final evaluation reward", language), learning_figure(xs, rewards, f"{experiment} evaluation reward", "Mean reward"), gif, summary, console_panel("\n".join(logs), language)
@@ -1135,6 +1151,8 @@ def run_catalog_experiment(experiment: str, budget: int, alpha: float, gamma: fl
 def train(experiment: str, budget: float, alpha: float, gamma: float, epsilon: float, seed: float, language: str):
     budget, seed = int(budget), int(seed)
     try:
+        if experiment not in EXPERIMENT_CHOICES:
+            raise ValueError("This environment is not registered in the current runtime. Refresh the page and choose an available task.")
         if is_catalog_experiment(experiment):
             yield from run_catalog_experiment(experiment, budget, alpha, gamma, epsilon, seed, language)
         elif experiment == BANDIT:
@@ -1211,7 +1229,7 @@ CSS = """
 .hero h1{max-width:760px;margin:0 0 12px;color:#fff;font-size:clamp(32px,5vw,48px);line-height:1.1;letter-spacing:-.035em}.hero-copy{max-width:760px;margin:0;color:#cdd3e2;font-size:15px;line-height:1.7}.hero-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.hero-link{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border:1px solid rgba(255,255,255,.18);border-radius:9px;color:#eef2ff!important;background:rgba(255,255,255,.08);font-size:13px;font-weight:650;text-decoration:none!important}.hero-link.primary{color:#172554!important;background:#fff;border-color:#fff}
 .lab-strip{display:flex;flex-wrap:wrap;gap:8px 22px;margin:17px 0 22px;padding:13px 18px;border:1px solid var(--line);border-radius:13px;background:#fff;color:var(--muted);font-size:13px;box-shadow:0 6px 20px rgba(18,25,43,.035)}.lab-strip strong{margin-left:5px;color:var(--ink)}
 .catalog-card{margin:0 0 18px!important;padding:22px!important;border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.catalog-tools{align-items:end!important}.catalog-family{min-width:420px!important}.catalog-search{min-width:280px!important}.catalog-meta{color:var(--muted);font-size:12px;font-weight:700}.catalog-pager{justify-content:flex-end!important;gap:8px!important}.catalog-pager button{max-width:110px!important;border-radius:9px!important}.experiment-gallery{max-height:720px;overflow:auto;padding:4px!important}.experiment-gallery .grid-wrap{gap:12px!important}.experiment-gallery button,.experiment-gallery .thumbnail-item{overflow:hidden!important;border:1px solid var(--line)!important;border-radius:14px!important;background:#fff!important;box-shadow:0 7px 18px rgba(18,25,43,.045)!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important}.experiment-gallery button:hover,.experiment-gallery .thumbnail-item:hover{transform:translateY(-2px);border-color:#a5b4fc!important;box-shadow:0 12px 25px rgba(50,55,120,.12)!important}.experiment-gallery img{aspect-ratio:2/1!important;object-fit:cover!important}.experiment-gallery .caption,.experiment-gallery .label{white-space:pre-line!important;color:var(--ink)!important;font-size:11px!important;line-height:1.45!important;text-align:left!important}.selected-experiment input{font-weight:750!important;color:var(--brand)!important;background:#f5f5ff!important}
-.task-brief{display:grid;grid-template-columns:minmax(210px,34%) 1fr;gap:20px;margin:0 0 18px;padding:14px;border:1px solid #dfe3f5;border-radius:15px;background:linear-gradient(135deg,#fafaff,#f6fbff)}.task-brief__visual img{display:block;width:100%;height:100%;min-height:190px;object-fit:cover;border-radius:11px}.task-brief__body{padding:9px 9px 7px}.task-kicker{color:var(--brand);font-size:10px;font-weight:850;letter-spacing:.12em}.task-brief h3{margin:6px 0;color:var(--ink);font-size:23px}.task-brief p{margin:0 0 13px;color:var(--muted);font-size:13px;line-height:1.6}.task-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.task-facts span{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:11px;overflow-wrap:anywhere}.task-facts b{display:block;margin-bottom:3px;color:#8a94a8;font-size:9px;letter-spacing:.09em;text-transform:uppercase}.task-hint{margin-top:12px!important;margin-bottom:0!important;font-weight:650;color:#4b5563!important}
+.task-brief{display:grid;grid-template-columns:minmax(210px,34%) 1fr;gap:20px;margin:0 0 18px;padding:14px;border:1px solid #dfe3f5;border-radius:15px;background:linear-gradient(135deg,#fafaff,#f6fbff)}.task-brief__visual{display:flex;align-items:center;overflow:hidden;border-radius:11px;background:#171b3f}.task-brief__visual img{display:block;width:100%;height:auto;max-height:250px;min-height:190px;object-fit:contain;border-radius:11px}.task-brief__body{padding:9px 9px 7px}.task-kicker{color:var(--brand);font-size:10px;font-weight:850;letter-spacing:.12em}.task-brief h3{margin:6px 0;color:var(--ink);font-size:23px}.task-brief p{margin:0 0 13px;color:var(--muted);font-size:13px;line-height:1.6}.task-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.task-facts span{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:11px;overflow-wrap:anywhere}.task-facts b{display:block;margin-bottom:3px;color:#8a94a8;font-size:9px;letter-spacing:.09em;text-transform:uppercase}.task-hint{margin-top:12px!important;margin-bottom:0!important;font-weight:650;color:#4b5563!important}
 .control-card,.chart-card,.output-card{border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.control-card,.chart-card{padding:22px!important}.output-card{margin-top:16px!important;padding:22px!important}.panel-title{margin:0 0 5px;color:var(--ink);font-size:19px}.panel-copy,.artifact-note{margin:0 0 17px;color:var(--muted);font-size:13px;line-height:1.6}.policy-preview{min-height:360px!important;border:1px solid var(--line)!important;border-radius:13px!important;background:#f8f9fc!important;overflow:hidden!important}.policy-preview .image-container,.policy-preview [data-testid="image"]{min-height:360px!important;background:#f8f9fc!important}.policy-preview img{display:block!important;width:100%!important;height:100%!important;min-height:360px!important;max-height:560px!important;object-fit:contain!important;background:#f8f9fc!important}
 .primary-btn{min-height:46px!important;border:0!important;border-radius:11px!important;background:linear-gradient(135deg,#5153d6,#6969ec)!important;font-weight:750!important}.run-state,.live-metric{display:flex;gap:12px;margin-top:14px;padding:14px 15px;border-radius:13px;background:#f8f9fc}.run-state__dot{width:9px;height:9px;margin-top:6px;border-radius:50%;background:#94a3b8}.run-state--running .run-state__dot{background:#5b5ce2;box-shadow:0 0 0 5px rgba(91,92,226,.13)}.run-state--complete .run-state__dot{background:#13a36f}.run-state strong,.run-state small,.summary-label{display:block}.summary-label{color:#8a94a8;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.run-state strong{margin-top:3px;color:var(--ink);font-size:14px}.run-state small,.live-metric small{margin-top:3px;color:var(--muted);font-size:12px}.metric-reading{display:flex;align-items:baseline;gap:9px;margin-top:4px}.metric-reading strong{color:var(--ink);font-size:24px}
 .console-panel{overflow:hidden;margin-top:18px;border:1px solid #202b3d;border-radius:13px;background:#0f1623}.console-head{display:flex;align-items:center;gap:9px;padding:11px 15px;border-bottom:1px solid #263244;color:#e2e8f0;font-size:12px;font-weight:750}.console-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.12)}.console-text{box-sizing:border-box;height:300px;margin:0;padding:17px 18px;overflow:auto;white-space:pre;color:#cbd5e1!important;background:#0f1623!important;font:12px/1.58 "SFMono-Regular",Consolas,monospace!important;scrollbar-gutter:stable}.footer-note{margin-top:18px;text-align:center;color:#94a3b8;font-size:12px}.footer-note a{color:var(--brand)!important;text-decoration:none!important;font-weight:650}
