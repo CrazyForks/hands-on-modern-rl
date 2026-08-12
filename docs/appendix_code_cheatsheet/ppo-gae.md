@@ -1,4 +1,4 @@
-# B.2 PPO 策略损失与 GAE
+# B.2 PPO 与 GAE
 
 PPO 是大模型 RL 面试中考查频率最高的算法。面试官通常要求写出 **clipped policy loss**，并追问 value loss 和 GAE。
 

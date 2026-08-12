@@ -2,7 +2,7 @@
 title: '5.4 Hands-On: LunarLander'
 ---
 
-# 5.4 Hands-on: LunarLander
+# 5.4 Hands-on: LunarLander and Atari
 > **Goal of this section**: start from a reproducible experiment, train DQN on `LunarLander-v3`, and use evaluation curves, replay GIFs, and failure diagnosis to answer the only question that matters: what did the policy actually learn?
 
 > **Code for this section**: [dqn_gym_sb3.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/dqn_gym_sb3.py) · [export_dqn_curves.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/export_dqn_curves.py) · [render_lunarlander_split.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/render_lunarlander_split.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/requirements.txt)

@@ -2,7 +2,7 @@
 title: 26.2 RL Scaling and Future Outlook
 ---
 
-# 26.2 RL Scaling and Future Outlook: Where Is the Ceiling?
+# 26.2 RL Scaling Laws and Foundation Model RL
 
 In the previous three sections, we traced the evolution of RL training from PPO to GRPO to DAPO/RLVR. On the strategy side, the Critic was removed; on the reward side, the RM was removed; training costs decreased step by step. But a more fundamental question remains unanswered: **Is there a ceiling to the benefits of RL training? Can we continue improving by investing more compute?**
 

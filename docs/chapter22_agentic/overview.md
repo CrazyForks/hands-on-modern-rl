@@ -1,6 +1,6 @@
-# 19.1 Agentic RL 总览
+# 19.1 Agentic RL 基础
 
-Part IV 训练模型生成更符合偏好的单段回答。模型接入搜索、代码执行和外部工具后，一次决策会改变后续观测，训练对象随之扩展为完整轨迹。Part V 从 Agentic RL 总览开始，依次处理多轮形式化、信用分配、工具调用、代码与浏览器智能体，以及多智能体协作。
+Part IV 训练模型生成更符合偏好的单段回答。模型接入搜索、代码执行和外部工具后，一次决策会改变后续观测，训练对象随之扩展为完整轨迹。Part V 从 Agentic RL 基础开始，依次处理多轮强化学习、信用分配、工具调用、代码与浏览器智能体，以及多智能体协作。
 
 **核心内容**
 
@@ -75,13 +75,13 @@ $$
 
 | 小节                                                       | 核心问题                                                                          |
 | ---------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| [19.1 Agentic RL 总览](./overview)                         | 单轮到多轮的范式转移、智能体四组件、最简 Agent Loop、工业框架全景                 |
-| [19.2 多轮 RL 形式化](./formulation)                       | 多轮 MDP 怎么写？联合状态、结构化动作、POMDP、step-level 轨迹、action mask        |
+| [19.1 Agentic RL 基础](./overview)                         | 单轮到多轮的范式转移、智能体四组件、最简 Agent Loop、工业框架全景                 |
+| [19.2 多轮强化学习](./formulation)                         | 多轮 MDP 怎么写？联合状态、结构化动作、POMDP、step-level 轨迹、action mask        |
 | [19.3 轨迹信用分配](./credit-assignment)                   | 多轮交互失败了，该怪谁？ORM vs PRM、turn-level discounting、group-based advantage |
-| [19.4 工具调用 RL](./tool-use-and-trajectory)              | 训练数据从哪来？轨迹合成、工具调用策略、沙箱与异步 rollout                        |
+| [19.4 工具调用与轨迹生成](./tool-use-and-trajectory)       | 训练数据从哪来？轨迹合成、工具调用策略、沙箱与异步 rollout                        |
 | [19.5 Search-Augmented RL](./tool-use-agents)              | 搜索增强 Agent 怎么训？DeepSeek-Researcher、Kimi-Researcher 的训练范式            |
-| [19.6 Code Interpreter RL 工业实战](./industrial-practice) | 代码 Agent 的真实训练陷阱：不稳定、长度失控、reward hacking 的工程对策            |
-| [19.7 多智能体协作与 Agent Swarm](./multi-agent-swarm)     | 多个 Agent 怎么协作？角色分工、通信协议、群体优势分配                             |
+| [19.6 Code Interpreter RL](./industrial-practice)          | 代码 Agent 的真实训练陷阱：不稳定、长度失控、reward hacking 的工程对策            |
+| [19.7 多智能体协作](./multi-agent-swarm)                   | 多个 Agent 怎么协作？角色分工、通信协议、群体优势分配                             |
 
 ## 学习目标
 
@@ -97,7 +97,7 @@ $$
 - [PPO 与奖励模型](../chapter10_ppo/intro)——策略优化的基础框架
 - [MDP 五元组](../chapter03_mdp/mdp)——形式化多轮交互的出发点
 
-准备好后，先从 Agentic RL 的整体图景开始——[19.1 Agentic RL 总览](./overview)。
+准备好后，先从 Agentic RL 的整体图景开始——[19.1 Agentic RL 基础](./overview)。
 
 前文给出了 Agentic RL 的形式化骨架，包括轨迹、POMDP 和信用分配。本节把这些公式落回具体的工程图景：Agent 在真实环境里如何运转，为什么训练它比训练单轮 LLM 更难，以及当前工业界用哪些框架完成训练。
 
@@ -137,7 +137,7 @@ reward = 1                              reward = 0
 
 两条轨迹最终 reward 截然不同，但**问题出在哪一步**？轨迹 B 失败是因为 T1 的 query 太宽，还是 T2 没比价直接选第一条，还是 T3 没确认就下单？只看最终 reward 无法回答。
 
-- 形式化地把"轨迹 vs 单轮 completion"写清楚，见 [19.2 多轮 RL 形式化](./formulation)。
+- 形式化地把"轨迹 vs 单轮 completion"写清楚，见 [19.2 多轮强化学习](./formulation)。
 - 把最终 reward 回拆到每一步，见 [19.3 轨迹信用分配](./credit-assignment)。
 
 ## 智能体的基本组件
@@ -401,15 +401,15 @@ AReaL 的研究表明，异步训练可以在不损失效果的前提下将速�
 
 另一个关键差异是：框架最初为单轮 RL（推理任务）设计，还是一开始就考虑了多轮 Agent 交互。前者的 Agent 执行模块是后加的，能用但不是为此优化；后者的 Agent 执行是架构一等公民，在状态管理、异构轨迹长度、工具调用异步返回等方面有原生支持。OpenRLHF、AReaL、ROLL、SkyRL 属于后者。
 
-框架选型取决于具体场景。刚入门想快速跑通 demo，OpenRLHF 代码最简洁、文档最完善。企业级大规模训练（70B+），verl 的吞吐和生态优势明显。模型是 MoE 架构（如 GLM-4.5、Qwen3-30B-A3B、DeepSeek-R1），slime 的 Megatron + SGLang 原生架构对 MoE 的 fp8 rollout、DeepEP 通信等做了专门优化。极致吞吐，AReaL 的全异步模式能做到近 3 倍加速。更多工程细节——沙箱管理、环境构建、分布式部署——在 [19.4 工具调用 RL](./tool-use-and-trajectory) 展开。
+框架选型取决于具体场景。刚入门想快速跑通 demo，OpenRLHF 代码最简洁、文档最完善。企业级大规模训练（70B+），verl 的吞吐和生态优势明显。模型是 MoE 架构（如 GLM-4.5、Qwen3-30B-A3B、DeepSeek-R1），slime 的 Megatron + SGLang 原生架构对 MoE 的 fp8 rollout、DeepEP 通信等做了专门优化。极致吞吐，AReaL 的全异步模式能做到近 3 倍加速。更多工程细节——沙箱管理、环境构建、分布式部署——在 [19.4 工具调用与轨迹生成](./tool-use-and-trajectory) 展开。
 
 ## 本节总结
 
 Agentic RL 把训练对象从"一段回答"扩展到"一条完整交互轨迹"。这一扩展引出四个核心议题，本章后续小节逐一深入：
 
-- **形式化**——轨迹、状态、动作在多轮设定下如何精确定义？POMDP 视角如何区分模型生成的 action token 与环境返回的 observation token？→ [19.2 多轮 RL 形式化](./formulation)
+- **形式化**——轨迹、状态、动作在多轮设定下如何精确定义？POMDP 视角如何区分模型生成的 action token 与环境返回的 observation token？→ [19.2 多轮强化学习](./formulation)
 - **信用分配**——一条轨迹最终失败，reward 怎么回拆到每一步？ORM/PRM/SALT/GiGPO/HGPO/SPA-RL/AgentPRM/ARPO/IGPO/StepPO 等十多种方法各有何取舍？→ [19.3 轨迹信用分配](./credit-assignment)
-- **工具与轨迹工程**——训练数据从哪来、工具策略怎么学、沙箱怎么管？→ [19.4 工具调用 RL](./tool-use-and-trajectory)
-- **真实训练陷阱**——工业界在哪些坑里摔过？→ [19.6 Code Interpreter RL 工业实战](./industrial-practice)
+- **工具与轨迹工程**——训练数据从哪来、工具策略怎么学、沙箱怎么管？→ [19.4 工具调用与轨迹生成](./tool-use-and-trajectory)
+- **真实训练陷阱**——工业界在哪些坑里摔过？→ [19.6 Code Interpreter RL](./industrial-practice)
 
-接下来先看形式化：把"多轮交互"翻译成 RL 能处理的数学对象——[19.2 多轮 RL 形式化](./formulation)。
+接下来先看形式化：把"多轮交互"翻译成 RL 能处理的数学对象——[19.2 多轮强化学习](./formulation)。

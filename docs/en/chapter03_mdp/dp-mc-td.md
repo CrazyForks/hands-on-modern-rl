@@ -2,7 +2,7 @@
 title: 4.1 DP, MC, and TD
 ---
 
-# 4.1 DP, MC, and TD: Three Methods for Value Estimation
+# 4.1 Dynamic Programming, Monte Carlo and TD
 ## Section Preview
 
 **Key Ideas**

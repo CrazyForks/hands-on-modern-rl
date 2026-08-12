@@ -1,4 +1,4 @@
-# 15.3 动手：RLVR 可验证奖励
+# 15.3 动手：构建 RLVR 奖励
 
 在 15.1 节和 15.2 节中，我们看到 GRPO 如何在策略端省掉 Critic、DAPO 如何让纯 RL 不依赖 SFT。它们都有一个隐含前提：**奖励信号是可靠的**。在数学和代码领域，这个前提自然成立（答对就是答对）。RLVR（Reinforcement Learning with Verifiable Rewards）把这个前提正式化成了一个范式：**在那些有客观答案的领域，不需要训练 RM，直接用规则验证就行**。
 

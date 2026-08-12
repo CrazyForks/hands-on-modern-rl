@@ -1,6 +1,6 @@
 # 19.3 轨迹信用分配
 
-[19.2 多轮 RL 形式化](./formulation) 把轨迹概率写成 $\rho_\theta(x | s_0, c) = \mathbb{I}(s_0, x) \prod_{t \in a(x)} p_\theta(x_t | \cdot)$，并推出 action mask——只有 action token 参与 policy gradient。但这只回答了"该在哪些 token 上算梯度"，没回答"每个 action token 该乘以多大的 advantage"。
+[19.2 多轮强化学习](./formulation) 把轨迹概率写成 $\rho_\theta(x | s_0, c) = \mathbb{I}(s_0, x) \prod_{t \in a(x)} p_\theta(x_t | \cdot)$，并推出 action mask——只有 action token 参与 policy gradient。但这只回答了"该在哪些 token 上算梯度"，没回答"每个 action token 该乘以多大的 advantage"。
 
 策略梯度的形式是：
 
@@ -667,7 +667,7 @@ PRM 的区分度是 ORM 的 19 倍。ORM 几乎无法区分正确步骤和错误
 
 规划能力则是多轮 RL 的**进阶形态**——信用分配解决"每步做得好不好"，规划解决"整体走哪条路径最优"。两者共同构成了 Agentic RL 的决策核心。
 
-下一节我们来拆解 Agentic RL 的工程核心——[19.4 工具调用 RL](./tool-use-and-trajectory)，看看训练数据从哪里来、工具策略怎么学、系统怎么跑起来。
+下一节我们来拆解 Agentic RL 的工程核心——[19.4 工具调用与轨迹生成](./tool-use-and-trajectory)，看看训练数据从哪里来、工具策略怎么学、系统怎么跑起来。
 
 ## 参考资料
 

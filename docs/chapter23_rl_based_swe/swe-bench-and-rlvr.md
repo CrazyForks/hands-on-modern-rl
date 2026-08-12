@@ -1,4 +1,4 @@
-# 20.1 SWE-RL 基础实验
+# 20.1 SWE-RL 基础
 
 [第 19 章 Agentic RL](../chapter22_agentic/overview) 介绍了智能体在工具调用、多轮交互上的 RL 训练。这一章我们聚焦一个最有工业价值的细分领域：**RL-based SWE（Software Engineering）**——用 RL 训练模型自动修复 bug、实现 feature、写测试。
 

@@ -1,4 +1,4 @@
-# 10.1 离线 RL 的挑战与经典方法
+# 10.1 离线数据与分布偏移
 
 Part II 依靠智能体持续与环境交互来收集经验。许多真实系统只能使用已有日志，新的试错可能昂贵、缓慢或存在安全风险。Part III 从离线强化学习开始，随后把固定数据学习推进到模仿学习、逆向强化学习、元强化学习、探索、多智能体与分层决策。
 
@@ -8,9 +8,11 @@ Part II 依靠智能体持续与环境交互来收集经验。许多真实系统
 
 ## 1. 固定数据为什么会产生分布偏移
 
-[第 5 章 DQN](../chapter07_dqn/from-q-to-dqn) 和 [第 9 章 SAC](../chapter11_continuous_control/intro) 都依赖同一个机制：Bellman 备份。无论 on-policy 还是 off-policy，价值函数的更新都写成：
+[第 5 章 DQN](../chapter07_dqn/from-q-to-dqn) 和 [第 9 章 SAC](../chapter11_continuous_control/intro) 都会用下一状态的估值更新当前状态。先写出这个一步目标：
 
 $$y = r + \gamma \cdot \mathbb{E}_{s' \sim P(\cdot \mid s, a)}\left[V(s')\right]$$
+
+这行公式可以从左向右读：$y$ 是本次要拟合的目标，$r$ 是当前动作已经得到的奖励，$V(s')$ 是下一状态之后的长期价值，$\gamma$ 控制未来价值在目标中占多大比重。在线训练即使暂时高估了某个新状态，策略以后仍有机会访问它，并用真实奖励修正估值。
 
 在线 RL 中，target 里那个 $V(s')$ 来自未来的探索——即使新策略走到一个没见过的状态，智能体会继续与环境交互、采到新数据，从而修正估值。**离线 RL 没有这个保险。** 数据集 $\mathcal{D} = \{(s, a, r, s')\}$ 由某个行为策略 $\pi_\beta$ 采得，训练时**完全冻结**：
 
@@ -22,20 +24,20 @@ $$\mathcal{D} = \{(s_i, a_i, r_i, s'_i)\}_{i=1}^{N}, \quad (s, a) \sim d^{\pi_\b
 
 Fujimoto et al. 2019 在 BCQ 论文中精确刻画了离线 RL 失败的根源。设数据集支撑集为 $\mathcal{D}_\mathcal{A}(s) = \{a : (s, a) \in \text{support}(\pi_\beta(\cdot \mid s))\}$。Bellman 算子在 $a' \notin \mathcal{D}_\mathcal{A}(s')$ 上的取值没有任何监督信号——神经网络在这些 OOD（out-of-distribution）点上 **外推**，结果是任意的。
 
-把估值误差分解为三类来源：
+为了看清问题来自哪里，可以把估值误差按来源写成一个示意分解：
 
 $$\underbrace{Q_\phi(s, a) - Q^\pi(s, a)}_{\text{总误差}} = \underbrace{\epsilon_{\text{stat}}}_{\substack{\text{统计误差}\\\text{(样本有限)}}} + \underbrace{\epsilon_{\text{approx}}}_{\substack{\text{函数逼近误差}\\\text{(网络容量)}}} + \underbrace{\max_{a'} Q_\phi(s', a') - Q^\pi(s', \pi(s'))}_{\text{外推误差 (Extrapolation Error)}}$$
 
-第三项是关键。Q-Learning 的 target 用 $\max_{a'} Q(s', a')$，在 OOD 动作上 $Q$ 可能因为外推给出**虚高的值**，于是策略被引向这些"幻想"动作。
+前两项在在线和离线训练中都会出现。第三项只在最大化操作选中了缺少数据支持的动作时出现：网络可能碰巧给这个动作很高的 $Q$ 值，$\max$ 又会优先选中它，于是这个未经验证的估值进入下一轮目标。
 
 外推误差的累积过程可以递归展开。设 $Q_0$ 是初始估值，Bellman 迭代 $T$ 次后误差满足：
 
 $$\|Q_T - Q^\pi\|_\infty \leq \gamma^T \|Q_0 - Q^\pi\|_\infty + \sum_{k=0}^{T-1} \gamma^k \|\mathcal{T} Q_k - \mathcal{T}^\pi Q_k\|_\infty$$
 
-其中 $\mathcal{T}$ 是数据约束下的 Bellman 算子（含 max），$\mathcal{T}^\pi$ 是真策略算子。当 max 算子在 OOD 上每次产生误差 $\epsilon_{\text{ood}}$，单步误差就以 $\sum \gamma^k \approx 1/(1-\gamma) \approx 100$（$\gamma = 0.99$）的系数累积。在线 RL 中，下一次交互会立即揭露这个错误（实际 reward 很低），Q 被拉回；离线 RL 中没有这种纠错机会，误差在 Bellman 迭代中**指数级累积**。
+其中 $\mathcal{T}$ 表示带动作最大化的 Bellman 更新，$\mathcal{T}^\pi$ 表示按真实策略计算的更新。右边第一项是初始误差，乘上 $\gamma^T$ 后会逐渐衰减；求和项是每一轮新引入的误差。若每轮都产生大小接近 $\epsilon_{\text{ood}}$ 的误差，它们的总影响会被几何级数放大到约 $\epsilon_{\text{ood}}/(1-\gamma)$。例如 $\gamma=0.99$ 时，放大系数接近 100。这里是**误差反复累加**，并非误差值本身指数增长。
 
 ::: warning 为什么加更多数据救不了
-直觉上，扩大数据集覆盖度可以缓解 OOD 问题。但实际上，连续动作空间里无论采多少数据，$\mathcal{D}_\mathcal{A}(s)$ 都是 $|\mathcal{A}|$ 维空间里的稀疏支撑。$a'$ 距离最近数据点的欧氏距离可能很小，但 $Q$ 函数在这个方向上的梯度可以任意大。**外推误差不是数据量的问题，而是 Q-Learning 的 max 算子与函数逼近器组合的结构性缺陷**。
+扩大数据覆盖可以减少 OOD 动作，却很难在连续动作空间中覆盖每个可能的 $a$。只要更新仍会在缺少数据的区域取最大值，外推误差就可能出现。因此，数据覆盖和保守更新需要同时处理。
 :::
 
 ### 1.2 离线 RL 要同时优化什么
@@ -105,29 +107,33 @@ class CQL(SAC):
 
 ### 2.3 IQL：避免显式评估数据集外动作
 
-Implicit Q-Learning（Kostrikov et al. 2022）的洞察更深一层：**根本不需要评估任何 OOD 动作的 Q**。它用一个分位数回归（quantile regression）学 $V(s)$，让 $V$ 偏向数据中较好的动作：
+Implicit Q-Learning（Kostrikov et al. 2022）避开了对数据集外动作取最大值。它用 expectile regression（期望分位回归）学习 $V(s)$，让 $V$ 偏向数据中价值较高的动作：
 
 $$\mathcal{L}_V = \mathbb{E}_{(s, a) \sim \mathcal{D}}\left[L_2^\tau(Q_{\bar{\theta}}(s, a) - V_\psi(s))\right]$$
 
-其中 $L_2^\tau(x) = |\tau - \mathbb{1}(x < 0)| \cdot x^2$ 是期望分位数为 $\tau$（通常 $\tau = 0.7$）的分位数损失。这把 $V$ 学成 "数据中较好动作的价值"，而**不需要 max 任何东西**。然后用 advantage $A(s, a) = Q_{\bar{\theta}}(s, a) - V_\psi(s)$ 做 advantage-weighted regression 训练策略：
+这里先计算残差 $x=Q_{\bar{\theta}}(s,a)-V_\psi(s)$，再用
+
+$$L_2^\tau(x) = |\tau - \mathbb{1}(x < 0)| \cdot x^2$$
+
+对正残差和负残差赋予不同权重。这叫 **expectile loss（期望分位损失）**。当 $\tau=0.7$ 时，$V(s)$ 会更靠近数据中较高的 $Q(s,a)$，但训练过程仍只使用数据集已经出现的动作。得到 $V$ 后，再定义优势 $A(s,a)=Q_{\bar\theta}(s,a)-V_\psi(s)$，并训练策略：
 
 $$\mathcal{L}_\pi = -\mathbb{E}_{(s, a) \sim \mathcal{D}}\left[\exp(\beta \cdot A(s, a)) \cdot \log \pi_\theta(a \mid s)\right]$$
 
-$\exp(\beta A)$ 给数据中表现好的动作更大权重，让 $\pi_\theta$ 向它们靠拢。$\beta$ 是温度。IQL 不在数据集外动作上执行 max，因此避开了这条外推误差的产生路径。它与 CQL 的区别在于：CQL 显式压低数据集外动作的价值，IQL 只使用数据中的动作学习 $Q$ 与 $V$。
+若 $A(s,a)>0$，说明这个动作在数据中优于当前状态的基准价值，指数权重就大于 1；若 $A(s,a)<0$，它的模仿权重就会降低。$\beta$ 控制这种差别被放大多少。IQL 不在数据集外动作上执行 $\max$，因此避开了这条外推误差路径。CQL 会主动压低数据集外动作的价值，IQL 则只从数据中的动作学习 $Q$、$V$ 和策略。
 
 ### 2.4 比较 BCQ、CQL 与 IQL
 
 | 维度               | BCQ             | CQL                 | IQL                  |
 | ------------------ | --------------- | ------------------- | -------------------- |
 | 约束位置           | 动作空间        | 值函数              | 隐式（分位数 + AWR） |
-| 是否评估 OOD 动作  | 否（采样约束）  | 是（logsumexp）     | 否（完全规避）       |
+| 是否评估 OOD 动作  | 否（采样约束）  | 是（logsumexp）     | 否（避免显式查询）   |
 | 额外网络           | VAE $\pi_\beta$ | 无                  | $V$ 网络             |
 | 超参敏感           | 高（扰动幅度）  | 中（$\alpha$ 自动） | 低（$\tau, \beta$）  |
 | 对中等数据集表现   | 中              | 强                  | 强                   |
 | 对稀疏数据集稳定性 | 中              | 偶发不稳定          | 强                   |
 | 实现复杂度         | 高              | 中                  | 低                   |
 
-**实战建议**：从 IQL 开始（最稳定、最少调参）；若 baseline 偏低再换 CQL（更激进）；BCQ 已较少作为新 baseline。
+第一次实现可以先用 IQL 建立基线，因为它的更新只依赖数据集内动作；需要显式控制保守程度时再比较 CQL。BCQ 适合帮助理解“限制候选动作”这条路线。
 
 ## 3. 用行为克隆约束策略更新
 
@@ -178,6 +184,6 @@ IQL 通过把 Bellman target 改成 $V(s')$（不再 max），从根源上消除
 
 ## 本节总结
 
-本节梳理了离线 RL 的核心挑战（分布偏移与外推误差）与三大保守路线：BCQ 约束动作空间、CQL 惩罚 OOD Q 值、IQL 完全规避 max 算子。这些算法都在 Bellman 框架内做文章。
+本节从分布偏移和外推误差出发，比较了三种处理方式：BCQ 把候选动作限制在数据附近，CQL 压低数据外动作的估值，IQL 避免对数据外动作显式取最大值。三者仍然使用 Bellman 更新，差别在于怎样阻止不可靠的估值进入策略改进。
 
-下一节 [10.2 Decision Transformer、Trajectory Transformer 与 Diffuser](./sequence-modeling) 走另一条路——彻底抛弃 Bellman，把 RL 写成条件序列生成。
+下一节 [10.2 基于序列建模的离线强化学习](./sequence-modeling) 走另一条路——彻底抛弃 Bellman，把 RL 写成条件序列生成。

@@ -2,7 +2,7 @@
 title: '2.4 Chapter Summary: MDP, Value, and Policy'
 ---
 
-# 2.4 Chapter Summary: MDP, Value, and Policy
+# 2.4 Discounting, Trajectories and POMDPs
 
 ## Overview
 

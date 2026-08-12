@@ -2,7 +2,7 @@
 title: A Brief History of RL
 ---
 
-# A Brief History of Reinforcement Learning
+# Brief History of RL
 
 If you asked an AI researcher in the early 2010s, "What is reinforcement learning?", they would probably draw a feedback loop of an agent interacting with an environment, and tell you it is mostly used for robotics control and board games.
 

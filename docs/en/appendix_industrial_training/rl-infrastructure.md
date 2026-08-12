@@ -2,7 +2,7 @@
 title: A.2 Training Infrastructure
 ---
 
-# A.2 RL Training Infrastructure: Rollout, Buffers, and Distributed Systems
+# A.2 Training Infrastructure
 
 Earlier chapters emphasized algorithms: how to write policy gradients, how PPO/GRPO update, and where rewards come from. Once you move into industrial training, there is an additional layer: **your training samples are not a fixed dataset sitting on disk. They are produced continuously by the current policy during training.**
 

@@ -2,7 +2,7 @@
 title: 2.2 Markov Decision Processes
 ---
 
-# 2.2 MDP: Modeling Sequential Decision-Making
+# 2.2 Markov Decision Processes
 
 ## What This Section Solves
 

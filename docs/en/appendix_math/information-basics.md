@@ -2,7 +2,7 @@
 title: D.4.1 Entropy and Exploration
 ---
 
-# D.4.1 Information Theory Basics: Self-Information, Entropy, and Exploration
+# D.4.1 Self-Information, Entropy, and Exploration
 
 <!--@include: ./information-theory.md{7,}-->
 

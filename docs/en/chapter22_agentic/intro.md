@@ -2,7 +2,7 @@
 title: 19.1 Agentic RL Overview
 ---
 
-# 19.1 Agentic RL Overview
+# 19.1 Agentic RL Foundations
 
 Part IV trained models to produce preference-aligned single responses. Once a model can search, execute code, and call external tools, each decision changes the next observation and the training object expands into a complete trajectory. Part V begins with that shift, then develops multi-turn formulation, credit assignment, tool use, code and browser agents, and multi-agent collaboration.
 

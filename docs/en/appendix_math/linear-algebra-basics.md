@@ -2,7 +2,7 @@
 title: 'D.1.1 Linear Algebra Basics: Vectors and Matrices'
 ---
 
-# D.1.1 Linear Algebra Basics: Vectors and Matrices
+# D.1.1 Vectors and Matrices
 
 If you opened this appendix, it is probably because a formula in the main text slowed you down. Maybe it was an expectation symbol inside a Bellman equation, a KL divergence term inside PPO, or the gradient operator that suddenly appears in the policy gradient theorem.
 

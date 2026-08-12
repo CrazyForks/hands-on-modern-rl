@@ -1,4 +1,4 @@
-# 12.2 多智能体 RL：CTDE、MADDPG 与 MAPPO
+# 12.2 多智能体强化学习
 
 [12.1](./intro)假设只有一个智能体，它需要解决的是怎样找到稀疏奖励。多个智能体同时学习时，问题又多了一层：对某个智能体来说，其他智能体的策略不断变化，因此同一个动作的后果也会变化。
 
@@ -6,7 +6,7 @@
 
 ## 1. 多智能体为什么使环境变得非平稳
 
-当环境里有多个智能体同时学习，标准的 MDP 假设被打破。从单个智能体 $i$ 的视角看，转移 $P(s' \mid s, a_i)$ 不再是固定的——它依赖其他智能体 $a_{-i}$ 当前的策略，而其他智能体的策略在不断变化。这种**非平稳性**让 Q 值估计永不收敛，独立学习（每个智能体把自己的对手当环境）在合作任务上常陷入"你进一步退一步"的震荡。
+当环境里有多个智能体同时学习，从智能体 $i$ 的视角看，下一状态不仅取决于自己的动作 $a_i$，还取决于其他智能体的联合动作 $a_{-i}$。其他策略更新以后，即使 $s$ 和 $a_i$ 相同，下一状态分布也可能改变。旧数据因此更快过时，独立 Q-Learning 的学习目标会不断移动。
 
 ### 1.1 从正则形式博弈到多智能体 RL
 
@@ -36,17 +36,17 @@ graph LR
   end
 ```
 
-CTDE 范式下产生了三大类算法：价值分解（VDN、QMIX）、actor-critic 型（MADDPG、MAPPO）、通信型（CommNet、TarMAC）。下面重点介绍 actor-critic 型的两个代表。
+CTDE 下常见三类方法：VDN、QMIX 等价值分解方法，MADDPG、MAPPO 等 Actor-Critic 方法，以及 CommNet、TarMAC 等显式通信方法。下面先看两个 Actor-Critic 代表。
 
 ## 3. 用 MADDPG 学习集中式 Critic
 
 ### 3.1 每个智能体怎样更新自己的 Actor
 
-Multi-Agent DDPG（Lowe et al. 2017）直接把 DDPG 扩展到多智能体设定。每个智能体 $i$ 持有自己的 actor $\mu_{\theta_i}(o_i)$ 和**集中式 critic** $Q_i(o_1, a_1, \ldots, o_n, a_n)$。Critic 的梯度：
+Multi-Agent DDPG（Lowe et al. 2017）直接把 DDPG 扩展到多智能体设定。每个智能体 $i$ 持有自己的 Actor $\mu_{\theta_i}(o_i)$ 和集中式 Critic $Q_i(o_1,a_1,\ldots,o_n,a_n)$。Actor $i$ 的更新需要知道：自己的动作稍微改变时，Critic 预测的回报会怎样变化。链式法则给出：
 
 $$\nabla_{\theta_i} J(\mu_{\theta_i}) = \mathbb{E}\left[\nabla_{\theta_i} \mu_{\theta_i}(o_i) \cdot \nabla_{a_i} Q_i(o_1, a_1, \ldots, o_n, a_n)\big|_{a_i = \mu_{\theta_i}(o_i)}\right]$$
 
-注意 critic 的输入维度随智能体数线性增长，且**只为自己的 $a_i$ 求梯度**，其他智能体的动作当作已知条件。这种"我学我对别人的最佳响应"的结构让 MADDPG 在混合合作-竞争任务（如 _Particle Environments_ 的 predator-prey）上稳定收敛。
+右边第一项表示参数变化会怎样改变 Actor 输出，第二项表示动作变化会怎样改变 Critic 的估值。相乘后，梯度就能把 Critic 的评价传回 Actor。更新 Actor $i$ 时只对 $a_i$ 求导，其他动作作为这批数据中的已知条件。Critic 输入会随智能体数量增长，因此这种写法在智能体很多时成本较高。
 
 ```python
 class MADDPG:
@@ -128,4 +128,4 @@ VDN 假设 $Q_{\text{tot}} = \sum_i Q_i(o_i, a_i)$，QMIX 推广为 $Q_{\text{to
 
 多智能体 RL 的主要困难是非平稳性：其他智能体的策略变化会改变单个智能体观察到的转移。CTDE 在训练时让 Critic 使用全局信息，执行时仍由各个 Actor 独立决策。MADDPG 使用异策略确定性更新，MAPPO 使用 On-Policy 裁剪更新；后者常作为 StarCraft 多智能体微操等合作任务的强基线。
 
-下一节 [12.3 分层 RL 与生成式世界模型](./hierarchical)处理长程任务，说明高层子目标与低层动作怎样缩短奖励传播距离。
+下一节 [12.3 分层强化学习与世界模型](./hierarchical)处理长程任务，说明高层子目标与低层动作怎样缩短奖励传播距离。

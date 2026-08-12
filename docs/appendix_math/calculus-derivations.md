@@ -229,4 +229,4 @@ GRPO 之所以能省掉传统 PPO 里的 Critic 网络，正是因为它用组�
 
 这三个工具分别对应策略梯度的推导骨架、更新幅度的理论依据、以及不用 Critic 的替代方案。下一篇把它们整理成完整的公式速查表。
 
-> **下一篇**：[E.3.5 完整优化公式](./calculus-advanced-formulas) —— PG、DQN、GAE、PPO、GRPO 完整公式速查。
+> **下一篇**：[D.3.5 强化学习优化公式汇总](./calculus-advanced-formulas)——集中整理 PG、DQN、GAE、PPO 与 GRPO 的公式。

@@ -1,4 +1,4 @@
-# 11.3 元 RL：MAML、RL²、PEARL 与 In-Context RL
+# 11.3 元强化学习与上下文适应
 
 [11.2](./irl-gail)假设训练与部署面对的是同一个任务，只是奖励需要从专家行为中推断。元 RL 改变了这一前提：训练期间看到一组相关任务，部署时再用少量新经验适应其中一个新任务。
 
@@ -6,9 +6,9 @@
 
 ## 1. 用三种机制适应新任务
 
-前面所有算法假设任务是固定的。但真实场景中任务常变：机器人换工件、自动驾驶换城市、LLM 换领域。**元 RL**（Meta-RL）的目标是**学习如何快速学习**——用大量相似任务训练，让智能体在新任务上用极少样本适应。
+固定任务上的策略只需学会一种行为。机器人换了工件、车辆进入新城市或语言模型换到新领域时，策略还要从少量新经验中判断“当前是哪一种任务”。**元 RL**（Meta-RL）在一组相关任务上训练，使模型学会这一步适应过程。
 
-### 1.1 三种元 RL 范式
+### 1.1 三种适应机制
 
 ```mermaid
 graph LR
@@ -22,17 +22,19 @@ graph LR
 
 ### 1.2 MAML：学习容易适应的初始化
 
-Model-Agnostic Meta-Learning（Finn et al. 2017）的核心思想：找一个初始化 $\theta^*$，使得**一两步梯度下降就能适应新任务**。
+Model-Agnostic Meta-Learning（Finn et al. 2017）要学习一个适合继续更新的初始化 $\theta$。对每个训练任务 $T_i$，先用该任务的数据做一步内层更新：
 
-外层目标：
+$$\theta_i'=\theta-\alpha\nabla_\theta\mathcal L_{T_i}(\theta)$$
+
+其中 $\alpha$ 是内层学习率，$\theta_i'$ 是适应任务 $T_i$ 后的参数。外层再检查 $\theta_i'$ 在同一任务的新数据上是否表现良好：
 
 $$\min_{\theta} \; \mathbb{E}_{T_i \sim p(T)}\left[\mathcal{L}_{T_i}\left(\theta - \alpha \nabla_\theta \mathcal{L}_{T_i}(\theta)\right)\right]$$
 
-内层用一步 SGD 得到 $\theta_i' = \theta - \alpha \nabla_\theta \mathcal{L}_{T_i}(\theta)$，外层评估 $\theta_i'$ 在 $T_i$ 上的损失。需要**二阶梯度**（梯度下降的梯度）：
+因为 $\theta_i'$ 本身由 $\theta$ 计算而来，外层对 $\theta$ 求梯度时会经过内层更新：
 
 $$\nabla_\theta \mathcal{L}_{T_i}(\theta_i') = \nabla_{\theta_i'} \mathcal{L}_{T_i}(\theta_i') \cdot (I - \alpha \nabla^2_\theta \mathcal{L}_{T_i}(\theta))$$
 
-实践中常用**一阶近似 FOMAML**：忽略 Hessian 项，只保留 $\nabla_{\theta_i'} \mathcal{L}_{T_i} \cdot (-\alpha \nabla_\theta)$，大幅降低计算成本。
+括号里的 Hessian $\nabla_\theta^2\mathcal L$ 会增加计算和显存。FOMAML 直接忽略这一项，把适应后参数上的梯度近似当作元梯度，从而降低成本。
 
 ```python
 def maml_meta_update(meta_policy, tasks, inner_lr=0.1, outer_lr=0.001):
@@ -55,27 +57,27 @@ def maml_meta_update(meta_policy, tasks, inner_lr=0.1, outer_lr=0.001):
 
 ### 1.3 RL²：把任务编码进 RNN 隐状态
 
-Duan et al. 2016 提出的 RL² 走另一条路：**整个 RL 算法被压缩进 RNN 的隐状态转移**。
+Duan et al. 2016 提出的 RL² 不在测试时更新参数，而是让 RNN 用隐状态记录交互历史。
 
 设定：跨多个 episode 训练一个 RNN 策略 $\pi_\theta(a_t \mid h_t)$，其中 $h_t = f_\theta(h_{t-1}, s_{t-1}, a_{t-1}, r_{t-1}, \text{done})$。一个 episode 内的交互历史（reward、transition）通过隐状态积累，让策略在**同一任务的后几步**做出更优决策——这等价于策略在"学习"当前任务。
 
-关键：跨 episode 时**不重置隐状态**（在 meta-training 时），让 RNN 学会"用前几轮的 reward 推断任务"。这就是**算法学习的隐式版本**——RL² 不指定学习算法，让网络自己学。
+在同一个任务的多个 episode 之间不重置隐状态，RNN 因而可以用前几轮的状态、动作和奖励调整后续行为。参数没有变化，适应发生在隐状态中；训练目标只要求后面的 episode 获得更高回报，并不预先规定网络必须实现哪一种更新算法。
 
 ### 1.4 PEARL：显式推断任务变量
 
 Probabilistic Embeddings for Actor-Critic RL（Rakelly et al. 2019）显式建模"任务后验"。设任务由隐变量 $z \sim p(z)$ 决定（如目标位置、摩擦系数），策略 $\pi_\theta(a \mid s, z)$ 条件于 $z$。
 
-适应就是推断后验 $q_\phi(z \mid \tau_{1:K})$——给定少量经验 $\tau$，输出任务嵌入 $z$。训练目标结合 ELBO 与 RL 损失：
+适应过程就是根据少量经验 $\tau$ 推断后验 $q_\phi(z\mid\tau)$，得到当前任务的嵌入 $z$。训练同时要求策略获得高回报，并限制后验不要无约束地偏离先验：
 
 $$\mathcal{L} = -\mathbb{E}_{z \sim q_\phi}\left[\sum_t r(s_t, a_t, z)\right] + \beta \cdot D_{\text{KL}}\left(q_\phi(z \mid \tau) \,\|\, p(z)\right)$$
 
-PEARL 在 Meta-World（50 个机器人任务）上仅用 5 步适应就能达到 80% 性能，远超 MAML（需要 50+ 步）。
+第一项是负回报，最小化它会提高策略表现；第二项是 KL 正则，$\beta$ 控制任务信息压缩的强度。实际适应速度取决于任务分布、上下文长度和实现，不能只由方法名称判断。
 
-| 方法  | 适应机制                | 是否二阶梯度         | 样本效率 | 推断方式       |
-| ----- | ----------------------- | -------------------- | -------- | -------------- |
-| MAML  | 梯度下降                | ✅（一阶近似可避免） | 中       | 显式更新参数   |
-| RL²   | RNN 隐状态              | ❌（端到端训练）     | 高       | 隐式（黑盒）   |
-| PEARL | 变分后验 $q(z\mid\tau)$ | ❌                   | 最高     | 显式（可解释） |
+| 方法  | 适应发生在哪里              | 是否需要二阶梯度     | 测试时怎样使用新经验 |
+| ----- | --------------------------- | -------------------- | -------------------- |
+| MAML  | 模型参数                    | 可用，也可做一阶近似 | 做少量梯度更新       |
+| RL²   | RNN 隐状态                  | 不需要               | 继续输入交互历史     |
+| PEARL | 任务变量后验 $q(z\mid\tau)$ | 不需要               | 更新任务变量后验     |
 
 ### 1.5 元 RL 与 Few-Shot 学习
 
@@ -83,13 +85,13 @@ PEARL 在 Meta-World（50 个机器人任务）上仅用 5 步适应就能达到
 
 ## 2. 把学习过程放进上下文
 
-RL² 的隐式"任务推断"在 transformer 时代迎来复兴。DeepMind 2022 的 **Algorithm Distillation**（Laskin et al.）证明：**transformer 的 in-context 能力可以蒸馏整个 RL 算法**。
+RL² 用隐状态承载适应过程，Algorithm Distillation（Laskin et al. 2022）则把一段完整的 RL 学习历史交给 Transformer，让模型预测学习过程中的下一步动作。
 
 ### 2.1 Algorithm Distillation 的训练数据
 
 给定一个跨多任务的 RL 训练 run，每条轨迹 $\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots)$。Algorithm Distillation 的关键洞察：
 
-> 沿一个 RL 训练 run 的进度看，**早期 episode 是菜鸟策略，后期 episode 是专家策略**。如果让 transformer 预测"给定前 $k$ 个 episode 的历史，下一个 action 是什么"，它必须**在上下文中学到从菜鸟到专家的改进过程**——即隐式学到 RL 算法本身。
+> 同一次 RL 训练中，早期 episode 的回报通常较低，后期 episode 的策略逐渐改善。Transformer 若要根据前 $k$ 个 episode 预测下一动作，就必须利用历史中的状态、动作和奖励判断行为怎样随经验变化。
 
 数据组织：
 
@@ -112,7 +114,7 @@ RL² 的隐式"任务推断"在 transformer 时代迎来复兴。DeepMind 2022 �
 | in-context 学什么 | 任务 ID（隐式）    | **RL 算法本身**         |
 | 跨算法泛化        | 单一算法           | 可蒸馏 DQN、PPO、A2C 等 |
 
-AD 的关键实验：训练时只用 PPO 的历史，但 transformer 在测试时**能执行从未见过的 RL 算法的功能**——因为它学到了"如何用 reward 改进策略"的通用机制。
+AD 的实验关心 Transformer 能否从训练历史中恢复“获得奖励以后怎样改变动作”的规律。它模仿的是轨迹中表现出来的学习过程，泛化能力取决于训练任务和学习历史是否覆盖测试时需要的变化。
 
 ```python
 def algorithm_distillation_data_generate(env, rl_algorithm, n_runs=1000, n_episodes_per_run=200):
@@ -163,7 +165,7 @@ LLM 的 in-context learning 历史与 in-context RL 高度平行：
 - **GPT-3 的 in-context learning**（2020）：在 prompt 里给几个例子，模型不更新参数就学会任务——这是**监督学习**的 in-context 版本
 - **Algorithm Distillation 的 in-context RL**（2022）：在 context 里给几条带 reward 的轨迹，模型不更新参数就学会 RL——这是**强化学习**的 in-context 版本
 
-两者都依赖 transformer 的**归纳推理**能力。这解释了为什么 LLM 在 RLHF 之后会涌现"在上下文中改善"的能力——transformer 编码了某种隐式的 RL 机制。
+两者都把示例或交互历史放进上下文，再预测下一步输出。是否真正实现了某种 RL 更新，需要通过新任务上的适应曲线检验，不能仅凭模型在上下文中改变回答就下结论。
 
 ## 4. 把模仿与适应放回 LLM 后训练
 
@@ -175,7 +177,7 @@ LLM 的 in-context learning 历史与 in-context RL 高度平行：
 
 $$\mathcal{L}_{\text{SFT}}(\theta) = -\sum_{t=1}^T \log \pi_\theta(y_t \mid x, y_{<t})$$
 
-这正是 11.1 节的行为克隆损失——$(x, y)$ 是"专家示范"，$\pi_\theta$ 是策略。SFT 的所有问题都是 BC 的经典问题：
+这个目标与 11.1 节的行为克隆形式相同：$(x,y)$ 是示范，$\pi_\theta$ 是待训练策略。行为克隆中的几个问题也会在自回归生成中出现：
 
 - **分布偏移**：训练时专家状态是高质量指令-回答，部署时模型生成的下一步 token 会偏离
 - **错误累积**：一旦生成 token 偏离，后续 token 在"未见过的状态"上更易出错

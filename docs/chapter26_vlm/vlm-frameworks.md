@@ -261,7 +261,7 @@ def multimodal_agent_reward(trajectory, task):
 如果你想训练多模态 Agent，建议的路径是：
 
 1. **先练视觉理解**：用本章的 VLM GRPO 训练基础视觉能力
-2. **再练工具调用**：用[第 19 章的工具调用 RL](../chapter22_agentic/tool-use-and-trajectory)训练基本的工具使用模式
+2. **再练工具调用**：用[第 19 章的工具调用与轨迹生成](../chapter22_agentic/tool-use-and-trajectory)训练基本的工具使用模式
 3. **最后联合训练**：在多模态 Agent 任务上做端到端 RL，reward 设计参考上面的复合奖励函数
 
 关键原则：**先单独验证视觉理解和工具调用各自达标，再做端到端联合训练**。如果基础组件有问题，联合训练也救不回来。

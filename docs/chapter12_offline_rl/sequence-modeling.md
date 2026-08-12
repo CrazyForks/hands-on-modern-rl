@@ -1,4 +1,4 @@
-# 10.2 Decision Transformer、Trajectory Transformer 与 Diffuser
+# 10.2 基于序列建模的离线强化学习
 
 [10.1](./intro)仍在 Bellman 框架中估计价值，只是限制策略或价值函数不要离开固定数据。Decision Transformer 提出了另一种做法：把状态、动作与回报排成序列，直接学习在给定目标回报时应该采取什么动作。
 
@@ -10,19 +10,21 @@
 
 ### 1.1 把 Return-to-Go 作为条件
 
-DT 的核心洞察是：在监督学习框架下，一条轨迹 $\tau = (s_1, a_1, r_1, s_2, a_2, r_2, \ldots, s_T, a_T, r_T)$ 里，每个动作 $a_t$ 都有一个**自然的目标**——从 $t$ 时刻起累计的回报：
+一条轨迹记为 $\tau=(s_1,a_1,r_1,\ldots,s_T,a_T,r_T)$。在第 $t$ 步，模型除了看到当前状态，还需要知道“接下来希望取得多少回报”。Decision Transformer 用从当前时刻到轨迹结束的奖励总和表示这个目标：
 
 $$\hat{R}_t = \sum_{t'=t}^{T} r_{t'}$$
 
-称为 **return-to-go**。给定 $\hat{R}_t$ 和 $s_t$，预测 $a_t$ 就是普通的条件监督学习。
+这个量称为 **return-to-go（RTG）**。例如后面三步奖励是 $2,1,3$，那么三个位置的 RTG 依次为 $6,4,3$。时间越往后，已经获得的奖励会从目标中扣除。给定 $\hat R_t$ 和 $s_t$ 后，训练任务就是预测数据中实际采取的 $a_t$。
 
 DT 把轨迹重组为三元组序列：
 
 $$\hat{R}_1, s_1, a_1, \hat{R}_2, s_2, a_2, \ldots, \hat{R}_T, s_T, a_T$$
 
-每个 timestep 包含 (RTG, state, action) 三个 token。然后用 GPT 风格的 causal transformer 自回归建模：
+每个时间步依次放入 RTG、状态和动作。因果注意力保证模型预测 $a_t$ 时只能看到当前及以前的信息：
 
 $$\pi_\theta(a_t \mid \hat{R}_t, s_t, a_{t-1}, \ldots) = \text{Transformer}(\hat{R}_{1:t}, s_{1:t}, a_{1:t-1})$$
+
+左边是模型在当前上下文中选择动作 $a_t$ 的概率；右边表示 Transformer 读取过去的目标回报、状态和动作。训练不会调用 Bellman 更新，只要求预测动作接近数据中的动作。
 
 ```python
 class DecisionTransformer(nn.Module):
@@ -80,7 +82,7 @@ DT 的训练损失就是连续动作回归的 MSE（或离散动作的交叉熵�
 
 $$\mathcal{L} = \mathbb{E}_{\tau \sim \mathcal{D}}\left[\sum_t \|\hat{a}_t - a_t\|^2\right]$$
 
-**没有 Bellman，没有 Q-Learning，没有时序差分**。整个训练过程和训练 GPT 完全一样：扫描轨迹，做下一个 token 预测。这一性质让 DT 可以无缝接入 LLM 训练栈——数据加载、AdamW、cosine schedule、gradient checkpointing 全部沿用。
+连续动作使用均方误差，离散动作则使用交叉熵。训练过程与一般序列模型相同：读取一段历史，预测下一个动作。因此，数据加载、优化器和分布式训练组件可以沿用 Transformer 训练栈。
 
 ### 1.3 推理时怎样使用目标回报
 
@@ -99,15 +101,15 @@ for t in range(max_steps):
     target_return -= reward
 ```
 
-这个机制非常优雅——RTG 是一个**控制变量**，调高调低能生成不同性能水平的策略。实验上 DT 在 Atari、MuJoCo、Key-to-Door 上**达到或超越** CQL/IQL。
+RTG 在推理时充当控制条件。每执行一步，就从剩余目标中减去实际奖励，使下一步输入表示“还差多少回报”。目标设得过高时，模型可能进入训练数据没有覆盖的条件区间，因此需要参考数据集中的回报范围。
 
 ### 1.4 Decision Transformer 为什么能够工作
 
-这是离线 RL 社区最有争议的问题之一。传统 RL 视角里，**没有 Bellman 备份就不可能学到长期回报的最优策略**——因为监督信号只能从采到的轨迹来。DT 的回答是：**当数据集足够丰富时，轨迹本身已经隐含了最优性信息**。
+Decision Transformer 能否工作，取决于数据中是否同时出现了状态、动作和最终回报之间的稳定关系。数据集如果包含不同质量的轨迹，RTG 就能帮助模型区分哪些动作经常出现在高回报轨迹中。
 
 - 数据集里有 expert 轨迹（高 RTG）、medium 轨迹（中 RTG）、random 轨迹（低 RTG）
 - 给定目标 RTG 高，transformer 学到的条件分布 $p(a \mid \hat{R}_{\text{high}}, s)$ 自然偏向高回报动作
-- 这相当于一种**基于检索的策略学习**——本质是模仿"曾经达到过类似 RTG 的轨迹"
+- 这可以理解为模仿“在相似状态下曾经达到相似 RTG 的轨迹”
 
 形式化地，DT 学到的策略可以写成：
 
@@ -117,7 +119,7 @@ $$\pi_\theta(a \mid s, \hat{R}) \propto \exp\left(-\frac{1}{2\sigma^2}\|a - f_\t
 
 $$\pi_\theta(a \mid s, \hat{R}) \approx \pi_\beta(a \mid s, \text{return} \approx \hat{R})$$
 
-即 DT 学到的是行为策略在"指定回报条件下"的条件分布。这正是为什么 DT 不能超越数据集中最好的策略——它从未组合过两个次优轨迹的好的部分。
+即 DT 学到的是行为策略在指定回报条件下的条件分布。数据没有覆盖的状态—动作组合仍然难以可靠预测；不同任务和数据集上的轨迹拼接能力也会不同。
 
 这一观察催生了后续大量工作：online RL 中的 RL via supervised learning、in-context RL（Algorithm Distillation）、Star-Vector、Eyre et al. 的 "language modeling is all you need for RL" 等。
 
@@ -145,11 +147,11 @@ $$p_\theta(\tau) = \prod_{t=1}^{T} p_\theta(s_t, a_t, r_t \mid s_{<t}, a_{<t}, r
 
 ## 3. 用 Diffuser 生成完整轨迹
 
-Janner et al. 2022 把扩散模型引入 RL。把一条轨迹 $\tau \in \mathbb{R}^{T \times (d_s + d_a)}$ 视为高维图像般的对象，训练一个扩散模型：
+Janner et al. 2022 把整条轨迹作为扩散模型的生成对象。若状态维度是 $d_s$、动作维度是 $d_a$、轨迹长度是 $T$，轨迹可以写成形状为 $T\times(d_s+d_a)$ 的矩阵。训练时先给真实轨迹加噪，再让网络预测加入的噪声：
 
 $$\min_\theta \; \mathbb{E}_{\tau, t, \epsilon}\left[\|\epsilon - \epsilon_\theta(\tau_t, t)\|^2\right]$$
 
-其中 $\tau_t$ 是轨迹在 timestep $t$ 加噪后的版本，$\epsilon_\theta$ 是去噪网络（通常是 1D temporal U-Net 或 transformer）。推理时从纯噪声开始逐步去噪，得到完整轨迹。
+其中 $\tau_t$ 是加噪后的轨迹，$t$ 表示扩散步骤，$\epsilon$ 是实际加入的噪声，$\epsilon_\theta$ 是网络预测的噪声。两者越接近，均方误差越小。推理时从随机噪声开始，多次减去预测噪声，最终得到一条完整轨迹。
 
 Diffuser 使用 classifier-free guidance 控制生成方向。训练时随机丢弃状态或奖励条件，让模型同时学习条件分布和无条件分布：
 
@@ -173,4 +175,4 @@ $$\tilde{\epsilon}_\theta = (1 + w) \cdot \epsilon_\theta(\tau_t, t, c) - w \cdo
 
 Decision Transformer 在给定 return-to-go 时自回归生成动作，因此可以直接复用 Transformer 的监督训练方法。Trajectory Transformer 用 Beam Search 搜索完整轨迹，Diffuser 则通过迭代去噪生成轨迹。三者都依赖离线数据中已有的行为覆盖，只是表示轨迹和选择动作的方式不同。
 
-下一节 [10.3 离线 RL 与 LLM 数据](./experiments)把固定数据的视角带到偏好优化，比较 DPO、偏好数据和序列建模之间的联系与差别。
+下一节 [10.3 离线强化学习与偏好数据](./experiments)把固定数据的视角带到偏好优化，比较 DPO、偏好数据和序列建模之间的联系与差别。

@@ -2,7 +2,7 @@
 title: 19.4 Tool Use, Trajectory Synthesis, and Agentic Engineering
 ---
 
-# 19.4 Tool Use, Trajectory Synthesis, and Agentic Engineering
+# 19.4 Tool Use and Trajectory Generation
 
 This section merges the original topics of "trajectory synthesis and data engineering" and "tool use and Agentic engineering" into one engineering storyline. We first ask where the training data comes from, then discuss how a model learns tool-use policies, and finally land on the environment, sandboxing, asynchronous rollout, and reward-design problems that real training systems must solve.
 

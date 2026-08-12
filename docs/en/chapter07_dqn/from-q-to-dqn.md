@@ -2,7 +2,7 @@
 title: 5.1 Why DQN Is Needed
 ---
 
-# 5.1 Why DQN Is Needed
+# 5.1 From Q-Learning to DQN
 
 Part I built the full value-learning loop with tables and explicit states. Real tasks have much larger state spaces, so the value function must be approximated by a neural network. Part II starts from this change, moves from Q-Learning to DQN, and then develops policy gradients, Actor-Critic, TRPO, PPO, and continuous control.
 

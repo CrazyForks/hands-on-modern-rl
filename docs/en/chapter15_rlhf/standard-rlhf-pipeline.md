@@ -2,7 +2,7 @@
 title: 13.4 The RLHF Pipeline
 ---
 
-# 13.4 The RLHF Pipeline
+# 13.4 Reinforcement Learning Fine-Tuning
 
 ## Reading Guide
 

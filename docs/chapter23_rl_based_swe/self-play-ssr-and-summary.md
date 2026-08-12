@@ -1,4 +1,4 @@
-# 20.3 Self-play SWE-RL 与工业落地
+# 20.3 Self-Play SWE-RL
 
 至此我们讨论了 SWE-RL 的三个支柱：
 

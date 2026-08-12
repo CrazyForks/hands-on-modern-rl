@@ -1,4 +1,4 @@
-# 13.7 动手：veRL PPO 训练 GSM8K
+# 13.7 动手：使用 veRL 和 PPO 训练 GSM8K
 
 13.4 节我们讲了 PPO-RLHF 的四模型协作原理——Actor、Reference、Reward Model、Critic 各自的角色，以及 KL 惩罚、token-level reward、advantage 估计的数学关系。这一节我们换一个姿势：用工业级框架 [veRL](https://github.com/volcengine/verl)，在 GSM8K 数学推理数据集上跑通 PPO 训练。
 

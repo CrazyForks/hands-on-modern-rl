@@ -2,7 +2,7 @@
 title: B.8 Attention Mechanism
 ---
 
-# B.8 Self-Attention, MHA, MQA, and GQA
+# B.8 Attention Mechanism
 
 Strictly speaking this is not an RL algorithm, but it is one of the top three most frequent "handwrite the code" questions in LLM interviews, and RL interviews often use it as prerequisite knowledge.
 

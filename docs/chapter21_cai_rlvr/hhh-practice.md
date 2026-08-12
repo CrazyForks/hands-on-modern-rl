@@ -1,6 +1,6 @@
 # 13.3 AI 反馈与安全原则
 
-> 前面的 [13.1 从基座模型到指令对齐](../chapter15_rlhf/base-model-to-assistant) 和 [13.2 SFT 指令微调](../chapter15_rlhf/imitation-learning-pipeline) 已经说明如何收集人类偏好，并把 `chosen/rejected` 回答对变成奖励模型的训练信号。这条路线依赖一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，人类标注会同时遇到成本、速度和专业判断力的瓶颈。本节由此引出一个问题：**训练信号还能从哪里来？** Anthropic 2022 年提出 Constitutional AI，让 AI 按明确的安全原则评价回答、修订回答并生成偏好对；这也为后面的 RL 微调建立了另一种反馈来源。
+> 前面的 [13.1 从基座模型到指令对齐](../chapter15_rlhf/base-model-to-assistant) 和 [13.2 监督微调 SFT](../chapter15_rlhf/imitation-learning-pipeline) 已经说明如何收集人类偏好，并把 `chosen/rejected` 回答对变成奖励模型的训练信号。这条路线依赖一个前提：**偏好数据来自人类**。当模型能力逼近或超过标注员水平时，人类标注会同时遇到成本、速度和专业判断力的瓶颈。本节由此引出一个问题：**训练信号还能从哪里来？** Anthropic 2022 年提出 Constitutional AI，让 AI 按明确的安全原则评价回答、修订回答并生成偏好对；这也为后面的 RL 微调建立了另一种反馈来源。
 
 ## Constitutional AI 框架
 

@@ -1,4 +1,4 @@
-# 9.1 DDPG 与确定性策略梯度
+# 9.1 确定性策略梯度与 DDPG
 
 > [第 8 章 PPO](../chapter10_ppo/intro) 解决了连续动作空间的策略学习问题——用高斯策略输出连续动作 + clip 保证稳定更新。但 PPO 是 on-policy 的：每次策略更新后必须重新采样数据，**样本效率极低**。本章解决两个问题：(1) 如何 off-policy 地处理连续动作（DDPG/TD3/SAC）；(2) 如何用环境模型进一步提升样本效率（Model-Based RL + AlphaZero/Dreamer）。
 

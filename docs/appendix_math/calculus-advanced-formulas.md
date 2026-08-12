@@ -1,4 +1,4 @@
-# D.3.5 PG、DQN、GAE、PPO、GRPO 完整公式
+# D.3.5 强化学习优化公式汇总
 
 > **前置知识**：本页汇总 E.3 模块所有公式，建议在读完 [E.3.1](./calculus-basics) 到 [E.3.4](./calculus-derivations) 后再来回顾。
 

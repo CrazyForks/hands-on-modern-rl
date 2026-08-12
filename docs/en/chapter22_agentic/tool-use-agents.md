@@ -2,7 +2,7 @@
 search: false
 ---
 
-# 19.5 Search-Augmented RL: Web and Code Agents
+# 19.5 Search-Augmented RL
 
 In the previous section, we unpacked the credit assignment problem in multi-turn RL: if a seven-turn interaction fails, which step should we blame? Now we turn to another key question: how does a model learn to "use tools"? Supervised fine-tuning (SFT) can teach a model what the JSON format of a tool call looks like, but it cannot reliably teach the model when to call a tool, which tool to call, or how to combine several tools. Those are strategic decisions, and this is exactly where RL is strong.
 

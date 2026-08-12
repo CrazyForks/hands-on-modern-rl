@@ -1,4 +1,4 @@
-# 10.3 离线 RL 与 LLM 数据
+# 10.3 离线强化学习与偏好数据
 
 [10.2](./sequence-modeling)把固定轨迹写成了序列建模问题。LLM 的偏好优化同样从固定数据出发：训练集已经给出提示、较好回答和较差回答，训练期间不能重新询问标注者这两个回答是否可靠。
 
@@ -14,13 +14,15 @@ LLM 偏好数据与离线 RL 数据共享一个关键约束：训练只能使用
 
 $$\mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(x, y_w, y_l)}\left[\log \sigma\left(\beta \log \frac{\pi_\theta(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \beta \log \frac{\pi_\theta(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)}\right)\right]$$
 
+先只看括号里的差值。$x$ 是提示，$y_w$ 是偏好数据中较好的回答，$y_l$ 是较差的回答。$\log(\pi_\theta/\pi_{\text{ref}})$ 衡量当前模型相对参考模型把某个回答提高了多少；两项相减后，训练会提高较好回答的相对概率，并降低较差回答的相对概率。$\beta$ 控制这个差值的尺度，$\sigma$ 再把它变成 $0$ 到 $1$ 之间的偏好概率。
+
 这个目标写成了分类损失。Rafailov et al. 2024 在后续论文 "From $r$ to $Q^*$" 中进一步证明，DPO 的隐式奖励可以表示为带 KL 约束的 Q 函数。
 
 定义隐式优势函数：
 
 $$\hat{A}(x, y) = \beta \log \frac{\pi_\theta(y \mid x)}{\pi_{\text{ref}}(y \mid x)}$$
 
-注意这里没有显式 reward model——但可以证明存在一个隐式 reward 函数 $\hat{r}(x, y) = \beta \log(\pi_\theta / \pi_{\text{ref}}) + \beta \log Z(x)$，使得 $\hat{A}$ 是该 reward 下的优势函数。进一步，定义 token-level 价值：
+这里没有单独训练奖励模型。带 KL 约束的最优策略可以反推出一个隐式奖励，其中与回答有关的部分正是上面的对数概率比。若把生成过程按 token 看成一段决策，还可以定义 token 级价值：
 
 $$Q^*(s_t, a_t) = \hat{r}(s_t, a_t) + \gamma \mathbb{E}_{s_{t+1}}\left[\max_{a'} Q^*(s_{t+1}, a')\right]$$
 
@@ -28,13 +30,13 @@ DPO 损失变为：
 
 $$\mathcal{L} = -\mathbb{E}\left[\log \sigma\left(\hat{A}(x, y_w) - \hat{A}(x, y_l)\right)\right]$$
 
-这正是 **preferential Bradley-Terry 模型对隐式优势的 softmax 损失**。DPO 训练完成时，$\hat{A}$ 自动满足一个隐式 Bellman 方程（推导见 Rafailov et al. 2024）。这意味着：
+DPO 用回答对的相对顺序训练这个隐式优势。完整的 Q 函数解释需要额外的序列决策假设，推导见 Rafailov et al. 2024。这里先保留三点直接结论：
 
 - **DPO 是离线 RL**：训练时不与 reward model 或 environment 交互，只用固定的 $(x, y_w, y_l)$ 数据集
 - **DPO 的约束**：KL 到参考模型 $\pi_{\text{ref}}$，对应离线 RL 里的"不偏离行为策略太远"
 - **DPO 避开了 Q-Learning 的 max 外推路径**：它直接从偏好数据学习相对关系，并用参考策略控制更新幅度。偏好数据覆盖不足时仍会产生分布外泛化问题，因此独立评测依然必要
 
-理解了这一对应，就能解释 LLM 后训练中许多经验现象：$\beta$ 太小 → $\pi_\theta$ 偏离 $\pi_{\text{ref}}$ 太远 → reward hacking（相当于离线 RL 中策略飞向 OOD 区域）；$\beta$ 太大 → 保守过头 → 学不到东西。这与离线 RL 中 $\alpha$ 调节 CQL 保守性的 trade-off 完全一致。
+这个对应也说明了 $\beta$ 的作用：它改变当前策略相对参考策略的更新尺度。更新过大时，模型容易进入偏好数据覆盖不足的区域；更新过小时，较好回答与较差回答的概率差又拉不开。因此要同时观察偏好准确率、KL、回答长度和独立评测，不能只看训练损失。
 
 ## 2. 把偏好数据看作固定数据集
 
@@ -82,12 +84,12 @@ graph LR
 ## 本章总结
 
 1. **固定数据会产生分布偏移**：Q-Learning 的 max 算子可能选中数据集外动作，使估值误差在多轮 Bellman 更新中累积
-2. **三大保守路线**：BCQ 约束动作空间、CQL 惩罚 OOD 的 Q 值、IQL 完全规避 max；以及工程化的 BC 正则路线（TD3+BC、AWAC）
+2. **三种保守路线**：BCQ 约束动作空间、CQL 惩罚 OOD 的 Q 值、IQL 避免对数据外动作取 max；以及工程化的 BC 正则路线（TD3+BC、AWAC）
 3. **Decision Transformer 采用条件序列建模**：它不使用 Bellman 更新，而是把 RTG 作为控制变量，让 Transformer 直接处理轨迹
 4. **Trajectory Transformer + Diffuser** 进一步把"序列建模"推到联合轨迹分布建模与扩散生成
 5. **DPO 可以从离线优化视角理解**：偏好数据是固定数据，参考策略限制更新幅度，隐式 Q-Learning 提供了一种解释其目标的方式
 
-下一章[第 11 章模仿学习、逆向 RL 与元 RL](../chapter13_imitation_meta_rl/bc-dagger)处理另一类缺少奖励信号的设定：只观察专家行为时，怎样学习策略或推断奖励。
+下一章[第 11 章模仿学习、逆强化学习与元强化学习](../chapter13_imitation_meta_rl/bc-dagger)处理另一类缺少奖励信号的设定：只观察专家行为时，怎样学习策略或推断奖励。
 
 ## 延伸阅读
 

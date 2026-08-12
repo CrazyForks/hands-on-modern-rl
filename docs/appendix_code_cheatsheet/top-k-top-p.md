@@ -1,4 +1,4 @@
-# B.7 Top-k / Top-p Sampling 与 Temperature
+# B.7 采样方法
 
 解码策略是 LLM 面试的常考题，和 RL 直接相关（RLHF 训练后的策略怎么采样、temperature 如何影响动作分布）。
 

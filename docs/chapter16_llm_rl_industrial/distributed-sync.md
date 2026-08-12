@@ -2,7 +2,7 @@
 outline: false
 ---
 
-# 18.4 多机 RL 训练如何协同
+# 18.4 分布式 RL 训练
 
 [18.3](./modern-industrial-practice) 已经说明，训练系统必须保证采样策略、模型版本和数值计算保持一致。现在把一次训练分到多张 GPU 上，看看数据怎样流动。
 
@@ -68,7 +68,9 @@ $$
 r_t(\theta) = \frac{\pi_\theta(a_t\mid s_t)}{\pi_{\text{old}}(a_t\mid s_t)}.
 $$
 
-这个比率假定分母 $\pi_{\text{old}}$ 就是生成动作时使用的策略。如果回答实际来自 $\pi_{\text{rollout}}$，而训练端用另一条计算路径重算出 $\pi_{\text{old}}$，分母在更新开始前已经带有偏差。clipping 可以限制新旧策略之间的更新幅度，无法消除两个引擎的计算差异。
+$\hat A_t$ 表示动作 $a_t$ 比当前平均水平好多少，$\epsilon$ 决定允许比率偏离 1 的范围。假设旧策略生成某个 token 的概率是 $0.20$，新策略把它提高到 $0.24$，那么 $r_t=0.24/0.20=1.2$。当 $\epsilon=0.2$ 时，这次变化刚好到达 clipping 的上边界；继续提高概率也不会继续放大这一项的优化收益。
+
+这个计算有一个前提：分母 $\pi_{\text{old}}$ 必须是生成动作时真正使用的策略。如果回答来自 $\pi_{\text{rollout}}$，训练端却用另一条计算路径重算 $\pi_{\text{old}}$，那么 $r_t$ 在更新开始以前就已经不准确。clipping 只能限制参数更新，不能修正两个引擎算出的概率差异。
 
 ### 1.3 训推偏差的排查顺序
 
@@ -424,7 +426,7 @@ class VLLMRolloutWorker:
 
 - **vLLM**：通用 rollout、单轮生成
 - **SGLang**：agentic rollout、多轮、结构化输出
-- **TRT-LLM**：NVIDIA 硬件极致优化
+- **TRT-LLM**：针对 NVIDIA GPU 的推理优化
 
 ### 3.2 显存怎样分摊到多张 GPU
 
@@ -432,19 +434,30 @@ class VLLMRolloutWorker:
 
 #### 训练显存的构成
 
-训练显存包含四部分：
+训练显存包含权重、梯度、优化器状态和激活。以常见的 BF16 权重与梯度、FP32 主权重和 Adam 一阶、二阶动量为例，每个参数大约需要：
 
-$$\text{Memory} = \underbrace{|\theta| \cdot 2}_{\text{权重（bf16）}} + \underbrace{|\theta| \cdot 2}_{\text{梯度}} + \underbrace{|\theta| \cdot 8 + \text{optimizer state}}_{\text{Adam state}} + \underbrace{\text{activation}}_{\text{激活}}$$
+$$
+\begin{aligned}
+M \approx {}& \underbrace{2N}_{\text{BF16 权重}}
++ \underbrace{2N}_{\text{BF16 梯度}}
++ \underbrace{4N}_{\text{FP32 主权重}} \\
+&+ \underbrace{8N}_{\text{Adam 的 }m\text{ 和 }v}
++ M_{\text{act}},
+\end{aligned}
+$$
+
+其中 $N$ 是参数数量，前四项的单位都是字节，$M_{\text{act}}$ 是激活占用。也就是说，在不考虑激活时，这种配置约需每个参数 $16$ 字节。不同优化器和精度配置会改变这个数字，例如不保存 FP32 主权重时会少 $4N$ 字节。
 
 对 70B 模型：
 
 - 权重：140 GB
 - 梯度：140 GB
-- Adam state（m, v, master weights）：560 GB
+- FP32 主权重：280 GB
+- Adam 的 $m$、$v$：560 GB
 - 激活：~100 GB（取决于 batch size 和 seq len）
-- **总计**：~940 GB
+- **总计**：约 1.22 TB
 
-单卡 80GB H100 远远不够。
+这个估算的作用是确定量级，并非精确预测显存。激活检查点、优化器实现、序列长度和 batch size 都会改变实际占用；但它已经足以说明 70B 全参数训练无法放进一张 80GB GPU。
 
 #### ZeRO（Zero Redundancy Optimizer）
 
@@ -862,6 +875,8 @@ with RLProfiler() as p:
 MFU 用实际执行的浮点运算量除以硬件在同一时间内能够提供的峰值运算量：
 
 $$\text{MFU} = \frac{\text{实际 FLOPs}}{\text{峰值 FLOPs} \times \text{时间}}$$
+
+例如，8 张 GPU 的理论峰值都是 1000 TFLOPS，连续运行 10 秒最多可完成 $8\times1000\times10=80{,}000$ TFLOP 的计算。若模型实际完成了 32,000 TFLOP，那么 MFU 为 $32{,}000/80{,}000=40\%$。剩余时间可能消耗在通信、等待数据或生成轨迹上。
 
 H100 bf16 峰值 ~1000 TFLOPS。典型 LLM RL 训练 MFU：
 

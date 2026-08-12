@@ -1,4 +1,4 @@
-# 6.7 动手：带基线的策略梯度
+# 6.7 动手：带价值基线的策略梯度
 
 > **本节目标**：在 `CartPole-v1` 上对比原始 REINFORCE 和 REINFORCE + Value Baseline，观察 $V(s)$ 如何让策略梯度训练更快、更稳。
 

@@ -2,7 +2,7 @@
 title: '6.5 Hands-On: Policy Gradient CartPole'
 ---
 
-# 6.5 Hands-on: Policy Gradient CartPole
+# 6.5 Hands-on: REINFORCE on CartPole
 > **Goal of this section**: Train `CartPole-v1` with REINFORCE, observe what policy gradients look like in a high-variance setting, and connect the slogan "good outcomes increase the probability of the actions that produced them" to a real control task.
 
 > **Code for this section**: [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)

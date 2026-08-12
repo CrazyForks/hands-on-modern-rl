@@ -1,4 +1,4 @@
-# 26.4 进化式 LLM 搜索与科学发现
+# 26.4 进化搜索与科学发现
 
 [本章前面几节](../self-play-outlook/)讨论了 RL 的传统前沿——self-play、multi-agent 与 scaling。这一节转向一个新的方向：**LLM 驱动的科学发现**。
 

@@ -2,7 +2,7 @@
 title: 14.3 DPO Theory, Math, and Method Selection
 ---
 
-# 14.3 DPO Theory, Math, and Method Selection
+# 14.3 DPO Improvements
 
 You have already run DPO training code and watched metrics such as loss, accuracy, and reward margin move during training. Now let us slow down and return to the original problem DPO tries to solve: **if we already have human preference data, can we train the language model directly, without training a Reward Model and without running a full PPO pipeline?**
 

@@ -2,7 +2,7 @@
 title: 18.2 The Complete Industrial Post-Training Workflow
 ---
 
-# 18.2 The Complete Industrial Post-Training Workflow
+# 18.2 Industrial Post-Training Pipeline
 
 When DPO, GRPO, and RLVR are placed inside real companies, post-training no longer looks like a single algorithm. It becomes an entire production system: data synthesis, SFT, preference optimization, verifiable rewards, online rollouts, tool environments, evaluation, refusal behavior, and safety policies are iterated together. The following survey organizes the mainstream practices that could be found in public materials as of 2026-05-06, with emphasis on the learnable methodological pieces in each company's disclosures: task construction, environment wrapping, reward design, the handoff between SFT and RL, training stability, and capability backfilling.
 

@@ -2,7 +2,7 @@
 title: 5.2 DQN Improvement Family
 ---
 
-# 5.2 DQN Improvement Family
+# 5.2 DQN Improvements
 In the previous section, we trained DQN on `LunarLander-v3` and saw a complete learning curve.
 
 That experiment makes two points clear:

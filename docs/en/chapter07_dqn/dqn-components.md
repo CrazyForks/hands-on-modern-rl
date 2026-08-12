@@ -2,7 +2,7 @@
 title: 5.3 DQN Architecture
 ---
 
-# 5.3 DQN Architecture
+# 5.3 Distributional RL
 ## Section Guide
 
 **Core ideas**

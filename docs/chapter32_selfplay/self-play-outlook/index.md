@@ -1,4 +1,4 @@
-# 26.1 自博弈基础与 LLM 自博弈
+# 26.1 自博弈与 LLM 训练
 
 从第 1 章的 CartPole 到第 15 章的 GRPO，我们走过了现代 RL 的核心旅程。你学会了 Q-Learning 和 DQN 如何让智能体从试错中学习，策略梯度如何直接优化行为，PPO 如何稳定地训练大模型，GRPO 如何用可验证奖励激发推理能力。第 19 章的 Agentic RL 把 RL 从"单轮对话"推进到了"多轮工具交互"。
 
@@ -11,7 +11,7 @@
 | [26.1 自博弈与自我进化](/chapter32_selfplay/self-play-outlook/)      | 模型能否通过自我博弈持续进化？           |
 | [26.2 RL Scaling 展望](/chapter32_selfplay/rl-scaling-outlook)       | 训练规模与推理规模怎样改变能力上限？     |
 | [26.3 LLM 多智能体强化学习](/chapter32_selfplay/llm-multi-agent-rl/) | 多个角色如何学习协作、竞争与分配信用？   |
-| [26.4 进化式 LLM 搜索与科学发现](/chapter32_selfplay/alphaevolve/)   | LLM 与进化搜索如何发现新算法和科学结果？ |
+| [26.4 进化搜索与科学发现](/chapter32_selfplay/alphaevolve/)         | LLM 与进化搜索如何发现新算法和科学结果？ |
 
 先从自博弈的基本循环开始——[26.1 自博弈与自我进化](/chapter32_selfplay/self-play-outlook/)。
 

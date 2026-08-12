@@ -1,4 +1,4 @@
-# 22.2 指令层级与 Prompt Injection 防御
+# 22.2 Prompt Injection 与指令层级
 
 > [22.1](./training) 让 GUI Agent 学会了操作 GUI。但当 agent 真正部署到用户电脑、企业 OA、生产数据库，安全成为首要问题——尤其是 **Prompt Injection**：恶意网页、伪造 UI、跨应用攻击 都可能劫持 agent 执行破坏性操作。本节讲清楚三件事：(1) Prompt Injection 的根本威胁与典型攻击向量；(2) OpenAI 指令层级方案的工程化落地；(3) RL 训练让模型在权重层面学会防御。
 

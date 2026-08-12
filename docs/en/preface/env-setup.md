@@ -2,7 +2,7 @@
 title: Environment Setup Guide
 ---
 
-# Environment Setup Guide
+# Environment Setup
 
 > **Goal of this section**: build a complete development environment for this course from scratch, covering Python, PyTorch, the RL toolchain, and LLM training frameworks. Follow the steps end to end, and you will be able to run every experiment in the book.
 

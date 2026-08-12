@@ -480,7 +480,7 @@ GUI Agent 能执行破坏性操作——删文件、转账、发邮件。生产�
 - **二次确认**：高风险操作前弹窗让用户确认
 - **审计日志**：所有操作记录可回溯
 
-详见 [22.2 指令层级与 Prompt Injection 防御](./safety-swarm)。
+详见 [22.2 Prompt Injection 与指令层级](./safety-swarm)。
 
 ## 本节总结
 
@@ -494,4 +494,4 @@ GUI Agent 能执行破坏性操作——删文件、转账、发邮件。生产�
 
 四条路线不是互斥的——UI-TARS-2 后期也加入了反思课程（类 MobileRL 思想），Open-AutoGLM 也用了反向课程（类 ComputerRL 思想）。**工业级系统往往是多种思想的组合**。
 
-下一节 [22.2 指令层级与 Prompt Injection 防御](./safety-swarm) 转向安全——agent 真正部署到用户电脑后，怎么防止恶意网页、伪造 UI、跨应用攻击劫持。
+下一节 [22.2 Prompt Injection 与指令层级](./safety-swarm) 转向安全——agent 真正部署到用户电脑后，怎么防止恶意网页、伪造 UI、跨应用攻击劫持。

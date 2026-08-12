@@ -1,4 +1,4 @@
-# 11.2 逆向 RL 与 GAIL
+# 11.2 逆强化学习与 GAIL
 
 [11.1](./bc-dagger)直接模仿专家在每个状态采取的动作。遇到专家数据没有覆盖的新状态时，策略仍然缺少判断依据。逆向 RL 改为从整条专家轨迹推断奖励，再用这个奖励训练策略。
 
@@ -10,11 +10,11 @@
 
 ### 1.1 逆向 RL 的基本设定
 
-给定专家轨迹 $\mathcal{D}_{\text{expert}} = \{\tau_1, \ldots, \tau_M\}$，每条 $\tau = (s_0, a_0, \ldots, s_T)$。目标是学一个奖励函数 $r_\psi(s, a)$ 满足：
+给定专家轨迹 $\mathcal{D}_{\text{expert}}=\{\tau_1,\ldots,\tau_M\}$，每条 $\tau=(s_0,a_0,\ldots,s_T)$。我们希望找到奖励函数 $r_\psi(s,a)$，使专家轨迹在这个奖励下比其他轨迹更有可能出现：
 
 $$\text{专家策略在 } r_\psi \text{ 下是最优的}$$
 
-但这个条件**严重不唯一**——所有常数奖励 $r_\psi \equiv c$ 都满足。需要额外的**正则化**或**最大熵原理**来唯一确定 $r_\psi$。
+只要求“专家最优”无法唯一确定奖励。例如给所有状态同一个常数奖励时，所有策略的回报都相同，专家依然可以被称为最优。最大熵 IRL 通过对轨迹分布增加熵约束，在满足专家特征的解中选择不过度集中的一个。
 
 ## 2. 用最大熵原则确定奖励
 
@@ -22,19 +22,19 @@ Ziebart et al. 2008 提出最大熵逆向 RL。它要求轨迹既匹配专家的
 
 $$\pi(a \mid s) \propto \exp\left(Q^{\text{soft}}_{r_\psi}(s, a)\right)$$
 
-那么专家轨迹的似然为：
+在最大熵模型中，一条轨迹的概率与它的累计奖励指数成正比：
 
 $$p(\tau \mid r_\psi) = \frac{1}{Z(r_\psi)} \exp\left(\sum_t r_\psi(s_t, a_t)\right)$$
 
-最大化专家数据的对数似然：
+其中 $Z(r_\psi)$ 把所有轨迹的未归一化分数加起来，使概率总和等于 1。对 $M=|\mathcal D_{\text{expert}}|$ 条专家轨迹取对数后，训练目标为：
 
 $$\max_\psi \; \mathcal{L}(\psi) = \sum_{\tau \in \mathcal{D}_{\text{expert}}} \left[\sum_t r_\psi(s_t, a_t)\right] - |\mathcal{D}_{\text{expert}}| \log Z(r_\psi)$$
 
-第一项是专家轨迹的累积奖励，第二项 $\log Z$ 是配分函数（所有可能轨迹上的指数和的对数）。梯度为：
+第一项提高专家轨迹的累计奖励，第二项防止所有轨迹的分数一起无界增大。对参数 $\psi$ 求梯度得到：
 
 $$\nabla_\psi \mathcal{L} = \mathbb{E}_{\tau \sim \text{expert}}\left[\sum_t \nabla_\psi r_\psi(s_t, a_t)\right] - \mathbb{E}_{\tau \sim p(\cdot \mid r_\psi)}\left[\sum_t \nabla_\psi r_\psi(s_t, a_t)\right]$$
 
-直白的解读：**让专家访问的 $(s, a)$ 的奖励升高，让当前策略（按 $r_\psi$ 滚动的策略）访问的 $(s, a)$ 的奖励降低**。当两者特征期望一致时，梯度为零。
+第一项来自专家轨迹，第二项来自当前奖励模型诱导的轨迹分布。如果某类状态—动作在专家中更常见，梯度会提高它的奖励；如果它只在当前策略中频繁出现，梯度会降低它的奖励。当两边的特征统计接近时，更新趋于停止。
 
 ### 2.1 配分函数为什么难以计算
 
@@ -71,11 +71,11 @@ Generative Adversarial Imitation Learning（Ho & Ermon 2016）借用 GAN 的思�
 
 $$\max_\phi \; \mathbb{E}_{(s,a) \sim \mathcal{D}_{\text{expert}}}\left[\log D_\phi(s, a)\right] + \mathbb{E}_{(s,a) \sim \pi_\theta}\left[\log (1 - D_\phi(s, a))\right]$$
 
-策略通过"骗过判别器"学习：
+策略需要让自己的状态—动作分布更接近专家。若约定 $D_\phi(s,a)$ 表示“样本来自专家”的概率，一种常用的策略目标是最小化：
 
-$$\min_\theta \; \mathbb{E}_{(s,a) \sim \pi_\theta}\left[\log D_\phi(s, a)\right] - \lambda \mathcal{H}(\pi_\theta)$$
+$$\min_\theta \; \mathbb{E}_{(s,a) \sim \pi_\theta}\left[\log (1-D_\phi(s, a))\right] - \lambda \mathcal{H}(\pi_\theta)$$
 
-第二项是熵正则化，避免策略过早坍缩。这里 $-\log D_\phi(s, a)$ 充当**隐式奖励**——等价于 MaxEnt IRL 中 $r_\psi(s, a) = \log D_\phi(s, a) - \log(1 - D_\phi(s, a))$ 的对抗推导。
+第二项是熵正则化，避免策略过早只输出少数动作。实现时常把 $-\log(1-D_\phi(s,a))$ 或 $\log D_\phi(s,a)$ 的等价变体作为隐式奖励；具体符号取决于判别器把专家标成 1 还是 0，代码与公式必须使用同一约定。
 
 ```python
 class GAIL:
@@ -102,18 +102,19 @@ class GAIL:
         for _ in range(n_policy_steps):
             states, actions, next_states, _ = self.policy.rollout()
             with torch.no_grad():
-                rewards = -F.logsigmoid(self.disc(states, actions))  # r = -log(1 - D)
+                # D 表示“来自专家”的概率，所以奖励取 -log(1-D)
+                rewards = -F.logsigmoid(-self.disc(states, actions))
             # 喂给任意 RL 算法（这里假设 PPO）
             self.policy.ppo_update(states, actions, rewards, next_states)
 ```
 
 ### 3.2 GAIL 与最大熵 IRL 的联系
 
-形式上，GAIL 是 MaxEnt IRL 在**奖励函数无约束**（任意神经网络）下的对偶问题。判别器 $D_\phi^*$ 的最优解为：
+固定策略后，二分类判别器的最优解可以写成两个访问分布的比例：
 
 $$D_\phi^*(s, a) = \frac{p_{\text{expert}}(s, a)}{p_{\text{expert}}(s, a) + p_{\pi_\theta}(s, a)}$$
 
-代入后，最优奖励正是 $r^*(s, a) = \log D^* - \log(1 - D^*) = \log \frac{p_{\text{expert}}}{p_{\pi_\theta}}$——即**对数似然比**。这与 MaxEnt IRL 推出的奖励一致，但 GAIL 不需要显式计算配分函数 $Z$。
+把这个 $D^*$ 代入对数比，可得 $\log D^* - \log(1-D^*)=\log\frac{p_{\text{expert}}}{p_{\pi_\theta}}$。当策略访问分布接近专家时，这个比值接近 1、对数接近 0。GAIL 通过判别器估计这种分布差异，因此不需要显式枚举所有轨迹来计算 $Z$。
 
 ## 4. 比较三条模仿学习路线
 

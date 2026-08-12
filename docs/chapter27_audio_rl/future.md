@@ -1,4 +1,4 @@
-# 24.2 多模态音频 Agent 未来方向
+# 24.2 多模态音频 Agent
 
 > [24.1](./reward-design) 讲了音频奖励设计。本节看音频 RL 的前沿——多模态音频 Agent（Step-Audio-Chat、Qwen2-Audio）、实时语音对话（GPT-4o Voice）、以及未来方向。
 
@@ -214,7 +214,7 @@ DPO 的精准对齐把错误率压到接近零。这一步看似琐碎，但部�
 - **数据质量 >> 数据数量**：pass@8 ∈ [3, 6] 的精选 5K 样本优于 200K 无筛选
 - **奖励设计是 RL 的灵魂**：单一可验证奖励会塌缩模型行为，多维 rubric 是对齐真实体验的关键
 
-下一节 [24.3 VLA 模型基础](../chapter28_vla/embodied-intelligence/) 将多模态感知接到物理动作：策略不仅要理解声音和图像，还要在连续控制、真实成本与物理约束下行动。多智能体协作 RL 的训练方法则见[第 19 章的多智能体协作与 Agent Swarm](../chapter22_agentic/multi-agent-swarm)。
+下一节 [24.3 VLA 模型](../chapter28_vla/embodied-intelligence/) 将多模态感知接到物理动作：策略不仅要理解声音和图像，还要在连续控制、真实成本与物理约束下行动。多智能体协作 RL 的训练方法则见[第 19 章的多智能体协作](../chapter22_agentic/multi-agent-swarm)。
 
 ## 延伸阅读
 

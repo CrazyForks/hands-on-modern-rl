@@ -2,7 +2,7 @@
 title: D.2.1 Probability Basics
 ---
 
-# D.2.1 Probability Basics: Probability, Conditional Probability, and Expectation
+# D.2.1 Probability, Conditional Probability, and Expectation
 
 <!--@include: ./probability-statistics.md{7,}-->
 

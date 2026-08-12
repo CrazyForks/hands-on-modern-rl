@@ -1,4 +1,4 @@
-# 25.5 评估原则与现代评估 Harness
+# 25.5 强化学习评测与 Harness
 
 > [第 25 章](../chapter30_alignment_failures/modern-incidents) 讲了 Qwen3 数据污染——benchmark 分数虚高 15-25 个百分点。这暴露的不只是数据问题，而是 **整个 RL 评估方法论的脆弱**。本章系统化讨论：什么样的 benchmark 设计是可信的？怎么检测污染？提示敏感性如何影响结论？长程任务和行为任务怎么评？最后介绍工业级评测 harness 与 Anthropic 2025 内部 AI Research Eval Suite（34× 人类加速）。
 

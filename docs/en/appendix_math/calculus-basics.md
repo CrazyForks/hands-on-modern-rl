@@ -2,7 +2,7 @@
 title: D.3.1 Derivatives and Gradients
 ---
 
-# D.3.1 Calculus Basics: Derivatives, Gradients, and the Chain Rule
+# D.3.1 Derivatives, Gradients, and the Chain Rule
 
 <!--@include: ./calculus-optimization.md{7,}-->
 

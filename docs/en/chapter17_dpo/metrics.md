@@ -2,7 +2,7 @@
 title: 14.2 Training Metrics
 ---
 
-# 14.2 Training Metrics
+# 14.2 DPO Training and Evaluation Metrics
 
 In Section 14.1, we derived the DPO loss. Now let's come back to the experiment and interpret the metrics that `DPOTrainer.train()` prints during training.
 

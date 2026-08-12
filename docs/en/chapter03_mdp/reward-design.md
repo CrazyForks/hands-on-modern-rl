@@ -2,7 +2,7 @@
 title: 4.3 Reward Function Design
 ---
 
-# 4.3 Reward Functions: Where Does the Optimization Objective Come From?
+# 4.3 Reward Design
 
 In the previous sections, we discussed value estimation methods and how data is collected. But whether we are doing DP, MC, or TD, and whether we are on-policy or off-policy, the target of every update ultimately comes from the same upstream source: the reward function.
 

@@ -1,4 +1,4 @@
-# 12.3 分层 RL 与生成式世界模型
+# 12.3 分层强化学习与世界模型
 
 [12.2](./marl)通过集中训练协调多个智能体。本节回到单个智能体，但把任务时间拉长：机器人完成整套房屋清洁可能需要上千步动作，最终奖励很难指导前面的每一个动作。
 
@@ -23,11 +23,11 @@ Sutton, Precup & Singh 1999 的 **options** 是分层 RL 的形式化基础。�
 - ** intra-option policy** $\pi_\omega$：option 执行期间遵循的策略
 - ** termination function** $\beta_\omega(s)$：到达 $s$ 后终止该 option 的概率
 
-半马尔可夫决策过程（SMDP）的 Bellman 方程扩展为对 option 求期望：
+一个 option 可能连续执行 $T$ 步，所以高层更新不能只使用一步奖励。它要把 option 执行期间的奖励加起来，再接上终止状态的价值：
 
 $$Q^\mu(s, \omega) = \mathbb{E}\left[\sum_{t=0}^{T-1}\gamma^t r_t + \gamma^T \max_{\omega'} Q^\mu(s_T, \omega')\right]$$
 
-其中 $T$ 是 option 的持续时间。高层可以在 SMDP 上学习选择 option，底层则分别训练各个 option 的内部策略。
+其中 $s$ 是启动 option 的状态，$\omega$ 是当前 option，$T$ 是它持续的步数，$s_T$ 是终止状态。求和项记录这段执行已经得到的奖励，$\gamma^T Q(s_T,\omega')$ 表示执行结束后继续选择下一个 option 的价值。高层在 SMDP 上选择 option，底层执行各个 option 的内部策略。
 
 ### 2.2 FeUdal Networks：Manager 指方向，Worker 执行动作
 
@@ -36,20 +36,20 @@ FeUdal Networks（Vezhnevets et al. 2017）把 options 做成端到端可学习�
 - **Manager** $M_\theta$：每 $c$ 步输出一个隐藏空间方向向量 $g_t \in \mathbb{R}^k$（不直接是子目标）
 - **Worker** $W_\phi$：在 $c$ 步窗口内，每个原子步输出动作 $\pi_\phi(a \mid s; g_t)$，目标分布方向由 $g_t$ 调制
 
-Manager 通过预测未来 $c$ 步的隐藏状态变化方向学习目标向量 $g_t$：
+Manager 输出方向 $g_t$ 后，需要判断 Worker 在接下来 $c$ 步是否真的沿这个方向移动。FeUdal 用两个隐藏状态之差表示实际移动方向：
 
 $$\mathcal{L}_M = -\langle g_t,\ \hat{z}_{t+c} - \hat{z}_t\rangle$$
 
-其中 $\hat{z}$ 是共享编码器的输出。这是一个**自监督**目标——Manager 不需要任何外部奖励就能学会"指向有信息增量的方向"。Worker 仍然用环境奖励训练，但条件在 $g_t$ 上。
+其中 $\hat z_t$ 是共享编码器在第 $t$ 步得到的表示，尖括号表示内积。若实际变化 $\hat z_{t+c}-\hat z_t$ 与 $g_t$ 同向，内积较大，前面的负号使损失较小。这个辅助目标训练 Manager 给出 Worker 能够执行的方向；任务回报仍然决定哪些方向值得选择。
 
-FeUdal 在 _Montezuma's Revenge_ 上首次让端到端深度 RL 拿到正分数，但训练不稳定、对超参敏感，工程复现困难。
+FeUdal 在 _Montezuma's Revenge_ 等长程任务上展示了这种层级结构的潜力，同时也暴露了联合训练 Manager 与 Worker 时对超参数较敏感的问题。
 
 ### 2.3 HIRO：用异策略数据学习连续子目标
 
 Data-Efficient Hierarchical Reinforcement Learning (HIRO, Nachum et al. 2018) 是 FeUdal 的现代化改进，关键创新是**off-policy 训练 + 目标转移**：
 
 - 高层输出连续子目标 $g_t \in \mathbb{R}^d$（直接是状态空间内的位移），每 $c$ 步切换
-- 底层奖励是内在的：$r^l_t = -\|s_{t+1} - (s_t + g_t)\|$，鼓励底层达到高层指定的位移
+- 底层奖励是 $r^l_t=-\|(s_{t+1}-s_t)-g_t\|$：实际位移越接近高层给出的位移 $g_t$，距离越小，奖励越高
 - 高层用 off-policy 算法（如 TD3）训练
 
 最大的技术难点是**off-policy 偏差**：高层从 replay buffer 取出的旧子目标 $g$，对应底层当时执行的策略，但现在底层策略已经变了。HIRO 用**目标转移**（goal transition）解决：把旧子目标 $g$ 重新映射成"如果用当前底层策略执行，能达到的新子目标 $g'$"，使高层训练数据保持一致。
@@ -83,7 +83,7 @@ for step in range(total_steps):
 
 ### 2.5 分层 RL 的实际困难
 
-分层 RL 听起来优雅，但工业落地少。原因：(1) 层次结构本身是强归纳偏置，错配会反向伤害性能；(2) 高层与底层耦合训练易陷入"互相欺骗"局部解——Manager 给无意义方向，Worker 学着忽略它；(3) LLM 时代的"分层"已经从神经网络架构转移到 prompt 层（plan-then-act、ReAct），更易调试。但思想仍深刻影响 agentic RL（[第 19 章](../chapter22_agentic/tool-use-and-trajectory)）和 [第 26 章 多智能体](../chapter32_selfplay/llm-multi-agent-rl/)。
+分层结构会加入额外假设：高层给出的子目标必须可执行，底层也必须真正利用它。层次划分不合适时，Manager 可能输出无意义方向，Worker 则学会忽略高层。LLM Agent 常把层次显式写成“先规划、再执行”的流程，原因之一是计划和执行记录更容易检查。无论层次放在网络内部还是交互流程中，都要验证子目标是否缩短了原任务的决策跨度。
 
 ## 3. 把生成式世界模型作为训练环境
 
@@ -103,7 +103,7 @@ Genie 3 进一步引入**潜在动作**（latent action）学习：模型自动�
 
 $$z_t = \text{LatentAction}(x_t, x_{t+1}),\quad x_{t+1} = \text{Decoder}(x_t, z_t)$$
 
-学到的 $z_t$ 可作为 RL 的动作空间，使得在 Genie 生成的环境中训练的 agent 能迁移到真实控制任务。这是 model-based RL（[第 9 章](../chapter11_continuous_control/intro#_12-5-model-based-rl-学习环境模型)）+ 视频生成模型 + 探索-利用理论的交汇点。
+$z_t$ 表示从 $x_t$ 变到 $x_{t+1}$ 的潜在变化因素。若这些因素能够被稳定控制，就可以把 $z_t$ 当作动作，再让解码器预测执行该动作后的画面。这里仍有一个重要限制：潜在动作是否对应真实可执行控制，需要在具体环境中验证。
 
 ## 4. 探索、协作与分层怎样使用生成环境
 
@@ -113,7 +113,7 @@ $$z_t = \text{LatentAction}(x_t, x_{t+1}),\quad x_{t+1} = \text{Decoder}(x_t, z_
 2. **多智能体**：Genie 类模型可生成包含 NPC 的环境，多智能体可在生成环境中做 self-play（[第 26 章 self-play](../chapter32_selfplay/self-play-outlook/)）
 3. **分层**：高层策略可以直接输出"潜在子目标"，由世界模型解码出环境状态变化，相当于 option 的隐式学习
 
-工业影响：DeepMind 的 SIMA（Scalable Instructable Multi-World Agent）已经在 Genie 生成的多游戏环境中训练通用 agent；Tongyi DeepResearch 等 LLM agent 也开始用 LLM 自生成的"code world model"作为训练环境（[第 26 章 LLM 驱动的科学发现](../chapter32_selfplay/alphaevolve/)）。世界模型从"训练辅助工具"升级为"训练环境本身"，是 2024-2026 年 RL 最深刻的变化之一。
+这些方向共同把世界模型从“预测下一状态”推进到“提供可交互训练轨迹”。训练者仍要检查生成环境是否遵守任务规则，以及策略是否利用了生成模型的错误。后续 Agent 章节会继续讨论怎样用工具环境和可执行反馈替代纯文本模拟。
 
 ## 本章总结
 

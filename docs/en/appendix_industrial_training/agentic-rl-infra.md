@@ -2,7 +2,7 @@
 title: A.3 Agentic RL Infrastructure
 ---
 
-# A.3 Agentic RL Infrastructure: Sandboxes, Multi-Turn Trajectories, and Tool Scheduling
+# A.3 Agent Sandbox
 
 > A.2 focuses on the RL training-system substrate: rollout, buffers, trainers, weight synchronization, and distributed parallelism. This page draws a different boundary: an agent's "action" is no longer just token generation. It may call tools, run code, read and write files, browse the web, or change external state over multiple turns.
 

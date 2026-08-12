@@ -2,7 +2,7 @@
 title: 26.1 Self-Play Basics and LLM Self-Play
 ---
 
-# 26.1 Self-Play Basics and LLM Self-Play
+# 26.1 Self-Play and LLM Training
 
 The preceding parts focused on building stronger policies and broader agent capabilities. Part VII turns to the conditions under which those systems fail, how they should be evaluated, and which research directions may change their limits. Its currently translated material begins with self-play, where the policy's opponents and training data evolve together.
 

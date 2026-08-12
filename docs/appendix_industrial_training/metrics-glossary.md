@@ -1,4 +1,4 @@
-# C.3 大模型 RL 训练指标词典
+# C.3 训练指标词典
 
 > 你第一次打开训练日志或监控面板的时候，可能会被几十个指标吓一跳——`actor/pg_clipfrac`、`critic/advantages/mean`、`timing_s/gen`、`perf/mfu/actor`……这么多数字，到底看哪个？
 >

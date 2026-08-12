@@ -2,7 +2,7 @@
 outline: [2, 3]
 ---
 
-# 3.2 From Q to Q-Learning
+# 3.2 Action Values and Bellman Optimality
 **Section Preview**
 
 **Core ideas**

@@ -2,7 +2,7 @@
 title: 7.2 Actor-Critic Architecture
 ---
 
-# 7.2 Actor-Critic Architecture
+# 7.2 Actor-Critic Updates
 
 In the previous two sections we met the [advantage function](./advantage-function) $A(s,a)$ and the [training method for the Critic](./critic-training). Now let's assemble all the parts and see how the Actor and the Critic collaborate.
 

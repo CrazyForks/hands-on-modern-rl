@@ -2,7 +2,7 @@
 title: '8.5 Hands-On: BipedalWalker Continuous Control'
 ---
 
-# 8.5 Hands-on: BipedalWalker Continuous Control
+# 8.5 Hands-on: PPO on BipedalWalker
 > **Goal of this section**: Train PPO to control a bipedal robot to walk over randomized terrain, and understand what really changes when we move from discrete actions to continuous actions.
 
 > **Code for this section**: [ppo_bipedal_walker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_ppo/ppo_bipedal_walker.py) · [render_bipedal_walker.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_ppo/render_bipedal_walker.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter07_ppo/requirements.txt)

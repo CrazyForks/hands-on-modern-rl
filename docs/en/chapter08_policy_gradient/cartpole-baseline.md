@@ -2,7 +2,7 @@
 title: '6.7 Hands-On: Policy Gradient with Baseline'
 ---
 
-# 6.7 Hands-on: Policy Gradient with a Baseline
+# 6.7 Hands-on: Policy Gradient with a Value Baseline
 > **Goal of this section**: On `CartPole-v1`, compare vanilla REINFORCE against REINFORCE + Value Baseline, and observe how $V(s)$ can make policy-gradient training faster and more stable.
 
 > **Code for this section**: [reinforce_with_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_with_baseline.py) · [render_cartpole_baseline.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/render_cartpole_baseline.py) · [reinforce_cartpole.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/reinforce_cartpole.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter05_policy_gradient/requirements.txt)

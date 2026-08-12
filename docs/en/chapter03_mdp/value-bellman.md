@@ -2,7 +2,7 @@
 title: 3.1 Value Functions and Bellman Equations
 ---
 
-# 3.1 V(s): Value Functions and Bellman Equations
+# 3.1 State Values and Bellman Expectation
 ## Section Guide
 
 **Core content**

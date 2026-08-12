@@ -2,7 +2,7 @@
 title: 8.3 Advantage Estimation and Reward Modeling
 ---
 
-# 8.3 Advantage Estimation and Reward Modeling
+# 8.3 GAE
 
 ## Section Overview
 

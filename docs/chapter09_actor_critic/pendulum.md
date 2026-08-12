@@ -1,4 +1,4 @@
-# 7.3 动手：Pendulum 实验
+# 7.3 动手：Pendulum 连续控制
 
 > **本节目标**：用 A2C 训练 `Pendulum-v1`，理解连续动作 Actor-Critic 为什么要输出高斯分布，以及 Critic 如何帮助 Actor 在连续控制中稳定学习。
 

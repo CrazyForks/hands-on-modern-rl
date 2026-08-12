@@ -85,7 +85,7 @@ flowchart LR
 
 $$\rho_t^{\text{stale}} = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{gen}}}(a_t \mid s_t)}$$
 
-分子表示当前模型生成动作 $a_t$ 的概率，分母表示旧模型当时生成该动作的概率。比率偏离 1 越远，说明这条轨迹与当前模型的差异越大。系统可以降低它的训练权重；版本相差过大时，也可以直接丢弃。LlamaRL 还讨论了模型卸载、异步 Off-Policy 训练和大规模权重同步。
+分子表示当前模型选择动作 $a_t$ 的概率，分母表示生成这条轨迹的旧模型当时选择该动作的概率。若两者都是 0.2，比率就是 1，这条经验与当前策略一致；若分别是 0.1 和 0.2，比率就是 0.5，说明当前模型已经不太会产生这个动作。比率偏离 1 越远，轨迹越陈旧。系统可以降低它的训练权重；版本相差过大时，也可以直接丢弃。
 
 #### 1.3.2 Agent 训练还要管理环境
 
@@ -133,13 +133,15 @@ $$\rho_t^{\text{stale}} = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{gen
 
 $$r_{\text{VR}}(q, o) = \mathbb{1}[\text{extract}(o) == \text{answer}(q)]$$
 
+$q$ 是题目，$o$ 是模型回答，$\text{extract}(o)$ 从回答中抽取最终结果。指示函数 $\mathbb 1[\cdot]$ 在等式成立时取 1，否则取 0。例如标准答案是 42，抽取结果也是 42，奖励就是 1；抽取失败或答案不同，奖励就是 0。
+
 数学题可以对比最终答案，代码题可以运行测试，逻辑题可以使用规则验证器。验证过程可以重复，但仍要防止答案解析错误、测试覆盖不足和环境故障。
 
 **Pairwise Preference Reward（PPR）** 来自一个学到的 Reward Model $R_\phi$，它从人类偏好数据 $(o_w, o_l)$（chosen 和 rejected）中训练：
 
 $$\mathcal{L}_{\text{RM}} = -\mathbb{E}\left[\log \sigma\left(R_\phi(q, o_w) - R_\phi(q, o_l)\right)\right]$$
 
-训练完成后，$R_\phi(q, o)$ 给出标量奖励。它学习的是标注数据中的偏好分布，因此会受到标注一致性、样本覆盖和奖励模型泛化能力影响。
+$o_w$ 是偏好数据中较好的回答，$o_l$ 是较差的回答。奖励差 $R_\phi(q,o_w)-R_\phi(q,o_l)$ 越大，$\sigma$ 输出的偏好概率越接近 1，损失越小。训练完成后，$R_\phi(q,o)$ 给出标量奖励。它学习的是标注数据中的偏好分布，因此会受到标注一致性、样本覆盖和泛化能力影响。
 
 | 维度     | Verifiable Reward      | Pairwise Preference Reward |
 | -------- | ---------------------- | -------------------------- |
@@ -186,7 +188,7 @@ def filter_prompts(prompts, base_model, num_rollouts=16):
 
 $$R_{\text{total}}(q, o) = \alpha \cdot R_{\text{VR}}(q, o) + (1 - \alpha) \cdot R_{\text{GenRM}}(q, o)$$
 
-其中 $\alpha$ 是任务相关权重——数学/代码题 $\alpha = 1.0$（纯 VR），开放对话 $\alpha = 0.0$（纯 GenRM），中间任务按比例混合。
+其中 $\alpha\in[0,1]$ 决定两种奖励的占比。数学或代码任务可以令 $\alpha$ 接近 1，开放写作任务可以令它接近 0。若 $R_{\text{VR}}=1$、$R_{\text{GenRM}}=0.6$、$\alpha=0.75$，总奖励就是 $0.75\times1+0.25\times0.6=0.9$。混合以前还要先对齐两种奖励的尺度。
 
 #### 2.3.1 生成式奖励模型与判别式奖励模型
 
@@ -243,23 +245,24 @@ $$\tilde{r}_{\text{domain}} = \frac{r - \mu_{\text{domain}}}{\sigma_{\text{domai
 
 ### 3.1 成本模型的基本公式
 
-LLM 训练的 GPU 小时数大致服从：
+先估算训练总 FLOPs，再除以单卡每秒实际完成的 FLOPs，最后把秒换算成小时：
 
-$$\text{GPU-hours} \approx \frac{6 \cdot N_{\text{params}} \cdot N_{\text{tokens}}}{\text{GPU\_FLOPS} \cdot \text{MFU}}$$
+$$\text{GPU-hours} \approx \frac{6 \cdot N_{\text{active}} \cdot N_{\text{tokens}}}{\text{GPU\_FLOPS} \cdot \text{MFU} \cdot 3600}$$
 
 其中：
 
-- $N_{\text{params}}$ 是模型参数量
+- $N_{\text{active}}$ 是每个 token 实际参与计算的参数量；Dense 模型等于总参数量，MoE 模型只计算被路由到的专家
 - $N_{\text{tokens}}$ 是训练 token 数
 - 系数 6 来自前向 + 反向的 FLOPs 估算（2 倍前向 + 4 倍反向，每 token 每参数约 6 FLOPs）
-- $\text{GPU\_FLOPS}$ 是单卡理论峰值（H100 BF16 约 989 TFLOPS）
+- $\text{GPU\_FLOPS}$ 是单卡每秒理论峰值
 - $\text{MFU}$（Model FLOPs Utilization）是实际利用率，典型值 30%-50%
+- 3600 把计算时间从秒换成小时
 
-例如 DeepSeek-V3（671B 参数，14.8T tokens，H800 集群）的估算：
+先用一个容易复算的例子：7B Dense 模型训练 10 亿 token，假设单卡峰值为 989 TFLOPS、MFU 为 40%，则
 
-$$\text{GPU-hours} = \frac{6 \cdot 671 \times 10^9 \cdot 14.8 \times 10^{12}}{989 \times 10^{12} \cdot 0.45} \approx 2.664 \times 10^6 \text{ H800-hours}$$
+$$\text{GPU-hours} \approx \frac{6\times7\times10^9\times10^9}{989\times10^{12}\times0.4\times3600}\approx29.5$$
 
-这与 [DeepSeek-V3 技术报告](https://arxiv.org/abs/2412.19437) 公开的 **2.664M H800 小时**完全吻合，说明上述公式在千亿参数规模下是可靠的。
+这表示总工作量约为 29.5 GPU-hours：一张卡理想情况下约 29.5 小时，8 张卡约 3.7 小时。真实训练还会增加通信、数据加载、检查点和流水线空闲时间。MoE 模型不能直接把总参数量代入该式，[DeepSeek-V3 技术报告](https://arxiv.org/abs/2412.19437)公开的集群用时应作为系统实测值，而不能由这个简化公式精确反推。
 
 ### 3.2 各训练阶段的成本分布
 
@@ -287,6 +290,8 @@ RL 训练成本比 SFT 复杂，因为它包含多个模型的计算开销。以
 
 $$C_{\text{RL-step}} = C_{\text{rollout}} + C_{\text{actor-update}} + C_{\text{ref-forward}} + C_{\text{reward}}$$
 
+四项分别是生成回答、更新 Actor、运行参考模型和计算奖励的成本。这个等式用于拆账：先测量每项耗时，再决定优化哪一项。它不是固定比例公式，不同回答长度、组大小和验证器会得到不同占比。
+
 典型配比（7B 模型，每步 batch=512 prompts × 8 rollouts）：
 
 | 组件               | 计算量占比 | 说明                                |
@@ -304,23 +309,23 @@ $$C_{\text{RL-step}} = C_{\text{rollout}} + C_{\text{actor-update}} + C_{\text{r
 
 **1. SFT 成本估算**
 
-$$C_{\text{SFT}} \approx \frac{2 \cdot N_{\text{params}} \cdot N_{\text{tokens}}}{\text{GPU\_FLOPS} \cdot \text{MFU}_{\text{SFT}}}$$
+$$C_{\text{SFT}} \approx \frac{6 \cdot N_{\text{active}} \cdot N_{\text{tokens}}}{\text{GPU\_FLOPS} \cdot \text{MFU}_{\text{SFT}} \cdot 3600}$$
 
-系数 2（只有前向 + 反向，无 RL 的多轮采样），$\text{MFU}_{\text{SFT}}$ 典型 40%-50%。
+这里仍用每 token 每参数约 6 FLOPs 表示前向与反向训练，结果单位是 GPU-hours。SFT 没有 RL 的多轮 rollout，因此总 token 数通常更容易确定。
 
 **2. RLHF 成本估算（PPO）**
 
-RLHF 每步需要：rollout $G$ 个回答 + 训练 Actor/Critic/RM。粗略估计 RLHF 总成本是同等 token 数 SFT 的 **5-10 倍**：
+RLHF 每步需要 rollout、Actor/Critic 更新、参考模型和奖励模型前向，可以先写成相对同等 token SFT 的倍数：
 
-$$C_{\text{RLHF}} \approx (5 \sim 10) \cdot C_{\text{SFT}}^{\text{equiv}}$$
+$$C_{\text{RLHF}} \approx k_{\text{PPO}} \cdot C_{\text{SFT}}^{\text{equiv}}$$
 
-这是因为 PPO 要做 4 个模型的 forward/backward，且每个 prompt 要采样多个 rollout。
+$k_{\text{PPO}}$ 把这些额外计算统一折算进去。它需要根据组大小、回答长度、训练 epoch 和模型放置实测，常见估算会落在数倍到十倍量级，不能作为固定常数。
 
 **3. RLVR 成本估算（GRPO）**
 
-GRPO 省掉了 Critic 和 Reward Model 训练，成本约为 PPO 的 60%：
+GRPO 省掉 Critic，使用规则奖励时也不需要运行大奖励模型。它的成本可以按组件相加：
 
-$$C_{\text{RLVR}} \approx 0.6 \cdot C_{\text{RLHF}}$$
+$$C_{\text{RLVR}} \approx C_{\text{rollout}}+C_{\text{actor-update}}+C_{\text{ref-forward}}+C_{\text{verifier}}$$
 
 省去 Critic 可以减少一套大模型的前向、反向和优化器状态；实际节省比例仍由 rollout 长度、组大小与验证成本决定。
 
@@ -328,9 +333,9 @@ $$C_{\text{RLVR}} \approx 0.6 \cdot C_{\text{RLHF}}$$
 
 部署后的推理成本常常被忽略，但对长期 TCO 影响巨大：
 
-$$C_{\text{inference}} = \text{requests} \cdot \text{avg\_tokens} \cdot \frac{2 \cdot N_{\text{active}}}{\text{GPU\_FLOPS} \cdot \text{MFU}_{\text{infer}}}$$
+$$C_{\text{inference}} \approx \text{requests} \cdot \text{avg\_tokens} \cdot \frac{2 \cdot N_{\text{active}}}{\text{GPU\_FLOPS} \cdot \text{MFU}_{\text{infer}} \cdot 3600}$$
 
-这里使用 $N_{\text{active}}$（激活参数）而非总参数，因为 MoE 模型每次推理只执行部分专家。部署估算还要加入专家路由与跨卡通信成本。
+这里使用 $N_{\text{active}}$ 而非总参数，因为 MoE 模型每次推理只执行部分专家。结果是粗略 GPU-hours；部署估算还要加入 KV cache、批处理效率、专家路由和跨卡通信成本。
 
 ### 3.5 成本控制策略
 
@@ -389,7 +394,7 @@ PPO 要训练 Critic 估计 $A_t$，但在 LLM 场景下 Critic 是和 Actor 同
 
 $$A_i = \frac{r_i - \text{mean}(r_1, \ldots, r_G)}{\text{std}(r_1, \ldots, r_G)}$$
 
-其中 $r_i$ 是第 $i$ 个 rollout 的 reward，$G$ 是组大小。这样省掉了 Critic 网络，advantage 直接从组内 reward 统计得到。详细推导见 [15.1 节 GRPO 核心机制](../chapter18_grpo/grpo-practice-and-mechanism)。
+其中 $r_i$ 是第 $i$ 个 rollout 的 reward，$G$ 是组大小。这样省掉了 Critic 网络，advantage 直接从组内 reward 统计得到。详细推导见 [15.1 GRPO 训练机制](../chapter18_grpo/grpo-practice-and-mechanism)。
 
 #### 算法演进对照
 
@@ -415,21 +420,25 @@ DPO 把带 KL 约束的奖励优化转写为偏好数据上的分类目标。理
 
 $$\max_\pi \; \mathbb{E}_{(q, o) \sim \pi}[r(q, o)] - \beta \cdot \text{KL}(\pi \| \pi_{\text{ref}})$$
 
+第一项希望策略 $\pi$ 生成高奖励回答，第二项惩罚它偏离参考策略 $\pi_{\text{ref}}$。$q$ 是提示，$o$ 是回答，$\beta$ 越大，策略越保守。
+
 DPO 的关键观察：这个优化问题有**闭式解**。对每个 $q$，最优策略满足：
 
 $$\pi^*(o \mid q) = \frac{1}{Z(q)} \pi_{\text{ref}}(o \mid q) \exp\left(\frac{r(q, o)}{\beta}\right)$$
 
-反解出 $r$：
+把等式两边除以参考策略、取对数，就能反解出奖励：
 
 $$r(q, o) = \beta \log \frac{\pi^*(o \mid q)}{\pi_{\text{ref}}(o \mid q)} + \beta \log Z(q)$$
 
-代入 Bradley-Terry 偏好模型 $P(o_w \succ o_l) = \sigma(r(o_w) - r(o_l))$，$Z(q)$ 项相消：
+偏好数据只比较同一提示下的两个回答 $o_w$ 与 $o_l$。把两个奖励代入 Bradley-Terry 偏好模型 $P(o_w\succ o_l)=\sigma(r(o_w)-r(o_l))$ 时，两者都含有的 $\beta\log Z(q)$ 会相消：
 
 $$P(o_w \succ o_l \mid q) = \sigma\left(\beta \log \frac{\pi^*(o_w \mid q)}{\pi_{\text{ref}}(o_w \mid q)} - \beta \log \frac{\pi^*(o_l \mid q)}{\pi_{\text{ref}}(o_l \mid q)}\right)$$
 
-对 $\theta$ 极大似然就得到 **DPO loss**：
+最后用当前策略 $\pi_\theta$ 代替未知的最优策略，并最大化偏好数据的似然，就得到 DPO 损失：
 
 $$\mathcal{L}_{\text{DPO}} = -\mathbb{E}\left[\log \sigma\left(\beta \log \frac{\pi_\theta(o_w \mid q)}{\pi_{\text{ref}}(o_w \mid q)} - \beta \log \frac{\pi_\theta(o_l \mid q)}{\pi_{\text{ref}}(o_l \mid q)}\right)\right]$$
+
+括号内比较“当前模型相对参考模型提高较好回答的幅度”和“提高较差回答的幅度”。前者越大、后者越小，偏好概率越接近 1，损失越低。
 
 详细推导见 [第 14 章 DPO 推导](../chapter17_dpo/intro)。
 
@@ -536,21 +545,25 @@ $$\text{FLOPs} = 6 \times 7 \times 10^9 \times 2.46 \times 10^9 \times 3.5 \appr
 
 假设用 A100 80GB（BF16 312 TFLOPS，MFU 35%）：
 
-$$\text{GPU-hours} = \frac{3.6 \times 10^{20}}{312 \times 10^{12} \times 0.35} \approx 3300 \text{ GPU-hours}$$
+$$\text{GPU-hours} = \frac{3.6 \times 10^{20}}{312 \times 10^{12} \times 0.35 \times 3600} \approx 916 \text{ GPU-hours}$$
+
+分母先算单卡每秒的有效吞吐 $312\times10^{12}\times0.35$，再乘 3600 换成每小时吞吐。总 FLOPs 除以它，得到约 916 个物理 GPU-hours。
 
 **Step 4：换算到实际资源**
 
-8 卡 A100 节点能跑约 250 GPU-hours/天（24h × 8 × 0.7 利用率 + 故障时间）：
+若使用 8 张 A100，并为调度、保存检查点和故障预留 20% 时间，可用吞吐约为 $8\times24\times0.8=153.6$ GPU-hours/天：
 
-$$\text{天数} = \frac{3300}{250} \approx 13 \text{ 天}$$
+$$\text{天数} = \frac{916}{153.6} \approx 6.0 \text{ 天}$$
 
-如果用 4 节点（32 卡），约 3-4 天。
+如果用 4 个同配置节点（32 卡），在并行效率保持不变的理想情况下约 1.5 天；跨节点通信可能继续拉长时间。
 
 **Step 5：成本估算**
 
 按 A100 云端价格 $2/小时：
 
-$$\text{成本} = 3300 \times 2 = \$6,600$$
+$$\text{成本} = 916 \times 2 = \$1,832$$
+
+这里还没有加入存储、网络、验证器 CPU 和失败重训费用。
 
 #### 估算中的工程修正
 
@@ -558,8 +571,8 @@ $$\text{成本} = 3300 \times 2 = \$6,600$$
 
 1. **显存检查**：7B 模型 + GRPO，单卡需要约 60GB（Actor 14GB + Ref 14GB + Rollout 14GB + Activations + KV cache）。A100 80GB 单卡能放下；如果是 40GB A100，需要 2 卡 TP。
 2. **MFU 校准**：小 batch 时 MFU 只有 20%；大 batch 才能达到 40%。给出 MFU 估计范围，不要拍脑袋。
-3. **失败重训预算**：实际训练要预留 30% 的失败重训预算，所以最终采购要按 4300 GPU-hours 估。
-4. **成本对比**：能用 H100 替代吗？H100 BF16 是 A100 的 3 倍 FLOPs，单价约 $3/小时。$3300 \times 3 / 3 = $3300，但 H100 数量少一半——如果集群紧张，H100 更划算。
+3. **失败重训预算**：若预留 30%，资源预算应从 916 提高到约 1190 GPU-hours。
+4. **硬件对比**：更换 H100 时要重新代入峰值 FLOPs 和实测 MFU，再比较 GPU-hours 乘单价；不能只按理论峰值倍数换算。
 
 ### 4.5 完整 RLHF 系统设计
 
@@ -585,7 +598,7 @@ $$\text{成本} = 3300 \times 2 = \$6,600$$
 - LlamaFactory 适合先跑通后训练；slime、veRL 和 OpenRLHF 用不同技术栈处理规模化 RL 的数据流与资源编排。
 - 同步训练等待整批生成结束；异步训练持续消费已完成的数据，更适合耗时差别较大的长任务。
 
-[18.2 工业后训练的完整流程](./industrial-post-training) 会继续说明这些步骤如何组成完整的后训练过程；[18.4 多机 RL 训练如何协同](./distributed-sync) 展开多机系统的实现细节；[18.5 大规模 RL 数据工程](./data-engineering) 则说明训练所需的任务、环境和轨迹怎样进入同一条数据生产线。
+[18.2 工业后训练流水线](./industrial-post-training) 会继续说明这些步骤如何组成完整的后训练过程；[18.4 分布式 RL 训练](./distributed-sync) 展开多机系统的实现细节；[18.5 大规模 RL 数据工程](./data-engineering) 则说明训练所需的任务、环境和轨迹怎样进入同一条数据生产线。
 
 ## 延伸阅读
 
