@@ -5,8 +5,10 @@ from __future__ import annotations
 import base64
 from collections import defaultdict
 import html
+import importlib
 import json
 import os
+import re
 import time
 from pathlib import Path
 
@@ -189,18 +191,100 @@ EXPERIMENTS = {
 }
 
 
+def load_optional_registries() -> list[str]:
+    """Register optional suites when their packages are installed."""
+    loaded = []
+    for module_name in ("ale_py", "gymnasium_robotics"):
+        try:
+            module = importlib.import_module(module_name)
+            if hasattr(gym, "register_envs"):
+                gym.register_envs(module)
+            loaded.append(module_name)
+        except Exception:
+            continue
+    return loaded
+
+
+OPTIONAL_REGISTRIES = load_optional_registries()
+INTERNAL_ENV_PREFIXES = ("GymV21Environment", "GymV26Environment")
+
+
+def env_family(env_id: str, entry_point) -> str:
+    text = f"{env_id} {entry_point}".lower()
+    if env_id.startswith("ALE/"):
+        return "Atari / ALE"
+    if "robotics" in text or any(name in env_id for name in ("Fetch", "Adroit", "Hand", "Franka")):
+        return "Robotics"
+    if "mujoco" in text:
+        return "MuJoCo"
+    if "box2d" in text:
+        return "Box2D"
+    if "toy_text" in text:
+        return "Toy Text"
+    if "classic_control" in text:
+        return "Classic Control"
+    if env_id.startswith("phys2d/"):
+        return "JAX Phys2D"
+    if env_id.startswith("tabular/"):
+        return "JAX Tabular"
+    return "Other"
+
+
+def discover_environment_catalog() -> list[str]:
+    choices = []
+    tuned_envs = {cfg["environment"] for cfg in EXPERIMENTS.values()}
+    for spec in sorted(gym.registry.values(), key=lambda item: item.id.lower()):
+        env_id = spec.id
+        if env_id.startswith(INTERNAL_ENV_PREFIXES):
+            continue
+        if env_id in tuned_envs:
+            continue
+        choices.append(f"{env_family(env_id, spec.entry_point)} · {env_id} · Auto")
+    return choices
+
+
+CATALOG_EXPERIMENTS = discover_environment_catalog()
+EXPERIMENT_CHOICES = list(EXPERIMENTS) + CATALOG_EXPERIMENTS
+
+
+def is_catalog_experiment(experiment: str) -> bool:
+    return experiment not in EXPERIMENTS
+
+
+def catalog_env_id(experiment: str) -> str:
+    return experiment.split(" · ", 2)[1]
+
+
+def catalog_config(experiment: str) -> dict:
+    env_id = catalog_env_id(experiment)
+    return {
+        "environment": env_id,
+        "family": experiment.split(" · ", 1)[0],
+        "algorithm": "Auto: inspect action space",
+        "budget": (200, 100000, 10000, 1000),
+        "alpha": (0.00001, 0.01, 0.0003, 0.00001),
+        "gamma": (0.8, 1.0, 0.99, 0.01),
+        "epsilon": (0.0, 1.0, 1.0, 0.05),
+        "gamma_visible": True,
+    }
+
+
+def experiment_config(experiment: str) -> dict:
+    return catalog_config(experiment) if is_catalog_experiment(experiment) else EXPERIMENTS[experiment]
+
+
 TEXT = {
     "English": {
         "course": "Hands-On Modern RL · CPU experiment collection",
         "title": "Gymnasium Training Playground",
-        "description": "Explore 12 CPU-friendly experiments covering bandits, Toy Text, classic control, tabular learning, DQN, PPO, and SAC.",
+        "description": "Browse every environment registered by Gymnasium and its installed suites. Twelve curated recipes remain ready for quick CPU training.",
         "chapter": "Companion chapter",
         "script": "Training source",
         "project": "GitHub project",
         "device": "Device",
         "experiments": "Experiments",
         "settings": "Experiment setup",
-        "settings_copy": "Choose a task and adjust its training recipe. Defaults are tuned for a quick first run.",
+        "settings_copy": "Search the full registry or choose a curated recipe. Auto entries inspect the action space and select DQN, PPO, or SAC.",
         "experiment": "Experiment",
         "budget": "Training budget",
         "budget_info": "Episodes for tabular tasks; environment steps for DQN, PPO, and SAC",
@@ -228,14 +312,14 @@ TEXT = {
     "中文": {
         "course": "《动手学现代强化学习》· CPU 实验合集",
         "title": "Gymnasium 在线训练游乐场",
-        "description": "在 12 个轻量实验间切换，覆盖多臂老虎机、Toy Text、经典控制、表格方法、DQN、PPO 与 SAC。",
+        "description": "浏览 Gymnasium 及已安装扩展套件注册的全部环境，同时保留 12 个可快速训练的调优配方。",
         "chapter": "阅读配套章节",
         "script": "训练源码",
         "project": "GitHub 项目",
         "device": "设备",
         "experiments": "实验数量",
         "settings": "实验设置",
-        "settings_copy": "选择任务并调整训练配方。默认值适合首次快速体验。",
+        "settings_copy": "可搜索完整环境目录或选择调优配方。Auto 项会检查动作空间并自动选择 DQN、PPO 或 SAC。",
         "experiment": "实验",
         "budget": "训练预算",
         "budget_info": "表格任务使用回合数；DQN、PPO 与 SAC 使用环境步数",
@@ -304,7 +388,8 @@ def panel_html(title: str, text: str, cls: str = "panel-copy") -> str:
 
 def hero_html(language: str, experiment: str = BANDIT) -> str:
     copy = copy_for(language)
-    chapter_url = CHAPTER_URLS[experiment]
+    cfg = experiment_config(experiment)
+    chapter_url = CHAPTER_URLS.get(experiment, COURSE_URL)
     return f"""
     <main class="app-shell">
       <section class="hero">
@@ -319,10 +404,10 @@ def hero_html(language: str, experiment: str = BANDIT) -> str:
         </nav>
       </section>
       <section class="lab-strip">
-        <span>{copy['experiments']} <strong>{len(EXPERIMENTS)}</strong></span>
+        <span>{copy['experiments']} <strong>{len(EXPERIMENT_CHOICES)}</strong></span>
         <span>{copy['device']} <strong>CPU</strong></span>
-        <span>Environment <strong>{EXPERIMENTS[experiment]['environment']}</strong></span>
-        <span>Algorithm <strong>{EXPERIMENTS[experiment]['algorithm']}</strong></span>
+        <span>Environment <strong>{cfg['environment']}</strong></span>
+        <span>Algorithm <strong>{cfg['algorithm']}</strong></span>
       </section>
     </main>
     """
@@ -374,7 +459,7 @@ def policy_grid_image(
 
 
 def save_summary(experiment: str, payload: dict) -> str:
-    slug = experiment.lower().replace(" ", "-").replace("·", "-")
+    slug = re.sub(r"[^a-z0-9]+", "-", experiment.lower()).strip("-")
     path = ARTIFACT_DIR / f"{slug}-run-summary.json"
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
     return str(path)
@@ -618,29 +703,79 @@ def record_model(model, env_id: str, seed: int, filename: str, max_steps: int) -
 
 def run_deep_control(experiment: str, env_id: str, algorithm: str, budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
     started = time.perf_counter(); env = gym.make(env_id)
-    if algorithm == "DQN":
-        model = DQN("MlpPolicy", env, learning_rate=alpha, gamma=gamma, learning_starts=min(1000, max(100, budget // 10)), buffer_size=max(10000, budget), exploration_initial_eps=epsilon, exploration_final_eps=0.05, seed=seed, device="cpu", verbose=0)
-    elif algorithm == "SAC":
-        model = SAC("MlpPolicy", env, learning_rate=alpha, gamma=gamma, learning_starts=min(1000, max(100, budget // 10)), buffer_size=max(10000, budget), batch_size=64, seed=seed, device="cpu", verbose=0)
+    if isinstance(env.observation_space, gym.spaces.Dict):
+        policy = "MultiInputPolicy"
+    elif isinstance(env.observation_space, gym.spaces.Box) and len(env.observation_space.shape) == 3:
+        policy = "CnnPolicy"
     else:
-        model = PPO("MlpPolicy", env, learning_rate=alpha, gamma=gamma, n_steps=min(1024, max(128, budget)), batch_size=64, seed=seed, device="cpu", verbose=0)
-    logs = [f"{experiment} training console", "=" * 72, elapsed_line(started, "CONFIG", f"environment={env_id} algorithm={algorithm} timesteps={budget} learning_rate={alpha:g} gamma={gamma:g} seed={seed} device=cpu")]
+        policy = "MlpPolicy"
+    if algorithm == "DQN":
+        model = DQN(policy, env, learning_rate=alpha, gamma=gamma, learning_starts=min(1000, max(100, budget // 10)), buffer_size=max(10000, budget), exploration_initial_eps=epsilon, exploration_final_eps=0.05, seed=seed, device="cpu", verbose=0)
+    elif algorithm == "SAC":
+        model = SAC(policy, env, learning_rate=alpha, gamma=gamma, learning_starts=min(1000, max(100, budget // 10)), buffer_size=max(10000, budget), batch_size=64, seed=seed, device="cpu", verbose=0)
+    else:
+        model = PPO(policy, env, learning_rate=alpha, gamma=gamma, n_steps=min(1024, max(128, budget)), batch_size=64, seed=seed, device="cpu", verbose=0)
+    logs = [f"{experiment} training console", "=" * 72, elapsed_line(started, "CONFIG", f"environment={env_id} algorithm={algorithm} policy={policy} timesteps={budget} learning_rate={alpha:g} gamma={gamma:g} seed={seed} device=cpu")]
     xs, rewards = [], []; chunk = 5000; trained = 0
     while trained < budget:
         step = min(chunk, budget - trained); model.learn(total_timesteps=step, reset_num_timesteps=False, progress_bar=False); trained += step
         eval_env = gym.make(env_id); values, _ = evaluate_policy(model, eval_env, n_eval_episodes=3, deterministic=True, return_episode_rewards=True, warn=False); eval_env.close(); mean = float(np.mean(values)); xs.append(trained); rewards.append(mean)
         logs.append(elapsed_line(started, "EVAL", f"step={trained}/{budget} mean_reward={mean:.1f}"))
         yield status_card("running", copy_for(language)["running"], f"{trained:,}/{budget:,} steps", language), metric_card(f"{mean:.1f}", "3-episode evaluation reward", language), learning_figure(xs, rewards, f"{experiment} evaluation reward", "Mean reward"), None, None, console_panel("\n".join(logs), language)
-    slug = env_id.split("-")[0].lower() + "-" + algorithm.lower(); model_path = ARTIFACT_DIR / slug; model.save(model_path); env.close()
-    gif = record_model(model, env_id, seed + 10000, f"{slug}-trained.gif", 500 if env_id in {"CartPole-v1", "Acrobot-v1"} else 999)
+    slug = re.sub(r"[^a-z0-9]+", "-", f"{env_id}-{algorithm}".lower()).strip("-"); model_path = ARTIFACT_DIR / slug; model.save(model_path); env.close()
+    try:
+        gif = record_model(model, env_id, seed + 10000, f"{slug}-trained.gif", 500 if env_id in {"CartPole-v1", "Acrobot-v1"} else 999)
+    except Exception as exc:
+        gif = None; logs.append(elapsed_line(started, "WARN", f"replay_unavailable={type(exc).__name__}: {exc}"))
     summary = save_summary(slug, {"experiment": experiment, "evaluation_steps": xs, "evaluation_rewards": rewards, "model": str(model_path.with_suffix('.zip')), "parameters": {"budget": budget, "learning_rate": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
     logs.append(elapsed_line(started, "DONE", f"replay={gif} model={model_path}.zip artifact={summary}"))
     yield status_card("complete", copy_for(language)["complete"], f"{budget:,} steps · {time.perf_counter() - started:.1f}s", language), metric_card(f"{rewards[-1]:.1f}", "final evaluation reward", language), learning_figure(xs, rewards, f"{experiment} evaluation reward", "Mean reward"), gif, summary, console_panel("\n".join(logs), language)
 
 
+def error_figure(title: str, message: str):
+    fig, ax = plt.subplots(figsize=(8.2, 4.0)); ax.axis("off")
+    ax.text(.5, .62, "Environment registered", ha="center", va="center", fontsize=20, fontweight="bold", color="#27324a")
+    ax.text(.5, .43, title, ha="center", va="center", fontsize=13, color="#5b5ce2")
+    ax.text(.5, .25, message[:180], ha="center", va="center", fontsize=10, color="#68748a", wrap=True)
+    fig.tight_layout(); return fig
+
+
+def run_catalog_experiment(experiment: str, budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
+    env_id = catalog_env_id(experiment); started = time.perf_counter()
+    logs = [f"{env_id} automatic training console", "=" * 72, elapsed_line(started, "REGISTER", f"environment={env_id} family={experiment.split(' · ', 1)[0]}"), elapsed_line(started, "CONFIG", f"budget={budget} learning_rate={alpha:g} gamma={gamma:g} epsilon={epsilon:g} seed={seed}")]
+    yield status_card("running", copy_for(language)["running"], "Inspecting environment and action space", language), metric_card("AUTO", "selecting a compatible baseline", language), error_figure(env_id, "Inspecting environment..."), None, None, console_panel("\n".join(logs), language)
+    env = None
+    try:
+        env = gym.make(env_id)
+        action_space = env.action_space; observation_space = env.observation_space
+        logs.append(elapsed_line(started, "SPACE", f"observation={observation_space} action={action_space}"))
+        if isinstance(action_space, gym.spaces.Discrete):
+            algorithm = "DQN"
+        elif isinstance(action_space, gym.spaces.Box):
+            algorithm = "SAC"
+        elif isinstance(action_space, (gym.spaces.MultiDiscrete, gym.spaces.MultiBinary)):
+            algorithm = "PPO"
+        else:
+            raise ValueError(f"Unsupported action space for the automatic baseline: {action_space}")
+        logs.append(elapsed_line(started, "AUTO", f"selected_algorithm={algorithm}")); env.close(); env = None
+        yield status_card("running", copy_for(language)["running"], f"Auto selected {algorithm}", language), metric_card(algorithm, f"action space: {action_space}", language), error_figure(env_id, f"Starting {algorithm} training..."), None, None, console_panel("\n".join(logs), language)
+        for status, metric, curve, preview, artifact, console in run_deep_control(experiment, env_id, algorithm, budget, alpha, gamma, epsilon, seed, language):
+            deep_text = re.search(r'<pre class="console-text">(.*?)</pre>', console, re.DOTALL)
+            combined = "\n".join(logs) + ("\n\n" + html.unescape(deep_text.group(1)) if deep_text else "")
+            yield status, metric, curve, preview, artifact, console_panel(combined, language)
+    except Exception as exc:
+        if env is not None:
+            env.close()
+        message = f"{type(exc).__name__}: {exc}"; logs.append(elapsed_line(started, "ERROR", message)); logs.append(elapsed_line(started, "HINT", "The environment remains registered. Install its optional package, ROM, or runtime dependency and try again."))
+        summary = save_summary(env_id, {"experiment": experiment, "environment": env_id, "status": "registered-but-unavailable", "error": message, "parameters": {"budget": budget, "learning_rate": alpha, "gamma": gamma, "epsilon": epsilon, "seed": seed}})
+        yield status_card("idle", "Environment registered", "Runtime dependency required", language), metric_card("SETUP", "see the latest log lines", language), error_figure(env_id, message), None, summary, console_panel("\n".join(logs), language)
+
+
 def train(experiment: str, budget: float, alpha: float, gamma: float, epsilon: float, seed: float, language: str):
     budget, seed = int(budget), int(seed)
-    if experiment == BANDIT:
+    if is_catalog_experiment(experiment):
+        yield from run_catalog_experiment(experiment, budget, alpha, gamma, epsilon, seed, language)
+    elif experiment == BANDIT:
         yield from run_bandit(budget, alpha, epsilon, seed, language)
     elif experiment == BLACKJACK:
         yield from run_blackjack(budget, alpha, gamma, epsilon, seed, language)
@@ -665,7 +800,7 @@ def slider_update(label: str, spec: tuple[float, float, float, float], visible: 
 
 
 def select_experiment(experiment: str, language: str):
-    copy = copy_for(language); cfg = EXPERIMENTS[experiment]
+    copy = copy_for(language); cfg = experiment_config(experiment)
     return (
         hero_html(language, experiment),
         slider_update(copy["budget"], cfg["budget"]),
@@ -681,10 +816,10 @@ def select_experiment(experiment: str, language: str):
 
 
 def switch_language(language: str, experiment: str, seed: float):
-    copy = copy_for(language); cfg = EXPERIMENTS[experiment]
+    copy = copy_for(language); cfg = experiment_config(experiment)
     return (
         hero_html(language, experiment), panel_html(copy["settings"], copy["settings_copy"]),
-        gr.Dropdown(choices=list(EXPERIMENTS), value=experiment, label=copy["experiment"]), slider_update(copy["budget"], cfg["budget"]), slider_update(copy["alpha"], cfg["alpha"]),
+        gr.Dropdown(choices=EXPERIMENT_CHOICES, value=experiment, label=copy["experiment"]), slider_update(copy["budget"], cfg["budget"]), slider_update(copy["alpha"], cfg["alpha"]),
         slider_update(copy["gamma"], cfg["gamma"], cfg["gamma_visible"]), slider_update(copy["epsilon"], cfg["epsilon"], cfg["algorithm"] not in {"PPO", "SAC"}),
         gr.Number(value=seed, precision=0, label=copy["seed"]), gr.Button(value=copy["start"]), status_card("idle", copy["ready"], copy["ready_detail"], language),
         metric_card("—", copy["metric_waiting"], language), panel_html(copy["curve"], copy["curve_copy"]), console_panel(copy["log_waiting"], language),
@@ -756,7 +891,7 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
     with gr.Row():
         with gr.Column(scale=1, min_width=310, elem_classes="control-card"):
             settings_header = gr.HTML(panel_html(copy["settings"], copy["settings_copy"]))
-            experiment = gr.Dropdown(choices=list(EXPERIMENTS), value=DEFAULT_EXPERIMENT, label=copy["experiment"], interactive=True)
+            experiment = gr.Dropdown(choices=EXPERIMENT_CHOICES, value=DEFAULT_EXPERIMENT, label=copy["experiment"], interactive=True, filterable=True)
             budget = gr.Slider(minimum=200, maximum=100000, value=cfg["budget"][2], step=100, label=copy["budget"], info=copy["budget_info"])
             alpha = gr.Slider(minimum=.00001, maximum=1, value=cfg["alpha"][2], step=.00001, label=copy["alpha"])
             gamma = gr.Slider(minimum=0, maximum=1, value=0, step=.05, label=copy["gamma"], visible=False)

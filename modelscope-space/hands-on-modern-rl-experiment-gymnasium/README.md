@@ -12,7 +12,7 @@ license: apache-2.0
 
 # Hands-On Modern RL · Gymnasium CPU Playground
 
-《动手学现代强化学习》的多实验在线训练合集。12 个实验全部使用 CPU，可在浏览器中切换环境、调整参数、查看实时训练曲线与自动跟随最新内容的训练日志。
+《动手学现代强化学习》的在线训练合集。页面自动注册 Gymnasium 核心环境以及已安装的 Atari/ALE、MuJoCo、Box2D 和 Robotics 扩展环境，并保留 12 个经过调优的 CPU 快速训练配方。
 
 首批实验：
 
@@ -25,7 +25,7 @@ license: apache-2.0
 - Acrobot、Pendulum：PPO
 - MountainCarContinuous：SAC 连续动作控制
 
-为保证浏览器中无需额外授权即可运行，合集暂不内置需要 ROM 的 Atari、依赖较重的 MuJoCo/机器人环境，以及需要额外系统包的 Box2D 环境。
+完整目录中的 Auto 项会检查动作空间：离散动作使用 DQN，连续动作使用 SAC，其他兼容动作空间使用 PPO。缺少 ROM 或运行时依赖时，环境仍保留在目录中，错误与安装提示会显示在曲线下方的实时日志里，不会让页面整体退出。
 
 课程项目：<https://github.com/walkinglabs/hands-on-modern-rl>
 
