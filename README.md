@@ -17,7 +17,7 @@
 
   <p>
     <a href="https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole">Train on ModelScope</a> ·
-    <a href="https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/notebooks/cartpole-ppo.ipynb">Open in Colab</a> ·
+    <a href="https://modelscope.cn/my/mynotebook">Open in ModelScope Notebook</a> ·
     <a href="https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole/file/view/master/train.py">ModelScope Script</a>
   </p>
 

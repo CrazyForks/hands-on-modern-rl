@@ -29,10 +29,7 @@ SEED = 42
 PROJECT_URL = "https://github.com/walkinglabs/hands-on-modern-rl"
 COURSE_URL = "https://walkinglabs.github.io/hands-on-modern-rl/"
 CHAPTER_URL = f"{COURSE_URL}chapter01_cartpole/training"
-COLAB_URL = (
-    "https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/"
-    "blob/main/notebooks/cartpole-ppo.ipynb"
-)
+MODELSCOPE_NOTEBOOK_URL = "https://modelscope.cn/my/mynotebook"
 SCRIPT_URL = (
     "https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole/"
     "file/view/master/train.py"
@@ -431,7 +428,7 @@ with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
             </p>
             <nav class="hero-links" aria-label="项目入口">
               <a class="hero-link primary" href="{CHAPTER_URL}" target="_blank" rel="noreferrer">阅读配套章节</a>
-              <a class="hero-link" href="{COLAB_URL}" target="_blank" rel="noreferrer">Colab Notebook</a>
+              <a class="hero-link" href="{MODELSCOPE_NOTEBOOK_URL}" target="_blank" rel="noreferrer">魔搭 Notebook</a>
               <a class="hero-link" href="{SCRIPT_URL}" target="_blank" rel="noreferrer">训练脚本</a>
               <a class="hero-link" href="{PROJECT_URL}" target="_blank" rel="noreferrer">GitHub 项目</a>
             </nav>

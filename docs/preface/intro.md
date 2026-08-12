@@ -2,7 +2,7 @@
 
 ::: tip 先训练一次 CartPole
 - **[ModelScope 创空间：浏览器一键训练](https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole)**：无需安装环境，点击“开始训练”后直接观察奖励曲线和策略动画。
-- **[Google Colab：打开 GitHub Notebook](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/notebooks/cartpole-ppo.ipynb)**：按顺序运行代码单元，可以修改训练步数并保留实验结果。
+- **[魔搭 Notebook：打开在线开发环境](https://modelscope.cn/my/mynotebook)**：启动 CPU 环境，拉取课程仓库后打开 `notebooks/cartpole-ppo.ipynb`，按顺序运行代码单元。
 - **[ModelScope：直接查看训练脚本](https://modelscope.cn/studios/walkinglab/modern-rl-experiment01-cartpole/file/view/master/train.py)**：在 ModelScope Notebook 或本地终端运行 `python train.py --timesteps 30000`。
 :::
 

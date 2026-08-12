@@ -47,7 +47,7 @@ print("最小环境验证通过！")
 ```
 
 ::: details 没有 GPU 也能跑
-课程前半部分（CartPole、DQN 等）CPU 即可训练，不强制要求 GPU。后半部分 LLM 微调（Ch7-Ch10）建议至少 24 GB 显存，也可以用 [Google Colab](https://colab.research.google.com/) 免费 GPU 完成。
+课程前半部分（CartPole、DQN 等）CPU 即可训练，不强制要求 GPU。后半部分 LLM 微调（Ch7-Ch10）建议至少 24 GB 显存，也可以用 [魔搭 Notebook](https://modelscope.cn/my/mynotebook) 的云端 GPU 环境完成。
 :::
 
 ---

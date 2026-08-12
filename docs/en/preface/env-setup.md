@@ -51,7 +51,7 @@ print("Minimal environment verified!")
 ```
 
 ::: details No GPU? You can still run the course.
-The first half of the course (CartPole, DQN, etc.) can be trained on CPU; a GPU is not required. The second half on LLM fine-tuning (Chapters 7-10) recommends at least 24 GB of VRAM, or you can use the free GPUs on [Google Colab](https://colab.research.google.com/).
+The first half of the course (CartPole, DQN, etc.) can be trained on CPU; a GPU is not required. The second half on LLM fine-tuning (Chapters 7-10) recommends at least 24 GB of VRAM, or you can use a cloud GPU environment in [ModelScope Notebook](https://modelscope.cn/my/mynotebook).
 :::
 
 ---
