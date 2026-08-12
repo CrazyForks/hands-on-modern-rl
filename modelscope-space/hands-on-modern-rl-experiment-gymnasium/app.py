@@ -285,19 +285,75 @@ FAMILY_VISUALS = {
 }
 
 
-def family_visual(family: str) -> str:
-    color, mark, label = FAMILY_VISUALS.get(family, FAMILY_VISUALS["Other"])
-    safe = re.sub(r"[^a-z0-9]+", "-", family.lower()).strip("-")
-    path = ARTIFACT_DIR / f"family-{safe}.svg"
-    if not path.exists():
-        path.write_text(f'''<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320">
+def semantic_scene(env_id: str, family: str) -> tuple[str, str]:
+    """Return a small SVG scene and a human-readable scene label."""
+    name = env_id.lower()
+    if "bandit" in name:
+        return '<rect x="105" y="185" width="55" height="70" rx="8"/><rect x="190" y="125" width="55" height="130" rx="8"/><rect x="275" y="72" width="55" height="183" rx="8"/><rect x="360" y="145" width="55" height="110" rx="8"/><path d="M98 265H430"/>', "EXPLORE"
+    if "blackjack" in name:
+        return '<g transform="rotate(-9 220 160)"><rect x="130" y="72" width="142" height="188" rx="14"/><text x="154" y="124">A</text><path d="M190 174l20-25 20 25-20 25z"/></g><g transform="rotate(9 340 160)"><rect x="270" y="72" width="142" height="188" rx="14"/><text x="294" y="124">10</text><circle cx="341" cy="176" r="25"/></g>', "CARDS"
+    if "taxi" in name:
+        return '<path d="M95 70V260M175 70V260M255 70V260M335 70V260M415 70V260M95 70H415M95 133H415M95 196H415M95 260H415" opacity=".35"/><rect x="174" y="145" width="92" height="48" rx="12"/><circle cx="194" cy="201" r="11"/><circle cx="246" cy="201" r="11"/><circle cx="368" cy="102" r="15"/><path d="M366 118v34"/>', "PICK UP"
+    if "frozenlake" in name:
+        return '<path d="M90 70H410V262H90zM170 70v192M250 70v192M330 70v192M90 118h320M90 166h320M90 214h320" opacity=".35"/><path d="M107 91l28 18-20 28zM265 178l26 20-23 25z"/><circle cx="370" cy="236" r="18"/><path d="M120 238C170 190 205 225 255 170S335 130 372 105" fill="none" stroke-dasharray="10 12"/>', "SLIPPERY"
+    if "cliff" in name:
+        return '<path d="M75 244H445M92 206H420M108 168H398M122 130H376" opacity=".3"/><path d="M75 245L165 245 205 180 270 245 445 245" fill="none"/><path d="M170 252l35 38 35-38M245 252l35 38 35-38"/><circle cx="102" cy="222" r="14"/><path d="M110 211C170 145 265 160 407 216" fill="none" stroke-dasharray="10 12"/>', "SAFE PATH"
+    if "cartpole" in name:
+        return '<path d="M76 252H454"/><rect x="205" y="194" width="118" height="48" rx="11"/><circle cx="231" cy="250" r="14"/><circle cx="297" cy="250" r="14"/><circle cx="264" cy="192" r="12"/><path d="M264 190L304 55" stroke-width="16"/><circle cx="304" cy="55" r="13"/><path d="M164 219h-55M364 219h55"/>', "BALANCE"
+    if "mountaincar" in name:
+        return '<path d="M55 240C130 115 205 270 285 205S395 80 470 225" fill="none"/><g transform="translate(245 188) rotate(-18)"><rect x="0" y="0" width="85" height="35" rx="10"/><circle cx="20" cy="39" r="12"/><circle cx="66" cy="39" r="12"/></g><path d="M365 105h54v52"/><path d="M419 105l-25 17 25 17" fill="none"/>', "MOMENTUM"
+    if "pendulum" in name and "inverted" not in name:
+        return '<circle cx="260" cy="82" r="18"/><path d="M260 82L345 215" stroke-width="17"/><circle cx="345" cy="215" r="27"/><path d="M176 216A105 105 0 0 1 338 104" fill="none" stroke-dasharray="10 12"/><path d="M337 104l-2 35-31-15" fill="none"/>', "SWING UP"
+    if "acrobot" in name:
+        return '<circle cx="260" cy="54" r="15"/><path d="M260 54L214 157L310 229" stroke-width="18" fill="none"/><circle cx="214" cy="157" r="17"/><circle cx="310" cy="229" r="18"/><path d="M130 102H394" stroke-dasharray="10 12"/><path d="M320 224c43-22 65-55 71-99" fill="none"/>', "SWING"
+    if "lunarlander" in name:
+        return '<circle cx="402" cy="72" r="29" opacity=".3"/><path d="M75 250l85-24 74 20 92-17 125 22" fill="none"/><path d="M224 128h72l22 69-30 24h-56l-30-24z"/><path d="M232 215l-24 31M288 215l24 31M222 246h-35M303 246h35"/><path d="M242 198l18 48 18-48" fill="none"/><path d="M177 188v50M343 188v50"/>', "LAND"
+    if "carracing" in name:
+        return '<path d="M90 245C40 150 145 70 240 112S435 60 455 170 340 274 260 225 130 285 90 245" fill="none" stroke-width="30" opacity=".45"/><g transform="translate(242 163) rotate(-18)"><rect width="90" height="40" rx="10"/><circle cx="20" cy="44" r="11"/><circle cx="70" cy="44" r="11"/></g>', "RACE"
+    if "bipedal" in name or "walker" in name or "humanoid" in name:
+        return '<circle cx="257" cy="68" r="23"/><path d="M257 92v83M257 120l-68 47M257 120l66 35M257 175l-54 76M257 175l65 72" fill="none" stroke-width="17"/><path d="M65 260h400"/>', "WALK"
+    if "hopper" in name:
+        return '<circle cx="257" cy="66" r="23"/><path d="M257 90v82l-50 47 61 35" fill="none" stroke-width="20"/><path d="M65 260h400M155 235l-30-28M365 227l30-32"/>', "HOP"
+    if "swimmer" in name:
+        return '<path d="M85 165C155 100 220 235 285 165S405 100 465 165" fill="none" stroke-width="25"/><circle cx="85" cy="165" r="17"/><path d="M80 247c90-30 160 25 250-5s110 12 145 4" fill="none" opacity=".3"/>', "SWIM"
+    if "cheetah" in name or "ant" in name:
+        return '<path d="M150 163h184l48 42M164 165l-58 75M215 168l-28 82M296 168l35 79M338 162l80 69" fill="none" stroke-width="17"/><circle cx="358" cy="137" r="25"/><path d="M85 260h380"/>', "LOCOMOTION"
+    if any(word in name for word in ("reach", "push", "slide", "pick", "place", "door", "hammer", "hand", "robot", "franka")) or family == "Robotics":
+        return '<rect x="92" y="226" width="105" height="27" rx="8"/><circle cx="145" cy="213" r="20"/><path d="M145 207l65-74 75 37 54-68" fill="none" stroke-width="20"/><circle cx="210" cy="133" r="17"/><circle cx="285" cy="170" r="17"/><path d="M330 91l24 24M350 84l24 24"/><circle cx="414" cy="205" r="31" stroke-dasharray="9 9" fill="none"/>', "REACH"
+    if "pong" in name:
+        return '<rect x="82" y="102" width="18" height="118" rx="8"/><rect x="420" y="80" width="18" height="118" rx="8"/><circle cx="274" cy="151" r="16"/><path d="M110 155l130-4M305 147l105-29" stroke-dasharray="9 11"/>', "PONG"
+    if "breakout" in name:
+        return '<rect x="90" y="58" width="75" height="26"/><rect x="175" y="58" width="75" height="26"/><rect x="260" y="58" width="75" height="26"/><rect x="345" y="58" width="75" height="26"/><rect x="205" y="248" width="110" height="18" rx="8"/><circle cx="300" cy="175" r="14"/><path d="M300 189l-42 52" stroke-dasharray="9 10"/>', "BREAKOUT"
+    if any(word in name for word in ("space", "asteroid", "battle", "beam", "galax", "star")):
+        return '<path d="M260 82l34 88-34-18-34 18z"/><circle cx="108" cy="87" r="6"/><circle cx="412" cy="141" r="7"/><circle cx="370" cy="66" r="5"/><path d="M255 173l-25 79M265 173l25 79"/><path d="M88 225l26-35 22 30 30-50 35 55" fill="none" opacity=".4"/>', "ARCADE"
+    if family == "Atari / ALE":
+        return '<rect x="82" y="72" width="356" height="188" rx="16"/><path d="M103 233l65-78 58 36 69-83 113 104" fill="none"/><circle cx="350" cy="118" r="19"/><rect x="120" y="98" width="52" height="34" rx="7"/>', "PIXEL CONTROL"
+    if family == "Toy Text" or family == "JAX Tabular" or "grid" in name:
+        return '<path d="M90 66H430V258H90zM175 66v192M260 66v192M345 66v192M90 114h340M90 162h340M90 210h340" opacity=".35"/><circle cx="130" cy="234" r="15"/><path d="M146 226C225 190 260 130 390 91" fill="none" stroke-dasharray="10 12"/><path d="M376 82h28v28" fill="none"/>', "GRID"
+    return '<circle cx="145" cy="183" r="47"/><circle cx="260" cy="112" r="37"/><circle cx="385" cy="195" r="54"/><path d="M184 158l42-27M292 136l51 33M188 201l139 2" fill="none"/><circle cx="145" cy="183" r="9"/><circle cx="260" cy="112" r="9"/><circle cx="385" cy="195" r="9"/>', "ENVIRONMENT"
+
+
+def experiment_visual(experiment: str) -> str:
+    cfg = experiment_config(experiment); family = cfg["family"]; env_id = cfg["environment"]
+    color, _, _ = FAMILY_VISUALS.get("Curated" if experiment in EXPERIMENTS else family, FAMILY_VISUALS["Other"])
+    scene, scene_label = semantic_scene(env_id if env_id != "Custom 4×4 GridWorld" else "gridworld", family)
+    safe = re.sub(r"[^a-z0-9]+", "-", experiment.lower()).strip("-")
+    path = ARTIFACT_DIR / f"card-{safe}.svg"
+    title = html.escape(env_id.replace("ALE/", "")); short_title = title if len(title) <= 29 else title[:27] + "…"
+    algorithm = html.escape(cfg["algorithm"].replace("Auto: inspect action space", "AUTO"))
+    path.write_text(f'''<svg xmlns="http://www.w3.org/2000/svg" width="520" height="320" viewBox="0 0 520 320">
 <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{color}"/><stop offset="1" stop-color="#111827"/></linearGradient></defs>
-<rect width="640" height="320" rx="30" fill="url(#g)"/><circle cx="520" cy="58" r="105" fill="#fff" opacity=".09"/>
-<path d="M70 235 C145 115 205 260 290 145 S430 235 555 92" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" opacity=".72"/>
-<circle cx="70" cy="235" r="13" fill="#fff"/><circle cx="290" cy="145" r="13" fill="#fff"/><circle cx="555" cy="92" r="13" fill="#fff"/>
-<text x="54" y="92" fill="#fff" font-size="58" font-family="Arial" font-weight="700">{mark}</text>
-<text x="54" y="142" fill="#fff" font-size="24" font-family="Arial" font-weight="700" letter-spacing="4">{label}</text></svg>''', encoding="utf-8")
+<rect width="520" height="320" rx="26" fill="url(#g)"/><circle cx="455" cy="36" r="95" fill="#fff" opacity=".08"/>
+<g fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">{scene}</g>
+<text x="28" y="38" fill="#fff" font-size="19" font-family="Arial" font-weight="700">{short_title}</text>
+<rect x="28" y="276" width="170" height="25" rx="12" fill="#fff" opacity=".15"/><text x="42" y="294" fill="#fff" font-size="13" font-family="Arial" font-weight="700" letter-spacing="2">{scene_label}</text>
+<rect x="402" y="276" width="90" height="25" rx="12" fill="#fff" opacity=".92"/><text x="447" y="294" text-anchor="middle" fill="#172033" font-size="12" font-family="Arial" font-weight="800">{algorithm}</text></svg>''', encoding="utf-8")
     return str(path)
+
+
+def visual_data_uri(experiment: str) -> str:
+    payload = Path(experiment_visual(experiment)).read_bytes()
+    return f"data:image/svg+xml;base64,{base64.b64encode(payload).decode()}"
 
 
 def experiment_goal(experiment: str) -> str:
@@ -310,6 +366,22 @@ def experiment_goal(experiment: str) -> str:
         "Pendulum-v1": "Swing up and stabilize the pendulum", "LunarLander-v3": "Land between the flags",
     }
     if env_id in goals: return goals[env_id]
+    name = env_id.lower()
+    if "pong" in name: return "Move the paddle to return the ball past the opponent"
+    if "breakout" in name: return "Keep the ball in play and clear the brick wall"
+    if "lunarlander" in name: return "Control the engines and land softly between the flags"
+    if "carracing" in name: return "Steer a car around the track as quickly and smoothly as possible"
+    if "bipedal" in name or "walker" in name: return "Coordinate the legs to walk forward without falling"
+    if "humanoid" in name: return "Coordinate a humanoid body to move forward without falling"
+    if "hopper" in name: return "Hop forward while keeping the body upright"
+    if "cheetah" in name: return "Coordinate the joints to run forward quickly"
+    if "ant" in name: return "Coordinate four legs to travel forward stably"
+    if "swimmer" in name: return "Propel the articulated body through fluid"
+    if "reach" in name: return "Move the robot end effector to the target position"
+    if "push" in name: return "Push an object from its initial position to the target"
+    if any(word in name for word in ("pick", "place")): return "Pick up an object and move it to the target"
+    if "door" in name: return "Manipulate the robot hand to open the door"
+    if "hammer" in name: return "Control the robot hand to drive the nail with a hammer"
     family = experiment_config(experiment)["family"]
     return {
         "Atari / ALE": "Learn control directly from game pixels", "MuJoCo": "Learn continuous physics control",
@@ -320,13 +392,41 @@ def experiment_goal(experiment: str) -> str:
     }.get(family, "Explore a registered Gymnasium task")
 
 
+def localized_goal(experiment: str, language: str) -> str:
+    if language != "中文": return experiment_goal(experiment)
+    env_id = experiment_config(experiment)["environment"]
+    goals = {
+        "4-armed Bernoulli bandit": "在探索未知选项和利用当前最优选项之间取得平衡",
+        "Custom 4×4 GridWorld": "学习从起点到终点的高回报路径",
+        "Blackjack-v1": "在点数不超过 21 的前提下战胜庄家", "FrozenLake-v1": "穿过湿滑冰面到达终点",
+        "CliffWalking-v1": "避开悬崖并安全抵达终点", "Taxi-v4": "接到乘客并送到指定位置",
+        "CartPole-v1": "移动小车，使杆子尽可能长时间保持竖直", "MountainCar-v0": "积累动量并冲上山顶",
+        "MountainCarContinuous-v0": "用连续推力控制小车爬上山顶", "Acrobot-v1": "摆动双连杆，使末端超过目标高度",
+        "Pendulum-v1": "将摆杆甩起并稳定在竖直位置", "LunarLander-v3": "控制推进器，在两面旗帜之间平稳着陆",
+    }
+    if env_id in goals: return goals[env_id]
+    name = env_id.lower()
+    if "pong" in name: return "移动球拍，把球回击到对手无法接到的位置"
+    if "breakout" in name: return "保持球不落下，并清除上方的砖块"
+    if "lunarlander" in name: return "控制推进器，在两面旗帜之间平稳着陆"
+    if "carracing" in name: return "控制赛车快速而平稳地沿赛道行驶"
+    if "bipedal" in name or "walker" in name or "humanoid" in name: return "协调身体关节向前移动，并避免摔倒"
+    if "hopper" in name: return "保持身体直立并连续向前跳跃"
+    if "cheetah" in name or "ant" in name: return "协调多个关节，稳定而快速地向前移动"
+    if "swimmer" in name: return "控制多节身体，在流体环境中向前游动"
+    if "reach" in name: return "把机械臂末端移动到指定目标位置"
+    if "push" in name: return "把物体从初始位置推到目标位置"
+    family = experiment_config(experiment)["family"]
+    return {"Atari / ALE": "直接根据游戏像素学习动作策略", "MuJoCo": "学习连续物理控制策略", "Robotics": "完成机械臂到达或物体操作任务", "Box2D": "在二维物理环境中学习控制策略", "Toy Text": "在小型离散环境中学习策略", "JAX Phys2D": "运行 JAX 二维物理控制任务", "JAX Tabular": "运行 JAX 表格型任务", "Bandit": "平衡探索与利用", "Tabular": "在小型环境中学习状态价值"}.get(family, "探索一个已注册的 Gymnasium 任务")
+
+
 def card_caption(experiment: str) -> str:
     cfg = experiment_config(experiment); title = experiment.split(" · ")[0] if not is_catalog_experiment(experiment) else cfg["environment"]
     return f"{title}\n{experiment_goal(experiment)}\n{cfg['family']} · {cfg['algorithm']}"
 
 
 def card_items(experiments: list[str]) -> list[tuple[str, str]]:
-    return [(family_visual("Curated" if item in EXPERIMENTS else experiment_config(item)["family"]), card_caption(item)) for item in experiments]
+    return [(experiment_visual(item), card_caption(item)) for item in experiments]
 
 
 def filter_choices(query: str, family: str) -> list[str]:
@@ -357,6 +457,42 @@ def choose_card(visible: list[str], event: gr.SelectData):
     return visible[event.index]
 
 
+def space_text(space) -> str:
+    if isinstance(space, gym.spaces.Discrete): return f"Discrete({space.n})"
+    if isinstance(space, gym.spaces.Box): return f"Box{space.shape}"
+    if isinstance(space, gym.spaces.MultiDiscrete): return f"MultiDiscrete{space.shape}"
+    if isinstance(space, gym.spaces.MultiBinary): return f"MultiBinary({space.n})"
+    if isinstance(space, gym.spaces.Dict): return "Dict(" + ", ".join(space.spaces.keys()) + ")"
+    if isinstance(space, gym.spaces.Tuple): return f"Tuple({len(space.spaces)} parts)"
+    return type(space).__name__
+
+
+def infer_algorithm(action_space, configured: str) -> str:
+    if configured != "Auto: inspect action space": return configured
+    if isinstance(action_space, gym.spaces.Discrete): return "DQN"
+    if isinstance(action_space, gym.spaces.Box): return "SAC"
+    if isinstance(action_space, (gym.spaces.MultiDiscrete, gym.spaces.MultiBinary)): return "PPO"
+    return "Manual setup"
+
+
+def task_brief(experiment: str, language: str) -> str:
+    cfg = experiment_config(experiment); env_id = cfg["environment"]
+    observation, action, algorithm, availability = "Custom", "Custom", cfg["algorithm"], "Ready"
+    if env_id == "4-armed Bernoulli bandit": observation, action = "Estimated arm values", "Choose one of 4 arms"
+    elif env_id == "Custom 4×4 GridWorld": observation, action = "Grid cell", "Up / Down / Left / Right"
+    else:
+        env = None
+        try:
+            env = gym.make(env_id); observation = space_text(env.observation_space); action = space_text(env.action_space); algorithm = infer_algorithm(env.action_space, cfg["algorithm"])
+        except Exception as exc:
+            availability = f"Registered · {type(exc).__name__} during setup"
+        finally:
+            if env is not None: env.close()
+    if language == "中文":
+        return f'''<section class="task-brief"><div class="task-brief__visual"><img src="{visual_data_uri(experiment)}" alt="{html.escape(env_id)} task scene"></div><div class="task-brief__body"><span class="task-kicker">训练前先理解任务</span><h3>{html.escape(env_id)}</h3><p>{html.escape(localized_goal(experiment, language))}</p><div class="task-facts"><span><b>观察</b>{html.escape(observation)}</span><span><b>动作</b>{html.escape(action)}</span><span><b>算法</b>{html.escape(algorithm)}</span><span><b>状态</b>{html.escape(availability)}</span></div><p class="task-hint">调整下方参数后再点击“开始训练”。训练曲线和实时日志会持续更新。</p></div></section>'''
+    return f'''<section class="task-brief"><div class="task-brief__visual"><img src="{visual_data_uri(experiment)}" alt="{html.escape(env_id)} task scene"></div><div class="task-brief__body"><span class="task-kicker">UNDERSTAND BEFORE TRAINING</span><h3>{html.escape(env_id)}</h3><p>{html.escape(localized_goal(experiment, language))}</p><div class="task-facts"><span><b>Observation</b>{html.escape(observation)}</span><span><b>Action</b>{html.escape(action)}</span><span><b>Algorithm</b>{html.escape(algorithm)}</span><span><b>Status</b>{html.escape(availability)}</span></div><p class="task-hint">Review the task, adjust the parameters below, then press Start training. The curve and live console will keep updating.</p></div></section>'''
+
+
 TEXT = {
     "English": {
         "course": "Hands-On Modern RL · CPU experiment collection",
@@ -378,7 +514,7 @@ TEXT = {
         "seed": "Random seed",
         "start": "Start training",
         "ready": "Ready to train",
-        "ready_detail": "Choose an experiment and start a CPU run",
+        "ready_detail": "Review the task brief, adjust parameters, then start the CPU run",
         "running": "Training in progress",
         "complete": "Training complete",
         "status": "Run status",
@@ -413,7 +549,7 @@ TEXT = {
         "seed": "随机种子",
         "start": "开始训练",
         "ready": "等待训练",
-        "ready_detail": "选择一个实验并启动 CPU 训练",
+        "ready_detail": "先阅读任务说明，调整参数，再启动 CPU 训练",
         "running": "训练进行中",
         "complete": "训练完成",
         "status": "训练状态",
@@ -887,6 +1023,7 @@ def select_experiment(experiment: str, language: str):
     copy = copy_for(language); cfg = experiment_config(experiment)
     return (
         hero_html(language, experiment),
+        task_brief(experiment, language),
         slider_update(copy["budget"], cfg["budget"]),
         slider_update(copy["alpha"], cfg["alpha"]),
         slider_update(copy["gamma"], cfg["gamma"], cfg["gamma_visible"]),
@@ -902,7 +1039,7 @@ def select_experiment(experiment: str, language: str):
 def switch_language(language: str, experiment: str, seed: float):
     copy = copy_for(language); cfg = experiment_config(experiment)
     return (
-        hero_html(language, experiment), panel_html(copy["settings"], copy["settings_copy"]),
+        hero_html(language, experiment), panel_html(copy["settings"], copy["settings_copy"]), task_brief(experiment, language),
         slider_update(copy["budget"], cfg["budget"]), slider_update(copy["alpha"], cfg["alpha"]), slider_update(copy["gamma"], cfg["gamma"], cfg["gamma_visible"]), slider_update(copy["epsilon"], cfg["epsilon"], cfg["algorithm"] not in {"PPO", "SAC"}),
         gr.Number(value=seed, precision=0, label=copy["seed"]), gr.Button(value=copy["start"]), status_card("idle", copy["ready"], copy["ready_detail"], language),
         metric_card("—", copy["metric_waiting"], language), panel_html(copy["curve"], copy["curve_copy"]), console_panel(copy["log_waiting"], language),
@@ -926,10 +1063,11 @@ CSS = """
 .hero h1{max-width:760px;margin:0 0 12px;color:#fff;font-size:clamp(32px,5vw,48px);line-height:1.1;letter-spacing:-.035em}.hero-copy{max-width:760px;margin:0;color:#cdd3e2;font-size:15px;line-height:1.7}.hero-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.hero-link{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border:1px solid rgba(255,255,255,.18);border-radius:9px;color:#eef2ff!important;background:rgba(255,255,255,.08);font-size:13px;font-weight:650;text-decoration:none!important}.hero-link.primary{color:#172554!important;background:#fff;border-color:#fff}
 .lab-strip{display:flex;flex-wrap:wrap;gap:8px 22px;margin:17px 0 22px;padding:13px 18px;border:1px solid var(--line);border-radius:13px;background:#fff;color:var(--muted);font-size:13px;box-shadow:0 6px 20px rgba(18,25,43,.035)}.lab-strip strong{margin-left:5px;color:var(--ink)}
 .catalog-card{margin:0 0 18px!important;padding:22px!important;border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.catalog-tools{align-items:end!important}.catalog-family{min-width:420px!important}.catalog-search{min-width:280px!important}.catalog-meta{color:var(--muted);font-size:12px;font-weight:700}.catalog-pager{justify-content:flex-end!important;gap:8px!important}.catalog-pager button{max-width:110px!important;border-radius:9px!important}.experiment-gallery{max-height:720px;overflow:auto;padding:4px!important}.experiment-gallery .grid-wrap{gap:12px!important}.experiment-gallery button,.experiment-gallery .thumbnail-item{overflow:hidden!important;border:1px solid var(--line)!important;border-radius:14px!important;background:#fff!important;box-shadow:0 7px 18px rgba(18,25,43,.045)!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important}.experiment-gallery button:hover,.experiment-gallery .thumbnail-item:hover{transform:translateY(-2px);border-color:#a5b4fc!important;box-shadow:0 12px 25px rgba(50,55,120,.12)!important}.experiment-gallery img{aspect-ratio:2/1!important;object-fit:cover!important}.experiment-gallery .caption,.experiment-gallery .label{white-space:pre-line!important;color:var(--ink)!important;font-size:11px!important;line-height:1.45!important;text-align:left!important}.selected-experiment input{font-weight:750!important;color:var(--brand)!important;background:#f5f5ff!important}
+.task-brief{display:grid;grid-template-columns:minmax(210px,34%) 1fr;gap:20px;margin:0 0 18px;padding:14px;border:1px solid #dfe3f5;border-radius:15px;background:linear-gradient(135deg,#fafaff,#f6fbff)}.task-brief__visual img{display:block;width:100%;height:100%;min-height:190px;object-fit:cover;border-radius:11px}.task-brief__body{padding:9px 9px 7px}.task-kicker{color:var(--brand);font-size:10px;font-weight:850;letter-spacing:.12em}.task-brief h3{margin:6px 0;color:var(--ink);font-size:23px}.task-brief p{margin:0 0 13px;color:var(--muted);font-size:13px;line-height:1.6}.task-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.task-facts span{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:11px;overflow-wrap:anywhere}.task-facts b{display:block;margin-bottom:3px;color:#8a94a8;font-size:9px;letter-spacing:.09em;text-transform:uppercase}.task-hint{margin-top:12px!important;margin-bottom:0!important;font-weight:650;color:#4b5563!important}
 .control-card,.chart-card,.output-card{border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.control-card,.chart-card{padding:22px!important}.output-card{margin-top:16px!important;padding:22px!important}.panel-title{margin:0 0 5px;color:var(--ink);font-size:19px}.panel-copy,.artifact-note{margin:0 0 17px;color:var(--muted);font-size:13px;line-height:1.6}
 .primary-btn{min-height:46px!important;border:0!important;border-radius:11px!important;background:linear-gradient(135deg,#5153d6,#6969ec)!important;font-weight:750!important}.run-state,.live-metric{display:flex;gap:12px;margin-top:14px;padding:14px 15px;border-radius:13px;background:#f8f9fc}.run-state__dot{width:9px;height:9px;margin-top:6px;border-radius:50%;background:#94a3b8}.run-state--running .run-state__dot{background:#5b5ce2;box-shadow:0 0 0 5px rgba(91,92,226,.13)}.run-state--complete .run-state__dot{background:#13a36f}.run-state strong,.run-state small,.summary-label{display:block}.summary-label{color:#8a94a8;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.run-state strong{margin-top:3px;color:var(--ink);font-size:14px}.run-state small,.live-metric small{margin-top:3px;color:var(--muted);font-size:12px}.metric-reading{display:flex;align-items:baseline;gap:9px;margin-top:4px}.metric-reading strong{color:var(--ink);font-size:24px}
 .console-panel{overflow:hidden;margin-top:18px;border:1px solid #202b3d;border-radius:13px;background:#0f1623}.console-head{display:flex;align-items:center;gap:9px;padding:11px 15px;border-bottom:1px solid #263244;color:#e2e8f0;font-size:12px;font-weight:750}.console-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.12)}.console-text{box-sizing:border-box;height:300px;margin:0;padding:17px 18px;overflow:auto;white-space:pre;color:#cbd5e1!important;background:#0f1623!important;font:12px/1.58 "SFMono-Regular",Consolas,monospace!important;scrollbar-gutter:stable}.footer-note{margin-top:18px;text-align:center;color:#94a3b8;font-size:12px}.footer-note a{color:var(--brand)!important;text-decoration:none!important;font-weight:650}
-@media(max-width:760px){.gradio-container{padding:12px 10px 30px!important}.language-bar{top:14px!important;right:14px!important}.language-switch{width:196px!important;min-width:196px!important}.hero{padding:70px 22px 25px;border-radius:19px}.hero-topline{align-items:flex-start;flex-direction:column}.project-mark{max-width:70%}.catalog-family,.catalog-search{min-width:100%!important}.experiment-gallery{max-height:580px}}
+@media(max-width:760px){.gradio-container{padding:12px 10px 30px!important}.language-bar{top:14px!important;right:14px!important}.language-switch{width:196px!important;min-width:196px!important}.hero{padding:70px 22px 25px;border-radius:19px}.hero-topline{align-items:flex-start;flex-direction:column}.project-mark{max-width:70%}.catalog-family,.catalog-search{min-width:100%!important}.experiment-gallery{max-height:580px}.task-brief{grid-template-columns:1fr}.task-brief__visual img{min-height:160px}.task-facts{grid-template-columns:1fr}}
 """
 
 
@@ -986,6 +1124,8 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
             previous_page = gr.Button("← Previous", size="sm")
             next_page = gr.Button("Next →", size="sm")
 
+    task_info = gr.HTML(task_brief(DEFAULT_EXPERIMENT, DEFAULT_LANGUAGE))
+
     with gr.Row():
         with gr.Column(scale=1, min_width=310, elem_classes="control-card"):
             settings_header = gr.HTML(panel_html(copy["settings"], copy["settings_copy"]))
@@ -1017,8 +1157,8 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
     previous_page.click(lambda q, f, p: move_catalog(q, f, p, -1), inputs=[search, family, catalog_page_state], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False)
     next_page.click(lambda q, f, p: move_catalog(q, f, p, 1), inputs=[search, family, catalog_page_state], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False)
     gallery.select(choose_card, inputs=[visible_experiments], outputs=[experiment], queue=False)
-    experiment.change(select_experiment, inputs=[experiment, language], outputs=[hero, budget, alpha, gamma, epsilon, status, metric, console, preview, artifact], queue=False)
-    language.change(switch_language, inputs=[language, experiment, seed], outputs=[hero, settings_header, budget, alpha, gamma, epsilon, seed, start, status, metric, chart_header, console, preview_header, artifact], queue=False)
+    experiment.change(select_experiment, inputs=[experiment, language], outputs=[hero, task_info, budget, alpha, gamma, epsilon, status, metric, console, preview, artifact], queue=False)
+    language.change(switch_language, inputs=[language, experiment, seed], outputs=[hero, settings_header, task_info, budget, alpha, gamma, epsilon, seed, start, status, metric, chart_header, console, preview_header, artifact], queue=False)
     start.click(train, inputs=[experiment, budget, alpha, gamma, epsilon, seed, language], outputs=[status, metric, curve, preview, artifact, console], concurrency_limit=1)
 
 
