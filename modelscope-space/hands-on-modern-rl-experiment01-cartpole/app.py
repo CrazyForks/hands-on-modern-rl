@@ -40,6 +40,103 @@ SCRIPT_URL = (
 ANSI_ESCAPE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
 
 
+UI_TEXT = {
+    "中文": {
+        "course": "《动手学现代强化学习》· 第 1 章配套",
+        "title": "CartPole 在线训练实验",
+        "description": "使用 PPO 从零训练倒立摆策略。启动后可以实时查看奖励曲线、PPO 输出和评估记录，训练结束后下载模型并播放策略动画。全程使用 CPU。",
+        "chapter": "阅读配套章节",
+        "notebook": "魔搭 Notebook",
+        "script": "训练脚本",
+        "project": "GitHub 项目",
+        "environment": "环境",
+        "algorithm": "算法",
+        "device": "设备",
+        "threshold": "解决阈值",
+        "max_score": "满分",
+        "settings_title": "训练设置",
+        "settings_copy": "选择总交互步数。系统每训练 2,000 步评估一次策略。",
+        "steps_label": "训练步数",
+        "steps_info": "建议首次使用 30,000 步",
+        "start": "开始训练",
+        "run_status": "训练状态",
+        "idle": "等待开始",
+        "idle_detail": "设置训练步数后启动实验",
+        "running": "训练进行中",
+        "complete": "训练完成",
+        "steps_unit": "步",
+        "seconds_unit": "秒",
+        "mean_reward": "平均奖励",
+        "final_mean_reward": "最终平均奖励",
+        "std": "标准差",
+        "episodes": "回合",
+        "metric_waiting": "训练开始后显示评估结果",
+        "chart_title": "奖励曲线",
+        "chart_copy": "纵轴为确定性策略的平均奖励，绿色虚线表示 475 分解决阈值。图表标记保留英文。",
+        "console_title": "实时训练日志",
+        "console_waiting": "等待训练任务...",
+        "results_title": "训练结果",
+        "results_copy": "任务完成后，这里会显示策略动画并提供模型文件。",
+        "animation": "策略动画",
+        "download": "下载 PPO 模型",
+        "footer": "实验 01",
+        "console_name": "CartPole PPO 训练日志",
+        "initialization": "PPO 初始化",
+        "collecting": "正在收集第一批环境交互",
+        "finished": "训练完成",
+    },
+    "English": {
+        "course": "Hands-On Modern RL · Chapter 1 companion",
+        "title": "CartPole Online Training Lab",
+        "description": "Train a CartPole policy from scratch with PPO. Follow the reward curve, PPO output, and evaluations in real time, then download the model and replay the trained policy. Runs entirely on CPU.",
+        "chapter": "Read companion chapter",
+        "notebook": "ModelScope Notebook",
+        "script": "Training script",
+        "project": "GitHub project",
+        "environment": "Environment",
+        "algorithm": "Algorithm",
+        "device": "Device",
+        "threshold": "Solved threshold",
+        "max_score": "Maximum score",
+        "settings_title": "Training setup",
+        "settings_copy": "Choose the total interaction steps. The policy is evaluated every 2,000 steps.",
+        "steps_label": "Training steps",
+        "steps_info": "30,000 steps is recommended for the first run",
+        "start": "Start training",
+        "run_status": "Run status",
+        "idle": "Ready to start",
+        "idle_detail": "Choose the training steps, then start the experiment",
+        "running": "Training in progress",
+        "complete": "Training complete",
+        "steps_unit": "steps",
+        "seconds_unit": "s",
+        "mean_reward": "Mean reward",
+        "final_mean_reward": "Final mean reward",
+        "std": "Standard deviation",
+        "episodes": "episodes",
+        "metric_waiting": "Evaluation results appear after training starts",
+        "chart_title": "Reward curve",
+        "chart_copy": "The vertical axis is the deterministic policy's mean reward. The green dashed line marks the solved threshold of 475.",
+        "console_title": "Live training log",
+        "console_waiting": "Waiting for a training run...",
+        "results_title": "Training results",
+        "results_copy": "When training finishes, the policy animation and model file will appear here.",
+        "animation": "Policy animation",
+        "download": "Download PPO model",
+        "footer": "Experiment 01",
+        "console_name": "CartPole PPO training console",
+        "initialization": "PPO initialization",
+        "collecting": "collecting the first rollout",
+        "finished": "training completed",
+    },
+}
+
+
+def text_for(language: str) -> dict[str, str]:
+    """Return UI copy for a supported language."""
+    return UI_TEXT["English" if language == "English" else "中文"]
+
+
 def evaluate(model: PPO, episodes: int = 5) -> tuple[float, float]:
     """Evaluate the current deterministic policy without rendering."""
     env = gym.make("CartPole-v1")
@@ -79,13 +176,14 @@ def log_line(started_at: float, level: str, message: str) -> str:
     return f"{elapsed:7.1f}s  {level:<7} {message}"
 
 
-def status_card(state: str, title: str, detail: str) -> str:
+def status_card(state: str, title: str, detail: str, language: str = "中文") -> str:
     """Render a compact run-status summary without nested borders."""
+    copy = text_for(language)
     return f"""
     <div class="run-state run-state--{state}">
       <span class="run-state__dot" aria-hidden="true"></span>
       <div class="run-state__body">
-        <span class="summary-label">训练状态</span>
+        <span class="summary-label">{copy['run_status']}</span>
         <strong>{title}</strong>
         <small>{detail}</small>
       </div>
@@ -124,13 +222,14 @@ def record_policy(model: PPO) -> tuple[str, float]:
     return str(gif_path), score
 
 
-def train(total_timesteps: int):
+def train(total_timesteps: int, language: str):
     """Train in chunks so the browser receives live progress and reward updates."""
+    copy = text_for(language)
     total_timesteps = int(total_timesteps)
     chunk_size = 2_000
     started_at = time.perf_counter()
     logs = [
-        "CartPole PPO training console",
+        copy["console_name"],
         "=" * 72,
         log_line(started_at, "CONFIG", "environment=CartPole-v1  algorithm=PPO  device=CPU"),
         log_line(started_at, "CONFIG", f"timesteps={total_timesteps}  seed={SEED}  eval_episodes=5"),
@@ -151,7 +250,7 @@ def train(total_timesteps: int):
         )
     initialization_output = clean_output(library_output.getvalue())
     if initialization_output:
-        logs.extend(["", "PPO initialization", initialization_output])
+        logs.extend(["", copy["initialization"], initialization_output])
 
     steps: list[int] = [0]
     mean_rewards: list[float] = []
@@ -165,13 +264,18 @@ def train(total_timesteps: int):
                 "EVAL",
                 f"step=0  mean_reward={initial_mean:.1f}  std={initial_std:.1f}",
             ),
-            log_line(started_at, "TRAIN", "collecting the first rollout"),
+            log_line(started_at, "TRAIN", copy["collecting"]),
         ]
     )
 
     yield (
-        status_card("running", "训练进行中", f"0 / {total_timesteps:,} 步"),
-        metric_card("平均奖励", f"{initial_mean:.1f}", f"标准差 {initial_std:.1f}"),
+        status_card(
+            "running",
+            copy["running"],
+            f"0 / {total_timesteps:,} {copy['steps_unit']}",
+            language,
+        ),
+        metric_card(copy["mean_reward"], f"{initial_mean:.1f}", f"{copy['std']} {initial_std:.1f}"),
         reward_figure(steps, mean_rewards),
         None,
         None,
@@ -206,10 +310,11 @@ def train(total_timesteps: int):
         yield (
             status_card(
                 "running",
-                "训练进行中",
-                f"{trained:,} / {total_timesteps:,} 步 · {trained / total_timesteps:.0%} · {elapsed:.1f} 秒",
+                copy["running"],
+                f"{trained:,} / {total_timesteps:,} {copy['steps_unit']} · {trained / total_timesteps:.0%} · {elapsed:.1f} {copy['seconds_unit']}",
+                language,
             ),
-            metric_card("平均奖励", f"{mean_reward:.1f}", f"标准差 {std_reward:.1f}"),
+            metric_card(copy["mean_reward"], f"{mean_reward:.1f}", f"{copy['std']} {std_reward:.1f}"),
             reward_figure(steps, mean_rewards),
             None,
             None,
@@ -232,17 +337,93 @@ def train(total_timesteps: int):
                 "FINAL",
                 f"episodes=10  mean_reward={final_mean:.1f}  std={final_std:.1f}",
             ),
-            log_line(started_at, "DONE", f"training completed in {elapsed:.1f}s"),
+            log_line(started_at, "DONE", f"{copy['finished']} · {elapsed:.1f} {copy['seconds_unit']}"),
         ]
     )
 
     yield (
-        status_card("complete", "训练完成", f"{total_timesteps:,} 步 · {elapsed:.1f} 秒"),
-        metric_card("最终平均奖励", f"{final_mean:.1f}", f"10 回合 · 标准差 {final_std:.1f}"),
+        status_card(
+            "complete",
+            copy["complete"],
+            f"{total_timesteps:,} {copy['steps_unit']} · {elapsed:.1f} {copy['seconds_unit']}",
+            language,
+        ),
+        metric_card(
+            copy["final_mean_reward"],
+            f"{final_mean:.1f}",
+            f"10 {copy['episodes']} · {copy['std']} {final_std:.1f}",
+        ),
         reward_figure(steps, mean_rewards),
         gif_path,
         model_file,
         "\n".join(logs),
+    )
+
+
+def hero_html(language: str) -> str:
+    """Render the bilingual hero and experiment facts."""
+    copy = text_for(language)
+    return f"""
+    <main class="app-shell">
+      <section class="hero">
+        <img class="project-mark" src="{LOGO_DATA_URI}" alt="Hands-On Modern RL" />
+        <div class="hero-topline">
+          <span class="experiment-badge">EXPERIMENT 01</span>
+          <span class="hero-course">{copy['course']}</span>
+        </div>
+        <h1>{copy['title']}</h1>
+        <p class="hero-copy">{copy['description']}</p>
+        <nav class="hero-links" aria-label="Project links">
+          <a class="hero-link primary" href="{CHAPTER_URL}" target="_blank" rel="noreferrer">{copy['chapter']}</a>
+          <a class="hero-link" href="{MODELSCOPE_NOTEBOOK_URL}" target="_blank" rel="noreferrer">{copy['notebook']}</a>
+          <a class="hero-link" href="{SCRIPT_URL}" target="_blank" rel="noreferrer">{copy['script']}</a>
+          <a class="hero-link" href="{PROJECT_URL}" target="_blank" rel="noreferrer">{copy['project']}</a>
+        </nav>
+      </section>
+      <section class="lab-strip" aria-label="Experiment configuration">
+        <span>{copy['environment']} <strong>CartPole-v1</strong></span>
+        <span>{copy['algorithm']} <strong>PPO</strong></span>
+        <span>{copy['device']} <strong>CPU</strong></span>
+        <span>{copy['threshold']} <strong>475</strong></span>
+        <span>{copy['max_score']} <strong>500</strong></span>
+      </section>
+    </main>
+    """
+
+
+def panel_html(title: str, copy: str, copy_class: str = "panel-copy") -> str:
+    """Render a panel heading and its supporting sentence."""
+    return f'<h2 class="panel-title">{title}</h2><p class="{copy_class}">{copy}</p>'
+
+
+def console_header_html(language: str) -> str:
+    """Render the localized console title."""
+    return f'<div class="console-head"><span class="console-dot"></span>{text_for(language)["console_title"]}</div>'
+
+
+def footer_html(language: str) -> str:
+    """Render the localized footer label."""
+    copy = text_for(language)
+    return f'<div class="footer-note">{copy["footer"]} · <a href="{COURSE_URL}" target="_blank" rel="noreferrer">Hands-On Modern RL</a> · WalkingLabs</div>'
+
+
+def switch_language(language: str):
+    """Update all visible interface copy when the language changes."""
+    copy = text_for(language)
+    return (
+        hero_html(language),
+        panel_html(copy["settings_title"], copy["settings_copy"]),
+        gr.Slider(label=copy["steps_label"], info=copy["steps_info"]),
+        gr.Button(value=copy["start"]),
+        status_card("idle", copy["idle"], copy["idle_detail"], language),
+        metric_card(copy["mean_reward"], "—", copy["metric_waiting"]),
+        panel_html(copy["chart_title"], copy["chart_copy"]),
+        console_header_html(language),
+        copy["console_waiting"],
+        panel_html(copy["results_title"], copy["results_copy"], "artifact-note"),
+        gr.Image(label=copy["animation"]),
+        gr.File(label=copy["download"]),
+        footer_html(language),
     )
 
 
@@ -262,6 +443,24 @@ CSS = """
   margin: 0 auto !important;
   padding: 28px 22px 52px !important;
   background: var(--canvas);
+}
+.language-switch {
+  width: fit-content !important;
+  margin: 0 0 12px auto !important;
+  padding: 3px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(20, 28, 48, .04) !important;
+}
+.language-switch label { display: none !important; }
+.language-switch > div { gap: 3px !important; }
+.language-switch label span {
+  min-height: 30px !important;
+  padding: 5px 12px !important;
+  border-radius: 7px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
 }
 .app-shell { font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--ink); }
 .hero {
@@ -457,51 +656,24 @@ CSS = """
   .hero { padding: 27px 22px 25px; border-radius: 19px; }
   .hero-topline { align-items: flex-start; flex-direction: column; gap: 8px; }
   .lab-strip { gap: 8px 16px; }
+  .language-switch { margin-right: 2px !important; }
 }
 """
 
 
 with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
-    gr.HTML(
-        f"""
-        <main class="app-shell">
-          <section class="hero">
-            <img class="project-mark" src="{LOGO_DATA_URI}" alt="Hands-On Modern RL" />
-            <div class="hero-topline">
-              <span class="experiment-badge">EXPERIMENT 01</span>
-              <span class="hero-course">《动手学现代强化学习》· 第 1 章配套</span>
-            </div>
-            <h1>CartPole 在线训练实验</h1>
-            <p class="hero-copy">
-              使用 PPO 从零训练倒立摆策略。启动后可以实时查看奖励曲线、PPO 输出和评估记录，
-              训练结束后下载模型并播放策略动画。全程使用 CPU。
-            </p>
-            <nav class="hero-links" aria-label="项目入口">
-              <a class="hero-link primary" href="{CHAPTER_URL}" target="_blank" rel="noreferrer">阅读配套章节</a>
-              <a class="hero-link" href="{MODELSCOPE_NOTEBOOK_URL}" target="_blank" rel="noreferrer">魔搭 Notebook</a>
-              <a class="hero-link" href="{SCRIPT_URL}" target="_blank" rel="noreferrer">训练脚本</a>
-              <a class="hero-link" href="{PROJECT_URL}" target="_blank" rel="noreferrer">GitHub 项目</a>
-            </nav>
-          </section>
-          <section class="lab-strip" aria-label="实验配置">
-            <span>环境 <strong>CartPole-v1</strong></span>
-            <span>算法 <strong>PPO</strong></span>
-            <span>设备 <strong>CPU</strong></span>
-            <span>解决阈值 <strong>475</strong></span>
-            <span>满分 <strong>500</strong></span>
-          </section>
-        </main>
-        """
+    language = gr.Radio(
+        choices=["中文", "English"],
+        value="中文",
+        label="Language",
+        show_label=False,
+        elem_classes="language-switch",
     )
+    hero = gr.HTML(hero_html("中文"))
 
     with gr.Row():
         with gr.Column(scale=1, min_width=300, elem_classes="control-card"):
-            gr.HTML(
-                """
-                <h2 class="panel-title">训练设置</h2>
-                <p class="panel-copy">选择总交互步数。系统每训练 2,000 步评估一次策略。</p>
-                """
-            )
+            settings_header = gr.HTML(panel_html(UI_TEXT["中文"]["settings_title"], UI_TEXT["中文"]["settings_copy"]))
             timesteps = gr.Slider(
                 minimum=10_000,
                 maximum=50_000,
@@ -520,16 +692,11 @@ with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
                 elem_classes="metric-output",
             )
         with gr.Column(scale=2, elem_classes="chart-card"):
-            gr.HTML(
-                """
-                <h2 class="panel-title">奖励曲线</h2>
-                <p class="panel-copy">纵轴为确定性策略的平均奖励，绿色虚线表示 475 分解决阈值。</p>
-                """
-            )
+            chart_header = gr.HTML(panel_html(UI_TEXT["中文"]["chart_title"], UI_TEXT["中文"]["chart_copy"]))
             curve = gr.Plot(show_label=False)
 
     with gr.Group(elem_classes="console-card"):
-        gr.HTML('<div class="console-head"><span class="console-dot"></span>实时训练日志</div>')
+        console_header = gr.HTML(console_header_html("中文"))
         console = gr.Textbox(
             value="等待训练任务...",
             lines=18,
@@ -541,23 +708,39 @@ with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
 
     with gr.Row(elem_classes="output-card"):
         with gr.Column(scale=2):
-            gr.HTML(
-                """
-                <h2 class="panel-title">训练结果</h2>
-                <p class="artifact-note">任务完成后，这里会显示策略动画并提供模型文件。</p>
-                """
+            results_header = gr.HTML(
+                panel_html(UI_TEXT["中文"]["results_title"], UI_TEXT["中文"]["results_copy"], "artifact-note")
             )
             animation = gr.Image(label="策略动画", type="filepath")
         with gr.Column(scale=1):
             model_download = gr.File(label="下载 PPO 模型", interactive=False)
 
-    gr.HTML(
-        f'<div class="footer-note">实验 01 · <a href="{COURSE_URL}" target="_blank" rel="noreferrer">Hands-On Modern RL</a> · WalkingLabs</div>'
+    footer = gr.HTML(footer_html("中文"))
+
+    language.change(
+        fn=switch_language,
+        inputs=language,
+        outputs=[
+            hero,
+            settings_header,
+            timesteps,
+            start,
+            status,
+            metrics,
+            chart_header,
+            console_header,
+            console,
+            results_header,
+            animation,
+            model_download,
+            footer,
+        ],
+        queue=False,
     )
 
     start.click(
         fn=train,
-        inputs=timesteps,
+        inputs=[timesteps, language],
         outputs=[status, metrics, curve, animation, model_download, console],
         concurrency_limit=1,
     )
