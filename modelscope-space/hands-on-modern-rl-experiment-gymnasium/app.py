@@ -34,12 +34,14 @@ from stable_baselines3.common.evaluation import evaluate_policy
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+from PIL import Image, ImageDraw, ImageFont, ImageOps  # noqa: E402
 
 
 ROOT = Path(__file__).parent
 ARTIFACT_DIR = ROOT / "artifacts"
 ARTIFACT_DIR.mkdir(exist_ok=True)
 PREVIEW_DIR = ROOT / "assets" / "previews"
+CARD_BACKGROUND_DIR = ROOT / "assets" / "card-backgrounds"
 LOGO_PATH = ROOT / "assets" / "readmelogo.png"
 LOGO_DATA_URI = f"data:image/png;base64,{base64.b64encode(LOGO_PATH.read_bytes()).decode()}"
 
@@ -344,6 +346,36 @@ FAMILY_VISUALS = {
     "JAX Tabular": ("#16a34a", "▦", "JAX"), "Other": ("#64748b", "◇", "ENV"),
 }
 
+CARD_BACKGROUNDS = {
+    "Bandit": "tabular.webp", "Tabular": "tabular.webp", "Toy Text": "tabular.webp",
+    "JAX Tabular": "tabular.webp", "Classic Control": "classic-control.webp",
+    "Box2D": "box2d.webp", "Atari / ALE": "atari.webp", "MuJoCo": "mujoco.webp",
+    "JAX Phys2D": "box2d.webp", "Robotics": "robotics.webp", "Other": "tabular.webp",
+}
+
+
+def card_font(size: int, bold: bool = False):
+    candidates = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/System/Library/Fonts/Supplemental/Arial Bold.ttf" if bold else "/System/Library/Fonts/Supplemental/Arial.ttf",
+    ]
+    for candidate in candidates:
+        if Path(candidate).exists():
+            return ImageFont.truetype(candidate, size=size)
+    return ImageFont.load_default()
+
+
+def fit_card_text(draw: ImageDraw.ImageDraw, text: str, max_width: int, start_size: int, minimum: int = 18):
+    for size in range(start_size, minimum - 1, -1):
+        font = card_font(size, bold=True)
+        if draw.textbbox((0, 0), text, font=font)[2] <= max_width:
+            return font
+    return card_font(minimum, bold=True)
+
+
+def card_scene_label(env_id: str, family: str) -> str:
+    return semantic_scene(env_id if env_id != "Custom 4×4 GridWorld" else "gridworld", family)[1]
+
 
 def semantic_scene(env_id: str, family: str) -> tuple[str, str]:
     """Return a small SVG scene and a human-readable scene label."""
@@ -397,19 +429,31 @@ def semantic_scene(env_id: str, family: str) -> tuple[str, str]:
 
 def experiment_visual(experiment: str) -> str:
     cfg = experiment_config(experiment); family = cfg["family"]; env_id = cfg["environment"]
-    color, _, _ = FAMILY_VISUALS.get("Curated" if experiment in EXPERIMENTS else family, FAMILY_VISUALS["Other"])
-    scene, scene_label = semantic_scene(env_id if env_id != "Custom 4×4 GridWorld" else "gridworld", family)
     safe = re.sub(r"[^a-z0-9]+", "-", experiment.lower()).strip("-")
-    path = ARTIFACT_DIR / f"card-{safe}.svg"
-    title = html.escape(env_id.replace("ALE/", "")); short_title = title if len(title) <= 29 else title[:27] + "…"
-    algorithm = html.escape(cfg["algorithm"].replace("Auto: inspect action space", "AUTO"))
-    path.write_text(f'''<svg xmlns="http://www.w3.org/2000/svg" width="520" height="320" viewBox="0 0 520 320">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{color}"/><stop offset="1" stop-color="#111827"/></linearGradient></defs>
-<rect width="520" height="320" rx="26" fill="url(#g)"/><circle cx="455" cy="36" r="95" fill="#fff" opacity=".08"/>
-<g fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">{scene}</g>
-<text x="28" y="38" fill="#fff" font-size="19" font-family="Arial" font-weight="700">{short_title}</text>
-<rect x="28" y="276" width="170" height="25" rx="12" fill="#fff" opacity=".15"/><text x="42" y="294" fill="#fff" font-size="13" font-family="Arial" font-weight="700" letter-spacing="2">{scene_label}</text>
-<rect x="402" y="276" width="90" height="25" rx="12" fill="#fff" opacity=".92"/><text x="447" y="294" text-anchor="middle" fill="#172033" font-size="12" font-family="Arial" font-weight="800">{algorithm}</text></svg>''', encoding="utf-8")
+    path = ARTIFACT_DIR / f"card-{safe}.webp"
+    source = CARD_BACKGROUND_DIR / CARD_BACKGROUNDS.get(family, "tabular.webp")
+    if path.exists() and path.stat().st_mtime >= source.stat().st_mtime:
+        return str(path)
+    image = ImageOps.fit(Image.open(source).convert("RGB"), (720, 360), method=Image.Resampling.LANCZOS)
+    shade = Image.new("RGBA", image.size, (0, 0, 0, 0)); shade_draw = ImageDraw.Draw(shade)
+    shade_draw.rectangle((0, 0, 720, 112), fill=(7, 12, 35, 188))
+    shade_draw.rectangle((0, 272, 720, 360), fill=(7, 12, 35, 205))
+    image = Image.alpha_composite(image.convert("RGBA"), shade)
+    draw = ImageDraw.Draw(image)
+    title = env_id.replace("ALE/", "")
+    algorithm = cfg["algorithm"].replace("Auto: inspect action space", "AUTO")
+    title_font = fit_card_text(draw, title, 660, 36)
+    draw.text((30, 23), title, font=title_font, fill="white", stroke_width=1, stroke_fill=(0, 0, 0, 90))
+    draw.text((31, 74), family.upper(), font=card_font(17, bold=True), fill=(180, 194, 255), spacing=3)
+    label = card_scene_label(env_id, family)
+    draw.rounded_rectangle((28, 294, 225, 339), radius=22, fill=(25, 31, 65, 255), outline=(145, 163, 255, 255), width=1)
+    draw.text((53, 306), label, font=card_font(17, bold=True), fill="white")
+    badge_font = fit_card_text(draw, algorithm, 170, 18, 13)
+    badge_width = min(210, max(105, draw.textbbox((0, 0), algorithm, font=badge_font)[2] + 44))
+    draw.rounded_rectangle((720 - badge_width - 28, 294, 692, 339), radius=22, fill=(255, 255, 255, 235))
+    text_width = draw.textbbox((0, 0), algorithm, font=badge_font)[2]
+    draw.text((720 - badge_width - 28 + (badge_width - text_width) / 2, 306), algorithm, font=badge_font, fill=(25, 31, 65))
+    image.convert("RGB").save(path, "WEBP", quality=84, method=6)
     return str(path)
 
 
@@ -484,7 +528,7 @@ def localized_goal(experiment: str, language: str) -> str:
 
 def card_caption(experiment: str) -> str:
     cfg = experiment_config(experiment); title = experiment.split(" · ")[0] if not is_catalog_experiment(experiment) else cfg["environment"]
-    return f"{title}\n{experiment_goal(experiment)}\n{cfg['family']} · {cfg['algorithm']}"
+    return f"{title} · {cfg['algorithm'].replace('Auto: inspect action space', 'AUTO')}"
 
 
 def card_items(experiments: list[str]) -> list[tuple[str, str]]:
