@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import contextlib
+import html
 import io
 import os
 import re
@@ -279,7 +280,7 @@ def train(total_timesteps: int, language: str):
         reward_figure(steps, mean_rewards),
         None,
         None,
-        "\n".join(logs),
+        console_panel("\n".join(logs), language),
     )
 
     trained = 0
@@ -318,7 +319,7 @@ def train(total_timesteps: int, language: str):
             reward_figure(steps, mean_rewards),
             None,
             None,
-            "\n".join(logs),
+            console_panel("\n".join(logs), language),
         )
 
     model_path = ARTIFACT_DIR / "ppo-cartpole"
@@ -356,7 +357,7 @@ def train(total_timesteps: int, language: str):
         reward_figure(steps, mean_rewards),
         gif_path,
         model_file,
-        "\n".join(logs),
+        console_panel("\n".join(logs), language),
     )
 
 
@@ -401,6 +402,16 @@ def console_header_html(language: str) -> str:
     return f'<div class="console-head"><span class="console-dot"></span>{text_for(language)["console_title"]}</div>'
 
 
+def console_panel(logs: str, language: str) -> str:
+    """Render stable, escaped console output without an input component redraw."""
+    return f"""
+    <section class="console-panel" aria-live="polite" aria-atomic="true">
+      {console_header_html(language)}
+      <pre class="console-text">{html.escape(logs)}</pre>
+    </section>
+    """
+
+
 def footer_html(language: str) -> str:
     """Render the localized footer label."""
     copy = text_for(language)
@@ -418,8 +429,7 @@ def switch_language(language: str):
         status_card("idle", copy["idle"], copy["idle_detail"], language),
         metric_card(copy["mean_reward"], "—", copy["metric_waiting"]),
         panel_html(copy["chart_title"], copy["chart_copy"]),
-        console_header_html(language),
-        copy["console_waiting"],
+        console_panel(copy["console_waiting"], language),
         panel_html(copy["results_title"], copy["results_copy"], "artifact-note"),
         gr.Image(label=copy["animation"]),
         gr.File(label=copy["download"]),
@@ -559,16 +569,15 @@ CSS = """
 .lab-strip strong { margin-left: 5px; color: var(--ink); font-weight: 750; }
 .panel-title { margin: 0 0 5px; color: var(--ink); font-size: 19px; font-weight: 780; letter-spacing: -.015em; }
 .panel-copy { margin: 0 0 17px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-.control-card, .chart-card, .output-card, .console-card {
+.control-card, .chart-card, .output-card {
   border: 1px solid var(--line) !important;
   border-radius: 17px !important;
   background: #ffffff !important;
   box-shadow: 0 9px 26px rgba(20, 28, 48, .05) !important;
 }
 .control-card { padding: 22px !important; }
-.chart-card { padding: 18px 18px 8px !important; }
+.chart-card { padding: 18px !important; }
 .output-card { margin-top: 14px !important; padding: 18px !important; }
-.console-card { margin-top: 14px !important; padding: 0 !important; overflow: hidden; }
 .primary-btn {
   min-height: 48px !important;
   border: 0 !important;
@@ -638,15 +647,49 @@ CSS = """
   font-weight: 700;
 }
 .console-dot { width: 8px; height: 8px; border-radius: 50%; background: #24c689; box-shadow: 0 0 0 4px rgba(36,198,137,.12); }
-.training-console, .training-console > div { border: 0 !important; border-radius: 0 !important; background: #0f1623 !important; }
-.training-console textarea {
-  min-height: 350px !important;
-  padding: 17px 18px !important;
+.console-output, .console-output > div {
+  min-width: 0 !important;
+  margin: 14px 0 0 !important;
+  padding: 0 !important;
   border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+.console-output.generating, .console-output.pending,
+.console-output.generating > div, .console-output.pending > div {
+  opacity: 1 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+.console-output.generating::before, .console-output.generating::after,
+.console-output.pending::before, .console-output.pending::after {
+  display: none !important;
+  content: none !important;
+  animation: none !important;
+}
+.console-panel {
+  overflow: hidden;
+  border: 1px solid #263044;
+  border-radius: 13px;
+  background: #0f1623;
+  contain: layout paint;
+  transition: none;
+}
+.console-text {
+  box-sizing: border-box;
+  height: 300px;
+  margin: 0;
+  padding: 17px 18px;
+  overflow: auto;
+  white-space: pre;
   color: #cbd5e1 !important;
   background: #0f1623 !important;
   font: 12px/1.58 "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
-  resize: vertical !important;
+  scrollbar-gutter: stable;
 }
 .artifact-note { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.55; }
 .footer-note a { color: var(--brand) !important; font-weight: 650; text-decoration: none !important; }
@@ -694,17 +737,10 @@ with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
         with gr.Column(scale=2, elem_classes="chart-card"):
             chart_header = gr.HTML(panel_html(UI_TEXT["中文"]["chart_title"], UI_TEXT["中文"]["chart_copy"]))
             curve = gr.Plot(show_label=False)
-
-    with gr.Group(elem_classes="console-card"):
-        console_header = gr.HTML(console_header_html("中文"))
-        console = gr.Textbox(
-            value="等待训练任务...",
-            lines=18,
-            max_lines=28,
-            interactive=False,
-            show_label=False,
-            elem_classes="training-console",
-        )
+            console = gr.HTML(
+                console_panel(UI_TEXT["中文"]["console_waiting"], "中文"),
+                elem_classes="console-output",
+            )
 
     with gr.Row(elem_classes="output-card"):
         with gr.Column(scale=2):
@@ -728,7 +764,6 @@ with gr.Blocks(title="实验 01 · CartPole 在线训练") as demo:
             status,
             metrics,
             chart_header,
-            console_header,
             console,
             results_header,
             animation,
