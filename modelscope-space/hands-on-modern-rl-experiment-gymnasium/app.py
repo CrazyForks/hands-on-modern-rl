@@ -14,7 +14,6 @@ import re
 import sys
 import textwrap
 import time
-import warnings
 from pathlib import Path
 
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
@@ -28,13 +27,7 @@ if sys.platform.startswith("linux") and ctypes.util.find_library("OSMesa"):
 import gradio as gr
 import gymnasium as gym
 import imageio.v2 as imageio
-import matplotlib
 import numpy as np
-from stable_baselines3 import DQN, PPO, SAC
-from stable_baselines3.common.evaluation import evaluate_policy
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
 from PIL import Image, ImageDraw, ImageFont, ImageOps  # noqa: E402
 
 
@@ -249,27 +242,51 @@ RUNTIME_PROBES = {
 }
 
 
-def preload_runtimes() -> dict[str, str]:
-    """Load native engines and representative assets before the UI opens."""
-    results = {}
-    for family, env_id in RUNTIME_PROBES.items():
-        env = None
-        try:
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                env = gym.make(env_id)
-                env.reset(seed=0)
-            results[family] = "Ready · preinstalled"
-        except Exception as exc:
-            results[family] = f"Unavailable · {type(exc).__name__}"
-        finally:
-            if env is not None:
-                env.close()
-    return results
+def registered_runtimes() -> dict[str, str]:
+    """Check registry membership without constructing heavyweight environments.
+
+    Native engines and assets are installed while the Studio image is built.
+    Constructing Atari, MuJoCo, Robotics, and JAX probes here used to block the
+    first page render on every cold CPU start. The selected environment is
+    still fully initialized and validated when its training run begins.
+    """
+    registry = gym.registry
+    return {
+        family: ("Ready · preinstalled" if env_id in registry else "Unavailable · not registered")
+        for family, env_id in RUNTIME_PROBES.items()
+    }
 
 
-RUNTIME_STATUS = preload_runtimes()
+RUNTIME_STATUS = registered_runtimes()
 RUNTIME_READY = sum(value.startswith("Ready") for value in RUNTIME_STATUS.values())
+
+
+@lru_cache(maxsize=1)
+def deep_rl_runtime():
+    """Import PyTorch and Stable-Baselines3 only when a deep run starts."""
+    from stable_baselines3 import DQN, PPO, SAC
+    from stable_baselines3.common.evaluation import evaluate_policy
+
+    return DQN, PPO, SAC, evaluate_policy
+
+
+@lru_cache(maxsize=1)
+def plotting_runtime():
+    """Initialize Matplotlib only when a run needs a curve or result image."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    return plt
+
+
+class _LazyPlotting:
+    def __getattr__(self, name):
+        return getattr(plotting_runtime(), name)
+
+
+plt = _LazyPlotting()
 
 
 def env_family(env_id: str, entry_point) -> str:
@@ -518,7 +535,7 @@ def experiment_visual(experiment: str) -> str:
 
 
 def visual_data_uri(experiment: str) -> str:
-    payload = Path(experiment_visual(experiment)).read_bytes()
+    payload = Path(gallery_background(experiment)).read_bytes()
     return f"data:image/webp;base64,{base64.b64encode(payload).decode()}"
 
 
@@ -708,19 +725,50 @@ def infer_algorithm(action_space, configured: str) -> str:
     return "Manual setup"
 
 
+def task_space_summary(experiment: str) -> tuple[str, str, str, str]:
+    """Return useful task metadata without constructing the environment."""
+    cfg = experiment_config(experiment); env_id = cfg["environment"]; family = cfg["family"]
+    if env_id == "4-armed Bernoulli bandit":
+        return "Estimated arm values", "Choose one of 4 arms", cfg["algorithm"], "Ready · built in"
+    if env_id == "Custom 4×4 GridWorld":
+        return "Grid cell", "Up / Down / Left / Right", cfg["algorithm"], "Ready · built in"
+
+    known = {
+        "Blackjack-v1": ("Tuple(3 parts)", "Discrete(2)"),
+        "FrozenLake-v1": ("Discrete(16)", "Discrete(4)"),
+        "CliffWalking-v1": ("Discrete(48)", "Discrete(4)"),
+        "Taxi-v4": ("Discrete(500)", "Discrete(6)"),
+        "CartPole-v1": ("Box(4,)", "Discrete(2)"),
+        "MountainCar-v0": ("Box(2,)", "Discrete(3)"),
+        "MountainCarContinuous-v0": ("Box(2,)", "Box(1,)"),
+        "Acrobot-v1": ("Box(6,)", "Discrete(3)"),
+        "Pendulum-v1": ("Box(3,)", "Box(1,)"),
+    }
+    observation, action = known.get(env_id, ("Inspected at run start", "Inspected at run start"))
+    algorithm = cfg["algorithm"]
+    name = env_id.lower()
+    if is_catalog_experiment(experiment):
+        if family == "Atari / ALE":
+            observation, action, algorithm = "RGB game frames", "Discrete actions", "DQN"
+        elif family in {"MuJoCo", "Robotics"}:
+            observation = "Continuous state" if family == "MuJoCo" else "Observation + goal"
+            action, algorithm = "Continuous actions", "SAC"
+        elif family in {"Toy Text", "JAX Tabular"}:
+            observation, action, algorithm = "Discrete state", "Discrete actions", "DQN"
+        elif family in {"Box2D", "Classic Control", "JAX Phys2D"}:
+            continuous = any(word in name for word in ("continuous", "racing", "walker", "pendulum"))
+            observation = "Continuous state"
+            action = "Continuous actions" if continuous else "Discrete actions"
+            algorithm = "SAC" if continuous else "DQN"
+        else:
+            algorithm = "Auto at run start"
+    status = RUNTIME_STATUS.get(family, "Ready · registered")
+    return observation, action, algorithm, status
+
+
 def task_brief(experiment: str, language: str) -> str:
     cfg = experiment_config(experiment); env_id = cfg["environment"]
-    observation, action, algorithm, availability = "Custom", "Custom", cfg["algorithm"], "Ready · built in"
-    if env_id == "4-armed Bernoulli bandit": observation, action = "Estimated arm values", "Choose one of 4 arms"
-    elif env_id == "Custom 4×4 GridWorld": observation, action = "Grid cell", "Up / Down / Left / Right"
-    else:
-        env = None
-        try:
-            env = gym.make(env_id); observation = space_text(env.observation_space); action = space_text(env.action_space); algorithm = infer_algorithm(env.action_space, cfg["algorithm"]); availability = "Ready · preinstalled"
-        except Exception as exc:
-            availability = f"Legacy / unavailable · {type(exc).__name__}"
-        finally:
-            if env is not None: env.close()
+    observation, action, algorithm, availability = task_space_summary(experiment)
     if language == "中文":
         return f'''<section class="task-brief"><div class="task-brief__visual"><img src="{visual_data_uri(experiment)}" alt="{html.escape(env_id)} task scene"></div><div class="task-brief__body"><span class="task-kicker">训练前先理解任务</span><h3>{html.escape(env_id)}</h3><p>{html.escape(localized_goal(experiment, language))}</p><div class="task-facts"><span><b>观察</b>{html.escape(observation)}</span><span><b>动作</b>{html.escape(action)}</span><span><b>算法</b>{html.escape(algorithm)}</span><span><b>状态</b>{html.escape(availability)}</span></div><p class="task-hint">调整下方参数后再点击“开始训练”。训练曲线和实时日志会持续更新。</p></div></section>'''
     return f'''<section class="task-brief"><div class="task-brief__visual"><img src="{visual_data_uri(experiment)}" alt="{html.escape(env_id)} task scene"></div><div class="task-brief__body"><span class="task-kicker">UNDERSTAND BEFORE TRAINING</span><h3>{html.escape(env_id)}</h3><p>{html.escape(localized_goal(experiment, language))}</p><div class="task-facts"><span><b>Observation</b>{html.escape(observation)}</span><span><b>Action</b>{html.escape(action)}</span><span><b>Algorithm</b>{html.escape(algorithm)}</span><span><b>Status</b>{html.escape(availability)}</span></div><p class="task-hint">Review the task, adjust the parameters below, then press Start training. The curve and live console will keep updating.</p></div></section>'''
@@ -969,7 +1017,7 @@ def example_preview(experiment: str, _run_state: str | None = None) -> str:
     # The full registry cannot ship a trained replay for every optional or
     # legacy environment. Use its task illustration without presenting it as
     # a learned result; a successful run replaces it with the generated GIF.
-    return experiment_visual(experiment)
+    return gallery_background(experiment)
 
 
 def policy_grid_image(
@@ -1286,7 +1334,9 @@ def record_model(model, env_id: str, seed: int, filename: str, max_steps: int) -
 
 
 def run_deep_control(experiment: str, env_id: str, algorithm: str, budget: int, alpha: float, gamma: float, epsilon: float, seed: int, language: str):
-    started = time.perf_counter(); env = gym.make(env_id)
+    started = time.perf_counter()
+    DQN, PPO, SAC, evaluate_policy = deep_rl_runtime()
+    env = gym.make(env_id)
     if isinstance(env.observation_space, gym.spaces.Dict):
         policy = "MultiInputPolicy"
     elif isinstance(env.observation_space, gym.spaces.Box) and len(env.observation_space.shape) == 3:
