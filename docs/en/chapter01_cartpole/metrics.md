@@ -11,16 +11,15 @@ title: 1.2 Reward, Entropy, Value Loss, and KL
 When observing the console output during training,
 you will notice the training script continuously prints various metrics.
 The excerpt below is taken from a real training log
-(2026-04-21, local backup in `code/chapter01_cartpole/swanlog/`):
+(2026-08-13, a complete run after fixing the GAE episode boundaries):
 
 ```
 ------------------------------------------------------------
-  Iteration  1/20 | Episodes:  98 | Mean Reward:   20.8 | KL: 0.0047 | clip%: 6.2%
-  Iteration  7/20 | Episodes:  10 | Mean Reward:  196.5 | KL: 0.0027 | clip%: 6.0%
-  Iteration 13/20 | Episodes:   4 | Mean Reward:  410.0 | KL: 0.0075 | clip%: 10.6%
-  Iteration 18/20 | Episodes:   4 | Mean Reward:  500.0 | KL: 0.0050 | clip%: 4.5%
-  Iteration 19/20 | Episodes:   4 | Mean Reward:  500.0 | KL: 0.0041 | clip%: 4.0%
-  Iteration 20/20 | Episodes:   4 | Mean Reward:  500.0 | KL: 0.0005 | clip%: 0.0%
+  Iteration  1/40 | Episodes:  85 | Mean Reward:   23.9 | KL: 0.0078 | clip%: 11.0%
+  Iteration  7/40 | Episodes:  10 | Mean Reward:  202.5 | KL: 0.0053 | clip%: 4.6%
+  Iteration 12/40 | Episodes:   4 | Mean Reward:  491.5 | KL: 0.0069 | clip%: 8.5%
+  Iteration 13/40 | Episodes:   4 | Mean Reward:  500.0 | KL: 0.0014 | clip%: 1.2%
+  Iteration 40/40 | Episodes:   4 | Mean Reward:  500.0 | KL: 0.0000 | clip%: 0.0%
 ------------------------------------------------------------
 Training complete! 20-episode evaluation: 500.0 +/- 0.0
 ```
@@ -53,32 +52,30 @@ denoted `ep_rew_mean` (_rollout episode reward mean_),
 to more stably reflect the agent's true current level.
 
 The reward curve obtained after training is shown below,
-displaying the training process of SB3 PPO (blue) and our custom PyTorch PPO (orange)
-on the same CartPole task:
+showing one complete CartPole-v1 run of the corrected pure PyTorch PPO:
 
 ![Episode Mean Reward Curve](../../chapter01_cartpole/images/training_curves.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>Figure 1-3: Episode mean reward climbs from around 20 to the maximum score of 500. The blue line is SB3 PPO, the orange line is the custom PyTorch PPO. The dashed line marks the 195-point solving threshold.</em>
+  <em>Figure 1-3: Measured curve from the corrected PyTorch PPO. Episode mean reward rises from 23.9 to the maximum score of 500. The dashed line marks the 475-point solving threshold for CartPole-v1.</em>
 </div>
 
-Three phases are clearly visible from the figure:
+This run can be divided into three phases:
 
 1. **Initial phase (0 ~ 5K Total Timesteps)**:
-   Both curves hover around `20 ~ 50`,
+   The curve starts around `20 ~ 50`,
    comparable to a _random policy_,
    indicating the model has not yet learned an effective balancing strategy.
 2. **Rapid improvement phase (5K ~ 25K Total Timesteps)**:
-   Reward quickly climbs from under 100 to above 300,
-   crossing the 195-point solving threshold (dashed line in the figure),
-   indicating the policy has begun to master balance control.
-   PyTorch PPO (orange) converges faster due to its linear learning rate decay.
+   Reward rises quickly from below 100,
+   indicating that the policy is beginning to master balance control.
+   At iteration 12, mean reward reaches 491.5 and first crosses the 475-point solving threshold.
 3. **Convergence phase (after 25K Total Timesteps)**:
-   Reward enters the `400 ~ 500` range,
+   Reward enters the `400 ~ 500` range and later crosses the 475-point solving threshold,
    eventually stabilizing at the maximum `500`.
    Both implementations ultimately achieve an evaluation result of `500.0 +/- 0.0`.
 
-In summary: **a curve that continuously rises and then stabilizes indicates successful training.**
+In summary: **training has produced a strong result when the moving average trends upward and stabilizes in the high-return range.**
 If the curve remains flat throughout or suddenly drops precipitously,
 the training process has a problem.
 

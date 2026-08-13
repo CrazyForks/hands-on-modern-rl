@@ -8,13 +8,13 @@
 
 这个数据集容易让人困惑（见 [issue #53](https://github.com/walkinglabs/hands-on-modern-rl/issues/53)）。它**不是** HumanEval 那种带 `entry_point` / `tests` 字段的格式，真实结构是：
 
-| 字段 | 含义 |
-| ---- | ---- |
-| `prompt` | chat 消息列表。`system` 是 PRIME 推理动作模板（`[ASSESS]`/`[ADVANCE]`…），`user` 才是题目 |
-| `ability` | `"math"` 或 `"code"`，本实验只取 `code`（train 25,276 条 / val 1,024 条） |
+| 字段           | 含义                                                                                                                                                     |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `prompt`       | chat 消息列表。`system` 是 PRIME 推理动作模板（`[ASSESS]`/`[ADVANCE]`…），`user` 才是题目                                                                |
+| `ability`      | `"math"` 或 `"code"`，本实验只取 `code`（train 25,276 条 / val 1,024 条）                                                                                |
 | `reward_model` | `{"ground_truth": <答案>, "style": "rule"}`。code 样本的 `ground_truth` 是 JSON 字符串 `{"inputs": [...], "outputs": [...]}`，即 **stdin/stdout 测试对** |
-| `data_source` | 来源：`codecontests` / `taco` / `apps` / `codeforces` |
-| `extra_info` | `{index, split}` |
+| `data_source`  | 来源：`codecontests` / `taco` / `apps` / `codeforces`                                                                                                    |
+| `extra_info`   | `{index, split}`                                                                                                                                         |
 
 也就是说，这些是**"读 stdin、写 stdout"的竞赛编程题**，不是"实现某个函数签名"的题。验证信息藏在 `reward_model.ground_truth` 里，veRL 会在训练时把它传给 reward 函数。
 
@@ -36,7 +36,7 @@ python prepare_data.py
 `code_reward.py` 是核心逻辑，可以独立自检：
 
 ```bash
-python code_reward.py
+HOMRL_ALLOW_UNSAFE_CODE_EXECUTION=1 python code_reward.py
 # 正确代码 -> score=1.00 pass_rate=1.00 format=1
 # 错误代码 -> score=0.00 pass_rate=0.00 format=1
 # 无代码   -> score=0.00 pass_rate=0.00 format=0
@@ -68,7 +68,7 @@ HumanEval 风格的 reward 会把测试写成 `assert two_sum(...) == ...` 然�
 3. 用 `subprocess` 起独立进程，对每个输入喂入 stdin，比对 stdout 和期望输出
 4. 返回通过率作为 reward
 
-用 `subprocess` 而不是 `exec` 有两个好处：**完整进程隔离**（模型写的死循环、文件操作、网络请求都影响不到训练进程）和**能模拟真实运行**（程序真正从 stdin 读、往 stdout 写）。
+`subprocess` 能隔离解释器状态，并模拟真实的 stdin/stdout 程序运行；它**不是安全沙箱**。子进程仍能访问当前用户可见的文件、网络和环境变量。训练前必须先把整个训练任务放进最小权限的容器或虚拟机，并清除凭据、挂载只读数据目录。确认外层隔离完成后，再设置 `HOMRL_ALLOW_UNSAFE_CODE_EXECUTION=1` 启用本地执行器。
 
 ### prompt：为什么必须是 chat 消息格式
 
@@ -105,11 +105,11 @@ REWARD=(
 
 ## 文件说明
 
-| 文件 | 作用 |
-| ---- | ---- |
-| `prepare_data.py` | 下载 Eurus-2-RL-Data → 过滤 code 样本 → 重建 chat 格式 prompt → 采样 → parquet |
-| `code_reward.py` | I/O 型 reward：提取代码 → 子进程跑 stdin/stdout 测试 → 返回通过率 |
-| `run_qwen_coder_ppo_single_gpu.sh` | 单卡 0.5B PPO 启动脚本（含 `custom_reward_function` 接线） |
+| 文件                               | 作用                                                                           |
+| ---------------------------------- | ------------------------------------------------------------------------------ |
+| `prepare_data.py`                  | 下载 Eurus-2-RL-Data → 过滤 code 样本 → 重建 chat 格式 prompt → 采样 → parquet |
+| `code_reward.py`                   | I/O 型 reward：提取代码 → 子进程跑 stdin/stdout 测试 → 返回通过率              |
+| `run_qwen_coder_ppo_single_gpu.sh` | 单卡 0.5B PPO 启动脚本（含 `custom_reward_function` 接线）                     |
 
 ## 环境提示
 

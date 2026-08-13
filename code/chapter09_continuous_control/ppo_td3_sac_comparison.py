@@ -43,6 +43,7 @@ import gymnasium as gym
 import numpy as np
 import matplotlib.pyplot as plt
 from stable_baselines3 import PPO, TD3, SAC
+from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import BaseCallback
 
@@ -178,7 +179,10 @@ td3_model = TD3(
     tau=0.005,
     gamma=0.99,
     policy_delay=2,           # 延迟策略更新：每 2 次 Critic 更新后才更新 Actor
-    action_noise=None,        # 动作噪声（TD3 内部会使用探索噪声）
+    action_noise=NormalActionNoise(
+        mean=np.zeros(action_dim),
+        sigma=0.1 * np.ones(action_dim),
+    ),
     verbose=0,
     seed=SEED,
     device="auto",

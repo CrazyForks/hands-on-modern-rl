@@ -73,17 +73,20 @@ class ValueNetwork(nn.Module):
         return self.net(s).squeeze(-1)
 
 # === GAE: Generalized Advantage Estimation ===
-def compute_gae(rewards, values, gamma=0.99, lam=0.95):
-    """Generalized Advantage Estimation."""
-    advantages = []
+def compute_gae(rewards, values, next_values, episode_ends,
+                gamma=0.99, lam=0.95):
+    """Compute GAE and stop the recursion at every environment reset."""
+    raw_advantages = []
     gae = 0
-    next_value = 0
-    for r, v in zip(reversed(rewards), reversed(values)):
-        delta = r + gamma * next_value - v
-        gae = delta + gamma * lam * gae
-        advantages.insert(0, gae)
-        next_value = v
-    return advantages
+    for r, v, v_next, episode_end in zip(
+        reversed(rewards), reversed(values), reversed(next_values),
+        reversed(episode_ends)
+    ):
+        # v_next is zero after true termination; truncation still bootstraps V(s').
+        delta = r + gamma * v_next - v
+        gae = delta + gamma * lam * (1.0 - float(episode_end)) * gae
+        raw_advantages.insert(0, gae)
+    return torch.tensor(raw_advantages, dtype=torch.float32)
 
 # === Main training loop ===
 def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
@@ -98,7 +101,8 @@ def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
 
     for iter in range(n_iters):
         # === 1. Rollout ===
-        states, actions, rewards, dones, log_probs_old, values = [], [], [], [], [], []
+        states, actions, rewards = [], [], []
+        values, next_values, episode_ends, log_probs_old = [], [], [], []
         s, _ = env.reset()
         ep_reward = 0
 
@@ -110,9 +114,12 @@ def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
 
             s_next, r, terminated, truncated, _ = env.step(a.item())
             done = terminated or truncated
+            with torch.no_grad():
+                v_next = 0.0 if terminated else value_fn(torch.FloatTensor(s_next)).item()
 
             states.append(s); actions.append(a.item()); rewards.append(r)
-            dones.append(done); log_probs_old.append(dist.log_prob(a).item()); values.append(v.item())
+            values.append(v.item()); next_values.append(v_next); episode_ends.append(done)
+            log_probs_old.append(dist.log_prob(a).item())
             ep_reward += r
 
             if done:
@@ -123,10 +130,14 @@ def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
                 s = s_next
 
         # === 2. Compute advantages ===
-        advantages = compute_gae(rewards, values, gamma, lam)
-        advantages = torch.FloatTensor(advantages)
-        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
-        returns = advantages + torch.FloatTensor(values)
+        raw_advantages = compute_gae(
+            rewards, values, next_values, episode_ends, gamma, lam
+        )
+        # The critic uses raw return targets; normalization is only for the policy loss.
+        returns = raw_advantages + torch.FloatTensor(values)
+        advantages = (raw_advantages - raw_advantages.mean()) / (
+            raw_advantages.std(unbiased=False) + 1e-8
+        )
 
         # === 3. PPO update (multiple epochs) ===
         states_t = torch.FloatTensor(np.array(states))
@@ -162,7 +173,9 @@ def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
 
                 optimizer.zero_grad()
                 loss.backward()
-                nn.utils.clip_grad_norm_(policy.parameters(), 0.5)
+                nn.utils.clip_grad_norm_(
+                    list(policy.parameters()) + list(value_fn.parameters()), 0.5
+                )
                 optimizer.step()
 
         if iter % 10 == 0:
@@ -177,7 +190,7 @@ if __name__ == '__main__':
 
 ## Training Curves and Visualization
 
-Running the code above produces a typical training curve like this:
+The following diagram shows the expected trend. The actual curve depends on the random seed and software versions and need not rise monotonically at every iteration.
 
 ```
 reward
@@ -247,7 +260,7 @@ tensorboard --logdir=runs
 
 Monitor five key metrics:
 
-- **reward_mean**: the primary training metric; it should rise monotonically to 500
+- **reward_mean**: the primary training metric; its moving average should trend upward, although short-term drops are normal
 - **policy_loss**: the loss after PPO clipping; oscillation is normal
 - **value_loss**: should decrease steadily
 - **entropy**: the policy entropy; it should slowly decrease from about 0.69 (the initial ln 2) to about 0.1
@@ -284,13 +297,11 @@ results = {
 plot_experiments(results)
 ```
 
-Expected results:
+Treat the following as hypotheses to test, not fixed convergence guarantees:
 
-- `lr=3e-4` + `clip=0.2` (default): converges in 150 iterations
-- `lr=1e-4`: converges in 300 iterations, but is more stable
-- `lr=1e-3`: has a 50% probability of failing to converge
-- `clip=0.1`: converges slowly but steadily
-- `clip=0.3`: converges quickly but oscillates
+- A smaller learning rate may be more stable but require more updates.
+- A larger learning rate or clipping range may speed up early learning but can also increase variability.
+- Compare the environment steps needed to reach the target return across multiple random seeds, reporting both the mean and dispersion.
 
 ## Section Summary
 

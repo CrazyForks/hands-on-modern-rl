@@ -66,7 +66,15 @@ def generate_response(model, tokenizer, prompt, max_new_tokens=80, temperature=0
     return response, input_length, outputs[0]
 
 
-def compute_log_probs(model, input_ids, attention_mask):
+def build_response_mask(attention_mask, prompt_length):
+    """构造与 shifted labels 对齐的回复 token 掩码。"""
+    positions = torch.arange(
+        attention_mask.shape[1] - 1, device=attention_mask.device
+    ).unsqueeze(0)
+    return attention_mask[:, 1:] * (positions >= prompt_length - 1)
+
+
+def compute_log_probs(model, input_ids, attention_mask, prompt_length):
     """
     计算模型在给定序列上的对数概率。
     用于 PPO 中的重要性采样比率计算。
@@ -87,12 +95,11 @@ def compute_log_probs(model, input_ids, attention_mask):
         2, shift_labels.unsqueeze(-1)
     ).squeeze(-1)
 
-    # 用 attention mask 排除 padding 部分（对齐到 shift 后的位置）
-    shift_mask = attention_mask[:, 1:]
-    token_log_probs = token_log_probs * shift_mask
+    # prompt 只提供条件，不属于策略动作；只统计回复 token。
+    response_mask = build_response_mask(attention_mask, prompt_length)
+    token_log_probs = token_log_probs * response_mask
 
-    # 返回序列的平均对数概率
-    return token_log_probs.sum(dim=-1) / shift_mask.sum(dim=-1)
+    return token_log_probs, response_mask
 
 
 # ==========================================
@@ -114,7 +121,7 @@ class SimpleRewardModel:
       - 回复过短或拒绝回答：扣分
     """
 
-    def __init__(self, tokenizer, backbone_model=None):
+    def __init__(self, tokenizer, backbone_model=None, value_head_path=None):
         self.tokenizer = tokenizer
         self.backbone_model = backbone_model
 
@@ -122,15 +129,24 @@ class SimpleRewardModel:
         self.value_head = None
         if backbone_model is not None:
             hidden_size = backbone_model.config.hidden_size
-            self.value_head = nn.Linear(hidden_size, 1)
+            self.value_head = nn.Linear(hidden_size, 1).to(
+                backbone_model.device
+            )
 
-            # 尝试加载已训练的价值头参数
-            value_head_path = "./output/rm_results/value_head.pt"
-            if os.path.exists(value_head_path):
+            if value_head_path and os.path.exists(value_head_path):
                 self.value_head.load_state_dict(
-                    torch.load(value_head_path, map_location="cpu")
+                    torch.load(
+                        value_head_path,
+                        map_location=backbone_model.device,
+                        weights_only=True,
+                    )
                 )
                 print(f"  已加载训练好的价值头参数：{value_head_path}")
+            else:
+                raise FileNotFoundError("奖励模型缺少训练好的价值头参数")
+
+            self.backbone_model.eval()
+            self.value_head.eval()
 
     def score(self, prompt, response):
         """
@@ -158,7 +174,7 @@ class SimpleRewardModel:
         enc = self.tokenizer(
             text, truncation=True, max_length=256,
             padding=True, return_tensors="pt",
-        )
+        ).to(self.backbone_model.device)
         with torch.no_grad():
             outputs = self.backbone_model(
                 **enc, output_hidden_states=True
@@ -234,7 +250,7 @@ class PPOTrainer:
     PPO 裁剪目标：
       L_CLIP = min(r(θ) * A, clip(r(θ), 1-ε, 1+ε) * A)
 
-    其中 r(θ) = π_θ(a|s) / π_ref(a|s) 是新旧策略的概率比。
+    其中 r(θ) = π_θ(a|s) / π_old(a|s) 是新旧策略的概率比。
 
     总损失 = -L_CLIP + β * KL(π_θ || π_ref)
     """
@@ -248,6 +264,7 @@ class PPOTrainer:
         kl_coef=0.1,
         clip_range=0.2,
         learning_rate=1e-6,
+        update_epochs=4,
     ):
         self.policy_model = policy_model
         self.reference_model = reference_model
@@ -255,6 +272,7 @@ class PPOTrainer:
         self.tokenizer = tokenizer
         self.kl_coef = kl_coef        # KL 散度惩罚系数
         self.clip_range = clip_range  # PPO 裁剪范围
+        self.update_epochs = update_epochs
 
         self.optimizer = torch.optim.AdamW(
             policy_model.parameters(), lr=learning_rate
@@ -269,39 +287,37 @@ class PPOTrainer:
             "response_lengths": [],
         }
 
-    def compute_kl_divergence(self, input_ids, attention_mask):
+    def compute_kl_divergence(
+        self, input_ids, attention_mask, prompt_length
+    ):
         """
         计算策略模型与参考模型之间的 KL 散度。
         KL(π_θ || π_ref) = Σ π_θ * log(π_θ / π_ref)
 
         这里使用近似计算：对每个 token 位置的 KL 散度求平均。
         """
-        with torch.no_grad():
-            # 策略模型的 logits
-            policy_outputs = self.policy_model(
-                input_ids=input_ids, attention_mask=attention_mask
-            )
-            policy_logits = policy_outputs.logits[:, :-1, :]
-            policy_log_probs = F.log_softmax(policy_logits, dim=-1)
-            policy_probs = torch.softmax(policy_logits, dim=-1)
+        policy_outputs = self.policy_model(
+            input_ids=input_ids, attention_mask=attention_mask
+        )
+        policy_logits = policy_outputs.logits[:, :-1, :]
+        policy_log_probs = F.log_softmax(policy_logits, dim=-1)
+        policy_probs = torch.softmax(policy_logits, dim=-1)
 
-            # 参考模型的 logits
+        with torch.no_grad():
             ref_outputs = self.reference_model(
                 input_ids=input_ids, attention_mask=attention_mask
             )
             ref_logits = ref_outputs.logits[:, :-1, :]
             ref_log_probs = F.log_softmax(ref_logits, dim=-1)
 
-            # 逐 token 计算 KL 散度
-            kl_per_token = (
-                policy_probs * (policy_log_probs - ref_log_probs)
-            ).sum(dim=-1)
+        kl_per_token = (
+            policy_probs * (policy_log_probs - ref_log_probs)
+        ).sum(dim=-1)
 
-            # 排除 padding token
-            shift_mask = attention_mask[:, 1:]
-            kl_div = (kl_per_token * shift_mask).sum() / shift_mask.sum()
+        response_mask = build_response_mask(attention_mask, prompt_length)
+        kl_div = (kl_per_token * response_mask).sum() / response_mask.sum()
 
-        return kl_div.item()
+        return kl_div
 
     def train_step(self, prompts):
         """
@@ -317,8 +333,8 @@ class PPOTrainer:
         self.policy_model.train()
 
         batch_rewards = []
-        batch_kl = []
         batch_lengths = []
+        all_prompt_lengths = []
         all_input_ids = []
         all_attention_masks = []
         all_old_log_probs = []
@@ -339,65 +355,79 @@ class PPOTrainer:
             batch_rewards.append(reward)
             batch_lengths.append(len(response))
 
-            # ---- 步骤3：计算 KL 散度 ----
-            kl_div = self.compute_kl_divergence(input_ids, attention_mask)
-            batch_kl.append(kl_div)
-
-            # ---- 步骤4：记录旧策略的对数概率 ----
+            # ---- 步骤3：记录旧策略的回复对数概率 ----
             with torch.no_grad():
-                old_log_prob = compute_log_probs(
-                    self.policy_model, input_ids, attention_mask
+                old_log_probs, _ = compute_log_probs(
+                    self.policy_model,
+                    input_ids,
+                    attention_mask,
+                    input_len,
                 )
-            all_old_log_probs.append(old_log_prob)
+            all_old_log_probs.append(old_log_probs)
             all_input_ids.append(input_ids)
             all_attention_masks.append(attention_mask)
+            all_prompt_lengths.append(input_len)
 
         # ---- 步骤5：计算优势函数 ----
         # 简化版：使用奖励值本身作为优势（不做 GAE 估计）
-        rewards_tensor = torch.tensor(batch_rewards, dtype=torch.float32)
+        rewards_tensor = torch.tensor(
+            batch_rewards,
+            dtype=torch.float32,
+            device=self.policy_model.device,
+        )
         advantages = rewards_tensor - rewards_tensor.mean()
-        advantages = advantages / (advantages.std() + 1e-8)
+        advantages = advantages / (
+            advantages.std(unbiased=False) + 1e-8
+        )
 
-        # ---- 步骤6：PPO 裁剪更新 ----
-        total_policy_loss = 0.0
-        for i, (input_ids, att_mask, old_log_p) in enumerate(
-            zip(all_input_ids, all_attention_masks, all_old_log_probs)
-        ):
-            # 新策略的对数概率
-            new_log_prob = compute_log_probs(
-                self.policy_model, input_ids, att_mask
+        # ---- 步骤6：对同一批 rollout 做多轮 PPO 裁剪更新 ----
+        for _ in range(self.update_epochs):
+            policy_losses = []
+            kl_values = []
+            for i, (input_ids, att_mask, old_log_p, prompt_len) in enumerate(
+                zip(
+                    all_input_ids,
+                    all_attention_masks,
+                    all_old_log_probs,
+                    all_prompt_lengths,
+                )
+            ):
+                new_log_probs, response_mask = compute_log_probs(
+                    self.policy_model,
+                    input_ids,
+                    att_mask,
+                    prompt_len,
+                )
+                ratio = torch.exp(new_log_probs - old_log_p)
+                advantage = advantages[i]
+                surr1 = ratio * advantage
+                surr2 = torch.clamp(
+                    ratio,
+                    1.0 - self.clip_range,
+                    1.0 + self.clip_range,
+                ) * advantage
+                token_loss = -torch.min(surr1, surr2) * response_mask
+                policy_losses.append(
+                    token_loss.sum() / response_mask.sum()
+                )
+                kl_values.append(
+                    self.compute_kl_divergence(
+                        input_ids, att_mask, prompt_len
+                    )
+                )
+
+            avg_policy_loss = torch.stack(policy_losses).mean()
+            avg_kl_tensor = torch.stack(kl_values).mean()
+            total_loss = avg_policy_loss + self.kl_coef * avg_kl_tensor
+
+            self.optimizer.zero_grad()
+            total_loss.backward()
+            torch.nn.utils.clip_grad_norm_(
+                self.policy_model.parameters(), 1.0
             )
+            self.optimizer.step()
 
-            # 重要性采样比率
-            ratio = torch.exp(new_log_prob - old_log_p)
-
-            # PPO 裁剪目标
-            advantage = advantages[i]
-            surr1 = ratio * advantage
-            surr2 = torch.clamp(
-                ratio, 1.0 - self.clip_range, 1.0 + self.clip_range
-            ) * advantage
-
-            # 取较小值（保守更新）
-            policy_loss = -torch.min(surr1, surr2)
-            total_policy_loss += policy_loss
-
-        # 平均策略损失
-        avg_policy_loss = total_policy_loss / len(prompts)
-
-        # KL 惩罚项
-        avg_kl = sum(batch_kl) / len(batch_kl)
-        kl_penalty = self.kl_coef * avg_kl
-
-        # 总损失 = 策略损失 + KL 惩罚
-        total_loss = avg_policy_loss + kl_penalty
-
-        # 反向传播
-        self.optimizer.zero_grad()
-        total_loss.backward()
-        # 梯度裁剪，防止梯度爆炸
-        torch.nn.utils.clip_grad_norm_(self.policy_model.parameters(), 1.0)
-        self.optimizer.step()
+        avg_kl = avg_kl_tensor.detach().item()
 
         # 记录统计信息
         self.stats["rewards"].append(sum(batch_rewards) / len(batch_rewards))
@@ -500,6 +530,7 @@ def main():
 
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
+    policy_model.to(device)
 
     # ---- 5.2 创建参考模型（冻结，不参与训练） ----
     print("\n[步骤2] 创建参考模型（冻结的 SFT 模型副本）...")
@@ -516,16 +547,22 @@ def main():
     # 尝试加载之前训练好的奖励模型骨干
     rm_backbone = None
     rm_backbone_path = "./output/rm_results"
-    if os.path.exists(os.path.join(rm_backbone_path, "value_head.pt")):
+    rm_value_head_path = os.path.join(rm_backbone_path, "value_head.pt")
+    rm_model_path = os.path.join(rm_backbone_path, "backbone")
+    if os.path.exists(rm_value_head_path) and os.path.exists(rm_model_path):
         print(f"  发现训练好的奖励模型参数：{rm_backbone_path}")
         rm_backbone = AutoModelForCausalLM.from_pretrained(
-            model_name, torch_dtype=torch.float32,
-        )
+            rm_model_path, torch_dtype=torch.float32,
+        ).to(device)
     else:
         print("  未找到训练好的奖励模型，将使用基于规则的评分函数。")
         print("  （建议先运行 reward_model_training.py 训练奖励模型）")
 
-    reward_model = SimpleRewardModel(tokenizer, backbone_model=rm_backbone)
+    reward_model = SimpleRewardModel(
+        tokenizer,
+        backbone_model=rm_backbone,
+        value_head_path=rm_value_head_path if rm_backbone else None,
+    )
     print("  奖励模型初始化完成。")
 
     # ---- 5.4 对齐前测试 ----
@@ -675,7 +712,7 @@ def main():
     print("=" * 60)
     print("\n  阶段回顾：")
     print("  [1] SFT（监督微调）    → output/sft_results/sft_model")
-    print("  [2] RM（奖励模型训练）  → output/rm_results/value_head.pt")
+    print("  [2] RM（奖励模型训练）  → output/rm_results/")
     print("  [3] PPO（对齐训练）     → output/ppo_results/aligned_model")
     print("\n  核心概念总结：")
     print("  - SFT：用指令数据让模型学会基本的指令跟随能力")

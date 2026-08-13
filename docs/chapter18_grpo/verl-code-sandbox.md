@@ -15,7 +15,7 @@
 - **Reward 设计思路**：把模型生成的代码当独立程序，跑 stdin/stdout 测试算通过率（详见下文 Reward 函数设计）。
 - **评测方法与数据**：使用 EvalScope 在 GSM8K、HumanEval、LiveCodeBench 上的评测流程，以及 RL 训练前后的对比数据。
 
-火山引擎原始教程使用 VKE 集群 + SandboxFusion 云沙箱做大规模分布式训练。本节把这些方案适配到**本地 GPU 环境**：用子进程隔离代替云沙箱，用单卡/多卡脚本代替集群部署，保留相同的算法逻辑和参数配置。完整的工业级代码 Agent 实验放在 [19.8 用 rLLM 训练 DeepCoder Agent](../chapter22_agentic/rllm-deepcoder-lab)，那里更关注 AgentFlow 和 sandbox cookbook；本节更关注如何把代码 verifier 接进 veRL 训练框架。
+火山引擎原始教程使用 VKE 集群 + SandboxFusion 云沙箱做大规模分布式训练。本节用本地子进程演示 reward 接线，再用单卡/多卡脚本替代集群部署。子进程只隔离解释器状态，无法代替安全沙箱；运行训练前仍要把任务放进最小权限的容器或虚拟机。完整的工业级代码 Agent 实验放在 [19.8 用 rLLM 训练 DeepCoder Agent](../chapter22_agentic/rllm-deepcoder-lab)，那里更关注 AgentFlow 和 sandbox cookbook；本节更关注如何把代码 verifier 接进 veRL 训练框架。
 
 ```mermaid
 flowchart LR
@@ -180,7 +180,7 @@ def extract_code(response: str) -> str:
 
 这里是本节和 13.7 节最大的差异。Eurus-2-RL-Data 的 code 样本**没有 `tests`（assert 语句）**，`reward_model.ground_truth` 是 JSON 字符串 `{"inputs": [...], "outputs": [...]}`——也就是**把生成的代码当独立程序跑**：对每个 input 喂入 stdin，比对 stdout 和期望 output。
 
-用 `subprocess` 起一个真实子进程执行，比 `exec` 更安全：完整进程隔离，模型写的死循环、文件操作、网络请求都影响不到训练进程：
+`subprocess` 可以隔离解释器状态并设置超时，但它仍继承当前用户的文件、网络和环境变量权限。下面的执行器只适合放在已经隔离的容器或虚拟机中运行；代码默认拒绝执行，只有设置 `HOMRL_ALLOW_UNSAFE_CODE_EXECUTION=1` 才会启用：
 
 ```python
 import json
@@ -266,7 +266,8 @@ def compute_score(data_source, solution_str, ground_truth, extra_info=None):
 完整文件见 [code/chapter18_grpo/verl_code_rlvr/code_reward.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter18_grpo/verl_code_rlvr/code_reward.py)。可以直接自检（不依赖训练环境）：
 
 ```bash
-python code/chapter18_grpo/verl_code_rlvr/code_reward.py
+HOMRL_ALLOW_UNSAFE_CODE_EXECUTION=1 \
+  python code/chapter18_grpo/verl_code_rlvr/code_reward.py
 ```
 
 输出示例：
@@ -514,6 +515,7 @@ evalscope eval \
 正式训练前，至少检查这些点：
 
 - 测试集不能出现在训练数据里。
+- 在容器或虚拟机中关闭网络、移除凭据，并以非特权用户运行 verifier。
 - reward 函数必须设置超时，避免死循环卡住 rollout。
 - reward 日志要记录三类错误：编译失败、运行失败、测试失败。
 - 不要只看训练 reward，要固定一份独立 eval set 看 Pass@1。
@@ -524,7 +526,7 @@ evalscope eval \
 ## 本节小结
 
 - 代码 RLVR 的奖励来自实际执行和测试通过率，格式与语法奖励只用于补充早期信号。
-- 本地子进程必须设置超时和资源限制；训练集与评测集必须隔离。
+- 子进程不能代替安全沙箱；外层必须限制文件、网络、凭据与资源访问。
 - 判断训练效果要比较基座模型与训练后模型的独立 Pass@1，并按编译、运行和测试失败分类诊断。
 
 [^volcengine-verl-code-sandbox]: 火山引擎，"veRL Code Sandbox 代码生成强化学习"，https://www.volcengine.com/docs/6460/1756203

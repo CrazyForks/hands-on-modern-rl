@@ -329,13 +329,13 @@ class ActorCritic(nn.Module):
     def __init__(self, obs_dim=4, act_dim=2, hidden=64):
         super().__init__()
         self.actor = nn.Sequential(
-            nn.Linear(obs_dim, hidden), nn.ReLU(),
-            nn.Linear(hidden, hidden), nn.ReLU(),
+            nn.Linear(obs_dim, hidden), nn.Tanh(),
+            nn.Linear(hidden, hidden), nn.Tanh(),
             nn.Linear(hidden, act_dim),
         )
         self.critic = nn.Sequential(
-            nn.Linear(obs_dim, hidden), nn.ReLU(),
-            nn.Linear(hidden, hidden), nn.ReLU(),
+            nn.Linear(obs_dim, hidden), nn.Tanh(),
+            nn.Linear(hidden, hidden), nn.Tanh(),
             nn.Linear(hidden, 1),
         )
 
@@ -364,6 +364,12 @@ def collect_rollout(model, env, num_steps=2048):
             action, log_prob, value = model.get_action(obs_tensor)
 
         next_obs, reward, terminated, truncated, _ = env.step(action.item())
+        with torch.no_grad():
+            if terminated:
+                next_value = 0.0
+            else:
+                _, next_value_tensor = model(torch.FloatTensor(next_obs))
+                next_value = next_value_tensor.item()
 
         transitions.append({
             "obs": obs, "action": action.item(),
@@ -371,14 +377,14 @@ def collect_rollout(model, env, num_steps=2048):
             "reward": float(reward),
             "terminated": terminated,  # 杆子倾倒，回合自然结束
             "truncated": truncated,    # 达到步数上限（杆子未倒）
-            "next_obs": next_obs if truncated and not terminated else None,
+            "next_value": next_value,
         })
 
         obs = next_obs
         if terminated or truncated:
             obs, _ = env.reset()
 
-    return transitions, last_bootstrap
+    return transitions
 ```
 
 这段代码有一个**关键的工程细节**：它区分了 `terminated`（杆子倾倒，回合自然结束）和 `truncated`（达到 500 步上限，但杆子仍保持平衡）。这个区分对训练效果影响显著——如果把 truncated 也当作 `terminated` 来处理，价值函数会在回合被截断处错误地置零，智能体会学到"达到 500 步是坏事"，从而无法收敛到最优策略。这是 RL 工程实践中常见的陷阱之一，配套代码对此做了正确处理。
@@ -399,23 +405,23 @@ action = dist.sample()  # 按概率随机抽取，而非 argmax
 事实上，"优势"这个概念可以追溯到时序差分学习（Temporal Difference Learning）中的 TD 误差（Sutton, 1988）。TD 误差衡量的是"实际得到的奖励比预期好多少"。然而，单步 TD 误差更依赖价值函数估计，通常低方差但高偏差；而蒙特卡洛或长多步回报更依赖实际采样回报，通常低偏差但高方差。 Schulman 等人在 2016 年提出了 GAE（Generalized Advantage Estimation），通过一个参数 λ 在偏差和方差之间做平滑的折中：
 
 ```python
-def compute_gae(model, transitions, last_bootstrap, gamma=0.99, lam=0.95):
+def compute_gae(transitions, gamma=0.99, lam=0.95):
+    gae = 0
+    raw_advantages = []
     for step in reversed(range(len(transitions))):
         t = transitions[step]
-        if t["terminated"]:
-            # 真正结束：V(s') = 0
-            delta = rewards[step] - values[step]
-            gae = delta
-        elif t["truncated"]:
-            # 时间截断：用 V(next_obs) bootstrap
-            delta = rewards[step] + gamma * bootstrap_values[step] - values[step]
-            gae = delta
-        else:
-            # 正常步
-            delta = rewards[step] + gamma * next_value - values[step]
-            gae = delta + gamma * lam * gae  # 传播
+        episode_end = t["terminated"] or t["truncated"]
+        delta = t["reward"] + gamma * t["next_value"] - t["value"]
+        gae = delta + gamma * lam * (1.0 - float(episode_end)) * gae
+        raw_advantages.insert(0, gae)
 
-        next_value = values[step]
+    raw_advantages = torch.tensor(raw_advantages, dtype=torch.float32)
+    values = torch.tensor([t["value"] for t in transitions])
+    returns = raw_advantages + values
+    advantages = (raw_advantages - raw_advantages.mean()) / (
+        raw_advantages.std(unbiased=False) + 1e-8
+    )
+    return advantages, returns
 ```
 
 直觉上，`delta` 回答的是"这一步拿到的奖励 + 下一步的预期价值 - 这一步的预期价值"。如果 `delta > 0`，说明这一步比预期做得好；如果 `delta < 0`，说明比预期差。GAE 通过 `gamma * lam * gae` 把多步的 delta 组合起来，形成一个更稳定、方差更小的优势估计。当 λ = 0 时，GAE 退化为单步 TD 误差（低方差但高偏差）；当 λ = 1 时，GAE 退化为蒙特卡洛回报（低偏差但高方差）。实践中通常取 λ = 0.95，在两者之间取得平衡。
@@ -490,10 +496,10 @@ env = gym.make("CartPole-v1")
 
 for iteration in range(40):
     # 第一步：收集经验数据（2048 步）
-    transitions, bootstrap = collect_rollout(model, env, 2048)
+    transitions = collect_rollout(model, env, 2048)
 
     # 第二步：计算 GAE 优势
-    advantages, returns = compute_gae(model, transitions, bootstrap)
+    advantages, returns = compute_gae(transitions)
 
     # 第三步：PPO 更新（同一批数据训练 10 个 epoch）
     metrics = ppo_update(model, optimizer, transitions, advantages, returns)
@@ -501,7 +507,7 @@ for iteration in range(40):
 
 这三步循环，就是 `model.learn(total_timesteps=80000)` 的本质。SB3 将这个循环封装为一行代码，并提供了一整套经过充分验证的默认超参数（学习率、批量大小、裁剪范围、GAE 参数等），使使用者无需关注底层细节即可完成训练。
 
-而我们的 [2-pytorch_ppo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/2-pytorch_ppo.py) 用纯 PyTorch 实现了同样的逻辑——独立 Actor-Critic 网络、正交初始化、正确的 truncated 处理、GAE 优势估计、PPO 裁剪、SwanLab 指标记录——最终效果和 SB3 持平，20 回合评估全部 500 满分。
+我们的 [2-pytorch_ppo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/2-pytorch_ppo.py) 用纯 PyTorch 实现了这条数据流：独立 Actor-Critic 网络、正交初始化、截断处的价值 bootstrap、回合边界处的 GAE 切断、PPO 裁剪和 SwanLab 指标记录。实际得分受随机种子和运行环境影响，应以本次运行的评估输出为准。
 
 > **动手实验**：同时运行两个脚本，在 SwanLab 中对比 SB3 和自研 PPO 的训练曲线：
 >

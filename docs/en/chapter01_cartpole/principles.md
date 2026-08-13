@@ -344,13 +344,13 @@ class ActorCritic(nn.Module):
     def __init__(self, obs_dim=4, act_dim=2, hidden=64):
         super().__init__()
         self.actor = nn.Sequential(
-            nn.Linear(obs_dim, hidden), nn.ReLU(),
-            nn.Linear(hidden, hidden), nn.ReLU(),
+            nn.Linear(obs_dim, hidden), nn.Tanh(),
+            nn.Linear(hidden, hidden), nn.Tanh(),
             nn.Linear(hidden, act_dim),
         )
         self.critic = nn.Sequential(
-            nn.Linear(obs_dim, hidden), nn.ReLU(),
-            nn.Linear(hidden, hidden), nn.ReLU(),
+            nn.Linear(obs_dim, hidden), nn.Tanh(),
+            nn.Linear(hidden, hidden), nn.Tanh(),
             nn.Linear(hidden, 1),
         )
 
@@ -379,6 +379,12 @@ def collect_rollout(model, env, num_steps=2048):
             action, log_prob, value = model.get_action(obs_tensor)
 
         next_obs, reward, terminated, truncated, _ = env.step(action.item())
+        with torch.no_grad():
+            if terminated:
+                next_value = 0.0
+            else:
+                _, next_value_tensor = model(torch.FloatTensor(next_obs))
+                next_value = next_value_tensor.item()
 
         transitions.append({
             "obs": obs, "action": action.item(),
@@ -386,14 +392,14 @@ def collect_rollout(model, env, num_steps=2048):
             "reward": float(reward),
             "terminated": terminated,  # pole fell; episode ends naturally
             "truncated": truncated,    # step limit reached (pole still up)
-            "next_obs": next_obs if truncated and not terminated else None,
+            "next_value": next_value,
         })
 
         obs = next_obs
         if terminated or truncated:
             obs, _ = env.reset()
 
-    return transitions, last_bootstrap
+    return transitions
 ```
 
 This code has a **critical engineering detail**: it distinguishes between `terminated` (the pole fell, the episode ends naturally) and `truncated` (the 500-step limit is reached, but the pole is still balanced). This distinction significantly affects training performance — if truncated episodes are treated the same as `terminated`, the value function would be incorrectly set to zero at truncation points, and the agent would learn that "reaching 500 steps is bad," making it impossible to converge to the optimal policy. This is one of the common pitfalls in RL engineering practice; the accompanying code handles it correctly.
@@ -414,23 +420,23 @@ After collecting data, PPO needs to answer a question: **How much better than "a
 In fact, the concept of "advantage" can be traced back to the TD error in Temporal Difference Learning (Sutton, 1988). The TD error measures "how much better the actual reward was than expected." However, single-step TD error relies more on value function estimation and typically has low variance but high bias; Monte Carlo or long multi-step returns rely more on actual sampled returns and typically have low bias but high variance. Schulman et al. proposed GAE (Generalized Advantage Estimation) in 2016, which uses a parameter $\lambda$ to smoothly trade off between bias and variance:
 
 ```python
-def compute_gae(model, transitions, last_bootstrap, gamma=0.99, lam=0.95):
+def compute_gae(transitions, gamma=0.99, lam=0.95):
+    gae = 0
+    raw_advantages = []
     for step in reversed(range(len(transitions))):
         t = transitions[step]
-        if t["terminated"]:
-            # True termination: V(s') = 0
-            delta = rewards[step] - values[step]
-            gae = delta
-        elif t["truncated"]:
-            # Time truncation: bootstrap with V(next_obs)
-            delta = rewards[step] + gamma * bootstrap_values[step] - values[step]
-            gae = delta
-        else:
-            # Normal step
-            delta = rewards[step] + gamma * next_value - values[step]
-            gae = delta + gamma * lam * gae  # propagate
+        episode_end = t["terminated"] or t["truncated"]
+        delta = t["reward"] + gamma * t["next_value"] - t["value"]
+        gae = delta + gamma * lam * (1.0 - float(episode_end)) * gae
+        raw_advantages.insert(0, gae)
 
-        next_value = values[step]
+    raw_advantages = torch.tensor(raw_advantages, dtype=torch.float32)
+    values = torch.tensor([t["value"] for t in transitions])
+    returns = raw_advantages + values
+    advantages = (raw_advantages - raw_advantages.mean()) / (
+        raw_advantages.std(unbiased=False) + 1e-8
+    )
+    return advantages, returns
 ```
 
 Intuitively, `delta` answers the question: "The reward received at this step + the expected value of the next step - the expected value of this step." If `delta > 0`, this step was better than expected; if `delta < 0`, it was worse than expected. GAE combines multi-step deltas through `gamma * lam * gae` to form a more stable, lower-variance advantage estimate. When $\lambda = 0$, GAE reduces to single-step TD error (low variance but high bias); when $\lambda = 1$, GAE reduces to Monte Carlo return (low bias but high variance). In practice, $\lambda = 0.95$ is commonly used to balance the two.
@@ -505,10 +511,10 @@ env = gym.make("CartPole-v1")
 
 for iteration in range(40):
     # Step 1: Collect experience data (2048 steps)
-    transitions, bootstrap = collect_rollout(model, env, 2048)
+    transitions = collect_rollout(model, env, 2048)
 
     # Step 2: Compute GAE advantages
-    advantages, returns = compute_gae(model, transitions, bootstrap)
+    advantages, returns = compute_gae(transitions)
 
     # Step 3: PPO update (train on the same data for 10 epochs)
     metrics = ppo_update(model, optimizer, transitions, advantages, returns)
@@ -516,7 +522,7 @@ for iteration in range(40):
 
 These three steps looping together constitute the essence of `model.learn(total_timesteps=80000)`. SB3 wraps this loop into a single line of code and provides a comprehensive set of well-validated default hyperparameters (learning rate, batch size, clip range, GAE parameters, etc.), enabling users to complete training without worrying about underlying details.
 
-Our [2-pytorch_ppo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/2-pytorch_ppo.py) implements the same logic in pure PyTorch — independent Actor-Critic networks, orthogonal initialization, correct truncation handling, GAE advantage estimation, PPO clipping, and SwanLab metric logging — achieving results comparable to SB3, with all 20 evaluation episodes scoring a perfect 500.
+Our [2-pytorch_ppo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/2-pytorch_ppo.py) implements this data flow in pure PyTorch: separate Actor-Critic networks, orthogonal initialization, value bootstrapping at truncation, GAE resets at episode boundaries, PPO clipping, and SwanLab metric logging. Scores depend on the random seed and runtime environment, so use the evaluation printed by the current run.
 
 > **Hands-on experiment**: Run both scripts simultaneously and compare SB3 and the from-scratch PPO training curves in SwanLab:
 >

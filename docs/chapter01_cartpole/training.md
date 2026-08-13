@@ -72,17 +72,20 @@ class ValueNetwork(nn.Module):
         return self.net(s).squeeze(-1)
 
 # === GAE：广义优势估计 ===
-def compute_gae(rewards, values, gamma=0.99, lam=0.95):
-    """Generalized Advantage Estimation."""
-    advantages = []
+def compute_gae(rewards, values, next_values, episode_ends,
+                gamma=0.99, lam=0.95):
+    """计算 GAE，并在每次环境 reset 处切断递推。"""
+    raw_advantages = []
     gae = 0
-    next_value = 0
-    for r, v in zip(reversed(rewards), reversed(values)):
-        delta = r + gamma * next_value - v
-        gae = delta + gamma * lam * gae
-        advantages.insert(0, gae)
-        next_value = v
-    return advantages
+    for r, v, v_next, episode_end in zip(
+        reversed(rewards), reversed(values), reversed(next_values),
+        reversed(episode_ends)
+    ):
+        # 真正终止时 v_next=0；时间截断时仍从 V(s') bootstrap。
+        delta = r + gamma * v_next - v
+        gae = delta + gamma * lam * (1.0 - float(episode_end)) * gae
+        raw_advantages.insert(0, gae)
+    return torch.tensor(raw_advantages, dtype=torch.float32)
 
 # === 主训练循环 ===
 def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
@@ -97,7 +100,8 @@ def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
 
     for iter in range(n_iters):
         # === 1. Rollout ===
-        states, actions, rewards, dones, log_probs_old, values = [], [], [], [], [], []
+        states, actions, rewards = [], [], []
+        values, next_values, episode_ends, log_probs_old = [], [], [], []
         s, _ = env.reset()
         ep_reward = 0
 
@@ -109,9 +113,12 @@ def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
 
             s_next, r, terminated, truncated, _ = env.step(a.item())
             done = terminated or truncated
+            with torch.no_grad():
+                v_next = 0.0 if terminated else value_fn(torch.FloatTensor(s_next)).item()
 
             states.append(s); actions.append(a.item()); rewards.append(r)
-            dones.append(done); log_probs_old.append(dist.log_prob(a).item()); values.append(v.item())
+            values.append(v.item()); next_values.append(v_next); episode_ends.append(done)
+            log_probs_old.append(dist.log_prob(a).item())
             ep_reward += r
 
             if done:
@@ -122,10 +129,14 @@ def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
                 s = s_next
 
         # === 2. 计算 advantage ===
-        advantages = compute_gae(rewards, values, gamma, lam)
-        advantages = torch.FloatTensor(advantages)
-        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
-        returns = advantages + torch.FloatTensor(values)
+        raw_advantages = compute_gae(
+            rewards, values, next_values, episode_ends, gamma, lam
+        )
+        # Critic 学习未归一化的回报；归一化只用于策略更新。
+        returns = raw_advantages + torch.FloatTensor(values)
+        advantages = (raw_advantages - raw_advantages.mean()) / (
+            raw_advantages.std(unbiased=False) + 1e-8
+        )
 
         # === 3. PPO 更新（多个 epoch） ===
         states_t = torch.FloatTensor(np.array(states))
@@ -161,7 +172,9 @@ def train_ppo(env_name='CartPole-v1', n_iters=200, n_steps=2048,
 
                 optimizer.zero_grad()
                 loss.backward()
-                nn.utils.clip_grad_norm_(policy.parameters(), 0.5)
+                nn.utils.clip_grad_norm_(
+                    list(policy.parameters()) + list(value_fn.parameters()), 0.5
+                )
                 optimizer.step()
 
         if iter % 10 == 0:
@@ -176,7 +189,7 @@ if __name__ == '__main__':
 
 ## 训练曲线与可视化
 
-运行上述代码，典型的训练曲线如下：
+下图是预期趋势示意。实际曲线受随机种子和软件版本影响，不会逐轮单调上升。
 
 ```
 reward
@@ -246,7 +259,7 @@ tensorboard --logdir=runs
 
 监控 5 个关键指标：
 
-- **reward_mean**：训练核心指标，应单调上升到 500
+- **reward_mean**：训练核心指标，其移动平均应整体上升，允许短期回落
 - **policy_loss**：PPO clip 后的 loss，振荡正常
 - **value_loss**：应平稳下降
 - **entropy**：策略熵，应从 ~0.69（初始 ln 2）缓慢下降到 ~0.1
@@ -283,13 +296,11 @@ results = {
 plot_experiments(results)
 ```
 
-预期结果：
+以下是待验证的实验假设，不是固定的收敛保证：
 
-- `lr=3e-4` + `clip=0.2`（默认）：150 iteration 收敛
-- `lr=1e-4`：300 iteration 收敛，但更稳定
-- `lr=1e-3`：50% 概率不收敛
-- `clip=0.1`：收敛慢但稳定
-- `clip=0.3`：收敛快但有抖动
+- 较小的学习率可能更稳定，但需要更多更新。
+- 较大的学习率或裁剪范围可能加快早期学习，也可能增大波动。
+- 用多个随机种子比较达到目标回报所需的环境步数，并报告均值和离散程度。
 
 ## 本节小结
 

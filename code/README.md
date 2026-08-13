@@ -22,7 +22,7 @@ pip install -r chapter01_cartpole/requirements.txt
 | Ch01 CartPole           | `chapter01_cartpole/`           | `1-ppo_cartpole.py`                  | SB3 PPO 训练 CartPole，记录 SwanLab 指标                                            |
 |                         |                                 | `2-pytorch_ppo.py`                   | 纯 PyTorch PPO：Actor-Critic、GAE、clip、指标记录                                   |
 |                         |                                 | `plot_curves.py`                     | 读取训练日志并绘制指标曲线                                                          |
-| Ch02 DPO                | `chapter02_dpo/`                | `0-download_model.py`                | 下载 Qwen2.5-0.5B-Instruct                                                          |
+| Ch02 DPO                | `chapter17_dpo/`                | `0-download_model.py`                | 下载 Qwen2.5-0.5B-Instruct                                                          |
 |                         |                                 | `1-generate_data.py`                 | 生成过度顺从纠正偏好数据                                                            |
 |                         |                                 | `2-test_before.py`                   | 微调前测试                                                                          |
 |                         |                                 | `3-train_dpo.py`                     | TRL DPO 训练                                                                        |

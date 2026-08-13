@@ -21,7 +21,10 @@
 #   custom_reward_function.name=compute_score
 
 import json
+import os
 import re
+import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -29,6 +32,38 @@ from pathlib import Path
 
 _CODE_BLOCK_RE = re.compile(r"```(?:python)?\n(.*?)```", re.DOTALL)
 _TIMEOUT_S = 10.0
+_MAX_OUTPUT_BYTES = 100_000
+_MAX_MEMORY_BYTES = 2 * 1024**3
+_SANDBOX_OPT_IN = "HOMRL_ALLOW_UNSAFE_CODE_EXECUTION"
+_RUNNER_SOURCE = r"""
+import math
+import resource
+import runpy
+import sys
+
+
+def set_soft_limit(kind, requested):
+    _, current_hard = resource.getrlimit(kind)
+    limit = requested if current_hard == resource.RLIM_INFINITY else min(
+        requested, current_hard
+    )
+    resource.setrlimit(kind, (limit, current_hard))
+
+
+solution_path = sys.argv[1]
+timeout_s = float(sys.argv[2])
+max_output_bytes = int(sys.argv[3])
+max_memory_bytes = int(sys.argv[4])
+set_soft_limit(resource.RLIMIT_CPU, max(1, math.ceil(timeout_s)))
+set_soft_limit(resource.RLIMIT_FSIZE, max_output_bytes)
+set_soft_limit(resource.RLIMIT_CORE, 0)
+set_soft_limit(resource.RLIMIT_NOFILE, 64)
+if sys.platform.startswith("linux") and hasattr(resource, "RLIMIT_AS"):
+    set_soft_limit(resource.RLIMIT_AS, max_memory_bytes)
+
+sys.argv = [solution_path]
+runpy.run_path(solution_path, run_name="__main__")
+"""
 
 
 def extract_code(response: str) -> str:
@@ -50,6 +85,26 @@ def _normalize(text: str) -> str:
     return "\n".join(line.rstrip() for line in text.strip().splitlines()).strip()
 
 
+def _require_execution_opt_in() -> None:
+    """阻止用户误把本地子进程当作安全沙箱。"""
+    if os.environ.get(_SANDBOX_OPT_IN) != "1":
+        raise RuntimeError(
+            "拒绝直接执行模型生成的代码。subprocess 不是安全沙箱；"
+            f"请先在容器/虚拟机中隔离网络、凭据和训练文件，再设置 "
+            f"{_SANDBOX_OPT_IN}=1。"
+        )
+
+
+def _terminate_process_group(proc: subprocess.Popen) -> None:
+    """终止测试进程及其派生的同组子进程。"""
+    if proc.poll() is not None:
+        return
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        return
+
+
 def run_io_tests(code: str, ground_truth_json: str, timeout_s: float = _TIMEOUT_S):
     """把 code 作为独立程序运行，用 ground_truth 里的 inputs/outputs 测试。
 
@@ -66,41 +121,65 @@ def run_io_tests(code: str, ground_truth_json: str, timeout_s: float = _TIMEOUT_
     if not inputs or len(inputs) != len(outputs):
         return 0.0, f"inputs/outputs 数量不匹配: {len(inputs)} vs {len(outputs)}"
 
-    # 把代码写入临时 .py 文件，用独立的 Python 解释器进程执行，
-    # 比 exec 更安全：完整进程隔离，死循环/文件操作都不会影响训练进程。
-    with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as f:
-        f.write(code)
-        tmp_path = f.name
+    _require_execution_opt_in()
+
+    # 子进程只隔离解释器状态，不隔离文件系统、网络、凭据或资源。
+    # 外层必须先把训练放进最小权限的容器或虚拟机。
+    tmp_dir = tempfile.mkdtemp(prefix="homrl-code-reward-")
+    tmp_path = Path(tmp_dir) / "solution.py"
+    runner_path = Path(tmp_dir) / "runner.py"
+    tmp_path.write_text(code, encoding="utf-8")
+    runner_path.write_text(_RUNNER_SOURCE, encoding="utf-8")
 
     try:
         passed = 0
         details = []
         for inp, expected in zip(inputs, outputs):
             try:
-                proc = subprocess.run(
-                    [sys.executable, tmp_path],
-                    input=inp,
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout_s,
-                )
+                stdout_path = Path(tmp_dir) / "stdout.txt"
+                with stdout_path.open("wb") as stdout_file:
+                    proc = subprocess.Popen(
+                        [
+                            sys.executable,
+                            "-I",
+                            str(runner_path),
+                            str(tmp_path),
+                            str(timeout_s),
+                            str(_MAX_OUTPUT_BYTES),
+                            str(_MAX_MEMORY_BYTES),
+                        ],
+                        stdin=subprocess.PIPE,
+                        stdout=stdout_file,
+                        stderr=subprocess.DEVNULL,
+                        text=True,
+                        cwd=tmp_dir,
+                        start_new_session=True,
+                    )
+                    try:
+                        proc.communicate(input=inp, timeout=timeout_s)
+                    except subprocess.TimeoutExpired:
+                        _terminate_process_group(proc)
+                        proc.communicate()
+                        details.append("FAIL(超时)")
+                        continue
                 if proc.returncode != 0:
                     details.append("FAIL(非零退出)")
                     continue
-                got = _normalize(proc.stdout)
+                stdout = stdout_path.read_text(
+                    encoding="utf-8", errors="replace"
+                )
+                got = _normalize(stdout)
                 want = _normalize(expected)
                 if got == want:
                     passed += 1
                     details.append("PASS")
                 else:
                     details.append("FAIL(输出不匹配)")
-            except subprocess.TimeoutExpired:
-                details.append("FAIL(超时)")
             except Exception as exc:  # noqa: BLE001
                 details.append(f"FAIL({exc!r})")
         return passed / len(inputs), "; ".join(details[:5])
     finally:
-        Path(tmp_path).unlink(missing_ok=True)
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
 def compute_score(data_source, solution_str, ground_truth, extra_info=None):
@@ -133,6 +212,7 @@ def compute_score(data_source, solution_str, ground_truth, extra_info=None):
 # 自检：不需要训练环境，直接验证 reward 逻辑
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
+    _require_execution_opt_in()
     # 用一个简单的 A+B 问题构造 ground_truth（inputs/outputs）
     ab_gt = json.dumps({"inputs": ["1 2", "10 20", "-3 5"], "outputs": ["3", "30", "2"]})
 

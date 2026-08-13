@@ -279,6 +279,7 @@ def grpo_policy_update(model, tokenizer, optimizer, prompt, responses, advantage
 
     其中 log_prob_i 是模型生成第 i 个回复的对数概率。
     为简化实现，这里使用 token 级别的平均对数概率作为近似。
+    正、负优势都参与更新：正优势提高对应回复概率，负优势降低概率。
 
     参数：
         model: 语言模型
@@ -304,9 +305,6 @@ def grpo_policy_update(model, tokenizer, optimizer, prompt, responses, advantage
     num_valid = 0
 
     for response, advantage in zip(responses, advantages):
-        if advantage <= 0:
-            continue  # 跳过负优势的回复，减少计算量
-
         # 将 prompt + response 拼接
         response_ids = tokenizer.encode(response, return_tensors="pt").to(model.device)
         # 去掉 response_ids 中可能的 BOS token
@@ -316,9 +314,8 @@ def grpo_policy_update(model, tokenizer, optimizer, prompt, responses, advantage
         full_ids = torch.cat([prompt_ids, response_ids], dim=-1)
 
         # 前向传播获取 logits
-        with torch.cuda.amp.autocast(enabled=False):
-            outputs = model(full_ids)
-            logits = outputs.logits
+        outputs = model(full_ids)
+        logits = outputs.logits
 
         # 计算生成部分的 log_prob（只取 response 部分的 token）
         # logits[:, :-1, :] 对应位置 t 的预测，full_ids[:, 1:] 对应位置 t+1 的真实 token

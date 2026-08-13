@@ -113,7 +113,7 @@ class ActorCritic(nn.Module):
 # ==========================================
 # 第二部分：计算 TD 误差和优势
 # ==========================================
-def compute_advantage(reward, value, next_value, gamma=0.99, done=False):
+def compute_advantage(reward, value, next_value, gamma=0.99, terminated=False):
     """
     计算 TD(0) 优势函数
 
@@ -133,19 +133,39 @@ def compute_advantage(reward, value, next_value, gamma=0.99, done=False):
         value: 当前状态价值 V(s_t)
         next_value: 下一状态价值 V(s_{t+1})
         gamma: 折扣因子
-        done: 回合是否结束
+        terminated: 是否到达 MDP 终止状态。时间截断仍需从 V(s') bootstrap
     返回：
         advantage: TD 优势值
     """
-    if done:
-        # 回合结束时，没有下一个状态，目标 = r_t
-        target = reward
+    reward_tensor = torch.as_tensor(
+        reward, dtype=value.dtype, device=value.device
+    )
+
+    if terminated:
+        # 到达 MDP 终止状态时，没有下一状态价值，目标 = r_t
+        target = reward_tensor
     else:
         # TD 目标：r_t + γ * V(s_{t+1})
-        target = reward + gamma * next_value
+        target = reward_tensor + gamma * next_value
 
     advantage = target - value
     return advantage, target
+
+
+def compute_actor_critic_losses(
+    log_prob, reward, value, next_value, gamma=0.99, terminated=False
+):
+    """计算一步 Actor-Critic 损失，并阻断策略损失到价值估计的梯度。"""
+    advantage, target = compute_advantage(
+        reward,
+        value,
+        next_value,
+        gamma=gamma,
+        terminated=terminated,
+    )
+    actor_loss = -log_prob * advantage.detach()
+    critic_loss = nn.functional.mse_loss(value, target.detach())
+    return actor_loss, critic_loss, advantage, target
 
 
 # ==========================================
@@ -231,17 +251,17 @@ def train():
 
             # ========== 第五步：计算 TD 优势和损失 ==========
             # TD 优势：A(s,a) = r + γ * V(s') - V(s)
-            is_done = done or truncated
-            advantage, target = compute_advantage(
-                reward, value, next_value, gamma, done=is_done
+            # terminated 才把下一状态价值置零；truncated 仍从 V(s') bootstrap。
+            actor_loss, critic_loss, advantage, target = (
+                compute_actor_critic_losses(
+                    log_prob,
+                    reward,
+                    value,
+                    next_value,
+                    gamma=gamma,
+                    terminated=done,
+                )
             )
-
-            # Actor 损失：-log π(a|s) * A(s,a)
-            # 与 REINFORCE 形式相同，但 advantage 是单步 TD 估计
-            actor_loss = -log_prob * advantage
-
-            # Critic 损失：让 V(s) 逼近 TD 目标 r + γ * V(s')
-            critic_loss = nn.MSELoss()(value, target.detach())
 
             # 合并损失（可以加权，这里等权）
             total_loss = actor_loss + critic_loss

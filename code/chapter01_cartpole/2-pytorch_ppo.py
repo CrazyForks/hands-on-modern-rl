@@ -42,13 +42,13 @@ class ActorCritic(nn.Module):
     def __init__(self, obs_dim=4, act_dim=2, hidden=64):
         super().__init__()
         self.actor = nn.Sequential(
-            nn.Linear(obs_dim, hidden), nn.ReLU(),
-            nn.Linear(hidden, hidden), nn.ReLU(),
+            nn.Linear(obs_dim, hidden), nn.Tanh(),
+            nn.Linear(hidden, hidden), nn.Tanh(),
             nn.Linear(hidden, act_dim),
         )
         self.critic = nn.Sequential(
-            nn.Linear(obs_dim, hidden), nn.ReLU(),
-            nn.Linear(hidden, hidden), nn.ReLU(),
+            nn.Linear(obs_dim, hidden), nn.Tanh(),
+            nn.Linear(hidden, hidden), nn.Tanh(),
             nn.Linear(hidden, 1),
         )
         self._init_weights()
@@ -94,7 +94,7 @@ def collect_rollout(model, env, num_steps=2048):
     收集轨迹，正确处理 terminated vs truncated：
     - terminated（杆子倒了）：V(s')=0
     - truncated（达到步数上限）：V(s')需要 bootstrap
-    - rollout 末尾未结束：需要 bootstrap
+    - rollout 末尾未结束：也用 V(s') bootstrap
     """
     obs, _ = env.reset()
     transitions = []
@@ -105,8 +105,14 @@ def collect_rollout(model, env, num_steps=2048):
             action, log_prob, value = model.get_action(obs_tensor)
 
         next_obs, reward, terminated, truncated, _ = env.step(action.item())
+        with torch.no_grad():
+            if terminated:
+                next_value = 0.0
+            else:
+                _, next_value_tensor = model(torch.FloatTensor(next_obs))
+                next_value = next_value_tensor.item()
 
-        # truncated 但没 terminated → 需要存 next_obs 用于 bootstrap
+        # 保存该步的 V(s')，使终止、截断和 rollout 末尾共用同一条 GAE 公式。
         transitions.append({
             "obs": obs,
             "action": action.item(),
@@ -115,72 +121,43 @@ def collect_rollout(model, env, num_steps=2048):
             "reward": float(reward),
             "terminated": terminated,
             "truncated": truncated,
-            "next_obs": next_obs if truncated and not terminated else None,
+            "next_value": next_value,
         })
 
         obs = next_obs
         if terminated or truncated:
             obs, _ = env.reset()
 
-    # rollout 末尾 bootstrap：如果最后一局没结束，计算 V(s_last)
-    if not (terminated or truncated):
-        with torch.no_grad():
-            _, _, bootstrap_value = model.get_action(torch.FloatTensor(obs))
-        last_bootstrap = bootstrap_value.item()
-    else:
-        last_bootstrap = 0.0
-
-    return transitions, last_bootstrap
+    return transitions
 
 
 # ==========================================
 # 第三部分：计算 GAE 优势
 # ==========================================
-def compute_gae(model, transitions, last_bootstrap, gamma=0.99, lam=0.95):
+def compute_gae(transitions, gamma=0.99, lam=0.95):
     """
     广义优势估计，正确处理：
     - terminated（真正结束）：不传播 GAE，V(s')=0
-    - truncated（时间截断）：不传播 GAE，但用 V(next_obs) 作为 bootstrap
-    - 正常步：正常传播 GAE
+    - truncated（时间截断）：用 V(s') bootstrap，但不跨越 reset 传播 GAE
+    - rollout 末尾：用已保存的 V(s') bootstrap
     """
-    n = len(transitions)
-    rewards = [t["reward"] for t in transitions]
-    values = [t["value"] for t in transitions]
-
-    # 预计算每个 truncated 步的 bootstrap value
-    bootstrap_values = [0.0] * n
-    for i, t in enumerate(transitions):
-        if t["truncated"] and not t["terminated"] and t["next_obs"] is not None:
-            with torch.no_grad():
-                _, _, bv = model.get_action(torch.FloatTensor(t["next_obs"]))
-            bootstrap_values[i] = bv.item()
-
-    advantages = []
+    raw_advantages = []
     gae = 0
-    next_value = last_bootstrap
 
-    for step in reversed(range(n)):
+    for step in reversed(range(len(transitions))):
         t = transitions[step]
+        episode_end = t["terminated"] or t["truncated"]
+        delta = t["reward"] + gamma * t["next_value"] - t["value"]
+        gae = delta + gamma * lam * (1.0 - float(episode_end)) * gae
+        raw_advantages.insert(0, gae)
 
-        if t["terminated"]:
-            # 真正结束：V(s') = 0
-            delta = rewards[step] - values[step]
-            gae = delta
-        elif t["truncated"]:
-            # 时间截断：用 V(next_obs) bootstrap，但不传播 GAE
-            delta = rewards[step] + gamma * bootstrap_values[step] - values[step]
-            gae = delta
-        else:
-            # 正常步
-            delta = rewards[step] + gamma * next_value - values[step]
-            gae = delta + gamma * lam * gae
-
-        next_value = values[step]
-        advantages.insert(0, gae)
-
-    advantages = torch.FloatTensor(advantages)
-    returns = advantages + torch.FloatTensor(values)
-    advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+    raw_advantages = torch.tensor(raw_advantages, dtype=torch.float32)
+    values = torch.tensor([t["value"] for t in transitions], dtype=torch.float32)
+    # Critic 学习未归一化的回报目标；归一化只用于策略损失。
+    returns = raw_advantages + values
+    advantages = (raw_advantages - raw_advantages.mean()) / (
+        raw_advantages.std(unbiased=False) + 1e-8
+    )
 
     return advantages, returns
 
@@ -243,7 +220,9 @@ def ppo_update(model, optimizer, transitions, advantages, returns,
 
             # 统计指标
             with torch.no_grad():
-                total_kl += (batch_old_log_probs - new_log_probs).mean().item()
+                log_ratio = new_log_probs - batch_old_log_probs
+                # 非负 KL 近似，与 SB3 的 approx_kl 计算一致。
+                total_kl += ((log_ratio.exp() - 1) - log_ratio).mean().item()
                 total_clip_frac += ((ratio - 1.0).abs() > clip_eps).float().mean().item()
 
             total_policy_loss += policy_loss.item()
@@ -322,7 +301,7 @@ def train():
 
     for iteration in range(total_iterations):
         # 收集数据
-        transitions, last_bootstrap = collect_rollout(model, env, steps_per_rollout)
+        transitions = collect_rollout(model, env, steps_per_rollout)
 
         total_timesteps += len(transitions)
 
@@ -340,35 +319,32 @@ def train():
                 ep_reward = 0
                 ep_length = 0
 
-        # 计算优势
-        advantages, returns = compute_gae(model, transitions, last_bootstrap)
+        # 计算优势和 Critic 的未归一化回报目标
+        advantages, returns = compute_gae(transitions)
+
+        # 在本轮更新前设置学习率。
+        frac = 1.0 - iteration / total_iterations
+        lr = 3e-4 * frac
+        for param_group in optimizer.param_groups:
+            param_group["lr"] = lr
 
         # PPO 更新
         metrics = ppo_update(
             model, optimizer, transitions, advantages, returns
         )
 
-        # 解释方差（用更新后的 Critic 重新预测，与 SB3 一致）
-        with torch.no_grad():
-            obs_tensor = torch.FloatTensor(np.array([t["obs"] for t in transitions]))
-            _, updated_values = model(obs_tensor)
+        # 解释方差要对比收集 rollout 时的价值预测与回报目标。
         return_values = returns.numpy()
-        updated_values_np = updated_values.numpy()
+        rollout_values = np.array([t["value"] for t in transitions])
         var_returns = np.var(return_values)
         if var_returns < 1e-6:
             # 所有回报相同（如全部 500 分），EV 无意义，置为 0
             explained_variance = 0.0
         else:
-            explained_variance = 1 - np.var(return_values - updated_values_np) / var_returns
+            explained_variance = 1 - np.var(return_values - rollout_values) / var_returns
 
         mean_reward = np.mean(ep_rewards) if ep_rewards else 0
         mean_ep_len = np.mean(ep_lengths) if ep_lengths else 0
-
-        # 学习率线性衰减（与 SB3 默认行为一致）
-        frac = 1.0 - iteration / total_iterations
-        lr = 3e-4 * frac
-        for param_group in optimizer.param_groups:
-            param_group["lr"] = lr
 
         # 记录到 SwanLab（与 SB3 指标对齐）
         swanlab.log({

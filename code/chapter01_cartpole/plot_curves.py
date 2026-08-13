@@ -223,8 +223,8 @@ def main():
                 label=name, linewidth=2.2, zorder=3)
         ax.fill_between(iters, 0, vals, alpha=0.08, color=c["color"])
 
-    ax.axhline(y=195, color="#94A3B8", linestyle="--", linewidth=1.2, alpha=0.7)
-    ax.text(0.3, 205, "Solve Line (195)", fontsize=10, color="#64748B", style="italic")
+    ax.axhline(y=475, color="#94A3B8", linestyle="--", linewidth=1.2, alpha=0.7)
+    ax.text(0.3, 455, "Solve Line (475)", fontsize=10, color="#64748B", style="italic")
     ax.axhline(y=500, color="#94A3B8", linestyle=":", linewidth=1, alpha=0.5)
     ax.text(0.3, 485, "Max (500)", fontsize=10, color="#94A3B8", style="italic")
 

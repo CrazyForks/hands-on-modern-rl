@@ -254,7 +254,8 @@ class RewardModel(nn.Module):
 
         # 提取最后一个有效 token 的隐藏状态
         last_token_hidden = last_hidden[
-            torch.arange(batch_size), sequence_lengths
+            torch.arange(batch_size, device=last_hidden.device),
+            sequence_lengths,
         ]  # (batch, hidden_size)
 
         # 通过价值头映射为标量奖励值
@@ -518,11 +519,15 @@ def main():
     save_dir = "./output/rm_results"
     os.makedirs(save_dir, exist_ok=True)
 
-    # 保存奖励模型的 value_head 参数
+    # 奖励模型训练会更新骨干和价值头，因此两部分都必须保存。
+    backbone_dir = os.path.join(save_dir, "backbone")
+    reward_model.base_model.save_pretrained(backbone_dir)
+    tokenizer.save_pretrained(backbone_dir)
     torch.save(
         reward_model.value_head.state_dict(),
         os.path.join(save_dir, "value_head.pt"),
     )
+    print(f"  奖励模型骨干已保存至：{backbone_dir}")
     print(f"  价值头参数已保存至：{save_dir}/value_head.pt")
 
     # 保存测试结果

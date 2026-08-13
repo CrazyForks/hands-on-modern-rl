@@ -99,13 +99,15 @@ class ActorCritic(nn.Module):
         log_probs = dist.log_prob(actions)
         entropy = dist.entropy()
 
-        return log_probs, values.squeeze(), entropy
+        return log_probs, values.squeeze(-1), entropy
 
 
 # ==========================================
 # 第二部分：GAE（广义优势估计）
 # ==========================================
-def compute_gae(rewards, values, dones, gamma=0.99, lam=0.95):
+def compute_gae(
+    rewards, values, next_values, episode_ends, gamma=0.99, lam=0.95
+):
     """
     计算广义优势估计 (Generalized Advantage Estimation)
 
@@ -116,7 +118,8 @@ def compute_gae(rewards, values, dones, gamma=0.99, lam=0.95):
     参数：
         rewards: 每步的奖励
         values:  每步的价值估计 V(s)
-        dones:   每步是否结束
+        next_values: 每步转移后的 V(s')。terminated 时为 0，truncated 时保留估计值
+        episode_ends: 每步后是否发生 reset，用来阻断 GAE 跨回合传播
         gamma:   折扣因子（控制远期回报的权重）
         lam:     GAE lambda（控制偏差-方差权衡）
             λ=0: 低方差、高偏差（仅看单步 TD 误差）
@@ -129,34 +132,24 @@ def compute_gae(rewards, values, dones, gamma=0.99, lam=0.95):
     advantages = []
     gae = 0
 
-    # 将列表转为张量方便计算
-    values = list(values)
-    # 最后一步需要添加一个终止状态的 V(s)=0
-    next_value = 0
-
     # 从后往前倒推计算 GAE
     for t in reversed(range(len(rewards))):
-        if dones[t]:
-            # 回合结束，下一步价值为 0
-            next_value = 0
-            gae = 0
-
         # TD 误差：δ_t = r_t + γ * V(s_{t+1}) - V(s_t)
-        delta = rewards[t] + gamma * next_value - values[t]
+        delta = rewards[t] + gamma * next_values[t] - values[t]
 
         # GAE 累加：A_t = δ_t + (γλ) * A_{t+1}
-        gae = delta + gamma * lam * gae
+        continuation = 0.0 if episode_ends[t] else 1.0
+        gae = delta + gamma * lam * continuation * gae
 
         advantages.insert(0, gae)
-
-        # 更新下一步的 V(s)
-        next_value = values[t]
 
     advantages = torch.FloatTensor(advantages)
     returns = advantages + torch.FloatTensor(values)
 
     # 归一化优势（提高训练稳定性）
-    advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+    advantages = (
+        advantages - advantages.mean()
+    ) / (advantages.std(unbiased=False) + 1e-8)
 
     return advantages, returns
 
@@ -207,7 +200,9 @@ def ppo_clip_loss(old_logprobs, new_logprobs, advantages, clip_eps=0.2):
 # ==========================================
 # 第四部分：收集轨迹数据
 # ==========================================
-def collect_trajectories(model, env, n_steps=2048):
+def collect_trajectories(
+    model, env, n_steps=2048, obs=None, current_ep_reward=0.0
+):
     """
     使用当前策略在环境中收集 n_steps 步的轨迹数据
 
@@ -216,7 +211,8 @@ def collect_trajectories(model, env, n_steps=2048):
         - actions: 动作
         - logprobs: 旧策略的 log 概率（用于后续 PPO 更新）
         - rewards: 奖励
-        - dones:   回合结束标志
+        - next_values: 每步下一状态价值
+        - episode_ends: 是否在该步后 reset
         - values:  价值估计
 
     返回：
@@ -226,12 +222,13 @@ def collect_trajectories(model, env, n_steps=2048):
     actions = []
     old_logprobs = []
     rewards = []
-    dones = []
+    next_values = []
+    episode_ends = []
     values = []
 
-    obs, _ = env.reset()
+    if obs is None:
+        obs, _ = env.reset()
     episode_rewards = []
-    current_ep_reward = 0
 
     for step in range(n_steps):
         state_tensor = torch.FloatTensor(obs)
@@ -252,11 +249,21 @@ def collect_trajectories(model, env, n_steps=2048):
         # 执行动作
         next_obs, reward, done, truncated, _ = env.step(action.item())
         rewards.append(reward)
-        dones.append(done or truncated)
+        episode_end = done or truncated
+
+        # 真正终止时 V(s')=0；时间截断和 rollout 尾部都要 bootstrap。
+        if done:
+            next_value = 0.0
+        else:
+            with torch.no_grad():
+                _, next_state_value = model(torch.FloatTensor(next_obs))
+            next_value = next_state_value.item()
+        next_values.append(next_value)
+        episode_ends.append(episode_end)
 
         current_ep_reward += reward
 
-        if done or truncated:
+        if episode_end:
             episode_rewards.append(current_ep_reward)
             current_ep_reward = 0
             next_obs, _ = env.reset()
@@ -269,11 +276,12 @@ def collect_trajectories(model, env, n_steps=2048):
         "actions": torch.LongTensor(actions),
         "old_logprobs": torch.FloatTensor(old_logprobs),
         "rewards": rewards,
-        "dones": dones,
+        "next_values": next_values,
+        "episode_ends": episode_ends,
         "values": values,
     }
 
-    return batch, episode_rewards
+    return batch, episode_rewards, obs, current_ep_reward
 
 
 # ==========================================
@@ -296,7 +304,10 @@ def ppo_update(model, optimizer, batch, n_epochs=10, batch_size=64,
     """
     # 先计算 GAE 优势和目标回报
     advantages, returns = compute_gae(
-        batch["rewards"], batch["values"], batch["dones"],
+        batch["rewards"],
+        batch["values"],
+        batch["next_values"],
+        batch["episode_ends"],
         gamma=0.99, lam=0.95
     )
 
@@ -410,12 +421,20 @@ def train():
 
     episode_count = 0
     iteration = 0
+    rollout_obs = None
+    current_ep_reward = 0.0
 
     while episode_count < total_episodes:
         iteration += 1
 
         # 第一步：收集轨迹
-        batch, ep_rewards = collect_trajectories(model, env, n_steps=n_steps)
+        batch, ep_rewards, rollout_obs, current_ep_reward = collect_trajectories(
+            model,
+            env,
+            n_steps=n_steps,
+            obs=rollout_obs,
+            current_ep_reward=current_ep_reward,
+        )
         episode_count += len(ep_rewards)
         all_rewards.extend(ep_rewards)
 

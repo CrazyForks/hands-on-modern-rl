@@ -61,6 +61,14 @@ VAL_FILE=${VAL_FILE:-$HOME/data/eurus2/validation.parquet}
 # reward 函数（和本脚本同目录下的 code_reward.py）
 REWARD_FILE=${REWARD_FILE:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/code_reward.py}
 
+# 该执行器会运行模型生成的代码。它必须位于已经隔离的容器或虚拟机中。
+if [[ "${HOMRL_ALLOW_UNSAFE_CODE_EXECUTION:-}" != "1" ]]; then
+    echo "Refusing to run generated code without an isolated container/VM." >&2
+    echo "After isolation, set HOMRL_ALLOW_UNSAFE_CODE_EXECUTION=1." >&2
+    exit 1
+fi
+export HOMRL_ALLOW_UNSAFE_CODE_EXECUTION
+
 EXPERIMENT_NAME=${EXPERIMENT_NAME:-coder_ppo_eurus2_$(date +%Y%m%d_%H%M)}
 # ==================== 可调参数结束 ====================
 
