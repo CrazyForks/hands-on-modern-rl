@@ -35,6 +35,7 @@ ARTIFACT_DIR = ROOT / "artifacts"
 ARTIFACT_DIR.mkdir(exist_ok=True)
 PREVIEW_DIR = ROOT / "assets" / "previews"
 CARD_BACKGROUND_DIR = ROOT / "assets" / "card-backgrounds"
+TASK_CARD_DIR = ROOT / "assets" / "task-cards"
 LOGO_PATH = ROOT / "assets" / "readmelogo.png"
 LOGO_DATA_URI = f"data:image/png;base64,{base64.b64encode(LOGO_PATH.read_bytes()).decode()}"
 
@@ -370,13 +371,30 @@ CARD_BACKGROUNDS = {
     "Box2D": "box2d.webp", "Atari / ALE": "atari.webp", "MuJoCo": "mujoco.webp",
     "JAX Phys2D": "box2d.webp", "Robotics": "robotics.webp", "Other": "tabular.webp",
 }
+
+CURATED_TASK_CARDS = {
+    BANDIT: "bandit.webp",
+    BLACKJACK: "blackjack.webp",
+    GRIDWORLD: "gridworld.webp",
+    FROZENLAKE: "frozenlake.webp",
+    CLIFF: "cliffwalking.webp",
+    TAXI: "taxi.webp",
+    CARTPOLE_DQN: "cartpole.webp",
+    CARTPOLE_PPO: "cartpole.webp",
+    MOUNTAINCAR: "mountaincar.webp",
+    ACROBOT: "acrobot.webp",
+    PENDULUM: "pendulum.webp",
+    MOUNTAINCAR_CONTINUOUS: "mountaincarcontinuous.webp",
+}
 def visual_data_uri(experiment: str) -> str:
     payload = Path(gallery_background(experiment)).read_bytes()
     return f"data:image/webp;base64,{base64.b64encode(payload).decode()}"
 
 
 def gallery_background(experiment: str) -> str:
-    """Use one immutable asset per family; the browser renders card titles."""
+    """Use real task frames for curated recipes and shared art for the registry."""
+    if experiment in CURATED_TASK_CARDS:
+        return str(TASK_CARD_DIR / CURATED_TASK_CARDS[experiment])
     family = experiment_config(experiment)["family"]
     return str(CARD_BACKGROUND_DIR / CARD_BACKGROUNDS.get(family, "tabular.webp"))
 
