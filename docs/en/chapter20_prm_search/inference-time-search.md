@@ -164,7 +164,7 @@ Beam Search only considers the current score at each level, and once a path is u
 
 **Monte Carlo Tree Search (MCTS)** distributes the budget by repeatedly visiting the tree. In LLM reasoning, the model can propose the next step, and then use rollout results, PRM, or an external checker to update node values:
 
-- Evaluate nodes using result rewards, PRM, or an external verifier
+- Evaluate nodes using outcome rewards, PRM, or an external verifier
 - Use the model as a policy (recommend the next step)
 - Balance exploration and exploitation using the UCB formula
 
@@ -172,10 +172,10 @@ Beam Search only considers the current score at each level, and once a path is u
 
 Each iteration performs the following:
 
-1. **Selection (Selection)**: Starting from the root, use the UCB formula to select the optimal child node until reaching a leaf
-2. **Expansion (Expansion)**: Generate N child nodes at the leaf node
-3. **Simulation (Simulation)**: Perform a rollout (quickly generate a full reasoning) on the child nodes
-4. **Backpropagation (Backpropagation)**: Propagate the rollout's reward back to all ancestor nodes
+1. **Selection**: Starting from the root, use the UCB rule to select child nodes until reaching a leaf.
+2. **Expansion**: Generate $N$ children from the leaf.
+3. **Simulation**: Roll out a complete candidate solution from a child node.
+4. **Backpropagation**: Propagate the rollout reward to the ancestor nodes.
 
 ### 3.2 The UCB Formula
 

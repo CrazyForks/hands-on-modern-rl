@@ -197,6 +197,10 @@ This turns a table of unrelated numbers into a set of shared parameters $\theta$
 
 This idea is older than DQN. What made DQN a turning point is: it made this idea trainable and stable enough to work at scale (notably on Atari).
 
+A DQN receives one state and outputs one $Q$ value for each discrete action. LunarLander maps its 8-dimensional state to 4 action values; an Atari DQN maps a stack of image frames to the actions available in that game.
+
+![DQN approximates the action-value function with a neural network](../../chapter07_dqn/images/dqn-q-network-architecture.svg)
+
 ## Why the Naive Replacement Still Fails
 
 At this point we have solved only the "the table does not fit" problem. A tempting next step is:

@@ -135,13 +135,13 @@ When training details are not publicly available, one should not infer from prod
 
 ## 4. Is Process Reward Always Necessary?
 
-Even if a verifier can explain step by step, the system should first ask whether it is worth training a PRM. When answers can be automatically validated and the model can sample extensively, result rewards may indirectly reinforce self-checking. However, when step errors are hard to locate or the sampling budget is limited, process feedback is more advantageous.
+Even if a verifier can explain step by step, the system should first ask whether it is worth training a PRM. When answers can be automatically validated and the model can sample extensively, outcome rewards may indirectly reinforce self-checking. However, when step errors are hard to locate or the sampling budget is limited, process feedback is more advantageous.
 
-[DeepSeek-R1](https://arxiv.org/abs/2501.12948) provides a contrast: R1-Zero mainly uses result correctness and format rewards, yet after training, it still observes behaviors such as checking steps and modifying answers. Result rewards increase the probability of correct final answers; if trajectories with self-checking are more likely to be correct, such behaviors may also be indirectly reinforced. Therefore, PRMs are one method for identifying intermediate errors, but not the only way to produce self-checking behavior.
+[DeepSeek-R1](https://arxiv.org/abs/2501.12948) provides a contrast: R1-Zero mainly uses result correctness and format rewards, yet after training, it still observes behaviors such as checking steps and modifying answers. Outcome rewards increase the probability of correct final answers; if trajectories with self-checking are more likely to be correct, such behaviors may also be indirectly reinforced. Therefore, PRMs are one method for identifying intermediate errors, but not the only way to produce self-checking behavior.
 
-When choosing a reward method, one can judge based on whether the feedback is sufficient: when answers can be automatically validated and the sampling volume is sufficient, result rewards may already be effective. When intermediate errors in long trajectories are hard to locate and the training budget is limited, PRMs can more quickly identify the location of errors. When applying across domains, one must also separately evaluate whether the PRM truly understands the new domain.
+When choosing a reward method, one can judge based on whether the feedback is sufficient: when answers can be automatically validated and the sampling volume is sufficient, outcome rewards may already be effective. When intermediate errors in long trajectories are hard to locate and the training budget is limited, PRMs can more quickly identify the location of errors. When applying across domains, one must also separately evaluate whether the PRM truly understands the new domain.
 
-Therefore, PRMs are not a necessary condition for all tasks; they can still provide feedback that result rewards lack when the training budget is limited or when intermediate errors need to be located.
+Therefore, PRMs are not a necessary condition for all tasks; they can still provide feedback that outcome rewards lack when the training budget is limited or when intermediate errors need to be located.
 
 ## Summary
 

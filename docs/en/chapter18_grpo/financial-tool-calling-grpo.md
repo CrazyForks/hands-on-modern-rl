@@ -378,7 +378,7 @@ SFT is useful, especially for teaching the output format. But SFT learns "imitat
 | SFT             | JSON format and common function-selection patterns        | new argument combinations, similar-tool confusion, guessing when arguments are missing |
 | GRPO/RLVR       | which calls are executable and which errors are penalized | reward hacking if the verifier is incomplete                                           |
 
-In practice, the common order is: use SFT to teach the tool-call format, then use GRPO/RLVR to correct tool-call mistakes. It is not A replacing B. It is B giving A a sharper post-training signal.
+In practice, SFT first teaches the tool-call format. GRPO or RLVR then uses execution feedback to reduce tool-selection and argument errors. The two stages solve different parts of the problem.
 
 ## Common Pitfalls
 

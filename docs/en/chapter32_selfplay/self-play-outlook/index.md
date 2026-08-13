@@ -163,7 +163,16 @@ Traditional RLHF (like PPO) is usually "offline": collect a batch of human prefe
 
 The core of self-evolution systems is **Online Learning**, which turns this process into a **never-ending flywheel**:
 
-$$ \text{Policy } \pi*{\theta} \xrightarrow{\text{Self-Play Generation}} \text{New trajectory data } \tau \xrightarrow{\text{Rule/RM scoring}} \text{Reward } R \xrightarrow{\text{PPO/GRPO update}} \text{New policy } \pi*{\theta'} \xrightarrow{\text{Loop}} \cdots $$
+$$
+\text{Policy }\pi_\theta
+\xrightarrow{\text{self-play}}
+\text{trajectories }\tau
+\xrightarrow{\text{rules or RM}}
+R
+\xrightarrow{\text{PPO or GRPO}}
+\pi_{\theta'}
+\xrightarrow{\text{repeat}}\cdots
+$$
 
 ![DeepSeek-R1 Pipeline](../../../chapter32_selfplay/self-play-outlook/images/deepseek_r1_pipeline.png)
 

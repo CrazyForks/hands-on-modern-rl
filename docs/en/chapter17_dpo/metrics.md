@@ -95,6 +95,20 @@ Suggested exercise: run the same training with `beta = 0.01` and `beta = 0.5`, a
 
 ## Reward Accuracy
 
+`Rewards/Accuracies` measures the fraction of examples in a batch for which the implicit reward of the chosen response exceeds that of the rejected response:
+
+$$
+\text{Accuracy}
+=
+\frac{\#\{i\in B:r(x_i,y_w^{(i)})>r(x_i,y_l^{(i)})\}}{|B|}.
+$$
+
+![Reward accuracy curve](../../chapter17_dpo/images/dpo-reward-accuracy.svg)
+
+At initialization, the two responses often receive similar implicit rewards, so accuracy is near 0.5. Training should raise it above chance. Accuracy and margin answer different questions: accuracy records which response ranks higher, while margin records the size of that separation. A high accuracy with a very small margin means the ordering is usually correct but weak.
+
+## Reward Accuracy
+
 `Rewards/Accuracies` measures how often the policy assigns higher implicit reward to the chosen response than to the rejected response (on the current batch). In other words, it is a ranking accuracy:
 
 - near 0.5: close to random guessing

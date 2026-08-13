@@ -3,6 +3,7 @@ title: '6.4 Hands-on: A Two-Armed Bandit (Dice-Game Slot Machine)'
 ---
 
 # 6.4 Hands-on: Two-Armed Dice-Game Bandit
+
 Imagine you walk into a casino. In front of you is a single old slot machine with two levers: one red, one blue. The red lever wins with probability 30%, while the blue lever wins with probability 70%. Each round, you may pull exactly one lever. If you win, you get $1; if you lose, you get nothing.
 
 A rational human would play this how? Of course: pull the blue lever forever. A 70% win rate crushes 30%.
@@ -19,7 +20,7 @@ This is the experimental playground for this section: an extremely minimal bandi
 
 **good outcomes reinforce the probability of the action that produced them.**
 
-This is fundamentally different from the coin-guessing game in Chapter 2. In that game we wrote down a [deterministic policy](../chapter03_mdp/mdp) ("always guess heads") by hand. Here, we want the AI to learn a [parameterized policy](../chapter03_mdp/policy-objective) $\pi_\theta(a|s)$ by itself.
+This differs from the coin-guessing game in Chapter 2. There we wrote a [deterministic policy](../chapter03_mdp/mdp), “always guess heads,” by hand. Here the model learns a [parameterized policy](../chapter03_mdp/policy-value) $\pi_\theta(a|s)$.
 
 ## Two-Armed Bandit Environment
 
@@ -110,7 +111,7 @@ The heart of this code is the single line `loss = -log_prob * reward`. Intuitive
 
 If the sampled action leads to a good outcome (`reward = 1`), then `-log_prob * 1` produces a gradient that pushes up the probability of that action. If the outcome is bad (`reward = 0`), the gradient is zero, and the probability stays unchanged. The minus sign is there because PyTorch performs gradient descent (minimizing a loss), while we conceptually want gradient ascent (maximizing expected return).
 
-This formula is not arbitrary. It is the single-step special case of the policy gradient estimator previewed in Chapter 2's [policy objective](../chapter03_mdp/policy-objective):
+This formula is the single-step case of the policy-gradient estimator introduced with the [policy objective](../chapter03_mdp/policy-value):
 $\nabla_\theta J(\theta) \propto \mathbb{E}[\nabla_\theta \log \pi_\theta(a|s) \cdot G_t]$.
 In the next section we will derive it carefully.
 

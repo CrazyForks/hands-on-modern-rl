@@ -12,19 +12,19 @@ When models are connected to search, code execution, and external tools, a singl
 **Core Formulas**
 
 $$
-\tau = (s_0, a_0, o_1, a_1, o_2, \ldots, a_T) \quad \text{（Trajectory: a mixed sequence of model-generated tokens, tool invocations, and environment observations）}
+\tau = (s_0, a_0, o_1, a_1, o_2, \ldots, a_T) \quad \text{(trajectory of tokens, tool calls, and observations)}
 $$
 
 $$
-\langle S_{\text{agent}},\ A_{\text{agent}},\ P_{\text{agent}},\ R_{\text{agent}},\ \gamma,\ O \rangle \quad \text{（POMDP: the agent can only observe part of the state）}
+\langle S_{\text{agent}},\ A_{\text{agent}},\ P_{\text{agent}},\ R_{\text{agent}},\ \gamma,\ O \rangle \quad \text{(POMDP: the agent observes only part of the state)}
 $$
 
 $$
-J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_{t=0}^{T} \gamma^t R(s_t, a_t)\right] \quad \text{（Multi-turn policy optimization objective: from single-step expectation to trajectory expectation）}
+J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_{t=0}^{T} \gamma^t R(s_t, a_t)\right] \quad \text{(multi-turn objective over complete trajectories)}
 $$
 
 $$
-A_t = R(\tau) - \bar{R}(s_t) \quad \text{（step-level advantage：split the trajectory reward back to each step）}
+A_t = R(\tau) - \bar{R}(s_t) \quad \text{(step-level advantage from a trajectory reward)}
 $$
 
 **The Role of Formulas in This Chapter**
@@ -146,7 +146,7 @@ An agent is not just an LLM. Minimal definition: **LLM backbone + instruction + 
 
 ### LLM Backbone
 
-The core decision-making component of an agent. It receives the current observation, reasons about the next step, and generates an action (text or tool call). Any sufficiently powerful LLM can serve as the backbone, but in practice, models trained for reasoning are often chosen. These models can generate a thinking trace before producing an action, making them more friendly for multi-step decision-making.
+The LLM is the agent's central decision-making component. It receives the current observation, reasons about the next step, and produces an action such as text or a tool call. In practice, reasoning-oriented models are often used because their training makes them better suited to multi-step decisions.
 
 ### Instructions
 

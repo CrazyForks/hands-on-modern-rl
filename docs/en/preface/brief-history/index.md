@@ -1,6 +1,6 @@
 # The History of Reinforcement Learning
 
-If we had asked an AI researcher in the early 2010s, "What is reinforcement learning?" he would likely draw a feedback loop diagram showing an agent interacting with an environment and explain that it is primarily used for robot control and playing games. However, if we rewind the clock a century or fast-forward to today's large model era, we will discover that reinforcement learning (Reinforcement Learning, RL) has undergone a dramatic evolution — it has grown from psychologist's animal experiments into the core engine driving today's most advanced AI systems.
+In the early 2010s, an introduction to reinforcement learning would often begin with a feedback loop between an agent and an environment, followed by examples from robot control and games. That picture is still useful, but the field now reaches much farther. Reinforcement learning (RL) grew from animal-learning experiments into a general framework for sequential decisions and, more recently, a tool for aligning and improving large models.
 
 Before we begin our code practice, let us take a few minutes to briefly review this history spanning over a century. Understanding these milestones will help you better grasp why modern RL algorithms are designed the way they are today.
 
@@ -61,7 +61,7 @@ After the turn of the 21st century, although the theory of reinforcement learnin
 
 $$\mathcal{L}(\theta) = \mathbb{E}_{(s,a,r,s') \sim \mathcal{D}} \left[ \left( r + \gamma \max_{a'} Q(s', a'; \theta^{-}) - Q(s, a; \theta) \right)^2 \right]$$
 
-Here, $\theta^{-}$ denotes the parameters of the **target network** (which is periodically copied from $\theta$ rather than being updated at every step), and $\mathcal{D}$ represents the **experience replay buffer** (Experience Replay Buffer). These two seemingly simple engineering techniques—target networks and experience replay—completely resolved the training instability issues that arose when combining deep networks with Q-learning, and they were key to the success of DQN.
+Here, $\theta^{-}$ denotes the parameters of the **target network**, which is copied from $\theta$ periodically rather than updated at every step. The dataset $\mathcal{D}$ is the **experience replay buffer**. Target networks and experience replay reduce the instability caused by combining bootstrapped Q-learning targets with a changing neural network.
 
 ![DQN Atari Performance](../../../preface/brief-history/images/dqn_atari.png)
 
@@ -77,7 +77,7 @@ Here, $\theta^{-}$ denotes the parameters of the **target network** (which is pe
   <em>Figure 4: Screenshot of AlphaGo's game against European Go champion Fan Hui. Source: <a href="https://commons.wikimedia.org/wiki/File:AlphaGo_Fan_Huiren_aurka.png" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a></em>
 </div>
 
-- **In 2017**, OpenAI proposed the **PPO (Proximal Policy Optimization, Proximal Policy Optimization)** algorithm [^8]. Compared to the high variance and fragility of earlier policy gradient methods, PPO found an excellent balance between training stability and sampling efficiency. Its core idea is to restrict the magnitude of each policy update through **clipping**, preventing "overstepping" that could lead to training collapse:
+- **In 2017**, OpenAI proposed **Proximal Policy Optimization (PPO)** [^8]. PPO limits each policy update with a clipped surrogate objective, making policy-gradient training easier to tune while retaining good sample efficiency:
 
 $$\mathcal{L}^{\text{CLIP}}(\theta) = \mathbb{E}_t \left[ \min \left( \frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{\text{old}}}(a_t|s_t)} \hat{A}_t, \; \text{clip}\left(\frac{\pi_\theta(a_t|s_t)}{\pi_{\theta_{\text{old}}}(a_t|s_t)}, 1-\epsilon, 1+\epsilon\right) \hat{A}_t \right) \right]$$
 
@@ -87,11 +87,11 @@ Here, $\frac{\pi_\theta}{\pi_{\theta_{\text{old}}}}$ represents the **ratio of n
 
 Just as people were beginning to think that the application scope of reinforcement learning (RL) was mainly limited to games and robot control, the rise of large language models (LLMs) has given RL a new mission — **alignment** and **reasoning**.
 
-- **In 2022**, OpenAI released ChatGPT. Behind this achievement was the **RLHF (Reinforcement Learning from Human Feedback)** [^9]. By training a reward model to simulate human preferences, and then using the PPO algorithm to optimize the language model, RL successfully transformed LLMs from "statistical machines that can respond to prompts" into "intelligent assistants that know when to speak and when to hold back." The training of RLHF consists of two steps: first, training a reward model $ r*\phi(x, y) $ using human preference data, and then using this reward model as the signal to optimize the language model's policy $ \pi*\theta $ with PPO:
+- **In 2022**, OpenAI released ChatGPT after a line of work on **reinforcement learning from human feedback (RLHF)** [^9]. In the standard pipeline, pairwise human preferences train a reward model $r_\phi(x,y)$, and PPO then optimizes the language-model policy $\pi_\theta$ against that learned signal:
 
 $$\max_\theta \; \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_\theta(\cdot|x)} \left[ r_\phi(x, y) - \beta \, \text{KL}\left(\pi_\theta(\cdot|x) \| \pi_{\text{ref}}(\cdot|x)\right) \right]$$
 
-The KL divergence penalty term $ \beta \, \text{KL}(\pi*\theta \| \pi*{\text{ref}}) $ ensures that the model does not deviate too far from its original behavior in pursuit of high rewards — this is a key constraint in RLHF to prevent **reward hacking**.
+The KL penalty $\beta\,\mathrm{KL}(\pi_\theta\|\pi_{\mathrm{ref}})$ discourages the policy from moving too far from the reference model while pursuing a high reward.
 
 ![Example of Early ChatGPT Interface](../../../preface/brief-history/images/chatgpt.png)
 
@@ -141,6 +141,7 @@ At the same time, DeepMind's **AlphaProof** and **AlphaGeometry 2** reached silv
 
 Another development was the expansion of RL from single-turn question answering to long-horizon tasks:
 
+- [The Information](https://www.theinformation.com/) reported large new investment in RL environments, reflecting how environment construction had become a production concern rather than a small research utility.
 - **Meta's SWE-RL** ([arXiv:2502.18449](https://arxiv.org/abs/2502.18449)) trained a model on software-evolution data and evaluated it on repository-level issue resolution.
 - **Claude Computer Use** and **OpenAI Operator** moved model actions into browsers and desktop interfaces.
 - ByteDance's **UI-TARS-2** ([arXiv:2509.02544](https://arxiv.org/abs/2509.02544)) and Zhipu's **AutoGLM** explored multi-turn GUI interaction and asynchronous rollout systems.
@@ -149,35 +150,25 @@ Another development was the expansion of RL from single-turn question answering 
 
 Chinese laboratories have taken on a unique position in this wave of RL industrialization. **DeepSeek has the highest transparency**—it publicly disclosed that the V3 pre-training used 2.664M H800 GPU hours, and R1-Zero used 128K GPU hours.
 
-[Stanford CRFM Transparency Report](https://crfm.stanford.edu/fmti/)
+See the [Stanford CRFM Foundation Model Transparency Index](https://crfm.stanford.edu/fmti/) for a broader comparison of public disclosures.
 
-**Qwen3 adopts GSPO as the new standard replacing PPO**. **Kimi K2 introduces the MuonClip optimizer** to address the stability of RL training.
+**Qwen3 adopts GSPO for large-scale RL**, while **Kimi K2 introduces the MuonClip optimizer** to improve training stability ([technical report](https://arxiv.org/abs/2507.20534)).
 
-[arXiv:2507.20534](https://arxiv.org/abs/2507.20534)
-
-**ByteDance is the largest contributor to the GRPO family of improvements** (DAPO + VAPO + UI-TARS + DanceGRPO + Seedance in a full chain). **Zhipu's GLM-4.5/4.6/5 series** first introduced "difficulty curriculum RL" as a mainstream training paradigm.
-
-[arXiv:2508.06471](https://arxiv.org/abs/2508.06471)
+ByteDance's public work spans DAPO, VAPO, UI agents, and generative-model RL. Zhipu's GLM releases likewise explore curriculum design and agentic RL ([GLM-4.5 report](https://arxiv.org/abs/2508.06471)).
 
 **Step3-VL by Starry Sky** proposes PaCoRe parallel coordinated reasoning, opening up another path for test-time scaling.
 
-In November 2025, **Anthropic publishes "Natural Emergent Misalignment from Reward Hacking"** (
+In November 2025, **Anthropic published "Natural Emergent Misalignment from Reward Hacking"** ([arXiv:2511.18397](https://arxiv.org/abs/2511.18397)), bringing reward-hacking research into a new stage: misaligned behavior that emerges naturally during RL training became an active security topic.
 
-[arXiv:2511.18397](https://arxiv.org/abs/2511.18397)
+In the same year, **Microsoft introduced Reinforcement Pre-Training (RPT)** ([arXiv:2506.08007](https://arxiv.org/abs/2506.08007)). RPT moves reinforcement learning into the pre-training stage and therefore changes the usual boundary between pre-training and fine-tuning. **DeepMind's AlphaEvolve** (May 2025) combines language models, evolutionary search, and automatic evaluators, showing how learned proposals and executable feedback can be placed in the same search loop.
 
-）bringing reward hacking research into a new stage — the naturally emerging misalignment behaviors during RL training have become a cutting-edge security topic. In the same month and year, **Microsoft's Reinforcement Pre-Training (RPT)** (
-
-[arXiv:2506.08007](https://arxiv.org/abs/2506.08007)
-
-This approach challenges the boundary between pre-training and fine-tuning, directly introducing reinforcement learning into the pre-training phase. **DeepMind's AlphaEvolve** (2025.05) combines LLMs, evolutionary algorithms, and automatic evaluators, achieving a 23% acceleration in matrix multiplication. This represents a new paradigm for search algorithms in the LLM era.
-
-RL has walked from the 1890s maze to the 2026 industrial cluster, spanning over a century. Yet its core has never changed — **letting agents trial and error in the environment, guided solely by accumulated rewards, to explore and find the optimal strategy on their own**.
+Across these changes, the recurring problem remains the same: an agent acts, receives feedback, and adjusts future decisions. What changes from one generation to the next is the scale of the state and action spaces, the source of the feedback, and the machinery used to collect experience.
 
 ## Summary
 
-From Thorndike's maze, to Bellman's equation; from the DQN in the Atari game console, to today's rapidly iterating DPO and GRPO in the cloud clusters. The history of reinforcement learning is an epic of **"learning from the environment, evolving from feedback, and moving from single machines to super models"**.
+The path from Thorndike's maze to Bellman's equation, from Atari DQN to DPO and GRPO, shows how the same idea has moved across very different systems: an agent acts, observes feedback, and changes its future decisions.
 
-Today, reinforcement learning is no longer a theoretical toy in the ivory tower. It is a necessary path toward general artificial intelligence (AGI). In the following chapters, we will follow the trajectory of this history, starting from the first line of code, and implement these great algorithms ourselves.
+The chapters that follow make this history concrete. We begin with small environments where every update can be inspected, then move toward the algorithms and training systems used for modern language-model alignment.
 
 ## References
 

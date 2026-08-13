@@ -1,10 +1,10 @@
-# 17.1 Result Rewards and Process Rewards
+# 17.1 Outcome Rewards and Process Rewards
 
-Chapter 16 enables models to have longer reasoning chains and larger reasoning budgets. As the trajectory becomes longer, new challenges arise during training. Suppose a model first selects the correct formula, but then copies a symbol incorrectly in the middle, leading to a wrong final answer; the result validator can only return 0, unable to inform the model to retain the earlier part or identify where the error began.
+Chapter 16 gave the model a longer reasoning chain and a larger inference budget. Once a trajectory grows longer, a single score at the end carries less information. Suppose the model chooses the right formula, copies one symbol incorrectly halfway through, and reaches a wrong answer. An outcome verifier can return 0, but that score does not say which earlier steps should be preserved or where the first error occurred.
 
-The same issue appears in code and Agent tasks. When a program fails to pass tests, the cause might be an incorrect file location from the start, or it could be a syntax error in the last line. When ten tool calls fail to complete a task, the value of the first nine steps cannot be distinguished by a single final score.
+The same problem appears in coding and agent tasks. A failed test may come from opening the wrong file at the beginning or from a syntax error in the final line. Likewise, one final score cannot tell us how much each of ten tool calls contributed to a failed task.
 
-Rewards only appear at the end of a sequence, with no direct feedback for intermediate actions. This is known as the **sparse reward problem**. A **Process Reward Model (Process Reward Model, PRM)** evaluates performance at intermediate steps, allowing the training system to locate errors and enabling the reasoning system to switch to an alternative path before errors propagate further. This section begins with a specific proof, establishes the mathematical forms of result rewards and process rewards, and finally discusses which tasks are worth the cost of step-by-step evaluation.
+When a sequence receives feedback only at the end, its intermediate actions have no direct learning signal. This is the **sparse-reward problem**. A **process reward model (PRM)** evaluates intermediate steps, helping the training system locate an error and the inference system abandon a bad path before the error spreads. We begin with a short proof, formalize outcome and process rewards, and then examine when step-level evaluation is worth its cost.
 
 ## 1. Why Final Rewards Are Insufficient
 
@@ -22,15 +22,15 @@ The two types of rewards address different problems. The outcome reward determin
 
 The next five sections all deal with the issue of "Step Six Failing," but the approach to checking it gradually changes:
 
-| Section                      | Feedback Used                              | Problem to Solve                                                            |
-| ---------------------------- | ------------------------------------------ | --------------------------------------------------------------------------- |
-| 17.2 Discriminative PRM      | good / bad / neutral probability           | How to quickly score a large number of steps                                |
-| 17.3 Generative PRM          | Natural language inspection and conclusion | How to explain where the mistake is and reduce the need for manual labeling |
-| 17.4 Formal Verifier         | Proof checker pass or fail                 | How to obtain deterministic feedback in formalizable tasks                  |
-| 17/C Search During Reasoning | Intermediate node scores                   | How to backtrack and try alternative paths before the error expands         |
-| 17.6 Parallel Reasoning      | Multiple complete paths and coordinator    | How to compare different solution approaches and aggregate the final answer |
+| Section                    | Feedback Used                              | Problem to Solve                                                            |
+| -------------------------- | ------------------------------------------ | --------------------------------------------------------------------------- |
+| 17.2 Discriminative PRM    | good / bad / neutral probability           | How to quickly score a large number of steps                                |
+| 17.3 Generative PRM        | Natural language inspection and conclusion | How to explain where the mistake is and reduce the need for manual labeling |
+| 17.4 Formal Verifier       | Proof checker pass or fail                 | How to obtain deterministic feedback in formalizable tasks                  |
+| 17.5 Inference-Time Search | Intermediate node scores                   | How to backtrack and try alternative paths before the error expands         |
+| 17.6 Parallel Reasoning    | Multiple complete paths and coordinator    | How to compare different solution approaches and aggregate the final answer |
 
-[Chapter 13 on RLHF](../chapter15_rlhf/standard-rlhf-pipeline) provides the foundation for reward models based on results, and [Chapter 15 on GRPO](../chapter18_grpo/grpo-family) explains how result-based rewards become strategy updates. Chapter 17 introduces intermediate feedback; later, [Agentic RL](../chapter22_agentic/overview) will extend the same issue to tool actions and environment states, while [Reward Hackers](../chapter30_alignment_failures/classical-failures) discusses what happens when the evaluator itself is exploited.
+[Chapter 13 on RLHF](../chapter15_rlhf/standard-rlhf-pipeline) introduced outcome reward models, and [Chapter 15 on GRPO](../chapter18_grpo/grpo-family) showed how outcome rewards drive policy updates. Chapter 17 adds intermediate feedback. Later, [Agentic RL](../chapter22_agentic/overview) extends the same problem to tool actions and environment states, while [reward hacking](../chapter30_alignment_failures/classical-failures) examines what happens when the evaluator itself can be exploited.
 
 ### 1.3 From a Final Score to Step-by-Step Feedback
 
@@ -58,7 +58,7 @@ Step 9: Therefore, √2 is irrational ✓
 
 Suppose there is an error in Step 6 — for example, the model writes "4k² = 2q², i.e., 4k = q²" (missing the square). The final conclusion "√2 is irrational" is still correct (the conclusion is correct), but the reasoning process contains an error.
 
-If the result validator only checks the conclusion "√2 is irrational," the entire response will still receive $r=1$. During training, the correct prefix from Steps 1–5, the error in Step 6, and the correct conclusion afterward all share the same reward. The model has no way of knowing that Step 6 should be suppressed, nor can it determine whether the earlier definitions and equations should be retained.
+If the outcome verifier checks only the conclusion "√2 is irrational," the entire response will still receive $r=1$. During training, the correct prefix from Steps 1–5, the error in Step 6, and the correct conclusion afterward all share the same reward. The model has no way of knowing that Step 6 should be suppressed, nor can it determine whether the earlier definitions and equations should be retained.
 
 This is the attribution difficulty caused by sparse rewards: a long trajectory receives only a single score at the end, and if that score happens to be correct, the incorrect steps along the entire trajectory may also be reinforced. The process reward aims to supplement the information of "where the error first appeared."
 
@@ -74,7 +74,7 @@ Classic RL addresses this problem with several approaches:
 
 Discount future rewards to the present:
 
-$$ G*t = r_t + \gamma r*{t+1} + \gamma^2 r\_{t+2} + \ldots + \gamma^{T-t} r_T $$
+$$G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \ldots + \gamma^{T-t} r_T$$
 
 Here, $ G_t $ is the discounted return starting from step $ t $, $ r_t $ is the current reward, and $ \gamma \in [0,1] $ is the discount factor. If only the final reward $ r_T = 1 $ is present, the return at step $ t $ is $ \gamma^{T-t} $; the farther away from the end, the smaller the weight. This is reasonable in many control tasks, but the early definition in the proof may determine the responsibility of all subsequent steps, and simply decaying by distance may not accurately reflect their responsibility.
 
@@ -88,7 +88,7 @@ Here, $ G_t $ is the discounted return starting from step $ t $, $ r_t $ is the 
 
 ### 2.4 PRM
 
-PRM trains an independent verifier to score each step of reasoning. Compared to a single reward at the end of the response, it provides more dense feedback, enabling the system to compare specific steps.
+A PRM trains an independent verifier to score each reasoning step. Compared with one reward at the end of the response, it provides denser feedback and lets the system compare specific steps.
 
 ## 3. Difference Between Outcome Reward and Process Reward
 
@@ -147,7 +147,7 @@ This approach transforms a terminal reward into multiple step rewards. If a step
 
 ## 4. When Is Process Reward Needed
 
-The length of the reasoning chain does not automatically imply that PRM must be trained. First, consider whether the task can reliably judge the final result. Mathematical answers can be substituted back into the original equation, code can be tested, and game positions can be read to determine win or loss; as long as the result validator is accurate and the cost of trial and error is acceptable, ORM is still capable of training a model that checks and corrects its behavior. [DeepSeek-R1](https://arxiv.org/abs/2501.12948) demonstrates this: R1-Zero mainly relies on rule-based accuracy rewards and format rewards, and is still able to gradually form longer reasoning and self-checking processes within RL.
+A long reasoning chain does not automatically require a PRM. We should first ask whether the task has a reliable outcome verifier. A mathematical answer can be substituted into the original equation, code can be tested, and a game state can reveal a win or loss. When outcome verification is accurate and sampling is affordable, an ORM can still train a model to check and revise its behavior. [DeepSeek-R1](https://arxiv.org/abs/2501.12948) provides an example: R1-Zero relies mainly on rule-based accuracy and format rewards, yet develops longer reasoning and self-checking behavior during RL.
 
 Process reward is particularly valuable in another scenario: the final result can only tell us that something has failed, but cannot pinpoint where the failure occurred. We can check three conditions in sequence:
 
@@ -203,7 +203,7 @@ System: A model responsible for generating formal proofs, combined with an indep
 
 These three approaches are the focus of the next three sections: [17.2 Discriminative PRM](./discriminative-prm), [17.3 Generative PRM](./generative-prm), and [17.4 Formal Verifier](./formal-prm).
 
-Result rewards determine whether the task is completed, while process rewards assess whether the reasoning can continue at a certain step. The longer the task, the more expensive error propagation becomes, making intermediate feedback more beneficial. If the final result is easy to verify, ORM can still serve as the primary training signal.
+Outcome rewards determine whether the task is completed, while process rewards assess whether the reasoning can continue at a certain step. The longer the task, the more expensive error propagation becomes, making intermediate feedback more beneficial. If the final result is easy to verify, ORM can still serve as the primary training signal.
 
 There are three common sources of process feedback:
 

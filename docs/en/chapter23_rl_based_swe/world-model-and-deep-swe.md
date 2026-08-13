@@ -37,7 +37,7 @@ This world model is a large language model (LLM), which takes as input $(s_t, a_
 Training data:
 
 - Trajectories collected from real SWE tasks
-- (s*t, a_t, s*{t+1}) triplets as training samples
+- $(s_t,a_t,s_{t+1})$ triplets as training samples
 - Let the world model learn to "predict the next state given the current code state and action"
 
 ### Training Process of CWM

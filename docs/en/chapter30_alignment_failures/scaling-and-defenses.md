@@ -260,9 +260,9 @@ If one can observe the internal state of a model, one can detect deception, alig
 - **Circuit analysis**: Analyze the model's reasoning paths
 - **Activation patching**: Locate critical neurons
 
-### Formal Reasoning via RL（Formal Reasoning via Reinforcement Learning）
+### Formal Reasoning via Reinforcement Learning
 
-[DeepSeek-Prover-V2](https://arxiv.org/abs/2504.21801)（DeepSeek, 2025.04）——**Using RL to Advance Formal Proofs**.
+[DeepSeek-Prover-V2](https://arxiv.org/abs/2504.21801) (DeepSeek, April 2025) uses RL to improve formal proof generation.
 
 Theoretically:
 

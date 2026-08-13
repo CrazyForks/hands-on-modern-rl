@@ -213,7 +213,7 @@ Language models are responsible for proposing lemmas and candidate steps, while 
 
 Formal PRM uses systems like Lean4 to check candidate proofs. AlphaProof and DeepSeek-Prover-V2 demonstrate that language models can be responsible for proposing candidates and guiding the search direction, while proof checkers are responsible for verifying formal rules.
 
-The boundaries of formal feedback are also clear: Lean data is much less than natural language corpora, automatic formalization may alter the problem's meaning, and proof search requires a large number of candidates. It is suitable for tasks with precise rules and cannot directly replace the result rewards or model evaluation in open language tasks.
+The boundaries of formal feedback are also clear: Lean data is much less than natural language corpora, automatic formalization may alter the problem's meaning, and proof search requires a large number of candidates. It is suitable for tasks with precise rules and cannot directly replace the outcome rewards or model evaluation in open language tasks.
 
 Thus far, we have reviewed the three approaches to PRM:
 

@@ -18,6 +18,7 @@
     "lint:fix": "eslint docs/.vitepress/theme --fix",
     "verify": "bash scripts/verify.sh",
     "verify:bilingual": "node scripts/check-bilingual-sync.mjs",
+    "verify:english": "node scripts/check-english-quality.mjs",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "fix:headings": "node scripts/fix-heading-numbers.mjs"
   },

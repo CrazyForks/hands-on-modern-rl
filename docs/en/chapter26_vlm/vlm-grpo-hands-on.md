@@ -4,6 +4,8 @@ title: '23.3 Hands-On: Train a VLM with GRPO'
 
 # 23.3 Hands-on: Multimodal GRPO
 
+> **Code for this section:** [vlm_grpo_train.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter11_vlm_rl/vlm_grpo_train.py)
+
 In Chapter 15 we ran GRPO training on a text-only model for math reasoning -- give the model a math problem, let it generate multiple reasoning paths, use rule rewards (whether the answer is correct) to compute group-relative advantages, then update the policy. Now we are going to do something even more interesting: give the model an image and a question about the image, and have it "look", "think", then "answer."
 
 The core difference in this experiment is the input: pure-text GRPO input is a sequence of tokens, while VLM GRPO input is **visual tokens (image encoding) + text tokens (question)**. The reward function and optimization algorithm itself have not changed -- GRPO's core code is exactly the same, except the model input now has an additional image dimension.

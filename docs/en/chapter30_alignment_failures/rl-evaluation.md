@@ -6,7 +6,7 @@
 
 A good RL benchmark must satisfy five principles:
 
-### Verifiability (Verifiability)
+### Verifiability
 
 The answer to each test sample must be **machine-verifiable**. Formally defined: there exists a function $\text{Verify}: \mathcal{Y} \times \mathcal{Y} \to \{0, 1\}$, such that for any $(y_{\text{pred}}, y_{\text{gold}})$, the correctness can be determined deterministically.
 

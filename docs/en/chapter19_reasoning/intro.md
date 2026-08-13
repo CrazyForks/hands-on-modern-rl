@@ -2,13 +2,13 @@
 
 [16.1](./emergence-and-o1) explains how reasoning models enter the product. Now returning to the training process: if we do not provide the model with manually written thought chains, but only the problem and an automatically verifiable answer, can reinforcement learning enable the model to learn to reason through the problem? DeepSeek-R1-Zero answers this question with a single public experiment.
 
-[Chapter 15](../chapter18_grpo/grpo-practice-and-mechanism) has already introduced GRPO, RLVR, and DAPO. This section does not repeat the algorithm family, but instead follows the training line of R1-Zero to answer four questions: what model and data does the training start with, how does GRPO use the result rewards to update the policy, how do long reasoning and self-checking emerge, and why does pure RL still require cold start and subsequent alignment.
+[Chapter 15](../chapter18_grpo/grpo-practice-and-mechanism) introduced GRPO, RLVR, and DAPO. Here we follow the R1-Zero training process: which model and data it starts from, how GRPO turns outcome rewards into policy updates, how longer reasoning and self-checking emerge, and why pure RL still needs cold-start data and later alignment.
 
 Throughout this section, the same problem is repeatedly sampled. Suppose the model faces the equation $x^2 - 5x + 6 = 0$: some answers directly guess $x = 2$, some fully calculate $x = 2$ or $3$, and some have correct formulas but make substitution errors. The verifier only checks the final solution set, and GRPO compares the rewards of the same group of answers. As training repeats, the derivation methods that can stably produce correct results will appear more frequently.
 
 ## 1. What Model Does Pure RL Start With
 
-To allow the result reward to provide information, the training must start with a model that already satisfies three conditions: the model can understand the problem and generate candidate solutions, the problem has a reliable verifier, and the model can sample answers that are both correct and incorrect for the same problem. Models that completely fail to solve the problem and tasks that cannot be scored cannot be started solely with the following loop.
+For an outcome reward to provide useful information, training must start with three conditions: the model can understand the problem and generate candidate solutions, the task has a reliable verifier, and the model can sample both correct and incorrect answers to the same problem. If every sample fails, or if the task cannot be scored, the following loop has no useful comparison signal.
 
 R1-Zero starts from a pre-trained base model and does not first use human thought chains for SFT. The training data is mainly composed of math, coding, and logic problems; each problem can be judged by a standard answer, a test program, or a rule-based verifier.
 
@@ -57,14 +57,14 @@ The format reward addresses the problem of machine parsing and cannot replace th
 
 Once the verifier provides scores for each response, the next step is to transform "who is better in this group" into parameter updates. GRPO uses the reward differences between responses to the same question, so the group must contain both better and worse samples.
 
-For the same question, the current strategy generates $G$ responses $y_1,\ldots,y_G$, and the verifier provides rewards $r_1,\ldots,r_G$. GRPO does not train an independent Critic, but instead constructs a relative advantage using the group mean and standard deviation:
+For the same question, the current policy generates $G$ responses $y_1,\ldots,y_G$, and the verifier provides rewards $r_1,\ldots,r_G$. GRPO does not train an independent Critic, but instead constructs a relative advantage using the group mean and standard deviation:
 
 $$
 \hat A_i=\frac{r_i-\operatorname{mean}(r_1,\ldots,r_G)}
 {\operatorname{std}(r_1,\ldots,r_G)+\epsilon}.
 $$
 
-Responses within the same group that have higher-than-average rewards receive a positive advantage, while those with lower-than-average rewards receive a negative advantage. The strategy update increases the probability of generating the former and decreases the probability of the latter. The PPO-style clipping limits the magnitude of a single update, and the KL term constrains the current strategy not to diverge too far from the reference strategy in a single round.
+Responses with above-average rewards receive positive advantages; those below the group average receive negative advantages. The policy update raises the probability of the former and lowers the probability of the latter. PPO-style clipping limits each update, while the KL term keeps the current policy close to the reference policy.
 
 Let's take a small example with four responses. If the rewards are $(1,1,0,0)$, the mean is $0.5$, and the standard deviation is also approximately $0.5$, the normalized advantage is approximately $(1,1,-1,-1)$. The first two correct responses receive positive weights, and the last two incorrect responses receive negative weights. If the rewards become $(1,1,1,1)$, after subtracting the mean, all responses are zero, meaning this question no longer provides a discriminative signal in the current batch. The $\epsilon$ in the formula is used to avoid division by zero when the standard deviation is zero.
 
@@ -97,13 +97,13 @@ These behaviors are not labeled step-by-step, but are indirectly selected by the
 
 ### 3.1 How to Understand the Aha Moment
 
-The Aha Moment in the R1-Zero report refers to the model's ability to pause during a reasoning process and write something like "Try a different approach to verify," indicating that result rewards can reinforce reflective behavior, but cannot prove that reinforcement learning from scratch has created reasoning capabilities.
+The Aha Moment in the R1-Zero report refers to the model's ability to pause during a reasoning process and write something like "Try a different approach to verify," indicating that outcome rewards can reinforce reflective behavior, but cannot prove that reinforcement learning from scratch has created reasoning capabilities.
 
 The base model has already seen proofs, code debugging, and self-correction texts during pre-training. The role of pure RL is to make these latent behaviors more consistently serve verifiable tasks. [16.1](./emergence-and-o1) Therefore, it distinguishes between capability emergence and capability activation.
 
 ## 4. Why Cold Start and Alignment Are Still Needed
 
-Result rewards answer the question of "whether the answer has been verified," but do not answer "whether the reasoning is readable, whether the length is appropriate, whether the answer is helpful for open-ended questions, or whether tool usage is safe." Therefore, R1-Zero is an experiment in training mechanisms, not yet a complete post-training process for a product.
+Outcome rewards answer the question of "whether the answer has been verified," but do not answer "whether the reasoning is readable, whether the length is appropriate, whether the answer is helpful for open-ended questions, or whether tool usage is safe." Therefore, R1-Zero is an experiment in training mechanisms, not yet a complete post-training process for a product.
 
 R1-Zero demonstrates that reasoning can be reinforced without relying on human thought chains, but the public results also expose the boundaries of pure RL:
 

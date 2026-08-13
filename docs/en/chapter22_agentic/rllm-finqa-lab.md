@@ -4,6 +4,8 @@ title: '19.9 Hands-On: Financial QA Agent'
 
 # 19.9 Hands-on: Training a Financial Analysis Agent with rLLM
 
+> **Resources for this section:** [rLLM repository](https://github.com/rllm-org/rllm) · [rLLM-FinQA model and data card](https://huggingface.co/rLLM/rLLM-FinQA-4B)
+
 In the previous section, DeepCoder showed a typical code post-training case: the model writes code, a sandbox runs tests, and test results provide verifiable reward. That example is rigorous but has a prerequisite: code-task reward is clean, while real business tasks are rarely so simple.
 
 Consider a more business-like scenario. A user asks:
@@ -248,7 +250,7 @@ The goal of this step is not to beat the benchmark but to check three things: wh
 
 ## Reproduction Path 2: Small-Scale GRPO Post-Training
 
-For actual training, the official project provides two paths: the default verl backend and the tinker LoRA backend.
+For actual training, the official project provides two paths: the default verl backend and the tinker LoRA backend. A locally hosted inference server normally exposes an OpenAI-compatible endpoint at `http://localhost:30000/v1`.
 
 verl backend for 4B model training:
 
@@ -358,4 +360,4 @@ rLLM-FinQA demonstrates a clear template for Agentic RL on enterprise tasks: the
 
 The key takeaway: **the difficulty of Agentic RL lies not only in the algorithm but in connecting the task environment, tools, reward, and benchmark into a closed loop.** The financial Agent is valuable because it is realistic enough yet controllable — a good first step from code RL toward enterprise Agent post-training.
 
-[^rllm-finqa]: rLLM official case page: [FinQA Financial Agent](https://github.com/rllm-org/rllm/tree/main/cookbooks/finqa), including model, data, tools, training commands, and benchmark results.
+[^rllm-finqa]: rLLM official case page: [FinQA Financial Agent](https://docs.rllm-project.com/cookbooks/finqa), including model, data, tools, training commands, and benchmark results. The corresponding implementation is available in the [rLLM repository](https://github.com/rllm-org/rllm/tree/main/cookbooks/finqa).

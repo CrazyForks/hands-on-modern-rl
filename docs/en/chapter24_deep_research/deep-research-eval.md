@@ -158,7 +158,7 @@ async def research():
     print(report)
 ```
 
-### Stanford STORM（stanford-omp-storm）
+### Stanford STORM (stanford-omp-storm)
 
 **An open-source research framework from Stanford Oval Group**, specifically designed for "long-form structured article generation."
 
@@ -181,7 +181,7 @@ runner = STORMWikiRunner(...)
 runner.run("History of reinforcement learning")
 ```
 
-### OpenResearcher（tjuloonkopen-researcher）
+### OpenResearcher (tjuloonkopen-researcher)
 
 **A fully open-source Deep Research training pipeline**, including RL training code.
 

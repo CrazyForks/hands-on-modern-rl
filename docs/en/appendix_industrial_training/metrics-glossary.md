@@ -112,16 +112,27 @@ Reading guidance: if loss, KL, and gradient norm all spike together, first check
 
 ## 3. Critic / Reward Statistics: "Scores from the Teacher"
 
-The critic matters because advantage estimates depend on it. If the critic fails, the actor receives garbage learning signals.
+PPO and GRPO can expose similarly named reward statistics, but the underlying mechanism is different.
 
-| Metric                   | What It Means                                                |
-| ------------------------ | ------------------------------------------------------------ |
-| `critic/loss`            | value-function regression loss                               |
-| `critic/value/mean`      | mean predicted value; track for drift or saturation          |
-| `critic/advantages/mean` | mean advantage; track for sign flips or collapse             |
-| `critic/advantages/std`  | advantage variance; extreme variance often means instability |
+### PPO: an independent critic
 
-Reading guidance: value loss should generally decrease over time. If it never decreases, suspect incorrect reward scaling, incorrect masks, or insufficient critic capacity.
+PPO trains a Critic to predict the expected return of each state. If that estimate fails, the Actor receives a poor advantage signal.
+
+| Metric                   | What It Means                                       |
+| ------------------------ | --------------------------------------------------- |
+| `critic/v_loss`          | value-function regression loss                      |
+| `critic/vpred/mean`      | mean predicted value; track for drift or saturation |
+| `critic/vpred/var`       | variance of the predicted values                    |
+| `critic/score/mean`      | sequence-level score statistic                      |
+| `critic/rewards/mean`    | mean sequence-level reward                          |
+| `critic/advantages/mean` | mean advantage; track for sign flips or collapse    |
+| `critic/returns/mean`    | mean return used as the Critic target               |
+
+Reading guidance: `critic/v_loss` should generally decrease while `critic/rewards/mean` improves. If reward rises but value loss does not fall, the Critic may be learning too slowly or receiving incorrectly scaled targets.
+
+### GRPO: reward statistics without a critic
+
+GRPO does not train a Critic when group-relative advantages are enabled. Logs may still contain names such as `critic/rewards/mean` and `critic/advantages/mean`; in that case they are batch statistics produced by the shared training infrastructure. They do **not** mean that a Critic network is active. A message such as `Disabled critic as algorithm.adv_estimator != gae` confirms this configuration.
 
 ---
 
@@ -129,14 +140,18 @@ Reading guidance: value loss should generally decrease over time. If it never de
 
 For LLM RL, rollout throughput and length distribution are first-class metrics. They determine both cost and stability.
 
-| Metric                       | What It Means                                            |
-| ---------------------------- | -------------------------------------------------------- |
-| `response_length/mean`       | mean completion length                                   |
-| `response_length/max`        | maximum completion length                                |
-| `response_length/clip_ratio` | fraction of completions clipped by `max_response_length` |
-| `prompt_length/mean`         | mean prompt length                                       |
-| `prompt_length/clip_ratio`   | fraction of prompts clipped by `max_prompt_length`       |
-| `response/aborted_ratio`     | fraction of generation failures/aborts                   |
+| Metric                          | What It Means                                            |
+| ------------------------------- | -------------------------------------------------------- |
+| `response_length/mean`          | mean completion length                                   |
+| `response_length/max`           | maximum completion length                                |
+| `response_length/min`           | minimum completion length                                |
+| `response_length/clip_ratio`    | fraction of completions clipped by `max_response_length` |
+| `response_length_non_aborted/*` | length statistics after failed generations are removed   |
+| `prompt_length/mean`            | mean prompt length                                       |
+| `prompt_length/max`             | maximum prompt length                                    |
+| `prompt_length/min`             | minimum prompt length                                    |
+| `prompt_length/clip_ratio`      | fraction of prompts clipped by `max_prompt_length`       |
+| `response/aborted_ratio`        | fraction of generation failures/aborts                   |
 
 Common interpretations:
 
@@ -157,8 +172,15 @@ DPO-family methods learn from preference data rather than on-policy rollouts, so
 | `rewards/rejected` | implicit reward for rejected responses                       |
 | `rewards/margins`  | chosen minus rejected; key signal of discrimination strength |
 | `rewards/accuracy` | fraction where the model prefers the chosen response         |
+| `logps/chosen`     | log-probability of the chosen response                       |
+| `logps/rejected`   | log-probability of the rejected response                     |
 
 If margins increase but validation does not improve, suspect overfitting to training pairs.
+
+### KTO and SimPO
+
+- **KTO** accepts individually desirable or undesirable responses instead of paired comparisons. Track `kl_estimate` and `loss/kl` alongside the preference loss.
+- **SimPO** removes the reference model. Its metrics resemble DPO, but reference-dependent fields disappear and length-normalized reward statistics become more important.
 
 ---
 

@@ -1,12 +1,14 @@
 # 19.10 Hands-on: Building an Agentic RL Training System from Scratch
 
+> **Code for this section:** [complete implementation](https://github.com/walkinglabs/hands-on-modern-rl/tree/main/docs/chapter22_agentic/code) · [trainer.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/docs/chapter22_agentic/code/trainer.py)
+
 In Sections 19.1 and 19.2, we discussed the decision framework and environment interaction design for Agentic RL. In Sections 19.3 through 19.5, we analyzed the architectures of frameworks such as OpenRLHF, veRL, and Relax. This section starts from those discussions and turns the concepts into a runnable implementation.
 
 Specifically, we will train a language model agent that can autonomously solve programming problems: after reading a problem, it writes code, executes it, reads the output, and if errors occur, revises the code and re-executes until it produces a correct answer. The entire system is kept under 500 lines of code and runs on CPU.
 
 This implementation follows the approach of [hyunwoongko/nanoRLHF](https://github.com/hyunwoongko/nanoRLHF) — using minimal code to reproduce core structures. But our goal is not merely to "get it running." It is to **understand how the structure of a training system is naturally derived from the training loop itself**. After reading this section, reading the source code of veRL or Relax will give you a much clearer understanding of their abstraction layers.
 
-The complete implementation for this section is available in the book's GitHub repository: `https://github.com/walkinglabs/hands-on-modern-rl/tree/main/docs/chapter22_agentic/code/`.
+The complete implementation for this section is available in the book's GitHub repository through the link above.
 
 ## Infrastructure Fundamentals of an Agentic RL Training System
 

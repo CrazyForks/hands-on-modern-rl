@@ -58,7 +58,7 @@ This chapter serves as the **theoretical foundation** for the entire book. Chapt
 | [Value Functions and the Bellman Equation](./value-bellman) | Introduce the state value function and derive its recursive structure                         |
 | [DP, MC, and TD](./dp-mc-td)                                | Compare three value estimation methods by assumptions, data requirements, and update rules    |
 | [From Q to Q-Learning](./value-q)                           | Use GridWorld to illustrate action value, TD targets, exploration, and tabular boundaries     |
-| [From Value to Policy](./policy-objective)                  | Define the objective function from the perspective of directly optimizing the policy          |
+| [Policy, Value, and Return](./policy-value)                 | Define the objective function from the perspective of directly optimizing the policy          |
 | [Where Does Data Come From](./algorithm-taxonomy)           | Discuss On-policy vs. Off-policy, Online vs. Offline                                          |
 | [Reward Function Design](./reward-design)                   | Discuss how rewards express task objectives and the problems that incorrect rewards can cause |
 | [Chapter Summary](./panorama)                               | Summarize core formulas, algorithmic routes, and connections to subsequent chapters           |
@@ -679,6 +679,8 @@ The smaller the regret, the better the policy. Uniform random "wastes" about 20 
 **One goal of RL exploration is to design policies whose regret grows as slowly as possible.** UCB and Thompson sampling are classic near-optimal answers: their regret grows only logarithmically with time and matches theoretical lower bounds [^4]. If you want to go deeper, follow the references.
 
 ## References
+
+For further reading, see Auer et al.'s [finite-time analysis of multi-armed bandits](https://link.springer.com/article/10.1023/A:1013689704352), Russo et al.'s [tutorial on Thompson sampling](https://arxiv.org/abs/1707.02038), and Lattimore and Szepesvári's open textbook [Bandit Algorithms](https://banditalgs.com/).
 
 [^1]: Thompson, W. R. (1933). On the likelihood that one unknown probability exceeds another in view of the evidence of two samples. _Biometrika_, 25(3/4), 285-294.
 

@@ -10,7 +10,7 @@ $$
 
 The scalar $R(\tau)$ at the trajectory level treats all steps in the trajectory equally — if the trajectory is successful, all actions are good; if the trajectory is failed, all actions are bad. This is the core challenge of Agentic RL: **if a 7-turn interaction fails, should the correct search in the first turn also be punished?**
 
-Breaking $R(\tau)$ down into step-level advantages $A_{i,t}$ is called **credit assignment (credit assignment)**. This section systematically addresses this problem: starting from the simplest ORM/PRM dichotomy, we then expand to the four categories of refined methods developed in 2025–2026.
+Breaking $R(\tau)$ down into step-level advantages $A_{i,t}$ is called **credit assignment**. We begin with outcome and process reward models, then examine four families of finer-grained methods developed in 2025–2026.
 
 ## Three-Layer Signals: From Final Outcome to Token Updates
 

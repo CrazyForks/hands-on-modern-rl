@@ -88,7 +88,7 @@ After determining the scope of the output, the question of whether the intermedi
 
 Traditional preference data primarily evaluates the final answer. However, reasoning models also generate longer intermediate texts, which influence subsequent tokens and tool actions. Even if these intermediate texts are not shown to the user, they still need to be included in training and monitoring.
 
-### 4/T.1 Do Reasoning Chains Need Value Constraints?
+### 4.1 Do Reasoning Chains Need Value Constraints?
 
 Safety goals should cover the final text, tool actions, and accessible logs. An unsafe candidate that appears in the internal reasoning process does not automatically lead to unsafe external behavior. The risk only enters the system boundary when it is returned to the user, written into an accessible log, or drives a tool to execute. Therefore, control should be implemented at three points: reducing unsafe trajectories during training, limiting tool permissions during execution, and filtering sensitive content during output.
 

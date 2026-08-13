@@ -78,7 +78,7 @@ When human labeling is limited, more training samples can be constructed from ex
 
 The classifier outputs the probability of each step's category. The system must then decide how to use these probabilities. During inference, multiple complete solutions can be ranked. During training, step scores can be converted into rewards. Both usages share the same PRM, but they differ in aggregation methods and risk profiles.
 
-The most direct usage is **Re-ranking (Re-ranking)**: First, generate multiple candidate inferences, then use step scores to select one. It can also provide training rewards, but this requires deciding how to convert step scores into token or trajectory rewards.
+The most direct use is **reranking**: generate several candidate solutions, score their intermediate steps, and select one candidate. A PRM can also provide training rewards, but the system must then decide how step scores become token- or trajectory-level signals.
 
 The workflow of Re-ranking is as follows:
 
@@ -152,7 +152,7 @@ Even with PRM800K, annotation is not 100% accurate:
 
 - Different annotators may judge the same step differently
 - The correctness of complex reasoning steps is inherently subjective
-- The boundaries of neutral (neutral) categories are ambiguous
+- The boundary of the neutral category is ambiguous
 
 Repeated annotation, dispute review, and model ensembling can reduce the impact of individual labels or individual evaluators.
 

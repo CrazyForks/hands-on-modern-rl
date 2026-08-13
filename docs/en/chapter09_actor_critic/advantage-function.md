@@ -4,7 +4,7 @@ title: 7.1 The Advantage Function
 
 # 7.1 Advantage Function
 
-Chapter 5 followed Line 1 (Value-Based): learn $Q(s,a)$ and pick the action with the highest score (review: [Q(s,a) and the Greedy Policy](../chapter03_mdp/value-q)). This tends to produce accurate scoring, but it is not good at exploration, and it can only handle discrete actions. Chapter 6 followed Line 2 (Policy-Based): directly optimize $J(\theta)$ (review: [Policy Objective](../chapter03_mdp/policy-objective)). This is good at exploration and supports continuous actions, but its variance is too large: run the same policy twice, and the gradient estimates can be wildly different.
+Chapter 5 followed the value-based route: learn $Q(s,a)$ and pick the action with the highest score (review: [Q-Values and the Greedy Policy](../chapter03_mdp/value-q)). Chapter 6 followed the policy-based route and optimized $J(\theta)$ directly (review: [Policy, Value, and Return](../chapter03_mdp/policy-value)). The first route uses explicit action scores; the second supports stochastic and continuous policies but produces noisy gradient estimates.
 
 At the end of Chapter 6, we found a key clue: subtracting a baseline reduces variance (review: [Policy Gradient Improvements](../chapter08_policy_gradient/pg-improvements)), and the best baseline is $V(s)$ (review: [State-Value Function](../chapter03_mdp/value-bellman)). But $V(s)$ itself must be learned, which means we need a dedicated network to estimate it. This network is the **Critic**.
 
@@ -17,7 +17,7 @@ This chapter is a synthesis of everything we have built so far. The following co
 - [Action-value $Q(s,a)$](../chapter03_mdp/value-q): the difference between $Q$ and $V$ is the advantage function
 - [DP / MC / TD: three ways to estimate values](../chapter03_mdp/dp-mc-td): three concrete strategies for training the Critic
 - [TD Error $\delta = r + \gamma V(s') - V(s)$](../chapter03_mdp/dp-mc-td): the Critic's core training signal
-- [Policy objective $J(\theta)$ and policy gradients](../chapter03_mdp/policy-objective): the Actor's optimization target
+- [Policy objective $J(\theta)$ and policy gradients](../chapter03_mdp/policy-value): the Actor's optimization target
 - [REINFORCE and baselines](../chapter08_policy_gradient/pg-improvements): why we need $V(s)$ as a baseline
   :::
 

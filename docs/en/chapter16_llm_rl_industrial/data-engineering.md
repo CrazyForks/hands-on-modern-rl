@@ -254,7 +254,7 @@ D_{\mathrm{KL}}\!\left(p_\theta\|q\right)
 \log\frac{p_\theta(a\mid x_{<t})}{q(a\mid x_{<t})}.
 $$
 
-The student first samples a trajectory according to $p_\theta$, and then compares the student's and teacher's distributions at each position. To reduce computation and communication, MiniCPM5 takes the top-k tokens from both the student and the teacher, and approximates the calculation over their union. This signal is more dense than providing a single 0/1 reward at the end of the response.
+The student first samples a trajectory according to $p_\theta$, then compares the student and teacher distributions at each position. To reduce computation and communication, MiniCPM5 takes the top-$k$ tokens from both distributions and approximates the calculation over their union. This signal is denser than a single 0/1 reward at the end of the response.
 
 Each term in the summation can be understood as a token-wise comparison. If the student assigns a probability of $0.6$ to token A, and the teacher assigns $0.3$, then $\log(0.6/0.3) = \log 2 > 0$, and this term will push the student to reduce overconfidence in A. If the probabilities are the same on both sides, the term is zero. The summation is weighted by the student's probability $p_\theta$, so the training focuses on the tokens that the student is most likely to choose. The top-k approximation retains only the most probable candidates from both sides, thus preserving the main differences with minimal communication overhead.
 

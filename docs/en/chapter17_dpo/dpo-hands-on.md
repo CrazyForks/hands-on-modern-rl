@@ -1,5 +1,7 @@
 # 14.4 Hands-on: A DPO Alignment Experiment
 
+> **Code for this section:** [generate data](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/1-generate_data.py) · [test before training](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/2-test_before.py) · [train with DPO](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/3-train_dpo.py) · [test after training](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/4-test_after.py)
+
 In [Chapter 14](../chapter17_dpo/intro), you already used DPO to teach a model to politely push back when a user is mistaken. That earlier run was mainly about "getting the pipeline to work". We did not look closely at what happens during training itself.
 
 In this section we will use a slightly more demanding setup: aligning a model that tends to respond with sarcasm, and then watching every movement in the training metrics.

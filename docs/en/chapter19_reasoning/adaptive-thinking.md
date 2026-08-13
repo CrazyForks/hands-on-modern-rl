@@ -117,7 +117,7 @@ Adaptive reasoning delegates the length of a request and the scope of execution 
 
 The length of reasoning itself does not equate to the quality of reasoning. The model may repeatedly check conclusions that have already been determined or generate text unrelated to the answer; this increases cost without improving success rate.
 
-During training, correctness and cost can be jointly included in the objective. During deployment, the system can compare the success rate of tasks before and after increasing the budget. Relying solely on language fluency is insufficient to determine whether a segment of reasoning is useful; it requires result validators, ablation studies, or process evaluations to check whether additional steps change the conclusion.
+During training, correctness and cost can be jointly included in the objective. During deployment, the system can compare the success rate of tasks before and after increasing the budget. Relying solely on language fluency is insufficient to determine whether a segment of reasoning is useful; it requires outcome verifiers, ablation studies, or process evaluations to check whether additional steps change the conclusion.
 
 ### 3.2 Controlling Latency and Cost Fluctuation
 

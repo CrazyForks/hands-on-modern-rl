@@ -45,7 +45,7 @@ This leads to the core motivation for trajectory synthesis: **use algorithms to 
 
 #### Method 1: Rejection Sampling, the Simplest Approach
 
-The idea behind rejection sampling is extremely intuitive: let the current model attempt the same task repeatedly, and keep only the successful trajectories as training data.
+Rejection sampling starts with repeated attempts by the current model. A verifier keeps the successful trajectories and discards the rest; the retained trajectories then become training data.
 
 ```python
 def rejection_sampling(model, task, tool_env, num_samples=64):
@@ -63,7 +63,7 @@ def rejection_sampling(model, task, tool_env, num_samples=64):
 
 The advantage of rejection sampling is that it is **simple to implement**. You only need a verifier that can judge "success" or "failure." The RLVR training in Chapter 15 uses exactly this idea.
 
-Its weaknesses are also obvious: **low efficiency and poor diversity**. If the current success rate of the model is only 5%, you need to sample 20 trajectories to obtain one success. More seriously, successful trajectories tend to concentrate on "strategies the model already knows well." Paths the model has not explored, even if they might be better, never appear under rejection sampling.
+The method is inefficient when success is rare and it tends to preserve only familiar behavior. At a 5% success rate, roughly 20 trajectories are needed for one positive example. Because the accepted samples come from the current policy, unexplored but potentially better paths do not enter the dataset.
 
 #### Method 2: Director-Actor, Separating Planning from Execution
 
@@ -157,7 +157,7 @@ LoopTool's experimental results are impressive. Using a 32B Qwen3 model as the d
 
 #### Method 5: Difficulty Adaptation, HardGen[^hardgen]
 
-HardGen specifically addresses the problem that synthetic data is often "too easy." Its core insight is that **model improvement mainly comes from difficult examples**. Simple trajectories, such as tasks solved with a single tool call, contribute little to training.
+HardGen addresses a common weakness in synthetic data: randomly generated tasks are often too easy. It begins with failures from a baseline model, extracts the API dependencies that made those cases difficult, and uses those structures to generate new tasks. A one-call task adds little once the model already solves it reliably; a task built from an observed failure targets a remaining weakness.
 
 HardGen first lets the model attempt a batch of tasks and collects failure cases. It then builds a **dynamic API graph** from those failures, analyzing which tool combinations and parameter types the model is most likely to fail on. Next, it uses this graph to generate difficult trajectories, ensuring that every trajectory touches the model's weaknesses.
 
@@ -173,7 +173,7 @@ This method greatly improves sample efficiency. Under rejection sampling, failed
 
 #### End-to-End Synthesis: ASTRA[^astra]
 
-The six methods above focus on "how to generate high-quality trajectories." ASTRA goes one step further. It not only synthesizes multi-turn interaction trajectories, but also **automatically packages the trajectories into independent, verifiable RL training environments**. This means the whole process from "data generation" to "environment construction" is automated. Given only a task specification, ASTRA can output pairs of trajectories and environments that can be directly used for GRPO/PPO training. This end-to-end idea is especially suitable for engineering scenarios that need to quickly build training data for new domains. The framework unifies SFT data, synthetic trajectories, and RL environments, verifiable arenas, in one pipeline. The official code and environments have been open-sourced.
+The preceding methods generate trajectories. ASTRA also packages them with independent, verifiable RL environments. From a task specification, it produces a trajectory together with the environment needed to replay and score it. This connects SFT examples, synthetic rollouts, and RL evaluation in one data pipeline, which is useful when a new domain lacks an existing training environment. The code and example environments are public.
 
 ### Comparing the Six Methods
 
@@ -200,7 +200,7 @@ Quality control usually has three dimensions.
 
 **Difficulty distribution**: Is the ratio of easy, medium, and difficult examples reasonable? Too many easy examples let the model "settle" into known strategies; too many difficult examples may destabilize training. A good distribution is often 30% easy, 50% medium, and 20% difficult.
 
-**Step-level calibration**: Beyond filtering and ranking, there is a more fine-grained method: **directly correct undesirable steps inside trajectories**. The core insight of STeCa, Step-level Trajectory Calibration[^steca], is that if a trajectory is mostly correct but contains a few flawed steps, it is better to find and fix those steps than to discard the whole trajectory. The method identifies which steps lower overall quality through step-level reward comparison, then uses a stronger model or rules to calibrate those steps. This is much more precise than a simple success/failure binary split. A trajectory may do well in 6 out of 7 steps, with only the fourth step using a suboptimal search strategy. STeCa keeps the first 6 good steps, calibrates only the fourth, and obtains a trajectory better than the original.
+**Step-level calibration** edits a weak step instead of discarding an otherwise useful trajectory. STeCa, or Step-level Trajectory Calibration[^steca], compares step-level rewards to locate the decisions that reduce quality, then replaces those decisions with corrections from rules or a stronger model. If six of seven steps are sound and only the fourth uses a poor search strategy, the first six can be preserved while that decision is revised. A binary success filter cannot make this distinction.
 
 ```python
 def filter_trajectories(trajectories, quality_threshold=0.7):
@@ -228,7 +228,7 @@ def filter_trajectories(trajectories, quality_threshold=0.7):
 
 ### How Trajectory Synthesis Connects to Chapter 9
 
-You may have noticed that many ideas in trajectory synthesis are closely related to RLVR from Chapter 15. The core of RLVR is "use verifiable outcomes as reward." Trajectory synthesis pushes this idea one step earlier: verification is used not only for reward, but also to **filter and generate better training data**.
+These methods reuse the verifier introduced by RLVR in Chapter 15. RLVR applies verifiable outcomes as training rewards; trajectory synthesis also uses the same checks before training to select, repair, or generate data.
 
 Concretely, RLVR has three uses at the data layer of Agentic RL:
 
@@ -335,7 +335,7 @@ def compute_quality(traj):
     return 0.5 * efficiency + 0.5 * completeness
 ```
 
-This pipeline is simple, but it contains the core stages of trajectory synthesis: generation, filtering, and quality control. In real engineering systems, you can gradually replace rejection sampling with LoopTool-style closed-loop iteration, and replace simple quality checks with more fine-grained verifiers.
+This minimal pipeline contains three stages: generation, filtering, and quality control. A production system can replace rejection sampling with LoopTool-style iterative generation and replace coarse checks with task-specific or step-level verifiers.
 
 Next, we focus on another key dimension of Agentic RL: tool-use RL, and how a model learns "when to use a tool and which tool to use."
 
@@ -401,7 +401,7 @@ VERL-TOOL is a cross-domain RL training framework for tool use. It covers math r
 
 #### MCP-RL: Turning a Tool Protocol into a Training Environment[^mcp_intro][^mcp_tools][^mcprl]
 
-From another angle, tool-use RL has an easily underestimated problem: tools are highly fragmented. Search tools have one interface, database tools have another, and file-system tools yet another. For product engineering, this is already troublesome. For RL training, it is even more serious, because the training system must know not only "which tools exist," but also each tool's parameter schema, return format, error states, permission boundary, and how a tool call should be recorded in a trajectory.
+Tool interfaces are fragmented. Search, database, and file-system tools expose different schemas, results, errors, and permission boundaries. An RL system must represent all of these details and record each call in a trajectory, so interface variation becomes part of the training environment rather than a small integration detail.
 
 This is exactly why MCP, the Model Context Protocol, belongs in an Agentic RL textbook. MCP itself is not an RL algorithm. It is more like a **standard interface layer for tool environments**. Servers expose tools, resources, and prompts to the model. Tools are discovered through `tools/list` and invoked through `tools/call`. Each tool has a name, description, input schema, and optional output schema. In other words, MCP organizes "what the external world can do" into a structured action space readable by both the model and the training system.
 
@@ -417,11 +417,11 @@ Once MCP is placed inside the RL training loop, the elements of the MDP become c
 
 The meaning behind this table is that MCP turns tool calling from "a pile of engineering glue code" into "an environment interface that can be observed and optimized by an RL system." In an ordinary application, a failed tool call may just be an error. In RL training, it becomes part of the trajectory, affects reward, and affects the next policy update. If the model calls a nonexistent tool, fills in the wrong arguments, repeatedly calls the same low-value tool, or keeps searching even after the returned information is sufficient, all of this can be recorded and turned into training signal.
 
-Look at it from another angle. Without a unified protocol, every new tool requires the training system to write a separate parser, executor, and logging format. A policy trained this way can easily overfit to a fixed tool set and fail when the environment changes. MCP's value is that it moves "tool descriptions" into structured information: what the model sees is not just a natural-language prompt, but a schema-bearing set of action candidates. Training is no longer merely about "imitating one tool-call format"; it becomes learning to choose among discoverable actions.
+Without a shared protocol, every new tool needs its own parser, executor, and log format. A policy may then overfit to a fixed interface and fail when the tool set changes. MCP represents tool descriptions as structured schemas, so the policy receives a discoverable set of candidate actions instead of one hard-coded call format.
 
 This also changes how we understand trajectory data. Ordinary LLM trajectories are mainly token sequences. MCP-RL trajectories look more like structured execution logs: which tools were discovered at which turn, which tool was selected, whether the arguments were legal, what the tool returned, whether it timed out, and whether the final task was completed. During training, tool returns themselves usually should not participate in the model loss. What should be reinforced are the decision tokens generated by the model: why it chose this tool, why it filled these arguments, and why it stopped at this moment. This is the same class of problem as the loss masks discussed earlier for SearchR1 and Code Agents.
 
-OpenPipe's MCP-RL article gives a very intuitive training pipeline: first automatically discover tools from MCP servers; then generate training scenarios based on the tool list; sample multiple agent trajectories for the same scenario; use relative-scoring methods such as RULER, an LLM-as-judge approach, to compare trajectory quality; finally update the model with GRPO. The key is not that "yet another new algorithm" has been invented, but that MCP allows different tool servers to be connected to the same training process. Today you can train a database agent; tomorrow you can switch to a file-management agent or weather agent while keeping the broad training code unchanged.
+OpenPipe's MCP-RL example first discovers tools from MCP servers, generates scenarios from the discovered schemas, samples several trajectories per scenario, compares them with RULER, and updates the model with GRPO. MCP does not change the policy optimizer. It lets the same training loop connect to a database server, a file-management server, or a weather server without rewriting the surrounding interface code.
 
 This pipeline is especially suitable for teaching, because it connects several parts of Agentic RL into one line. MCP provides the action space. Scenario generation constructs the task distribution. Multiple rollouts provide exploration. RULER or another reward method compares the quality of trajectories. GRPO converts relative quality into a policy update. What this step really shows is that the protocol layer, data layer, reward layer, and algorithm layer each have their own job. If these four layers are not separated, many discussions become tangled: "tools are easy to connect" is mistaken for "the model has learned to use tools," or "the tool call succeeded" is mistaken for "the policy is optimal."
 
@@ -429,7 +429,7 @@ However, MCP-RL also reminds us of an important boundary: **a standardized inter
 
 There is another finer boundary: MCP can standardize "how to call a tool," but it cannot automatically define "what it means to call it well." For the same `search` tool, a fact-checking question should encourage multi-source cross-validation; a simple date question should penalize excessive search; a coding question may require combining search results with local test results. In other words, MCP provides the action interface, but reward must still be determined by task semantics. The real issue is that the easier tools are to connect, the more carefully reward must be designed; otherwise, the model may learn not "how to solve problems better," but "how to exploit the tool interface to get points."
 
-Therefore, the best positioning for MCP in this chapter is that it is the **environment abstraction and tool-protocol layer** of Agentic RL. PPO, GRPO, and GSPO still handle policy optimization. RLVR, RULER, and PRMs still handle reward. MCP organizes external tools into a discoverable, callable, and recordable environment interface. Once this division of labor is clear, the reader can understand why "training an agent that can use tools" is not only a model problem, but also a protocol, environment, and evaluation problem.
+MCP belongs at the environment and tool-protocol layer of Agentic RL. PPO, GRPO, and GSPO optimize the policy; RLVR, RULER, and PRMs supply evaluation signals; MCP makes external actions discoverable, callable, and recordable. Training a tool-using agent therefore depends on the model, protocol, environment, and evaluator together.
 
 #### ToolRL: Tools as RL Actions[^toolrl]
 
@@ -473,7 +473,7 @@ Tool-call reward is not as subjective as preference alignment. It can be designe
 | SQL generation  | Whether query results match expectation      | Binary + execution-time penalty  | Avoid inefficient queries              |
 | Data analysis   | Whether conclusions are correct and complete | Multi-dimensional score          | Evaluate both accuracy and readability |
 
-One notable pattern is that many agentic rewards include **efficiency penalties**. This is not only to make the model faster, but also because every tool call has a cost: API fees, latency, and resource consumption. A good agent does not merely "complete the task"; it "completes the task efficiently."
+Many agentic rewards include **efficiency penalties** because every tool call consumes money, time, or compute. Outcome checks establish whether the task was completed; efficiency terms distinguish a three-call solution from a twenty-call solution when both succeed.
 
 Formally, the total reward for tool-use RL can be written as:
 
@@ -585,13 +585,13 @@ Most existing Code Agent RL assumes Python for code execution and verification. 
 
 So far, all Code Agent RL rewards have depended on **code execution**: run the code and see whether the result is correct. But Meta's research shows a more elegant approach: **let the model reason about the behavior of code without executing it**. This method is called semi-formal reasoning. The model must explicitly list assumptions, trace each execution path, and write formal conclusions, much like a mathematical proof. It cannot skip steps or be vague.
 
-This method achieved 93% accuracy on real-world patch verification. Its core value is that it **requires no sandbox, no execution environment, and has no security risk**. You can understand it as a low-cost alternative for Code Agent RL. If the reward signal only needs to know whether a piece of code is roughly right or wrong, semi-formal reasoning may be enough. If exact output matching is required, then code must still be executed.
+The reported method reached 93% accuracy on real-world patch verification without executing the candidate code. It can serve as a lower-cost verifier when an approximate judgment is sufficient. Exact behavioral claims still require compilation, tests, or another executable check.
 
 #### The Scaling Law of Code Bootstrapping[^zeroscaling]
 
 Chapter 26 discusses RL scaling laws in detail: more training steps often produce stronger reasoning ability. Agentic RL has its own scaling law. ZeroTIR lets the model spontaneously learn to generate and execute code to assist reasoning **without supervised examples**. Researchers found a predictable relationship: training steps, code-execution frequency, and final accuracy follow a **power-law relationship**. This means you can predict final model performance early in training. If after 100 training steps the code-execution frequency is still rising, the model is still learning and training can continue. If the frequency has plateaued, learning is close to saturation and training can be stopped early.
 
-This finding is very important for engineering practice. It gives you a **free training-progress indicator**. You do not need to run the whole training job; by monitoring code-execution frequency, you can judge whether to keep training. ZeroTIR was accepted by NeurIPS 2025.
+Code-execution frequency can therefore serve as an additional training-progress indicator. A continued rise suggests that the policy is still changing how it uses the tool; a plateau may indicate saturation. This signal complements held-out accuracy and does not replace it. ZeroTIR was accepted at NeurIPS 2025.
 
 <details>
 <summary>Reflection question: What is the essential difference between reward design for Web Agents and Code Agents? How does it affect RL training strategy?</summary>
@@ -612,7 +612,7 @@ In 2025, SearchR1[^searchr1], by Jin et al., pioneered the use of RL for search-
 
 #### Why Prompting Is Not Enough
 
-Before SearchR1, the mainstream method was to teach the model through prompting that "you can call a search engine during reasoning." ReAct[^react] and Self-RAG[^selfrag] both follow this route. But prompting has three fundamental limitations.
+Earlier systems often prompted the model to call a search engine during reasoning; ReAct[^react] and Self-RAG[^selfrag] are examples. Prompting alone leaves three limitations.
 
 **Search timing cannot be exhaustively specified.** You can write "search when knowledge is uncertain" in the prompt, but what counts as "uncertain"? The model may be fully confident about outdated information, not knowing that it does not know. It may also over-search obvious common knowledge.
 
@@ -854,7 +854,7 @@ class ToolSandbox:
 
 ### Infrastructure Comparison: Standard LLM RL vs Agentic RL
 
-With these bottlenecks in mind, let us compare the core differences between the two kinds of RL training infrastructure.
+The following comparison shows how these bottlenecks change the training infrastructure.
 
 | Component                | Standard LLM RL                    | Agentic RL                                                                    |
 | ------------------------ | ---------------------------------- | ----------------------------------------------------------------------------- |
@@ -1107,7 +1107,7 @@ The core principle is: **reward design should follow an iterative rule of "simpl
 
 ### Chapter Summary
 
-Let us review the core takeaways from Chapter 10 so far.
+The chapter so far establishes the following points.
 
 **1. Agentic RL = multi-turn RL + tool use.** Expanding from "generating text" to "acting in an environment" is the key leap from dialogue models to autonomous agents.
 

@@ -3,6 +3,7 @@ outline: [2, 3]
 ---
 
 # 3.2 Action Values and Bellman Optimality
+
 **Section Preview**
 
 **Core ideas**
@@ -330,6 +331,8 @@ One greedy policy learned:
 ↑ ↑ → G
 ```
 
+![Greedy policy learned by Q-Learning](../../chapter03_mdp/images/q-learning-learned-policy.svg)
+
 For example, at the start state, the learned $Q$ values for the four actions are: up $-5.1$, right $-4.6$, down $-4.6$, left $-5.2$. This indicates that, in terms of long-run return, “right” and “down” are both better than “up” and “left”.
 
 <span id="off-policy"></span>
@@ -382,7 +385,7 @@ In 4×4 GridWorld, we have only 16 states × 4 actions = 64 $Q$ values. But in r
 
 So the core idea of Q-Learning has not become obsolete: iteratively approximate the solution to the Bellman optimality equation using TD targets. What becomes infeasible is “store a separate row for every state-action pair”. Chapter 4 will tackle this exact issue: if a table cannot fit, can we use a neural network to **approximate** the entire $Q$ function? The answer is Deep Q-Networks (DQN).
 
-Previous section: [DP, MC, and TD](./dp-mc-td) | Next section: [From Value to Policy](./policy-objective)
+Previous section: [DP, MC, and TD](./dp-mc-td) | Next section: [Policy, Value, and Return](./policy-value)
 
 **Summary**
 
@@ -403,6 +406,6 @@ Previous section: [DP, MC, and TD](./dp-mc-td) | Next section: [From Value to Po
 
 [^1]: Watkins, C. J. C. H. (1989). _Learning from delayed rewards_. PhD thesis, King's College, Cambridge.
 
-[^2]: Watkins, C. J. C. H., & Dayan, P. (1992). Q-learning. _Machine Learning_, 8(3-4), 279-292. DOI: <https://doi.org/10.1007/BF00992698>；Author page: <https://www.gatsby.ucl.ac.uk/~dayan/papers/wd92.html>.
+[^2]: Watkins, C. J. C. H., & Dayan, P. (1992). Q-learning. _Machine Learning_, 8(3-4), 279-292. DOI: <https://doi.org/10.1007/BF00992698>; author page: <https://www.gatsby.ucl.ac.uk/~dayan/papers/wd92.html>.
 
 [^3]: Sutton, R. S., & Barto, A. G. (2018). _Reinforcement Learning: An Introduction_ (2nd ed.). MIT Press.

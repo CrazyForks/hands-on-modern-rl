@@ -3,11 +3,12 @@ title: 6.2 The Policy Gradient Theorem and REINFORCE
 ---
 
 # 6.2 REINFORCE and Value Baselines
+
 The previous section explained why we need policy-based methods: DQN's $\arg\max$ does not work in continuous action spaces, so learning the policy $\pi_\theta(a|s)$ directly is the more natural approach. This section answers two questions: what metric should we use to measure "how good" a policy is, and how do we optimize that metric?
 
 ## The Policy Objective
 
-Chapter 2 introduced the [policy objective](../chapter03_mdp/policy-objective) $J(\theta)$ — a measure of "how good this policy is overall." The answer is natural: across all possible starting points, how much [discounted return](../chapter03_mdp/mdp) does policy $\pi_\theta$ accumulate on average?
+Chapter 3 introduced the [policy objective](../chapter03_mdp/policy-value) $J(\theta)$ — a measure of how well the policy performs overall. Across possible starting points, how much [discounted return](../chapter03_mdp/mdp) does policy $\pi_\theta$ accumulate on average?
 
 $$J(\theta) = \mathbb{E}_{\pi_\theta} \left[ \sum_{t=0}^{\infty} \gamma^t r_t \right]$$
 

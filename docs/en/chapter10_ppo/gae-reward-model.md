@@ -63,6 +63,24 @@ Set $\gamma = 1$ and substitute the table row by row:
 
 At the last step $V(s_5) = 0$ (episode ended). The TD advantage is exactly this $\delta_t$ column. Its variance is low — only one step of randomness is involved — but it is biased: if the critic's $V$ is inaccurate, the error flows directly into $\delta_t$ through $\gamma V(s_{t+1})$.
 
+We can identify the bias term explicitly. Write the critic estimate as
+
+$$
+V(s_t)=V^*(s_t)+b_t,
+$$
+
+where $V^*$ is the true value and $b_t$ is the critic's error. Substituting this expression into the TD error gives
+
+$$
+\delta_t
+=
+\underbrace{r_t+\gamma V^*(s_{t+1})-V^*(s_t)}_{\text{true TD error}}
++
+\underbrace{\gamma b_{t+1}-b_t}_{\text{critic bias}}.
+$$
+
+If $\gamma=1$ and the critic makes nearly the same additive error in neighboring states, the two errors cancel. When the critic's error changes across states, however, that difference enters every TD estimate.
+
 ### MC estimator: full-trajectory return
 
 The MC estimator (review: [MC methods](../chapter03_mdp/dp-mc-td)) waits until the episode ends, then subtracts $V(s_t)$ from the full return starting at $t$:
@@ -91,6 +109,8 @@ Then subtract $V(s_t)$:
 
 MC does not depend on the critic — with enough samples, the estimate is unbiased in expectation. But $G_t$ contains all randomness from $t$ to the end, so its variance is large; and we must wait until the episode ends, which in LLM settings can mean thousands of steps.
 
+For a numerical picture of that variance, suppose the same $s_0$ leads to a terminal reward of $+1$ half the time and $-1$ half the time. With $V(s_0)=0.1$, the two sampled MC advantages are $+0.9$ and $-1.1$. They differ by 2.0 even though the starting state and action are the same. TD trades this trajectory-level noise for dependence on the critic.
+
 Side by side, the gap is clear:
 
 | $t$ | $A_t^{\text{TD}}$ | $A_t^{\text{MC}}$ |
@@ -114,6 +134,40 @@ where $\delta_t = r_t + \gamma V(s_{t+1}) - V(s_t)$ is the TD error. Three limit
 - $\lambda = 0$: $\hat{A}_t = \delta_t$, reduces to one-step TD
 - $\lambda = 1$: $\hat{A}_t = \sum_{k=0}^{\infty} \gamma^k \delta_{t+k} = G_t - V(s_t)$, reduces to MC
 - $0 < \lambda < 1$: later $\delta_{t+k}$ are down-weighted by $(\gamma\lambda)^k$
+
+### Why the Formula Uses Exponential Weights
+
+MC is not an unrelated signal placed beside TD. It can be written as the discounted sum of future TD errors:
+
+$$
+G_t-V(s_t)=\sum_{k=0}^{\infty}\gamma^k\delta_{t+k}.
+$$
+
+The interpolation should therefore change the weights on the sequence of TD errors. One-step TD keeps only $\delta_t$; MC keeps every future error with weight $\gamma^k$. GAE inserts the additional factor $\lambda^k$:
+
+$$
+w_k=(\gamma\lambda)^k.
+$$
+
+At $\lambda=0$, every term after the first disappears. At $\lambda=1$, the MC weights return. Intermediate values progressively suppress more distant TD errors.
+
+### From a Quadratic Sum to a Linear-Time Recursion
+
+Computing the definition separately for every $t$ would repeatedly sum overlapping suffixes. Expanding one term shows the shared structure:
+
+$$
+\hat A_t
+=\delta_t+(\gamma\lambda)\delta_{t+1}
++(\gamma\lambda)^2\delta_{t+2}+\cdots.
+$$
+
+Everything after $\delta_t$ is $\gamma\lambda$ times $\hat A_{t+1}$, so
+
+$$
+\hat A_t=\delta_t+\gamma\lambda\hat A_{t+1}.
+$$
+
+A single backward pass now computes every advantage in $O(N)$ time.
 
 ### Computing it via the recursion
 
@@ -146,6 +200,16 @@ This table ties the whole section together:
 - The $\lambda=0$ column is the TD estimator (left column of the earlier comparison)
 - The $\lambda=1$ column is the MC estimator (right column of the earlier comparison)
 - $\lambda=0.95$ sits between: near MC close to the end, increasingly suppressed toward the start by the exponential decay
+
+For $\lambda=0.95$, the first advantage expands as
+
+$$
+\hat A_0
+=\delta_0+0.95\delta_1+0.95^2\delta_2
++0.95^3\delta_3+0.95^4\delta_4.
+$$
+
+The corresponding weights are approximately $1.00$, $0.95$, $0.90$, $0.86$, and $0.81$. The final TD error therefore still contributes to the first action, but its influence decreases with distance.
 
 As $\lambda$ grows, the advantage at early steps climbs from $0.1$ toward $0.9$ — **credit propagates from the final step back to every step**, at the cost of rising variance (more distant $\delta$ randomness is included). The PPO default is typically $\lambda = 0.95$, leaning toward MC: a small bias in exchange for a substantial variance reduction.
 
@@ -202,6 +266,15 @@ advantages, returns = compute_gae(rewards, values, dones)
 print("advantages:", advantages)
 print("returns:", returns)
 ```
+
+With the default arguments, the program prints approximately
+
+```text
+advantages: [0.6203 0.4951 0.4159 0.3222 0.2   ]
+returns:    [0.7203 0.6951 0.7159 0.8222 1.0   ]
+```
+
+The first step receives a larger advantage than the terminal step because several later TD errors contribute to it. If $\lambda$ were set to zero, the result would reduce to the one-step TD column $[0.1,0.1,0.2,0.3,0.2]$.
 
 ## Reward Models
 

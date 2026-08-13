@@ -419,7 +419,7 @@ If you want to systematically select a direction for reproduction, it is recomme
 | RLHF / Preference Alignment          | Optimize language/multimodal models from human or AI preferences               | PPO, DPO, IPO, KTO, ORPO; [OpenAI InstructGPT](https://arxiv.org/abs/2203.02155), [Anthropic Constitutional AI](https://www.anthropic.com/research/constitutional-ai-harmlessness-from-ai-feedback), [TRL](https://huggingface.co/docs/trl/index), [NeMo-RL](https://github.com/NVIDIA-NeMo/RL) |
 | RLVR / Reasoning RL                  | Verifiable rewards, mathematical/code reasoning, long CoT                      | GRPO, DAPO, RLOO, REINFORCE++; [DeepSeek-R1](https://github.com/deepseek-ai/DeepSeek-R1), [Open-R1](https://github.com/huggingface/open-r1), [DAPO](https://github.com/BytedTsinghua-SIA/DAPO), [reasoning-gym](https://github.com/open-thought/reasoning-gym)                                  |
 | Agentic RL                           | Search, tool use, code execution, and web/desktop tasks                        | Trajectory reward, tool-use reward, process reward; [OpenAI Agents SDK](https://github.com/openai/openai-agents-python), [Google ADK](https://github.com/google/adk-python), [Agent Lightning](https://github.com/microsoft/agent-lightning), [SkyRL](https://docs.skyrl.ai/docs)               |
-| VLM / GUI / Computer-Use RL          | Image understanding, GUI grounding, and web/mobile/desktop control             | Multimodal GRPO, GUI action RL; [OpenAI CUA](https                                                                                                                                                                                                                                              |
+| VLM / GUI / Computer-Use RL          | Image understanding, GUI grounding, and web/mobile/desktop control             | Multimodal GRPO, GUI action RL; [OpenAI CUA](https://openai.com/index/computer-using-agent/), [Anthropic Computer Use](https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool), [VLM-R1](https://github.com/om-ai-lab/VLM-R1), [OSWorld](https://os-world.github.io/)  |
 
 #### Pre-LLM Era and Fixed Environments, Simulations, and Classical Algorithms
 
@@ -479,7 +479,7 @@ This path is ideal for building a strong foundation in reinforcement learning. I
 
 ##### Getting Started with Unity ML-Agents
 
-[Unity ML-Agents](https://github.com/Unity-Technologies/ml-agents) is a unique reinforcement learning toolkit that allows training directly within a 3D game engine. Unlike Gymnasium's 2D grid or PyBullet's pure physics simulation, ML-Agents provides a full 3/C space, including occlusion, perspective, gravity, and collision, making it ideal for research on visual navigation and spatial reasoning.
+[Unity ML-Agents](https://github.com/Unity-Technologies/ml-agents) supports reinforcement-learning experiments inside a 3D game engine. Unlike a two-dimensional grid or a physics-only simulator, it can combine perspective, occlusion, gravity, collision, and programmable environments for visual navigation and spatial-reasoning tasks.
 
 **Typical Use Cases**:
 

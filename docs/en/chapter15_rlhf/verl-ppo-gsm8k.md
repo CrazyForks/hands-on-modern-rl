@@ -1,5 +1,7 @@
 # 13.7 Hands-on: veRL PPO on GSM8K
 
+> **Code for this section:** [single-GPU script](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh) · [eight-GPU script](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_8gpu.sh) · [reward function](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/gsm8k_reward.py)
+
 In Section 13.4, we explained the four-model collaboration behind PPO-RLHF: the roles of the Actor, Reference, Reward Model, and Critic, and the mathematical relationship between the KL penalty, token-level rewards, and advantage estimation. In this section, we take a more practical route: we will use the industrial-grade framework [veRL](https://github.com/volcengine/verl) to run PPO training end-to-end on the GSM8K mathematical reasoning dataset.
 
 Handwritten pseudo-code helps you internalize the principles; veRL helps you run a real experiment. The relationship is similar to Chapter 8, where we run PPO with Stable Baselines3: the algorithm is the same, but the framework takes care of engineering details such as distributed scheduling, VRAM optimizations, and inference acceleration.
@@ -592,7 +594,7 @@ Other parameters (learning rates, `clip_ratio`, GAE settings, etc.) **do not nee
 
 ## Advanced Reward Functions
 
-The earlier `gsm8k_reward.py` uses only a 0/1 accuracy reward. In real training, you often add a format reward to guide the model toward cleaner outputs. This repository provides the advanced version here: [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py).
+The earlier `gsm8k_reward.py` uses only a 0/1 accuracy reward. In real training, you often add a format reward to guide the model toward cleaner outputs. This repository provides the advanced version here: [`code/chapter08_rlhf/verl_gsm8k/gsm8k_reward_advanced.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/gsm8k_reward_advanced.py).
 
 ```python
 # gsm8k_reward_advanced.py
@@ -748,11 +750,11 @@ This section depends on external veRL and does not copy veRL source code. This r
 
 | File                                                                                                                                                                                                 | Purpose                             |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| [`code/chapter15_rlhf/verl_gsm8k/README.md`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/README.md)                                                   | External veRL index and usage notes |
-| [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward.py)                                       | Basic 0/1 accuracy reward           |
-| [`code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/gsm8k_reward_advanced.py)                     | Accuracy + format combined reward   |
-| [`code/chapter15_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh) | Single-GPU 0.5B PPO launch script   |
-| [`code/chapter15_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_8gpu.sh`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter15_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_8gpu.sh)             | Single-node 8-GPU PPO launch script |
+| [`code/chapter08_rlhf/verl_gsm8k/README.md`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/README.md)                                                   | External veRL index and usage notes |
+| [`code/chapter08_rlhf/verl_gsm8k/gsm8k_reward.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/gsm8k_reward.py)                                       | Basic 0/1 accuracy reward           |
+| [`code/chapter08_rlhf/verl_gsm8k/gsm8k_reward_advanced.py`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/gsm8k_reward_advanced.py)                     | Accuracy + format combined reward   |
+| [`code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_single_gpu.sh) | Single-GPU 0.5B PPO launch script   |
+| [`code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_8gpu.sh`](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter08_rlhf/verl_gsm8k/run_qwen2_5_0_5b_ppo_8gpu.sh)             | Single-node 8-GPU PPO launch script |
 
 ## Exercises
 

@@ -404,7 +404,7 @@ The core significance of VLA is that it advances embodied intelligence from "tra
 
 RT-2 established the basic VLA formulation, but its demonstrations focused mainly on short manipulation tasks such as picking and placing objects. Longer tasks introduce three additional requirements: the robot must plan several dependent actions, combine more than visual and language input, and adapt when the physical outcome differs from the plan.
 
-Google DeepMind's [Gemini Robotics](https://deepmind.google/models/gemini-robotics/) extends the VLA formulation toward this setting. Before issuing low-level controls, the system can represent an intermediate plan:
+Google DeepMind's [Gemini Robotics](https://deepmind.google/models/gemini-robotics/) and [Gemini Robotics 1.5](https://deepmind.google/blog/gemini-robotics-15-brings-ai-agents-into-the-physical-world/) extend the VLA formulation toward this setting. Before issuing low-level controls, the system can represent an intermediate plan:
 
 ```text
 Instruction: place the blue block on the red block

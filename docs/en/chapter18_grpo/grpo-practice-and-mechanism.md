@@ -416,7 +416,7 @@ Recall the [baseline analysis in Chapter 6](../chapter08_policy_gradient/pg-impr
 
 ### The Core Idea of GRPO
 
-GRPO's idea is surprisingly simple. For the same problem $x_j$, first sample $G$ answers and obtain $G$ rewards:
+GRPO constructs its baseline from the other answers to the same problem. For problem $x_j$, first sample $G$ answers and obtain $G$ rewards:
 
 $$
 \{r_{j,1},r_{j,2},\ldots,r_{j,G}\}

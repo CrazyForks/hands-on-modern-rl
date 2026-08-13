@@ -45,7 +45,7 @@ Remember the data order: **Generation → Reward → Update → Synchronize Para
 
 Parameter synchronization addresses the issue of model version mismatches. Once the rollout GPU and training GPU obtain the same set of weights, they must go through their respective computation engines to derive the token probabilities. The inference side typically uses vLLM or SGLang, and employs KV Cache and low-precision computation. The training side commonly uses FSDP or Megatron, retaining the computational graph required for backpropagation. These two computational paths differ, and the resulting probabilities may also differ.
 
-Let us denote the policy actually executed by the rollout engine as $\pi_{\text{rollout}}$, and the old policy recorded by the training side as $\pi_{\text{old}}$. Ideally, these two should be the same. However, when there are discrepancies in model versions, floating-point precision differences, MoE routing variations, or errors in recomputing log-probabilities, the two policies will diverge. This is known as training-inference mismatch (Training-Inference Mismatch).
+Let $\pi_{\text{rollout}}$ denote the policy executed by the rollout engine and $\pi_{\text{old}}$ the policy recorded by the trainer. They should match. Different model versions, numerical precision, MoE routing, or incorrect log-probability recomputation can make them diverge; this is a **training-inference mismatch**.
 
 ### 1.1 Sources of Discrepancy Between Generation and Training Strategies
 
@@ -193,7 +193,7 @@ class RolloutWorker:
         self.engine.load_weights(new_weights)
 ```
 
-##### Driver（Single Controller）
+##### Driver (Single Controller)
 
 The Driver is the main loop of the RL algorithm, orchestrating all Workers:
 
@@ -503,7 +503,7 @@ model = FSDP(
 
 veRL defaults to using FSDP — it is more stable than DeepSpeed and more compatible with the PyTorch ecosystem.
 
-#### Gradient Checkpointing（Gradient Checkpointing）
+#### Gradient Checkpointing
 
 Instead of splitting the model, it trades computation for memory by not saving intermediate activations during the forward pass and recomputing them during the backward pass:
 
@@ -661,7 +661,7 @@ Some experts are frequently activated, while others remain idle. This leads to:
 - Uneven computational load (some GPUs are overloaded)
 - Biased training data distribution (some experts are under-trained)
 
-**Solution**: **Expert Balancing Loss**：
+**Solution**: **expert-balancing loss**:
 
 ```python
 def expert_balancing_loss(router_logits, num_experts):

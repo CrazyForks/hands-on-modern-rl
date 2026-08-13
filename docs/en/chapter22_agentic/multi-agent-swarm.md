@@ -94,7 +94,11 @@ This approach is simple but can lead to the **free-rider problem**: a worker who
 
 The Shapley value from game theory measures the marginal contribution of each agent:
 
-$$ \phi*i = \sum*{S \subseteq N \setminus \{i\}} \frac{|S|!(N - |S| - 1)!}{N!} [v(S \cup \{i\}) - v(S)] $$
+$$
+\phi_i = \sum_{S \subseteq N \setminus \{i\}}
+\frac{|S|!(N-|S|-1)!}{N!}
+\left[v(S\cup\{i\})-v(S)\right]
+$$
 
 Here, $ v(S) $ is the success probability of the subset $ S $ completing the task. The term $ N! $ requires **counterfactual evaluation** — removing agent $ i $ from the team and checking whether the task can still be completed. Although this method is the fairest, it is computationally expensive.
 

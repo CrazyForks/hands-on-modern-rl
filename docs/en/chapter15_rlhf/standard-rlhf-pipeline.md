@@ -133,6 +133,26 @@ $$
 
 In plain words: given the prompt and the already-generated prefix, make the model more likely to generate the demonstration next token.
 
+A minimal SFT record can use the chat format below:
+
+```json
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a clear, honest, and concise reinforcement-learning tutor."
+    },
+    { "role": "user", "content": "What is a value function?" },
+    {
+      "role": "assistant",
+      "content": "A value function estimates the expected cumulative return obtained by following a policy from a given state."
+    }
+  ],
+  "source": "human_written",
+  "quality": "verified"
+}
+```
+
 One crucial implementation detail is the **loss mask**: in chat-format data, only the assistant tokens should contribute to the loss. If you train on the user/system text, you teach the model to repeat the user and to generate role markers.
 
 ## Step 2: The Reward Model Teaches "What Is Better"
@@ -143,7 +163,9 @@ A reward model does not learn a single correct answer. It learns preference orde
 {
   "prompt": "Explain PPO's KL penalty.",
   "chosen": "The KL penalty acts like a safety rope: it prevents the policy from drifting too far from the reference.",
-  "rejected": "KL is a math formula and PPO uses it, so it is important."
+  "rejected": "KL is a math formula and PPO uses it, so it is important.",
+  "labeler": "human_or_judge",
+  "rubric": ["accuracy", "helpfulness", "clarity"]
 }
 ```
 
@@ -166,6 +188,53 @@ $$
 $$
 
 If margins are tiny, PPO will receive a weak and noisy reward signal even if the ordering accuracy looks acceptable.
+
+A reward model usually reuses a language model as its backbone and adds a scalar head to the hidden state of the final valid token. The same parameters score the chosen and rejected responses; their score difference supplies the training signal. The scalar score is meaningful only relative to the current model and data distribution.
+
+Before using those scores for PPO, make two checks. First, split training and validation data by prompt so that response pairs derived from one prompt cannot leak across the split. Second, inspect the reward mean, variance, and correlation with response length on a fixed calibration set. A weak reward scale will be overwhelmed by the KL penalty, while an excessive scale can drive the policy away from the reference model.
+
+The Step 2 deliverable should therefore include held-out preference accuracy, the margin distribution, reward–length correlation, and a manually inspected set of high- and low-scoring answers.
+
+::: details Advanced: a minimal PyTorch reward model
+
+```python
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class RewardModel(nn.Module):
+    """Map a prompt-response sequence to one scalar reward."""
+
+    def __init__(self, base_model, hidden_dim):
+        super().__init__()
+        self.base_model = base_model
+        self.reward_head = nn.Linear(hidden_dim, 1)
+
+    def forward(self, input_ids, attention_mask):
+        outputs = self.base_model(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+        )
+        # Production code should locate the last valid token from attention_mask.
+        last_hidden = outputs.last_hidden_state[:, -1, :]
+        return self.reward_head(last_hidden).squeeze(-1)
+
+
+def preference_loss(
+    reward_model,
+    chosen_ids,
+    chosen_mask,
+    rejected_ids,
+    rejected_mask,
+):
+    chosen_reward = reward_model(chosen_ids, chosen_mask)
+    rejected_reward = reward_model(rejected_ids, rejected_mask)
+    return -F.logsigmoid(chosen_reward - rejected_reward).mean()
+```
+
+This example shows the parameter flow. A production implementation must also handle padding, distributed batches, prompt-level splits, and reward calibration.
+
+:::
 
 ## Step 3: PPO-RLHF Optimizes the Policy Under Constraints
 

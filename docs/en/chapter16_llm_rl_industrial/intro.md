@@ -155,11 +155,11 @@ $o_w$ is the better response in the preference data, and $o_l$ is the worse resp
 
 ### 2.2 Difficulty Filtering for Training Prompts
 
-The success of VR training heavily depends on the quality of the prompts. A key observation from the Seed-Thinking paper [arXiv:2504.13914](https://arxiv.org/abs/2504.13914) is that **not all verifiable prompts are of training value**. If a question is too easy (all rollouts are correct) or too hard (all rollouts are incorrect) for the current strategy, the group's reward variance becomes zero, and the advantage is also zero. Such data **contributes nothing to the gradient**.
+The success of VR training heavily depends on the quality of the prompts. A key observation from the Seed-Thinking paper [arXiv:2504.13914](https://arxiv.org/abs/2504.13914) is that **not all verifiable prompts are of training value**. If a question is too easy (all rollouts are correct) or too hard (all rollouts are incorrect) for the current policy, the group's reward variance becomes zero, and the advantage is also zero. Such data **contributes nothing to the gradient**.
 
 Seed-Thinking provides three criteria for prompt selection:
 
-1. **Learnability**: The pass rate of the current strategy $\in [0.1, 0.9]$. Prompts that are always correct or always incorrect are filtered out.
+1. **Learnability**: The pass rate of the current policy $\in [0.1, 0.9]$. Prompts that are always correct or always incorrect are filtered out.
 2. **Diversity**: Questions cover different reasoning modes (algebra, geometry, combinatorics, number theory), avoiding the strategy collapsing into a single problem-solving template.
 3. **Difficulty Stratification**: Prompts are bucketed based on the base model's pass rate (easy/medium/hard), and curriculum learning schedules tasks by bucket.
 

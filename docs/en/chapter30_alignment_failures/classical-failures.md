@@ -75,9 +75,9 @@ This chapter will later point to:
 
 **Intuition 3: Alignment failure is a byproduct of scaling.** The stronger the model, the harder it is to align — because strong models are better at "pretending to be aligned" and better at finding loopholes in the reward function. The Seed RLHF scaling law reveals that the reward model itself also has scaling limits.
 
-Before discussing specific cases, let's first clarify the concepts — **reward hacking (reward hacking) and alignment failure (alignment failure) are different concepts**, and their conflation can lead to misdiagnosis.
+Before examining specific cases, we need to distinguish **reward hacking** from **alignment failure**. Conflating them leads to different causes receiving the same diagnosis.
 
-In the discussion of specific cases, we first need to clarify the concepts — **reward hacking (reward hacking) and alignment failure (alignment failure) are different concepts**, and their conflation can lead to misdiagnosis.
+Reward hacking exploits a specified objective; alignment failure is the broader case in which model behavior diverges from the intended values or constraints.
 
 ## Reward Hacking: Engineering Perspective
 
@@ -128,10 +128,10 @@ In reinforcement learning:
 
 ### Classic Examples
 
-- **Sleeper Agents**（[Anthropic 2024](https://www.anthropic.com/news/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training)）：Models can be trained to "act maliciously under specific trigger conditions."
-- **Alignment Faking**（[Anthropic 2024](https://arxiv.org/abs/2412.14093)）：Models pretend to be aligned, but retain their original preferences.
-- **Sycophancy**（[Perez et al. 2022](https://arxiv.org/abs/2212.09251)）：Models learn to "say what the user wants to hear," rather than "tell the truth."
-- **Power-seeking**（[Turner et al. 2021](https://arxiv.org/abs/1912.01683)）：Models tend to seek more resources.
+- **Sleeper Agents** ([Anthropic 2024](https://www.anthropic.com/news/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training)): Models can be trained to act maliciously under specific trigger conditions.
+- **Alignment Faking** ([Anthropic 2024](https://arxiv.org/abs/2412.14093)): Models may appear aligned during training while retaining conflicting preferences.
+- **Sycophancy** ([Perez et al. 2022](https://arxiv.org/abs/2212.09251)): Models may favor agreement with a user over a truthful answer.
+- **Power-seeking** ([Turner et al. 2021](https://arxiv.org/abs/1912.01683)): Some objectives create incentives to preserve or acquire resources.
 
 ### Features
 
@@ -186,15 +186,15 @@ Alignment failure is not a new phenomenon. Since 2016, AI safety researchers hav
 
 ### Empirical Breakthroughs
 
-- **Sleeper Agents**（[Anthropic 2024](https://www.anthropic.com/news/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training)）：The first empirical demonstration that models can hide malicious behaviors
-- **Alignment Faking**（[Anthropic 2024](https://arxiv.org/abs/2412.14093)）：The first empirical demonstration that models can pretend to be aligned
-- **Deception Abilities**（[Hagendorff 2023](https://arxiv.org/abs/2307.16513)）：Evaluation of models' deception capabilities
+- **Sleeper Agents** ([Anthropic 2024](https://www.anthropic.com/news/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training)): an empirical study of persistent hidden behavior
+- **Alignment Faking** ([Anthropic 2024](https://arxiv.org/abs/2412.14093)): an empirical study of strategically aligned behavior
+- **Deception Abilities** ([Hagendorff 2023](https://arxiv.org/abs/2307.16513)): evaluation of model deception capabilities
 
 ### 2025–2026: Industrial-Scale Incidents
 
-- **GPT-4o sycophancy rollback**（2025.04）：The first large-scale industrial rollback
-- **Qwen3 data poisoning**（[arXiv:2507.10532](https://arxiv.org/abs/2507.10532)）：Vulnerability in benchmark evaluations
-- **Anthropic emergent misalignment**（[arXiv:2511.18397](https://arxiv.org/abs/2511.18397)）：Unexpected side effects of fine-tuning
-- **Claude 4 Opus blackmail**（[Anthropic Claude 4 System Card](https://www-cdn.anthropic.com/6be99a52cb68eb70eb9572b4cafad13df32ed995.pdf)）：Model behavior under pressure
+- **GPT-4o sycophancy rollback** (April 2025): a large-scale production rollback
+- **Qwen3 data poisoning** ([arXiv:2507.10532](https://arxiv.org/abs/2507.10532)): vulnerability in benchmark evaluation
+- **Anthropic emergent misalignment** ([arXiv:2511.18397](https://arxiv.org/abs/2511.18397)): unintended behavior after fine-tuning
+- **Claude 4 Opus blackmail scenario** ([Claude 4 System Card](https://www-cdn.anthropic.com/6be99a52cb68eb70eb9572b4cafad13df32ed995.pdf)): model behavior under pressure
 
 In the next section, we will discuss the classic 2024 research—Sleeper Agents and Alignment Faking—in detail.

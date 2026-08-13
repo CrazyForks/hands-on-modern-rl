@@ -3,6 +3,7 @@ title: 8.4 RL in Long-Horizon Tasks
 ---
 
 # 8.4 Long-Horizon Tasks and Planning
+
 In the previous sections, we used PPO on BipedalWalker and collected a set of game-project entry points. Those tasks usually have horizons from tens to a few thousand steps, and their reward signals can often be shaped without too much difficulty. Many real tasks are different. A robot in a kitchen may need to open a fridge, take out ingredients, wash, cut, cook, and plate food. An agent in Minecraft may need to collect resources, craft tools, and build shelter from scratch. These are **long-horizon tasks**: the decision sequence may span thousands or tens of thousands of steps, and reward may be almost absent until the end.
 
 This section reviews classical RL ideas for long-horizon planning, without involving LLMs: hierarchical RL, hindsight experience replay, model-based planning, explicit exploration, reward shaping, curriculum learning, and imitation learning. Understanding these methods will make it easier to compare them with LLM-based agent planning later.
@@ -275,6 +276,8 @@ where $\Phi$ is any state potential function. Ng et al. showed that this form do
 
 ![Reward shaping](../../chapter10_ppo/images/reward-shaping-concept.png)
 
+_Figure 9: A learned dense reward can provide intermediate training signals in an environment whose original reward is sparse. Source: [Learning to Learn with Probabilistic Task Embeddings](https://arxiv.org/abs/1904.07854)._
+
 Good shaping still requires knowledge of useful intermediate states. To reduce manual design, researchers use inverse RL, preference-based RL, and self-supervised reward discovery.
 
 ### Curriculum Learning
@@ -282,6 +285,8 @@ Good shaping still requires knowledge of useful intermediate states. To reduce m
 **Curriculum learning** trains from easy tasks to hard tasks. A robot opening a door might start with a half-open door, then a barely open door, then a closed door.
 
 ![Curriculum learning categories](../../chapter10_ppo/images/curriculum-overview.png)
+
+_Figure 10: Five common ways to construct a curriculum for reinforcement learning. Source: [Lilian Weng, “Curriculum for Reinforcement Learning”](https://lilianweng.github.io/posts/2020-01-29-curriculum-rl/)._
 
 Lilian Weng groups RL curricula into several types:
 

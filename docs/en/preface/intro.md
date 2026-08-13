@@ -5,10 +5,11 @@ title: Course Overview
 # Introduction to RL
 
 ::: tip Train CartPole before you start
+
 - **[ModelScope Studio: train in the browser](https://modelscope.cn/studios/walkinglab/hands-on-modern-rl-experiment01-cartpole)**: start PPO training without installing a local environment, then inspect the reward curve and policy animation.
 - **[ModelScope Notebook: open the cloud workspace](https://modelscope.cn/my/mynotebook)**: start a CPU environment, clone the course repository, and open `notebooks/cartpole-ppo.ipynb`.
 - **[ModelScope: open the training script](https://modelscope.cn/studios/walkinglab/hands-on-modern-rl-experiment01-cartpole/file/view/master/train.py)**: run `python train.py --timesteps 30000` in a ModelScope Notebook or a local terminal.
-:::
+  :::
 
 ::: warning 📣 Announcement
 We sincerely thank everyone for your support of this tutorial! A new version is coming soon. Many sections are still being organized and refined, so we appreciate your patience. Suggestions and feedback are always welcome!
@@ -23,6 +24,29 @@ This course is under rapid iteration. We recommend starting with chapters not ma
 ::: tip Looking for Support
 Because compute resources are limited, we are looking for GPU sponsorship. If you can offer GPU access, please contact us at [physicoada@gmail.com](mailto:physicoada@gmail.com).
 :::
+
+## Start with CartPole
+
+CartPole is a standard first control task. A pole is attached to a cart by a joint, and the agent moves the cart left or right to keep the pole upright. The task is small enough to train on an ordinary laptop CPU in about half a minute; no GPU or prior RL mathematics is required.
+
+![CartPole: the cart moves left and right to keep the pole upright](../../preface/images/cartpole.gif)
+
+<div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
+  <em>CartPole. The cart moves left and right to keep the pole upright. Source: <a href="https://gymnasium.farama.org/environments/classic_control/cart_pole/" target="_blank" rel="noopener noreferrer">Gymnasium</a></em>
+</div>
+
+Use one of the online links at the top of the page to run a training job before continuing. Early episode rewards usually fluctuate around 20; as the policy improves, they approach the environment limit of 500. [Chapter 1](../chapter01_cartpole/principles) explains the local setup, training script, and learning curve.
+
+For now, the goal is only to observe a policy improving through interaction. The implementation and mathematics are developed in the chapters that follow.
+
+## What This Book Covers
+
+CartPole represents the classical control side of reinforcement learning. The later parts of the book carry the same ideas into modern language-model and agent training:
+
+- **DPO and model alignment**: [Chapter 14](../chapter17_dpo/dpo-theory-and-family) shows how preference pairs change a model's responses without running an online PPO loop.
+- **GRPO and reasoning**: [Chapter 15](../chapter18_grpo/grpo-practice-and-mechanism) develops group-relative policy updates, and [Chapter 16](../chapter19_reasoning/intro) studies reasoning budgets and test-time scaling.
+- **Computer use and GUI agents**: [Chapter 22](../chapter25_computer_use/training) examines policies that read screens, call tools, and complete multi-step interface tasks.
+- **Software-engineering agents**: [Chapter 20](../chapter23_rl_based_swe/swe-bench-and-rlvr) follows repository-level tasks from executable verification to RL training.
 
 ## Why Reinforcement Learning?
 

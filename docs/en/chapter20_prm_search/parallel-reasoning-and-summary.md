@@ -59,7 +59,7 @@ The coordinator may bring two benefits:
 
 #### Training PaCoRe
 
-PaCoRe uses result rewards to train coordination and synthesis capabilities, without requiring step-by-step PRM labels. The reward only indicates whether the final answer is correct, and the training algorithm must also estimate which paths and messages contributed to the result.
+PaCoRe uses outcome rewards to train coordination and synthesis capabilities, without requiring step-by-step PRM labels. The reward only indicates whether the final answer is correct, and the training algorithm must also estimate which paths and messages contributed to the result.
 
 ```python
 def pacore_reward(prompt, target_answer, round_widths):
@@ -75,7 +75,7 @@ def pacore_reward(prompt, target_answer, round_widths):
     return reward
 ```
 
-This pseudocode only illustrates the data flow. In practice, the implementation would distinguish between intermediate coordination messages and the final answer, and record the corresponding generation probabilities; a result reward would not be automatically and equally distributed to all paths.
+This pseudocode only illustrates the data flow. In practice, the implementation would distinguish between intermediate coordination messages and the final answer, and record the corresponding generation probabilities; an outcome reward would not be automatically and equally distributed to all paths.
 
 ## 2. Choosing Among the Three Reasoning Structures
 
@@ -93,7 +93,7 @@ Comparison of the three reasoning structures:
 | ------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | Reasoning Structure | Multiple parallel paths with compressed messages              | Parallel consideration of multiple hypotheses, internal algorithm not fully disclosed | Explicit tree state with repeated visits                  |
 | Budget Control      | Number of paths per round and number of rounds                | Product effort or mode                                                                | Number of iterations, expansion count, and rollout length |
-| Feedback            | Training mainly uses result rewards                           | Public materials do not disclose full structure                                       | Results, PRM, or external verifier                        |
+| Feedback            | Training mainly uses outcome rewards                          | Public materials do not disclose full structure                                       | Results, PRM, or external verifier                        |
 | Main Cost           | Large number of complete trajectories and message compression | Difficult to reproduce internal coordination                                          | Serial selection, state maintenance, and multiple scoring |
 
 ### 2.2 Tasks Suitable for PaCoRe
@@ -185,13 +185,13 @@ Fixed PRM can score each step; adaptive search further decides how to allocate s
 
 ### 4.4 From Single to Mixed
 
-Result rewards, process rewards, formal checks, and LLM evaluations cover different types of errors. When using them in combination, it is important to clarify which layer each score applies to and handle dimensionality and conflicts.
+Outcome rewards, process rewards, formal checks, and LLM evaluations cover different types of errors. When using them in combination, it is important to clarify which layer each score applies to and handle dimensionality and conflicts.
 
 ## Summary of This Chapter
 
 Chapter 17 begins with the example of "missing a square in the sixth step, yet the final answer may coincidentally be correct," and gradually fills in the feedback needed for training and reasoning:
 
-- **17.1 Result Rewards and Process Rewards**: Sparse reward problems and credit assignment
+- **17.1 Outcome Rewards and Process Rewards**: Sparse rewards and credit assignment
 - **17.2 Discriminative PRM**: Let's Verify and PRM800K
 - **17.3 Generative PRM**: Natural language evaluation and label efficiency of ThinkPRM
 - **17.4 Formal Verifier**: AlphaProof, Lean4, and DeepSeek-Prover-V2

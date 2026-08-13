@@ -4,28 +4,21 @@ title: 'Supplement: Benchmarks and Case Studies'
 
 # Supplement: Benchmarks and Case Studies
 
-This section merges what used to be "industrial practice" and "benchmarks." The reason is simple: in real agent training, every operational problem eventually has to be closed by **evaluation**, **monitoring**, **badcase attribution**, and **regression testing**.
+Agent training produces failures that a reward curve alone cannot explain: unstable updates, format collapse, unsupported claims, and context loss. Each failure needs a measurable diagnosis before the next training run can address it. This chapter therefore connects industrial training practice with evaluation, monitoring, failure attribution, and regression testing.
 
-We will do two things in one storyline:
-
-1. start from the failures you actually see in training (instability, format collapse, hallucination, context issues),
-2. then show how to measure them with benchmarks and custom evaluation so that training becomes an iterative loop rather than a blind run.
+We begin with failure modes observed in production training systems. The second half turns those observations into benchmark choices, task-specific rubrics, and an evaluation pipeline.
 
 ## Industrial Practice: Common Failure Modes and Fix Patterns
 
-Agentic RL inherits the familiar RL issues (variance, exploration, reward hacking), but tool use and multi-turn interaction make everything easier to break.
+Agentic RL inherits the familiar problems of variance, exploration, and reward hacking. Tool calls and multi-turn interaction add more failure points because an early incorrect state can alter every later action.
 
-Between 2025 and 2026, multiple teams shared practical lessons from agentic training systems (for example, Alibaba Tongyi, Moonshot, LinkedIn, and others). The most useful way to learn from these reports is not by listing teams, but by grouping them by the failure scenario you will encounter in practice.
+Between 2025 and 2026, teams including Alibaba Tongyi, Moonshot, LinkedIn, and Bespoke Labs published lessons from agent training systems. The sections below organize those reports by failure scenario so that each observation leads to a concrete diagnostic and response.
 
-> Key point:
->
-> In Agentic RL, training stability often matters more than which RL algorithm you pick. Data quality and environment consistency decide the outcome.
+> **Key point:** Algorithm choice cannot compensate for inconsistent environments or unreliable data. Establish reproducibility and training stability before comparing RL objectives.
 
 ### Scenario A: Data Collection and Environment Construction
 
-The first question in agent training is not "which optimizer." It is:
-
-Can you provide a stable, replayable interaction environment?
+Agent training begins with a stable, replayable interaction environment. Without one, two identical actions can produce different observations and rewards, so changes in the training curve cannot be attributed to the policy update.
 
 #### Live APIs are not reproducible
 
@@ -161,23 +154,44 @@ In pure dialogue, the consequence of hallucination is usually limited to providi
 3. Turn 5: the new tool lacks a key capability -> the model fabricates a seemingly plausible conclusion.
 4. Final output: a report that looks complete on the surface but is built on hallucinated premises.
 
-The more serious point is that if RL reward only depends on final output quality, the model may in theory discover that "making up a plausible answer" receives higher reward than "admitting uncertainty." That means RL training could reinforce hallucination behavior. This inference is logically valid, though it has not yet been clearly reported as an observed phenomenon in public industrial practice.
+If the reward only measures the final output, a plausible fabrication may score higher than an honest expression of uncertainty. Training can then reinforce the fabrication. This is a design risk inferred from the reward objective; the industrial reports surveyed here do not yet establish its prevalence.
 
 #### RL Training for Hallucination Penalty
 
-**Citation-aware scoring reward.** CaRR designs a fine-grained reward mechanism to guide the model in correctly citing evidence. The core idea is decomposing multi-hop questions into atomic fact statements (Rubrics), then computing reward through a three-step process: (1) check whether the model output identifies key entities; (2) extract URLs from the output, fetch web content, and judge whether each Rubric is supported by cited content; (3) verify through graph BFS whether Rubrics are logically connected to the final answer. The final reward is the ratio of satisfied and logically connected Rubrics to total Rubrics.
+**Citation-aware scoring reward.** CaRR[^carr_industrial] designs a fine-grained reward mechanism to guide the model in correctly citing evidence. The core idea is decomposing multi-hop questions into atomic fact statements (Rubrics), then computing reward through a three-step process: (1) check whether the model output identifies key entities; (2) extract URLs from the output, fetch web content, and judge whether each Rubric is supported by cited content; (3) verify through graph BFS whether Rubrics are logically connected to the final answer. The final reward is the ratio of satisfied and logically connected Rubrics to total Rubrics.
 
 **Tool result fidelity reward.** Encourage the model to faithfully interpret tool-returned results. If the model's summary deviates from what the tool actually returned (detected via NLI models or cross-validation), apply penalty.
 
 **Uncertainty reward.** Encourage the model to proactively express "need more information" or "this result is uncertain" when unsure, rather than fabricating answers.
 
+A simplified reward can combine these checks while preserving the separate diagnostics:
+
+```python
+def hallucination_aware_reward(answer, tool_results, citations):
+    """Score fidelity to tool results and cited evidence."""
+    claims = extract_atomic_claims(answer)
+    supported = sum(
+        claim_supported(claim, tool_results, citations)
+        for claim in claims
+    )
+    unsupported = len(claims) - supported
+
+    return {
+        "reward": supported / max(len(claims), 1) - 0.5 * unsupported,
+        "supported_claims": supported,
+        "unsupported_claims": unsupported,
+    }
+```
+
+Keeping the component counts is important. A single total reward cannot show whether a regression came from tool misuse, unsupported claims, or broken citations.
+
 #### Verification-Based Hallucination Filtering
 
 Besides penalizing hallucinations in the reward function, we can also filter them during inference through verification.
 
-**Self-RAG** proposes an adaptive retrieval plus self-evaluation framework. Unlike traditional RAG, which retrieves for every query, Self-RAG lets the model decide whether external retrieval is needed before generating each text segment by using special reflection tokens. If retrieval is needed, it retrieves relevant passages, generates continuations for each passage, scores the candidates with reflection tokens such as relevance, support, and usefulness, and then uses segmented beam search to select the best overall output.
+**Self-RAG**[^selfrag_industrial] proposes an adaptive retrieval plus self-evaluation framework. Unlike traditional RAG, which retrieves for every query, Self-RAG lets the model decide whether external retrieval is needed before generating each text segment by using special reflection tokens. If retrieval is needed, it retrieves relevant passages, generates continuations for each passage, scores the candidates with reflection tokens such as relevance, support, and usefulness, and then uses segmented beam search to select the best overall output.
 
-**CRITIC** proposes tool-assisted correction. After the model generates an initial answer, it actively calls external tools such as search engines or code executors to verify key claims, then produces structured critique from tool feedback. If the critique indicates that the answer is flawed, the model regenerates a corrected answer. This verify -> revise -> verify loop can iterate multiple times until the answer passes verification or reaches the maximum iteration count.
+**CRITIC**[^critic_industrial] proposes tool-assisted correction. After the model generates an initial answer, it actively calls external tools such as search engines or code executors to verify key claims, then produces structured critique from tool feedback. If the critique indicates that the answer is flawed, the model regenerates a corrected answer. This verify -> revise -> verify loop can iterate multiple times until the answer passes verification or reaches the maximum iteration count.
 
 ### Multi-Tool Collaboration
 
@@ -211,7 +225,7 @@ The industry currently has two parallel training paradigms regarding whether SFT
 
 > **SFT-RL paradigm (mainstream path)**: **Alibaba Tongyi** designed a **CPT -> SFT -> RL** three-stage training pipeline for Tongyi DeepResearch. During pre-training (CPT), tool-call trajectories are incorporated as text; during SFT, human or high-quality synthetic data cultivates the model's basic reasoning and tool-use capabilities; finally, RL performs exploration and optimization. The core insight: for non-reasoning alignment scenarios (like complex API calls, long-horizon exploration), SFT/RM remains the most effective means for **reducing exploration space and overcoming cold-start difficulty**. If the model lacks basic tool-use formatting at the outset, direct RL training often gets lost in an enormous action space.
 
-> **Pure-RL paradigm (frontier breakthrough)**: In sharp contrast, **DeepSeek-R1-Zero** brought a paradigm revolution. It proved that in scenarios with clear right/wrong feedback (math, code testing, objective reasoning), **completely abandoning SFT cold-start** and doing large-scale RL directly on the base model is absolutely feasible. Under pure RL, the model spontaneously emerged with long chain-of-thought, self-verification, and even self-reflection capabilities. This SFT-bias-free training approach broke through the ceiling of human annotation data, but places extremely high demands on reward signal objectivity and environment anti-cheating capabilities.
+> **Pure-RL paradigm**: **DeepSeek-R1-Zero** showed that a base model can be trained directly with large-scale RL when feedback is objectively verifiable, as in mathematics and executable code. The trained model developed longer reasoning traces, self-verification, and self-correction without an SFT cold start. This route reduces dependence on demonstration data, but it requires reliable rewards and an environment that resists reward hacking.
 
 These two paradigms are not mutually exclusive in Agentic RL; researchers should choose the appropriate pipeline based on **whether the environment provides fully deterministic objective rewards**.
 
@@ -300,6 +314,8 @@ BFCL evaluates in pure text: given function signatures and user requests, the mo
 
 This is one of the hardest code agent evaluations. Top models (like Claude Opus) achieve only about 50% resolution rate. The complexity of real software engineering tasks far exceeds single-file code generation.
 
+The current leaderboard is available at [swebench.com](https://www.swebench.com/).
+
 #### WebArena
 
 **WebArena** provides a real web environment for agents to perform tasks -- shopping on e-commerce sites, posting on forums, managing code repositories on GitLab. The agent needs to understand web page visual layout and DOM structure, executing click, input, and navigation operations.
@@ -323,6 +339,8 @@ The challenge lies in state maintenance and uncertainty handling. Users may give
 - Level 3: Multi-step reasoning + multiple tools working together
 
 Even top models perform far from saturation on Level 3.
+
+See the [GAIA leaderboard](https://huggingface.co/spaces/gaia-benchmark/leaderboard) for current results.
 
 #### Toolathlon
 
@@ -371,7 +389,7 @@ Standard LLM evaluation only looks at outcomes. Math answers correct gets points
 
 Outcome evaluation checks whether the final deliverable meets requirements. Process evaluation checks whether each step's decisions during task completion were reasonable.
 
-Process evaluation is not just icing on the cake. Berkeley RDI research found that almost every mainstream agentic benchmark can be "gamed" to near-perfect scores without actually completing the task. Without process evaluation, you may only be measuring the model's ability to find shortcuts.
+Process evaluation is not an optional refinement. Berkeley RDI showed that mainstream agentic benchmarks can often be gamed to near-perfect scores without completing the intended task.[^benchmark-exploit] Without process evaluation, a benchmark may measure shortcut discovery instead of capability.
 
 #### Breaking "Quality" into Quantifiable Dimensions
 
@@ -423,7 +441,7 @@ def evaluate_trajectory(trajectory, task):
     return total, scores
 ```
 
-Weight allocation reflects your emphasis on different dimensions. Code agents may weight correctness higher (0.5). Research agents may weight completeness and citations higher (0.25 each). Weight selection has no standard answer; it depends on the business scenario.
+Weight allocation reflects your emphasis on different dimensions. Code agents may weight correctness higher (0.5). Research agents may weight completeness and citations higher (0.25 each). The weights may also change as the policy improves: DR Tulu adjusts rubric weights so evaluation continues to target the model's current weaknesses.[^rler]
 
 #### Process Evaluation Methods
 
@@ -431,27 +449,226 @@ Process evaluation is the key difference between agent evaluation and standard L
 
 **Statistics.** Count total interaction turns, tool-call count, repeated action ratio, and similar metrics. This does not judge whether each step is "right," but it catches obvious inefficiency such as searching the same query five times.
 
+```python
+def process_stats(trajectory):
+    """Summarize observable properties of one trajectory."""
+    tool_steps = [step for step in trajectory.steps if step.is_tool_call]
+    return {
+        "total_turns": len(trajectory.steps),
+        "tool_calls": len(tool_steps),
+        "repeat_actions": count_repeats(trajectory.steps),
+        "distinct_tools": len({step.tool_name for step in tool_steps}),
+    }
+```
+
 **Step-level rule checks.** Define process rules for the task and check whether the agent violates them. Examples include forbidding three identical tool calls in a row, requiring search results to be used within a few steps, or requiring at least one search before final answering in a research task.
+
+```python
+def check_process_rules(trajectory, rules):
+    """Return the names of violated process rules."""
+    return [rule.name for rule in rules if not rule.check(trajectory)]
+```
 
 **Step-level LLM scoring.** Use an LLM to evaluate whether each trajectory step is reasonable. This is essentially the evaluation-side counterpart of a Process Reward Model: during training, PRM provides learning signals; during evaluation, it provides quality assessment.
 
+The judge should see the task, the state before the action, the available tools, and the action itself. A useful rubric asks whether the step advances the task, whether the tool and arguments are appropriate, and whether a safer or more efficient action was available. The score should cite evidence from the trajectory rather than rely on a general impression.
+
+Agent-as-a-Judge[^agent-judge] extends this idea by giving the evaluator its own tools. If the evaluated agent claims that a URL supports a fact, the judge can open the URL instead of rating the prose alone. This is more expensive than static LLM scoring but can verify claims that depend on external state.
+
 #### Where Do Tasks Come From?
 
-The scoring method answers "how do we judge quality," but an evaluation set also needs good tasks. Task quality directly determines whether the benchmark is meaningful. A practical approach is to extract tasks from real user needs: user feedback, support tickets, failure logs, and production traces. These tasks have ecological validity because they come from scenarios users actually care about.
+The scoring method answers "how do we judge quality," but an evaluation set also needs good tasks. A survey of 78 agentic benchmarks found ambiguity and evaluation flaws serious enough to overstate capability; its Agentic Benchmark Checklist provides a useful design review.[^abc] A practical approach is to extract tasks from real user needs: user feedback, support tickets, failure logs, and production traces, as Anthropic recommends.[^anthropic-eval] These tasks have ecological validity because they come from scenarios users actually care about.
 
-Another direction is automatic task synthesis. Start from simple, verifiable atomic tasks, then increase depth by adding more steps and increase breadth by adding more tools and constraints. Each expansion should be validated so that the task remains solvable rather than becoming an ambiguous prompt.
+Another direction is automatic task synthesis. TaskCraft[^taskcraft] starts from simple, verifiable atomic tasks, then increases depth by adding steps and breadth by adding tools and constraints. APIGen-MT[^apigen] instead simulates multi-turn interaction between an agent and a user. In both cases, each generated task must be validated so that it remains solvable rather than becoming an ambiguous prompt.
+
+A second useful source is failure-driven synthesis. HardGen[^hardgen] runs a baseline agent, collects failed trajectories, and extracts the tool dependencies that caused trouble. New tasks then instantiate those dependency patterns with different parameters. Evol-Instruct[^evol-instruct] provides operators for deepening, broadening, and constraining instructions; Tag-Evol[^tag-evol] adds explicit domain, difficulty, and skill tags. Executing each generated task in the environment closes the loop: unsolvable or incorrectly specified tasks are discarded before they enter the evaluation set.
+
+Web tutorials offer another source of successful trajectories. AgentTrek[^agenttrek] extracts ordered action sequences from tutorials and replays them in the target environment. Firefly[^firefly] grounds tool-use data in real APIs, while WebShaper[^webshaper] builds a reproducible offline search environment. Only successful, reproducible executions should become evaluation tasks.
 
 #### How to Evaluate Open-Ended Tasks?
 
 Many agent tasks are open-ended: writing a report, doing research, or giving advice. These tasks do not have a single correct answer.
 
-A practical strategy is hybrid scoring: deterministic checks for daily regression, LLM-as-Judge for periodic quality evaluation, and manual spot-checking for final acceptance. It is also useful to maintain two evaluation sets: a capability set with hard tasks that the model does not need to pass completely, and a regression set with basic tasks that the model should pass consistently.
+A practical strategy is hybrid scoring: deterministic checks for daily regression, LLM-as-Judge for periodic quality evaluation, and manual spot-checking for final acceptance.[^anthropic-eval] JADE[^jade] makes open-ended evaluation more explicit by first activating task-specific expert skills and then verifying concrete claims. It is also useful to maintain two evaluation sets: a capability set with hard tasks that the model does not need to pass completely, and a regression set with basic tasks that the model should pass consistently.
 
 #### Example: Building an Evaluation for a Frontend Page-Generation Agent
 
 Suppose you train a frontend page-generation agent. Given a requirement such as "build a login page supporting phone and email login," the agent must plan the page structure, choose components, write HTML/CSS/JS, and deliver a runnable page.
 
 There is no single gold answer. The same login-page requirement can be satisfied by many designs. A useful evaluation decomposes quality into functional correctness, visual match, code quality, responsiveness, accessibility, and performance. Functional correctness can be checked with Playwright tests; responsiveness can be checked with screenshots at multiple viewports; accessibility can use Lighthouse or axe; visual quality often needs LLM-as-Judge plus human spot checks.
+
+##### Define the Task Contract
+
+An open-ended task still needs explicit acceptance criteria. The contract below does not prescribe one visual design; it states which user-visible behaviors must exist.
+
+```python
+task = {
+    "id": "frontend_001",
+    "prompt": (
+        "Build a login page with phone and email login, "
+        "a forgot-password link, and a registration link."
+    ),
+    "difficulty": "medium",
+    "checklist": [
+        "phone input is present",
+        "email input is present",
+        "password input is present",
+        "login button responds to a click",
+        "forgot-password link is present",
+        "registration link is present",
+    ],
+    "style_reference": "light background with a blue primary color",
+    "max_turns": 15,
+}
+```
+
+The task set should cover a difficulty ladder. A static landing page is a simple task; an interactive form is an intermediate task; a dashboard with nested components, filtering, and responsive behavior is harder. A first evaluation set might contain 20–30 tasks at each level.
+
+##### Evaluate the Result in Layers
+
+The first two layers should be deterministic. If the page does not load or the required interaction fails, visual polish should not compensate for it.
+
+```python
+class FrontendEvalPipeline:
+    """Evaluate a generated page from executable checks to judgment."""
+
+    def __init__(self, judge):
+        self.judge = judge
+
+    def evaluate(self, task, trajectory):
+        code = trajectory.final_answer
+        screenshot = take_screenshot(code)
+
+        scores = {
+            "runnable": check_page_loads(code),
+            "functionality": run_playwright_checks(
+                code, task["checklist"]
+            ),
+            "visual": self.judge.score(
+                task["prompt"], screenshot, VISUAL_RUBRIC
+            ),
+            "code_quality": 0.5 * run_eslint(code)
+            + 0.5 * self.judge.score(code, CODE_RUBRIC),
+            "process": evaluate_frontend_process(trajectory, task),
+        }
+        return aggregate(scores), scores
+```
+
+This produces five separate measurements:
+
+- **Runnable**: the browser loads the page without a JavaScript error.
+- **Functionality**: Playwright can complete each required interaction.
+- **Visual quality**: the rendered page matches the stated layout and style.
+- **Code quality**: static checks and a rubric assess maintainability.
+- **Process quality**: the trajectory uses planning, preview, and incremental repair effectively.
+
+The aggregate score is useful for ranking checkpoints, but the component scores are the evidence needed for diagnosis.
+
+##### Make Visual Evaluation Reproducible
+
+A single prompt asking whether a page “looks good” is unstable. Design2Code[^design2code] separates page structure, text, position, color, and semantic similarity instead of collapsing them into one opaque score. When a reference image is available, compare several measurable properties:
+
+```python
+def visual_metrics(generated, reference):
+    """Return diagnostic visual metrics, not one opaque score."""
+    return {
+        "block_match": compute_block_match(generated, reference),
+        "position": compute_position_alignment(generated, reference),
+        "color": compute_ciede2000(generated, reference),
+        "semantic": clip_image_similarity(generated, reference),
+    }
+```
+
+The metrics answer different questions. Block matching checks page regions, position alignment checks geometry, CIEDE2000 checks perceptual color difference, and CLIP checks broad visual semantics. Reporting them separately reveals whether a page has the right structure but the wrong colors, or the right theme but missing content.
+
+When no reference image exists, replace a continuous beauty score with a checklist:
+
+```text
+For each item, return PASS or FAIL and cite visible evidence.
+
+1. The form is placed at a clear visual focus.
+2. Phone, email, and password controls are distinguishable.
+3. At least one primary action button is visible.
+4. Text and controls do not overlap.
+5. Inputs and buttons have visible boundaries and labels.
+6. The layout remains usable at 390 px and 1440 px widths.
+```
+
+Discrete checks reduce judge variance and make disagreements easier to review. This calibration matters: Omni-I2C found that pixel metrics correlate weakly with human judgment, while an LMM judge correlates more strongly but still disagrees on a meaningful fraction of cases.[^omni-i2c] FullFront likewise shows a large gap between model and human accuracy on webpage perception.[^fullfront] A small sample should therefore still be scored by humans periodically. If judge–human agreement falls below the release threshold, revise the rubric before comparing more checkpoints.
+
+##### Evaluate How the Agent Worked
+
+Two agents can produce the same runnable page through very different trajectories. One may plan, build a skeleton, preview, and repair a local error. Another may replace the entire file repeatedly until one attempt happens to pass. Outcome checks treat them equally, but the second process is slower and less reliable.
+
+Start with observable statistics:
+
+```python
+def frontend_process_stats(trajectory):
+    """Measure editing and verification behavior."""
+    rewrites = count_full_rewrites(trajectory)
+    edits = count_incremental_edits(trajectory)
+    return {
+        "turns": len(trajectory.steps),
+        "full_rewrites": rewrites,
+        "incremental_edits": edits,
+        "previews": count_tool_calls(trajectory, "browser_preview"),
+        "rewrite_ratio": rewrites / max(rewrites + edits, 1),
+    }
+```
+
+A high rewrite ratio indicates that the agent is replacing work instead of locating the failing component. It is a diagnostic signal rather than proof of a bad solution, so it should be combined with explicit process rules:
+
+```python
+FRONTEND_PROCESS_RULES = [
+    Rule("plan_before_large_edit", plan_precedes_first_large_edit),
+    Rule("preview_after_edit", preview_within_three_steps),
+    Rule("no_rewrite_loop", no_consecutive_full_rewrites),
+    Rule("reasonable_size", generated_code_within_task_budget),
+]
+```
+
+Rules catch known failure patterns cheaply. For deeper diagnosis, a judge can inspect the state before and after each step and ask whether the action advanced a checklist item, targeted the observed error, or introduced a regression.
+
+AgentPRM frames step quality through promise and progress signals.[^agent-prm] A deterministic approximation of progress is the change in passed checks:
+
+```python
+def step_progress(trajectory, checks):
+    deltas = []
+    for index in range(len(trajectory.steps)):
+        before = count_passed(checks, trajectory.code_at(index))
+        after = count_passed(checks, trajectory.code_at(index + 1))
+        deltas.append(after - before)
+
+    return {
+        "net_progress": sum(deltas),
+        "wasted_steps": sum(delta <= 0 for delta in deltas),
+        "per_step": deltas,
+    }
+```
+
+This measure is imperfect: a refactor may enable later progress without immediately passing a new check. It is most useful for finding trajectories that make no observable progress for many consecutive steps.
+
+##### Check for Evaluation Exploits
+
+An agent can satisfy a naive DOM check without producing a usable page. For example, it may add invisible required elements or hard-code values from the test fixture. Add explicit exploit checks before trusting a high score:
+
+```python
+FRONTEND_EXPLOIT_RULES = [
+    Rule("no_invisible_required_elements", no_hidden_required_controls),
+    Rule("no_hardcoded_fixture_data", no_test_fixture_literals),
+    Rule("no_suspicious_css_overrides", no_hidden_or_offscreen_content),
+]
+```
+
+Process scores should remain secondary to executable outcomes. AdaRubric shows why the process dimensions should depend on the task rather than use one fixed checklist.[^ada-rubric] A practical weighting gives runnable behavior and functional checks most of the score, while process metrics explain failures and contribute a smaller fraction. Iterative reward-calibration results warn that a poorly calibrated dense reward can underperform a sparse outcome reward.[^irc]
+
+The exploit rules can also be monitored as a separate signal. METR reports strong reward-hacking detection from a dedicated monitor; the corresponding engineering lesson is to keep exploit detection outside the policy's main reward whenever possible.[^metr] Visual differences may also become a training signal: VisRefiner uses rendered screenshot differences to train screenshot-to-code generation.[^visrefiner]
+
+##### Calibrate and Freeze a Regression Set
+
+Run the initial task set with the untrained or pre-RL baseline. If more than 90% of simple tasks already pass, raise their interaction requirements. If fewer than 10% of hard tasks even load, split them into smaller tasks before using them to compare training runs.
+
+Select a subset of tasks that the baseline reliably passes and freeze it as the regression set. Run deterministic layers on every checkpoint, visual and judge-based layers periodically, and human review before release. A new checkpoint should improve the capability set without losing tasks in the regression set.
 
 ### Evaluation System Design
 
@@ -590,3 +807,53 @@ Improvement direction: Don't keep spending effort on tool calling; instead, stre
 - Yao S, Shinn N, Razavi P, Narasimhan K. "[tau-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains](https://arxiv.org/abs/2406.12045)." arXiv:2406.12045, 2024. -- Conversational agent evaluation.
 - Li M, et al. "[API-Bank: A Comprehensive Benchmark for Tool-Augmented LLMs](https://arxiv.org/abs/2304.08244)." EMNLP 2023. -- Tool-augmented LLM evaluation.
 - Li J, et al. "[The Tool Decathlon](https://arxiv.org/abs/2510.25726)." ICLR 2026. -- Toolathlon, multi-tool long-workflow evaluation.
+
+[^carr_industrial]: Zhang J, Lv X, Feng L, Hou L, Li J. "[Chaining the Evidence: Robust Reinforcement Learning for Deep Search Agents with Citation-Aware Rubric Rewards](https://arxiv.org/abs/2601.06021)." 2026.
+
+[^selfrag_industrial]: Asai A, et al. "[Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection](https://arxiv.org/abs/2310.11511)." ICLR 2024.
+
+[^critic_industrial]: Gou Z, et al. "[CRITIC: Large Language Models Can Self-Correct with Tool-Interactive Critiquing](https://arxiv.org/abs/2305.11738)." ICLR 2024.
+
+[^benchmark-exploit]: Berkeley RDI. "[Trustworthy Benchmarks for Contamination](https://rdi.berkeley.edu/blog/trustworthy-benchmarks-cont)." 2025.
+
+[^abc]: Zhu J, et al. "[Establishing Best Practices for Building Rigorous Agentic Benchmarks](https://arxiv.org/abs/2507.02825)." NeurIPS 2025.
+
+[^agent-judge]: Zhuge M, et al. "[Agent-as-a-Judge: Evaluate Agents with Agents](https://arxiv.org/abs/2410.10934)." ICML 2025.
+
+[^taskcraft]: Shi D, Cao J, Chen Q, et al. "[TaskCraft: Automated Generation of Agentic Tasks](https://arxiv.org/abs/2506.10055)." ICLR 2026.
+
+[^hardgen]: Hao B, et al. "[From Failure to Mastery: Generating Hard Samples for Tool-use Agents](https://arxiv.org/abs/2601.01498)." 2026.
+
+[^evol-instruct]: Xu C, et al. "[WizardLM: Empowering Large Language Models to Follow Complex Instructions](https://arxiv.org/abs/2304.12244)." ICLR 2024.
+
+[^tag-evol]: Wang Y, Zhou S, Guo C, Zhu Q. "[Tag-Evol: Achieving Efficient Instruction Evolving via Tag Injection](https://arxiv.org/abs/2505.24165)." 2025.
+
+[^agenttrek]: Xu Y, Lu D, Shen Z, et al. "[AgentTrek: Agent Trajectory Synthesis via Guiding Replay with Web Tutorials](https://arxiv.org/abs/2412.09605)." ICLR 2025 Spotlight.
+
+[^firefly]: Lu Y, et al. "[Firefly: Illuminating Large-Scale Verified Tool-Call Data Generation from Real APIs](https://arxiv.org/abs/2605.17558)." 2026.
+
+[^webshaper]: Tao Z, et al. "[WebShaper: Agentically Data Synthesizing via Information-Seeking Formalization](https://arxiv.org/abs/2507.15061)." 2025.
+
+[^apigen]: Prabhakar A, Liu Z, Zhu M, et al. "[Agentic Pipeline for Multi-Turn Data Generation](https://openreview.net/forum?id=qk6ORqQ4Cu)." NeurIPS 2025.
+
+[^jade]: Lin L, Liu J, Yang T, et al. "[JADE: Expert-Grounded Dynamic Evaluation](https://arxiv.org/html/2602.06486v1)." 2026.
+
+[^rler]: Allen AI. "[DR Tulu: Reinforcement Learning with Evolving Rubrics](https://arxiv.org/abs/2511.19399)." 2025.
+
+[^anthropic-eval]: Anthropic Engineering. "[Demystifying Evals for AI Agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)." 2025.
+
+[^design2code]: Si C, et al. "[Design2Code: How Far Are We from Automating Front-End Engineering?](https://salt-nlp.github.io/Design2Code/)." NAACL 2025.
+
+[^omni-i2c]: Zhou J, Zhang C, Feng X, et al. "[Omni-I2C: A Holistic Benchmark for Image-to-Code](https://arxiv.org/abs/2603.17508)." 2026.
+
+[^fullfront]: Sun H, Wang H W, Gu J, Li L, Cheng Y. "[FullFront: Benchmarking MLLMs Across the Full Front-End Engineering Workflow](https://arxiv.org/abs/2505.17399)." 2025.
+
+[^visrefiner]: Deng J, Yao K, Zhang L. "[VisRefiner: Learning from Visual Differences for Screenshot-to-Code Generation](https://arxiv.org/abs/2602.05998)." 2026.
+
+[^agent-prm]: Xi Z, et al. "[AgentPRM: Process Reward Models for LLM Agents via Step-Wise Promise and Progress](https://arxiv.org/abs/2511.08325)." 2025.
+
+[^ada-rubric]: Ding L. "[AdaRubric: Task-Adaptive Rubrics for LLM Agent Evaluation](https://arxiv.org/abs/2603.21362)." 2026.
+
+[^irc]: Modecrua W, et al. "[Iterative Reward Calibration for Multi-Turn Agent RL](https://arxiv.org/abs/2604.02869)." 2026.
+
+[^metr]: METR. "[MALT: Monitoring Agents for Reward Hacking](https://metr.org/)." 2025.

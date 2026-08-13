@@ -22,11 +22,11 @@ One failure mode worth calling out early is **sycophancy**: the model tries to p
 
 Preference alignment assumes that the target (human satisfaction) can be represented as a **relative preference** between two different responses. To train a model that predicts and follows human preferences, we collect paired data of the form:
 
-- prompt (Prompt)
+- prompt
 - a preferred answer (Chosen)
 - a dispreferred answer (Rejected)
 
-In ML terms, this is a **preference dataset (Preference Dataset)**.
+In machine learning, this is a **preference dataset**.
 
 Each row (one interaction containing a prompt and two candidate responses) is a preference sample. We denote the "good" response we want the model to move toward as $y_w$ (winner), the "bad" response we want the model to move away from as $y_l$ (loser), and the input prompt as $x$. If the dataset has $N$ samples, the $i$-th sample is written as $(x^{(i)}, {y_w}^{(i)}, {y_l}^{(i)})$.
 
