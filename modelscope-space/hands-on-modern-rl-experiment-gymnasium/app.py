@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 from collections import defaultdict
 import ctypes.util
+from functools import lru_cache
 import html
 import importlib
 import json
@@ -352,9 +353,10 @@ CARD_BACKGROUNDS = {
     "Box2D": "box2d.webp", "Atari / ALE": "atari.webp", "MuJoCo": "mujoco.webp",
     "JAX Phys2D": "box2d.webp", "Robotics": "robotics.webp", "Other": "tabular.webp",
 }
-CARD_RENDER_VERSION = "v2"
+CARD_RENDER_VERSION = "v3"
 
 
+@lru_cache(maxsize=64)
 def card_font(size: int, bold: bool = False):
     candidates = [
         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
@@ -364,6 +366,17 @@ def card_font(size: int, bold: bool = False):
         if Path(candidate).exists():
             return ImageFont.truetype(candidate, size=size)
     return ImageFont.load_default()
+
+
+@lru_cache(maxsize=None)
+def prepared_card_background(filename: str) -> Image.Image:
+    """Decode and resize each family background once per Studio process."""
+    source = CARD_BACKGROUND_DIR / filename
+    return ImageOps.fit(
+        Image.open(source).convert("RGB"),
+        (720, 360),
+        method=Image.Resampling.LANCZOS,
+    ).convert("RGBA")
 
 
 def fit_card_text(draw: ImageDraw.ImageDraw, text: str, max_width: int, start_size: int, minimum: int = 18):
@@ -475,7 +488,7 @@ def experiment_visual(experiment: str) -> str:
     source = CARD_BACKGROUND_DIR / CARD_BACKGROUNDS.get(family, "tabular.webp")
     if path.exists() and path.stat().st_mtime >= source.stat().st_mtime:
         return str(path)
-    image = ImageOps.fit(Image.open(source).convert("RGB"), (720, 360), method=Image.Resampling.LANCZOS)
+    image = prepared_card_background(CARD_BACKGROUNDS.get(family, "tabular.webp")).copy()
     shade = Image.new("RGBA", image.size, (0, 0, 0, 0)); shade_draw = ImageDraw.Draw(shade)
     shade_draw.rectangle((0, 0, 720, 138), fill=(7, 12, 35, 202))
     shade_draw.rectangle((0, 272, 720, 360), fill=(7, 12, 35, 205))
@@ -497,13 +510,21 @@ def experiment_visual(experiment: str) -> str:
     draw.rounded_rectangle((720 - badge_width - 28, 294, 692, 339), radius=22, fill=(255, 255, 255, 235))
     text_width = draw.textbbox((0, 0), algorithm, font=badge_font)[2]
     draw.text((720 - badge_width - 28 + (badge_width - text_width) / 2, 306), algorithm, font=badge_font, fill=(25, 31, 65))
-    image.convert("RGB").save(path, "WEBP", quality=84, method=6)
+    # These are runtime gallery thumbnails. Method 2 is visually equivalent at
+    # this size and avoids several seconds of first-switch encoding work.
+    image.convert("RGB").save(path, "WEBP", quality=82, method=2)
     return str(path)
 
 
 def visual_data_uri(experiment: str) -> str:
     payload = Path(experiment_visual(experiment)).read_bytes()
     return f"data:image/webp;base64,{base64.b64encode(payload).decode()}"
+
+
+def gallery_background(experiment: str) -> str:
+    """Use one immutable asset per family; the browser renders card titles."""
+    family = experiment_config(experiment)["family"]
+    return str(CARD_BACKGROUND_DIR / CARD_BACKGROUNDS.get(family, "tabular.webp"))
 
 
 def experiment_goal(experiment: str) -> str:
@@ -571,12 +592,13 @@ def localized_goal(experiment: str, language: str) -> str:
 
 
 def card_caption(experiment: str) -> str:
-    cfg = experiment_config(experiment); title = experiment.split(" · ")[0] if not is_catalog_experiment(experiment) else cfg["environment"]
-    return f"{title} · {cfg['algorithm'].replace('Auto: inspect action space', 'AUTO')}"
+    cfg = experiment_config(experiment)
+    algorithm = cfg["algorithm"].replace("Auto: inspect action space", "AUTO")
+    return f"{cfg['environment']}\n{algorithm}"
 
 
 def card_items(experiments: list[str]) -> list[tuple[str, str]]:
-    return [(experiment_visual(item), card_caption(item)) for item in experiments]
+    return [(gallery_background(item), card_caption(item)) for item in experiments]
 
 
 def filter_choices(query: str, family: str) -> list[str]:
@@ -1356,7 +1378,7 @@ CSS = """
 .hero-topline{display:flex;align-items:center;gap:11px;margin-bottom:22px}.experiment-badge{padding:6px 11px;border:1px solid #fff;border-radius:999px;color:#25265d;background:#fff;box-shadow:0 4px 12px rgba(8,15,35,.16);font-size:12px;font-weight:800;letter-spacing:.06em}.hero-course{color:#b9c0d4;font-size:13px;font-weight:650}
 .hero h1{max-width:760px;margin:0 0 12px;color:#fff;font-size:clamp(32px,5vw,48px);line-height:1.1;letter-spacing:-.035em}.hero-copy{max-width:760px;margin:0;color:#cdd3e2;font-size:15px;line-height:1.7}.hero-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}.hero-link{display:inline-flex;align-items:center;min-height:38px;padding:0 14px;border:1px solid rgba(255,255,255,.18);border-radius:9px;color:#eef2ff!important;background:rgba(255,255,255,.08);font-size:13px;font-weight:650;text-decoration:none!important}.hero-link.primary{color:#172554!important;background:#fff;border-color:#fff}
 .lab-strip{display:flex;flex-wrap:wrap;gap:8px 22px;margin:17px 0 22px;padding:13px 18px;border:1px solid var(--line);border-radius:13px;background:#fff;color:var(--muted);font-size:13px;box-shadow:0 6px 20px rgba(18,25,43,.035)}.lab-strip strong{margin-left:5px;color:var(--ink)}
-.catalog-card{margin:0 0 18px!important;padding:22px!important;border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.catalog-tools{align-items:end!important}.catalog-family{min-width:420px!important}.catalog-search{min-width:280px!important}.catalog-meta{color:var(--muted);font-size:12px;font-weight:700}.catalog-pager{justify-content:flex-end!important;gap:8px!important}.catalog-pager button{max-width:110px!important;border-radius:9px!important}.experiment-gallery{max-height:720px;overflow:auto;padding:4px!important}.experiment-gallery .grid-wrap{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))!important;gap:12px!important}.experiment-gallery button,.experiment-gallery .thumbnail-item{min-width:0!important;overflow:hidden!important;border:1px solid var(--line)!important;border-radius:14px!important;background:#fff!important;box-shadow:0 7px 18px rgba(18,25,43,.045)!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important}.experiment-gallery button:hover,.experiment-gallery .thumbnail-item:hover{transform:translateY(-2px);border-color:#a5b4fc!important;box-shadow:0 12px 25px rgba(50,55,120,.12)!important}.experiment-gallery .image-container,.experiment-gallery [data-testid="image"]{width:100%!important;height:auto!important;aspect-ratio:2/1!important;background:#0b1230!important;overflow:hidden!important}.experiment-gallery img{display:block!important;width:100%!important;height:100%!important;aspect-ratio:2/1!important;object-fit:contain!important;object-position:center!important}.experiment-gallery .caption,.experiment-gallery .label{display:block!important;min-height:34px!important;overflow:visible!important;text-overflow:clip!important;white-space:normal!important;overflow-wrap:anywhere!important;color:var(--ink)!important;font-size:11px!important;line-height:1.45!important;text-align:left!important}.selected-experiment input{font-weight:750!important;color:var(--brand)!important;background:#f5f5ff!important}
+.catalog-card{margin:0 0 18px!important;padding:22px!important;border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.catalog-tools{align-items:end!important}.catalog-family{min-width:420px!important}.catalog-search{min-width:280px!important}.catalog-meta{color:var(--muted);font-size:12px;font-weight:700}.catalog-pager{justify-content:flex-end!important;gap:8px!important}.catalog-pager button{max-width:110px!important;border-radius:9px!important}.experiment-gallery{max-height:720px;overflow:auto;padding:4px!important}.experiment-gallery .grid-wrap{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))!important;gap:12px!important}.experiment-gallery button,.experiment-gallery .thumbnail-item{position:relative!important;min-width:0!important;overflow:hidden!important;border:1px solid var(--line)!important;border-radius:14px!important;background:#0b1230!important;box-shadow:0 7px 18px rgba(18,25,43,.045)!important;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease!important}.experiment-gallery button:hover,.experiment-gallery .thumbnail-item:hover{transform:translateY(-2px);border-color:#a5b4fc!important;box-shadow:0 12px 25px rgba(50,55,120,.12)!important}.experiment-gallery .image-container,.experiment-gallery [data-testid="image"]{width:100%!important;height:auto!important;aspect-ratio:2/1!important;background:#0b1230!important;overflow:hidden!important}.experiment-gallery img{display:block!important;width:100%!important;height:100%!important;aspect-ratio:2/1!important;object-fit:cover!important;object-position:center!important}.experiment-gallery .caption,.experiment-gallery .label{position:absolute!important;inset:0 0 auto 0!important;z-index:2!important;display:block!important;min-height:72px!important;padding:14px 16px 18px!important;overflow:visible!important;text-overflow:clip!important;white-space:pre-line!important;overflow-wrap:anywhere!important;background:linear-gradient(180deg,rgba(5,9,30,.94),rgba(5,9,30,.76) 70%,transparent)!important;color:#fff!important;font-size:clamp(12px,1.25vw,17px)!important;font-weight:800!important;line-height:1.28!important;text-align:left!important;text-shadow:0 1px 2px rgba(0,0,0,.4)!important;pointer-events:none!important}.selected-experiment input{font-weight:750!important;color:var(--brand)!important;background:#f5f5ff!important}
 .task-brief{display:grid;grid-template-columns:minmax(210px,34%) 1fr;gap:20px;margin:0 0 18px;padding:14px;border:1px solid #dfe3f5;border-radius:15px;background:linear-gradient(135deg,#fafaff,#f6fbff)}.task-brief__visual{display:flex;align-items:center;overflow:hidden;border-radius:11px;background:#171b3f}.task-brief__visual img{display:block;width:100%;height:auto;max-height:250px;min-height:190px;object-fit:contain;border-radius:11px}.task-brief__body{padding:9px 9px 7px}.task-kicker{color:var(--brand);font-size:10px;font-weight:850;letter-spacing:.12em}.task-brief h3{margin:6px 0;color:var(--ink);font-size:23px}.task-brief p{margin:0 0 13px;color:var(--muted);font-size:13px;line-height:1.6}.task-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.task-facts span{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:11px;overflow-wrap:anywhere}.task-facts b{display:block;margin-bottom:3px;color:#8a94a8;font-size:9px;letter-spacing:.09em;text-transform:uppercase}.task-hint{margin-top:12px!important;margin-bottom:0!important;font-weight:650;color:#4b5563!important}
 .control-card,.chart-card,.output-card{border:1px solid var(--line)!important;border-radius:17px!important;background:#fff!important;box-shadow:0 10px 30px rgba(18,25,43,.045)!important}.control-card,.chart-card{padding:22px!important}.output-card{margin-top:16px!important;padding:22px!important}.panel-title{margin:0 0 5px;color:var(--ink);font-size:19px}.panel-copy,.artifact-note{margin:0 0 17px;color:var(--muted);font-size:13px;line-height:1.6}.policy-preview{min-height:360px!important;border:1px solid var(--line)!important;border-radius:13px!important;background:#f8f9fc!important;overflow:hidden!important}.policy-preview .image-container,.policy-preview [data-testid="image"]{min-height:360px!important;background:#f8f9fc!important}.policy-preview img{display:block!important;width:100%!important;height:100%!important;min-height:360px!important;max-height:560px!important;object-fit:contain!important;background:#f8f9fc!important}
 .primary-btn{min-height:46px!important;border:0!important;border-radius:11px!important;background:linear-gradient(135deg,#5153d6,#6969ec)!important;font-weight:750!important}.primary-btn:disabled{opacity:.8!important;cursor:wait!important}.run-wait{position:relative;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;overflow:hidden;margin:0 0 16px;padding:14px 16px 17px;border:1px solid #c7d2fe;border-radius:13px;background:linear-gradient(135deg,#f5f5ff,#f0f7ff);box-shadow:0 8px 24px rgba(79,70,229,.08)}.run-wait__spinner{width:24px;height:24px;border:3px solid #d9ddff;border-top-color:#5b5ce2;border-radius:50%;animation:run-spin .8s linear infinite}.run-wait__copy strong,.run-wait__copy small{display:block}.run-wait__copy strong{color:#292d65;font-size:13px}.run-wait__copy small{margin-top:4px;color:#68748a;font-size:11px;line-height:1.5}.run-wait__elapsed{display:inline-block;margin-top:7px;color:#5b5ce2;font-size:11px;font-style:normal;font-weight:750}.run-wait__pulse{position:absolute;right:0;bottom:0;left:0;height:3px;background:#e0e7ff}.run-wait__pulse i{display:block;width:38%;height:100%;border-radius:999px;background:linear-gradient(90deg,transparent,#6366f1,#22c55e,transparent);animation:run-pulse 1.4s ease-in-out infinite}@keyframes run-spin{to{transform:rotate(360deg)}}@keyframes run-pulse{0%{transform:translateX(-110%)}100%{transform:translateX(285%)}}.run-state,.live-metric{display:flex;gap:12px;margin-top:14px;padding:14px 15px;border-radius:13px;background:#f8f9fc}.run-state__dot{width:9px;height:9px;margin-top:6px;border-radius:50%;background:#94a3b8}.run-state--running .run-state__dot{background:#5b5ce2;box-shadow:0 0 0 5px rgba(91,92,226,.13);animation:run-dot 1.2s ease-in-out infinite}@keyframes run-dot{50%{box-shadow:0 0 0 9px rgba(91,92,226,.04)}}.run-state--complete .run-state__dot{background:#13a36f}.run-state strong,.run-state small,.summary-label{display:block}.summary-label{color:#8a94a8;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.run-state strong{margin-top:3px;color:var(--ink);font-size:14px}.run-state small,.live-metric small{margin-top:3px;color:var(--muted);font-size:12px}.metric-reading{display:flex;align-items:baseline;gap:9px;margin-top:4px}.metric-reading strong{color:var(--ink);font-size:24px}
@@ -1453,10 +1475,10 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
 
     gr.HTML(footer_html())
 
-    search.change(reset_catalog, inputs=[search, family], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False)
-    family.change(reset_catalog, inputs=[search, family], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False)
-    previous_page.click(lambda q, f, p: move_catalog(q, f, p, -1), inputs=[search, family, catalog_page_state], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False)
-    next_page.click(lambda q, f, p: move_catalog(q, f, p, 1), inputs=[search, family, catalog_page_state], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False)
+    search.change(reset_catalog, inputs=[search, family], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False, show_progress="hidden")
+    family.change(reset_catalog, inputs=[search, family], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False, show_progress="hidden")
+    previous_page.click(lambda q, f, p: move_catalog(q, f, p, -1), inputs=[search, family, catalog_page_state], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False, show_progress="hidden")
+    next_page.click(lambda q, f, p: move_catalog(q, f, p, 1), inputs=[search, family, catalog_page_state], outputs=[gallery, visible_experiments, catalog_page_state, catalog_meta], queue=False, show_progress="hidden")
     gallery.select(choose_card, inputs=[visible_experiments], outputs=[experiment], queue=False)
     experiment.change(select_experiment, inputs=[experiment, language], outputs=[hero, task_info, budget, alpha, gamma, epsilon, status, metric, console, preview, artifact], queue=False)
     language.change(switch_language, inputs=[language, experiment, seed], outputs=[hero, settings_header, task_info, budget, alpha, gamma, epsilon, seed, start, status, metric, chart_header, console, preview_header, artifact], queue=False)
