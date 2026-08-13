@@ -38,6 +38,10 @@ CARD_BACKGROUND_DIR = ROOT / "assets" / "card-backgrounds"
 TASK_CARD_DIR = ROOT / "assets" / "task-cards"
 LOGO_PATH = ROOT / "assets" / "readmelogo.png"
 LOGO_DATA_URI = f"data:image/png;base64,{base64.b64encode(LOGO_PATH.read_bytes()).decode()}"
+# These immutable card assets are served directly instead of being copied into
+# Gradio's per-component cache on every Gallery update. Their stable URLs let
+# the browser reuse decoded images when learners switch paths and goals.
+gr.set_static_paths(paths=[CARD_BACKGROUND_DIR, TASK_CARD_DIR])
 
 PROJECT_URL = "https://github.com/walkinglabs/hands-on-modern-rl"
 COURSE_URL = "https://walkinglabs.github.io/hands-on-modern-rl/"
@@ -617,8 +621,14 @@ def card_caption(experiment: str) -> str:
     return f"{cfg['environment']}\n{algorithm}\n{experiment_feature(experiment)}"
 
 
+@lru_cache(maxsize=256)
+def card_items_cached(experiments: tuple[str, ...]) -> tuple[tuple[str, str], ...]:
+    return tuple((gallery_background(item), card_caption(item)) for item in experiments)
+
+
 def card_items(experiments: list[str]) -> list[tuple[str, str]]:
-    return [(gallery_background(item), card_caption(item)) for item in experiments]
+    """Reuse immutable gallery payloads instead of rebuilding file metadata."""
+    return list(card_items_cached(tuple(experiments)))
 
 
 def path_choices(language: str) -> list[tuple[str, str]]:
@@ -758,7 +768,7 @@ TEXT = {
         "experiments": "Experiments",
         "catalog_title": "Choose an experiment",
         "catalog_copy": "Choose a learning path on the left, then optionally narrow it by goal on the right. Search works across the complete catalog.",
-        "catalog_version": "Navigation v2.3 · two-column",
+        "catalog_version": "Navigation v2.4 · cached images",
         "path": "Learning path",
         "search": "Know a task name? Search the full catalog",
         "search_placeholder": "Optional: try CartPole, Pong, robot...",
@@ -805,7 +815,7 @@ TEXT = {
         "experiments": "实验数量",
         "catalog_title": "选择一个实验",
         "catalog_copy": "在左侧选择学习路线，再在右侧按训练目标细分。搜索会覆盖完整实验目录。",
-        "catalog_version": "导航版本 v2.3 · 双栏布局",
+        "catalog_version": "导航版本 v2.4 · 图片已缓存",
         "path": "学习路线",
         "search": "知道任务名称？搜索完整目录",
         "search_placeholder": "可选：输入 CartPole、Pong、robot…",
@@ -912,6 +922,23 @@ def panel_html(title: str, text: str, cls: str = "panel-copy") -> str:
 def catalog_header_html(language: str) -> str:
     copy = copy_for(language)
     return f'<div class="catalog-heading"><div><h2 class="panel-title">{copy["catalog_title"]}</h2><p class="panel-copy">{copy["catalog_copy"]}</p></div><span class="ui-version">{copy["catalog_version"]}</span></div>'
+
+
+def card_preload_html() -> str:
+    """Keep one decoded copy of every shared card image in browser memory."""
+    filenames = sorted(set(CURATED_TASK_CARDS.values()) | set(FEATURE_TASK_CARDS.values()) | set(CARD_BACKGROUNDS.values()))
+    paths = []
+    for filename in filenames:
+        path = TASK_CARD_DIR / filename
+        if not path.exists():
+            path = CARD_BACKGROUND_DIR / filename
+        if path.exists():
+            paths.append(path)
+    images = "".join(
+        f'<img src="/gradio_api/file={html.escape(str(path))}" alt="" loading="eager" decoding="async">'
+        for path in paths
+    )
+    return f'<div class="card-image-preload" aria-hidden="true">{images}</div>'
 
 
 def hero_html(language: str, experiment: str = BANDIT) -> str:
@@ -1501,6 +1528,7 @@ CSS = """
 @media(max-width:760px){.gradio-container{padding:12px 10px 30px!important}.language-bar{top:14px!important;right:14px!important}.language-switch{width:196px!important;min-width:196px!important}.hero{padding:70px 22px 25px;border-radius:19px}.hero-topline{align-items:flex-start;flex-direction:column}.project-mark{max-width:70%}.catalog-card{padding:16px!important}.catalog-heading{display:block}.ui-version{display:inline-flex;margin:0 0 14px}.catalog-family>div,.catalog-feature>div{grid-template-columns:1fr!important}.experiment-gallery{max-height:580px}.experiment-gallery .grid-wrap{grid-template-columns:1fr!important}.experiment-gallery button,.experiment-gallery .thumbnail-item{max-width:none!important}.task-brief{grid-template-columns:1fr}.task-brief__visual img{min-height:160px}.task-facts{grid-template-columns:1fr}.policy-preview,.policy-preview .image-container,.policy-preview [data-testid="image"],.policy-preview img{min-height:230px!important}.policy-preview img{max-height:420px!important}}
 .catalog-family input,.catalog-feature input{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;opacity:0!important;cursor:pointer!important;pointer-events:auto!important}
 .catalog-filter-row{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:stretch!important;gap:14px!important;margin:4px 0 16px!important}.catalog-filter-pane{min-width:0!important;margin:0!important;padding:14px!important;border:1px solid #e4e8f2!important;border-radius:13px!important;background:#fafbfe!important}.catalog-filter-pane--path{background:linear-gradient(145deg,#fbfbff,#f7f8ff)!important}.catalog-filter-pane--goal{background:linear-gradient(145deg,#fbfdfd,#f6fbfa)!important}.catalog-filter-pane .catalog-family,.catalog-filter-pane .catalog-feature{margin:0!important;padding:0!important;border:0!important;background:transparent!important}.catalog-filter-pane .catalog-family>div,.catalog-filter-pane .catalog-feature>div{grid-template-columns:1fr!important}.catalog-filter-pane .catalog-family label span,.catalog-filter-pane .catalog-feature label span{min-height:40px!important}.catalog-filter-pane .catalog-feature label span{border-color:#e7eaf1!important;background:#fff!important}.catalog-filter-pane .catalog-feature label:has(input:checked) span,.catalog-filter-pane .catalog-feature input:checked+span{border-color:#5b5ce2!important;background:#5b5ce2!important}.catalog-search{margin-bottom:10px!important}
+.card-image-preload{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;opacity:.001!important;pointer-events:none!important}.card-image-preload img{position:absolute!important;width:1px!important;height:1px!important}
 .experiment-gallery .grid-wrap{display:block!important;width:100%!important;height:auto!important;min-height:0!important}.experiment-gallery .grid-container{display:grid!important;width:100%!important;grid-template-columns:repeat(auto-fill,minmax(230px,270px))!important;justify-content:start!important;gap:12px!important}.experiment-gallery .gallery-item{width:100%!important;min-width:0!important}
 .experiment-gallery button,.experiment-gallery .thumbnail-item{height:auto!important;aspect-ratio:2/1!important}.experiment-gallery .caption-label{position:absolute!important;inset:0 0 auto 0!important;z-index:2!important;display:block!important;width:100%!important;min-height:72px!important;padding:14px 16px 18px!important;overflow:visible!important;text-overflow:clip!important;white-space:pre-line!important;overflow-wrap:anywhere!important;background:linear-gradient(180deg,rgba(5,9,30,.94),rgba(5,9,30,.76) 70%,transparent)!important;color:#fff!important;font-size:clamp(12px,1.25vw,17px)!important;font-weight:800!important;line-height:1.28!important;text-align:left!important;text-shadow:0 1px 2px rgba(0,0,0,.4)!important;pointer-events:none!important}
 @media(max-width:760px){.experiment-gallery .grid-container{grid-template-columns:1fr!important}}
@@ -1568,6 +1596,7 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
 
     with gr.Column(elem_classes="catalog-card"):
         catalog_header = gr.HTML(catalog_header_html(DEFAULT_LANGUAGE))
+        gr.HTML(card_preload_html())
         search = gr.Textbox(label=copy["search"], placeholder=copy["search_placeholder"], elem_classes="catalog-search")
         with gr.Row(elem_classes="catalog-filter-row"):
             with gr.Column(elem_classes="catalog-filter-pane catalog-filter-pane--path"):
@@ -1614,9 +1643,9 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
     demo.load(lambda: gr.Radio(choices=initial_feature_choices, value=ALL_FEATURES, visible=True), outputs=[feature], queue=False, show_progress="hidden")
     catalog_outputs = [feature, gallery, visible_experiments, catalog_page_state, catalog_meta, previous_page, next_page]
     page_outputs = [gallery, visible_experiments, catalog_page_state, catalog_meta, previous_page, next_page]
-    search.change(reset_search, inputs=[search, family, language], outputs=catalog_outputs, queue=False, show_progress="hidden")
-    family.change(reset_family, inputs=[search, family, language], outputs=catalog_outputs, queue=False, show_progress="hidden")
-    feature.input(reset_catalog, inputs=[search, family, feature, language], outputs=page_outputs, queue=False, show_progress="hidden")
+    search.change(reset_search, inputs=[search, family, language], outputs=catalog_outputs, queue=False, show_progress="hidden", trigger_mode="always_last")
+    family.change(reset_family, inputs=[search, family, language], outputs=catalog_outputs, queue=False, show_progress="hidden", trigger_mode="always_last")
+    feature.input(reset_catalog, inputs=[search, family, feature, language], outputs=page_outputs, queue=False, show_progress="hidden", trigger_mode="always_last")
     previous_page.click(lambda q, f, t, p, lang: move_catalog(q, f, t, p, lang, -1), inputs=[search, family, feature, catalog_page_state, language], outputs=page_outputs, queue=False, show_progress="hidden")
     next_page.click(lambda q, f, t, p, lang: move_catalog(q, f, t, p, lang, 1), inputs=[search, family, feature, catalog_page_state, language], outputs=page_outputs, queue=False, show_progress="hidden")
     gallery.select(choose_card, inputs=[visible_experiments], outputs=[experiment], queue=False)
