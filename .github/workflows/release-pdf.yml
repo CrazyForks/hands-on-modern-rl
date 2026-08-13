@@ -163,10 +163,10 @@ jobs:
           EPUB_ASSET_NAME: ${{ steps.release.outputs.epub_asset_name }}
           EN_EPUB_ASSET_NAME: ${{ steps.release.outputs.en_epub_asset_name }}
         run: |
-          pdf_url=”https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${PDF_ASSET_NAME}”
-          en_pdf_url=”https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${EN_PDF_ASSET_NAME}”
-          epub_url=”https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${EPUB_ASSET_NAME}”
-          en_epub_url=”https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${EN_EPUB_ASSET_NAME}”
+          pdf_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${PDF_ASSET_NAME}"
+          en_pdf_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${EN_PDF_ASSET_NAME}"
+          epub_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${EPUB_ASSET_NAME}"
+          en_epub_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${EN_EPUB_ASSET_NAME}"
           cat > release-notes.md <<EOF
           # Hands-On Modern RL: Open Textbook Release ${TAG_NAME}
 
