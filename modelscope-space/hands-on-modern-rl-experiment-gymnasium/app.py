@@ -757,8 +757,8 @@ TEXT = {
         "device": "Device",
         "experiments": "Experiments",
         "catalog_title": "Choose an experiment",
-        "catalog_copy": "Pick one learning path, then optionally narrow it by goal. Search works across the complete catalog.",
-        "catalog_version": "Navigation v2.2 · refreshed",
+        "catalog_copy": "Choose a learning path on the left, then optionally narrow it by goal on the right. Search works across the complete catalog.",
+        "catalog_version": "Navigation v2.3 · two-column",
         "path": "Learning path",
         "search": "Know a task name? Search the full catalog",
         "search_placeholder": "Optional: try CartPole, Pong, robot...",
@@ -804,8 +804,8 @@ TEXT = {
         "device": "设备",
         "experiments": "实验数量",
         "catalog_title": "选择一个实验",
-        "catalog_copy": "先选择一条学习路线，再按训练目标细分。搜索会覆盖完整实验目录。",
-        "catalog_version": "导航版本 v2.2 · 已刷新",
+        "catalog_copy": "在左侧选择学习路线，再在右侧按训练目标细分。搜索会覆盖完整实验目录。",
+        "catalog_version": "导航版本 v2.3 · 双栏布局",
         "path": "学习路线",
         "search": "知道任务名称？搜索完整目录",
         "search_placeholder": "可选：输入 CartPole、Pong、robot…",
@@ -1500,9 +1500,11 @@ CSS = """
 .console-panel{overflow:hidden;margin-top:18px;border:1px solid #202b3d;border-radius:13px;background:#0f1623}.console-head{display:flex;align-items:center;gap:9px;padding:11px 15px;border-bottom:1px solid #263244;color:#e2e8f0;font-size:12px;font-weight:750}.console-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.12)}.console-text{box-sizing:border-box;height:300px;margin:0;padding:17px 18px;overflow:auto;white-space:pre;color:#cbd5e1!important;background:#0f1623!important;font:12px/1.58 "SFMono-Regular",Consolas,monospace!important;scrollbar-gutter:stable}.footer-note{margin-top:18px;text-align:center;color:#94a3b8;font-size:12px}.footer-note a{color:var(--brand)!important;text-decoration:none!important;font-weight:650}
 @media(max-width:760px){.gradio-container{padding:12px 10px 30px!important}.language-bar{top:14px!important;right:14px!important}.language-switch{width:196px!important;min-width:196px!important}.hero{padding:70px 22px 25px;border-radius:19px}.hero-topline{align-items:flex-start;flex-direction:column}.project-mark{max-width:70%}.catalog-card{padding:16px!important}.catalog-heading{display:block}.ui-version{display:inline-flex;margin:0 0 14px}.catalog-family>div,.catalog-feature>div{grid-template-columns:1fr!important}.experiment-gallery{max-height:580px}.experiment-gallery .grid-wrap{grid-template-columns:1fr!important}.experiment-gallery button,.experiment-gallery .thumbnail-item{max-width:none!important}.task-brief{grid-template-columns:1fr}.task-brief__visual img{min-height:160px}.task-facts{grid-template-columns:1fr}.policy-preview,.policy-preview .image-container,.policy-preview [data-testid="image"],.policy-preview img{min-height:230px!important}.policy-preview img{max-height:420px!important}}
 .catalog-family input,.catalog-feature input{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;opacity:0!important;cursor:pointer!important;pointer-events:auto!important}
+.catalog-filter-row{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:stretch!important;gap:14px!important;margin:4px 0 16px!important}.catalog-filter-pane{min-width:0!important;margin:0!important;padding:14px!important;border:1px solid #e4e8f2!important;border-radius:13px!important;background:#fafbfe!important}.catalog-filter-pane--path{background:linear-gradient(145deg,#fbfbff,#f7f8ff)!important}.catalog-filter-pane--goal{background:linear-gradient(145deg,#fbfdfd,#f6fbfa)!important}.catalog-filter-pane .catalog-family,.catalog-filter-pane .catalog-feature{margin:0!important;padding:0!important;border:0!important;background:transparent!important}.catalog-filter-pane .catalog-family>div,.catalog-filter-pane .catalog-feature>div{grid-template-columns:1fr!important}.catalog-filter-pane .catalog-family label span,.catalog-filter-pane .catalog-feature label span{min-height:40px!important}.catalog-filter-pane .catalog-feature label span{border-color:#e7eaf1!important;background:#fff!important}.catalog-filter-pane .catalog-feature label:has(input:checked) span,.catalog-filter-pane .catalog-feature input:checked+span{border-color:#5b5ce2!important;background:#5b5ce2!important}.catalog-search{margin-bottom:10px!important}
 .experiment-gallery .grid-wrap{display:block!important;width:100%!important;height:auto!important;min-height:0!important}.experiment-gallery .grid-container{display:grid!important;width:100%!important;grid-template-columns:repeat(auto-fill,minmax(230px,270px))!important;justify-content:start!important;gap:12px!important}.experiment-gallery .gallery-item{width:100%!important;min-width:0!important}
 .experiment-gallery button,.experiment-gallery .thumbnail-item{height:auto!important;aspect-ratio:2/1!important}.experiment-gallery .caption-label{position:absolute!important;inset:0 0 auto 0!important;z-index:2!important;display:block!important;width:100%!important;min-height:72px!important;padding:14px 16px 18px!important;overflow:visible!important;text-overflow:clip!important;white-space:pre-line!important;overflow-wrap:anywhere!important;background:linear-gradient(180deg,rgba(5,9,30,.94),rgba(5,9,30,.76) 70%,transparent)!important;color:#fff!important;font-size:clamp(12px,1.25vw,17px)!important;font-weight:800!important;line-height:1.28!important;text-align:left!important;text-shadow:0 1px 2px rgba(0,0,0,.4)!important;pointer-events:none!important}
 @media(max-width:760px){.experiment-gallery .grid-container{grid-template-columns:1fr!important}}
+@media(max-width:900px){.catalog-filter-row{grid-template-columns:1fr!important}.catalog-filter-pane{padding:12px!important}}
 """
 
 
@@ -1566,9 +1568,12 @@ with gr.Blocks(title="Hands-On Modern RL · Gymnasium CPU Playground") as demo:
 
     with gr.Column(elem_classes="catalog-card"):
         catalog_header = gr.HTML(catalog_header_html(DEFAULT_LANGUAGE))
-        family = gr.Radio(choices=path_choices(DEFAULT_LANGUAGE), value="Start here", label=copy["path"], elem_classes="catalog-family")
         search = gr.Textbox(label=copy["search"], placeholder=copy["search_placeholder"], elem_classes="catalog-search")
-        feature = gr.Radio(choices=all_feature_choices, value=ALL_FEATURES, label=copy["goal"], visible=True, elem_classes="catalog-feature")
+        with gr.Row(elem_classes="catalog-filter-row"):
+            with gr.Column(elem_classes="catalog-filter-pane catalog-filter-pane--path"):
+                family = gr.Radio(choices=path_choices(DEFAULT_LANGUAGE), value="Start here", label=copy["path"], elem_classes="catalog-family")
+            with gr.Column(elem_classes="catalog-filter-pane catalog-filter-pane--goal"):
+                feature = gr.Radio(choices=all_feature_choices, value=ALL_FEATURES, label=copy["goal"], visible=True, elem_classes="catalog-feature")
         gallery = gr.Gallery(value=initial_cards, label=None, show_label=False, columns=4, rows=3, object_fit="cover", height="auto", allow_preview=False, buttons=[], elem_classes="experiment-gallery")
         visible_experiments = gr.State(initial_visible)
         catalog_page_state = gr.State(initial_page)
