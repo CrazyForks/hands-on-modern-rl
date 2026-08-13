@@ -341,7 +341,7 @@ A Deep Research result needs to satisfy four layers at once:
 | Process rigor        | Whether the reasoning chain is coherent      | Step-level PRM scoring                    |
 | Execution efficiency | Whether the task is completed with few steps | Number of interaction turns               |
 
-Mainstream benchmarks include GAIA for real-world complex QA, Humanity's Last Exam for expert-level multidisciplinary questions, WebArena/Mind2Web for web operation success rate, and BFCL for tool/API call accuracy. See the evaluation section of [Project: Deep Research Agent](./deep-research-agent) for more detail.
+Mainstream benchmarks include GAIA for real-world complex QA, Humanity's Last Exam for expert-level multidisciplinary questions, WebArena/Mind2Web for web operation success rate, and BFCL for tool/API call accuracy. See [Deep Research Evaluation](../chapter24_deep_research/deep-research-eval) for more detail.
 
 ### How to Choose Benchmarks?
 

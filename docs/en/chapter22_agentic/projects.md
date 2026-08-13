@@ -5,7 +5,7 @@ title: 'Legacy Project Collection'
 
 # Legacy Page: Project Practice (Split into Two Project Pages)
 
-> This page is kept as an entry point for legacy links. The core content has been moved to [19.8 rLLM DeepCoder Lab](./rllm-deepcoder-lab) and [Deep Research Agent](./deep-research-agent). The original material is preserved below so readers arriving through old links can compare it with the newer pages.
+> This page is kept as an entry point for legacy links. The core content has been moved to [19.8 rLLM DeepCoder Lab](./rllm-deepcoder-lab) and [Deep Research Agent](../chapter24_deep_research/browser-rl-harness). The original material is preserved below so readers arriving through old links can compare it with the newer pages.
 
 # Project 1: Multi-Tool Agentic RL: Search Documentation, Write Code, Run Tests
 

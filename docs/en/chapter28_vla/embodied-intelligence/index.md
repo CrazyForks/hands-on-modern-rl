@@ -1,8 +1,8 @@
 ---
-title: 'Legacy Page: Embodied Intelligence'
+title: '24.3 VLA Models'
 ---
 
-# Legacy Page: Embodied Intelligence
+# 24.3 VLA Models
 
 In the previous eight chapters, our agents lived in the "digital world" -- CartPole's inverted pendulum, Atari's pixels, LLM's tokens. These settings share a common property: trial-and-error is nearly free, `env.reset()` completes in milliseconds, and the environment is fully controllable. But the ultimate goal of RL goes far beyond this -- we want agents that can enter the real world, control robots, drive cars, and complete complex tasks in factories and hospitals.
 
@@ -400,6 +400,50 @@ flowchart LR
 
 The core significance of VLA is that it advances embodied intelligence from "training specific policies for specific tasks" to "general policies that understand language instructions and execute them" -- a critical step toward general-purpose embodied intelligence.
 
+### From RT-2 to Long-Horizon VLA Systems
+
+RT-2 established the basic VLA formulation, but its demonstrations focused mainly on short manipulation tasks such as picking and placing objects. Longer tasks introduce three additional requirements: the robot must plan several dependent actions, combine more than visual and language input, and adapt when the physical outcome differs from the plan.
+
+Google DeepMind's [Gemini Robotics](https://deepmind.google/models/gemini-robotics/) extends the VLA formulation toward this setting. Before issuing low-level controls, the system can represent an intermediate plan:
+
+```text
+Instruction: place the blue block on the red block
+
+Plan:
+1. locate both blocks
+2. choose a stable grasp on the blue block
+3. move above the target
+4. release and verify stability
+
+Execution:
+[a sequence of joint-control commands]
+```
+
+This intermediate structure is useful when later actions depend on the outcome of earlier ones. The policy can also combine camera images, force feedback, and proprioception—the robot's measurements of its own joint positions and velocities—to estimate the current state.
+
+Generalization remains the main test. A useful VLA policy should handle an unseen object, a changed workspace layout, or a new composition of familiar instructions. Large-scale simulation supplies diverse interactions, while domain randomization and a smaller amount of real-robot data help transfer the policy to physical hardware.
+
+### Training a VLA Policy
+
+A VLA system is commonly trained in stages:
+
+```text
+Phase 1: multimodal pretraining
+  images + language + action demonstrations
+  learn the basic mapping from instructions to actions
+
+Phase 2: reinforcement learning in simulation
+  optimize task success, motion smoothness, and efficiency
+
+Phase 3: adaptation on physical robots
+  use real trajectories to reduce the sim-to-real gap
+
+Phase 4: long-horizon planning
+  train intermediate plans and recovery behavior before execution
+```
+
+The order matters. Demonstrations give the policy a safe initial action distribution; simulation then provides the volume needed for exploration; real data corrects the remaining mismatch in dynamics and sensing. Long-horizon planning is added after the policy can already execute the underlying motor skills.
+
 ## Hands-On: Training a Simulated Robot to Run with PPO
 
 To give you direct experience with embodied intelligence training, we provide a **very lightweight** hands-on exercise. You only need a regular laptop (no GPU required, CPU only) and can train a virtual robot (HalfCheetah) to run forward in just a few minutes.
@@ -510,7 +554,7 @@ In short: **PPO sacrifices per-sample utilization for higher overall training th
 </details>
 
 ::: tip Continue Reading: Model-Based RL
-When embodied intelligence truly enters the physical world, the biggest bottleneck is often not the algorithm formulas but the cost of real-world interaction. The next section expands MBRL into a standalone topic: [Model-Based RL: From Model-Free to Model-Based](./model-based-rl).
+When embodied intelligence truly enters the physical world, the biggest bottleneck is often not the algorithm formulas but the cost of real-world interaction. The next section expands MBRL into a standalone topic: [Model-Based RL: From Model-Free to Model-Based](./model-based-rl/).
 :::
 
 ## Further Reading: Unitree Robotics Open-Source Ecosystem

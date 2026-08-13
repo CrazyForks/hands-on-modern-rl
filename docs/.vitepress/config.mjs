@@ -1588,7 +1588,7 @@ const enSidebar = {
         },
         {
           text: 'Brief History of RL',
-          link: '/en/preface/brief-history'
+          link: '/en/preface/brief-history/'
         },
         {
           text: 'Environment Setup',
@@ -1613,7 +1613,8 @@ const enSidebar = {
               link: '/en/chapter01_cartpole/metrics'
             },
             {
-              text: '1.3 Hands-on: PPO Training Visualization'
+              text: '1.3 Hands-on: PPO Training Visualization',
+              link: '/en/chapter01_cartpole/training'
             }
           ]
         },
@@ -1630,7 +1631,8 @@ const enSidebar = {
               link: '/en/chapter03_mdp/mdp'
             },
             {
-              text: '2.3 Policy, Value and Return'
+              text: '2.3 Policy, Value and Return',
+              link: '/en/chapter03_mdp/policy-value'
             },
             {
               text: '2.4 Discounting, Trajectories and POMDPs',
@@ -1651,7 +1653,8 @@ const enSidebar = {
               link: '/en/chapter03_mdp/value-q'
             },
             {
-              text: '3.3 Hands-on: Value Function Experiments'
+              text: '3.3 Hands-on: Value Function Experiments',
+              link: '/en/chapter03_mdp/value-experiment'
             }
           ]
         },
@@ -1796,16 +1799,20 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '9.1 Deterministic Policy Gradients and DDPG'
+              text: '9.1 Deterministic Policy Gradients and DDPG',
+              link: '/en/chapter11_continuous_control/intro'
             },
             {
-              text: '9.2 TD3 and SAC'
+              text: '9.2 TD3 and SAC',
+              link: '/en/chapter11_continuous_control/td3-sac'
             },
             {
-              text: '9.3 Model-Based RL'
+              text: '9.3 Model-Based RL',
+              link: '/en/chapter11_continuous_control/model-based'
             },
             {
-              text: '9.4 Search and World Models'
+              text: '9.4 Search and World Models',
+              link: '/en/chapter11_continuous_control/search-world-models'
             }
           ]
         }
@@ -1820,13 +1827,16 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '10.1 Offline Data and Distribution Shift'
+              text: '10.1 Offline Data and Distribution Shift',
+              link: '/en/chapter12_offline_rl/intro'
             },
             {
-              text: '10.2 Sequence Modeling for Offline RL'
+              text: '10.2 Sequence Modeling for Offline RL',
+              link: '/en/chapter12_offline_rl/sequence-modeling'
             },
             {
-              text: '10.3 Offline RL and Preference Data'
+              text: '10.3 Offline RL and Preference Data',
+              link: '/en/chapter12_offline_rl/experiments'
             }
           ]
         },
@@ -1835,13 +1845,16 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '11.1 Behavioral Cloning and Interactive Imitation'
+              text: '11.1 Behavioral Cloning and Interactive Imitation',
+              link: '/en/chapter13_imitation_meta_rl/bc-dagger'
             },
             {
-              text: '11.2 Inverse RL and GAIL'
+              text: '11.2 Inverse RL and GAIL',
+              link: '/en/chapter13_imitation_meta_rl/irl-gail'
             },
             {
-              text: '11.3 Meta-RL and In-Context Adaptation'
+              text: '11.3 Meta-RL and In-Context Adaptation',
+              link: '/en/chapter13_imitation_meta_rl/meta-rl'
             }
           ]
         },
@@ -1850,13 +1863,16 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '12.1 Intrinsic Motivation and Exploration'
+              text: '12.1 Intrinsic Motivation and Exploration',
+              link: '/en/chapter14_exploration_marl_hierarchical/intro'
             },
             {
-              text: '12.2 Multi-Agent Reinforcement Learning'
+              text: '12.2 Multi-Agent Reinforcement Learning',
+              link: '/en/chapter14_exploration_marl_hierarchical/marl'
             },
             {
-              text: '12.3 Hierarchical RL and World Models'
+              text: '12.3 Hierarchical RL and World Models',
+              link: '/en/chapter14_exploration_marl_hierarchical/hierarchical'
             }
           ]
         }
@@ -1879,7 +1895,8 @@ const enSidebar = {
               link: '/en/chapter15_rlhf/imitation-learning-pipeline'
             },
             {
-              text: '13.3 AI Feedback and Safety Principles'
+              text: '13.3 AI Feedback and Safety Principles',
+              link: '/en/chapter21_cai_rlvr/hhh-practice'
             },
             {
               text: '13.4 Reinforcement Learning Fine-Tuning',
@@ -1938,10 +1955,12 @@ const enSidebar = {
               link: '/en/chapter18_grpo/rlvr'
             },
             {
-              text: '15.4 GRPO Improvements'
+              text: '15.4 GRPO Improvements',
+              link: '/en/chapter18_grpo/grpo-family'
             },
             {
-              text: '15.5 RL Environments and Verifiers'
+              text: '15.5 RL Environments and Verifiers',
+              link: '/en/chapter18_grpo/rl-environments'
             },
             {
               text: '15.6 Hands-on: GRPO for Financial Tool Calling',
@@ -1952,7 +1971,8 @@ const enSidebar = {
               link: '/en/chapter18_grpo/on-policy-distillation'
             },
             {
-              text: '15.8 Hands-on: Code Generation with veRL'
+              text: '15.8 Hands-on: Code Generation with veRL',
+              link: '/en/chapter18_grpo/verl-code-sandbox'
             }
           ]
         },
@@ -1961,22 +1981,28 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '16.1 From Language Models to Reasoning Models'
+              text: '16.1 From Language Models to Reasoning Models',
+              link: '/en/chapter19_reasoning/emergence-and-o1'
             },
             {
-              text: '16.2 R1-Zero Pure RL Reasoning'
+              text: '16.2 R1-Zero Pure RL Reasoning',
+              link: '/en/chapter19_reasoning/intro'
             },
             {
-              text: '16.3 Test-Time Scaling'
+              text: '16.3 Test-Time Scaling',
+              link: '/en/chapter19_reasoning/test-time-scaling'
             },
             {
-              text: '16.4 Hybrid Thinking and Budget Control'
+              text: '16.4 Hybrid Thinking and Budget Control',
+              link: '/en/chapter19_reasoning/hybrid-thinking'
             },
             {
-              text: '16.5 Adaptive Thinking'
+              text: '16.5 Adaptive Thinking',
+              link: '/en/chapter19_reasoning/adaptive-thinking'
             },
             {
-              text: '16.6 Reasoning Trace Presentation and Alignment'
+              text: '16.6 Reasoning Trace Presentation and Alignment',
+              link: '/en/chapter19_reasoning/cot-visibility-alignment'
             }
           ]
         },
@@ -1985,22 +2011,28 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '17.1 Outcome and Process Rewards'
+              text: '17.1 Outcome and Process Rewards',
+              link: '/en/chapter20_prm_search/outcome-vs-process'
             },
             {
-              text: '17.2 Discriminative PRMs'
+              text: '17.2 Discriminative PRMs',
+              link: '/en/chapter20_prm_search/discriminative-prm'
             },
             {
-              text: '17.3 Generative PRMs'
+              text: '17.3 Generative PRMs',
+              link: '/en/chapter20_prm_search/generative-prm'
             },
             {
-              text: '17.4 Formal Verifiers'
+              text: '17.4 Formal Verifiers',
+              link: '/en/chapter20_prm_search/formal-prm'
             },
             {
-              text: '17.5 Inference-Time Search'
+              text: '17.5 Inference-Time Search',
+              link: '/en/chapter20_prm_search/inference-time-search'
             },
             {
-              text: '17.6 Parallel Reasoning and Answer Aggregation'
+              text: '17.6 Parallel Reasoning and Answer Aggregation',
+              link: '/en/chapter20_prm_search/parallel-reasoning-and-summary'
             }
           ]
         },
@@ -2009,20 +2041,24 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '18.1 From Single-Machine Experiments to Industrial Training'
+              text: '18.1 From Single-Machine Experiments to Industrial Training',
+              link: '/en/chapter16_llm_rl_industrial/intro'
             },
             {
               text: '18.2 Industrial Post-Training Pipeline',
               link: '/en/chapter16_llm_rl_industrial/industrial-post-training'
             },
             {
-              text: '18.3 Training Stability'
+              text: '18.3 Training Stability',
+              link: '/en/chapter16_llm_rl_industrial/modern-industrial-practice'
             },
             {
-              text: '18.4 Distributed RL Training'
+              text: '18.4 Distributed RL Training',
+              link: '/en/chapter16_llm_rl_industrial/distributed-sync'
             },
             {
-              text: '18.5 Data Engineering for Large-Scale RL'
+              text: '18.5 Data Engineering for Large-Scale RL',
+              link: '/en/chapter16_llm_rl_industrial/data-engineering'
             }
           ]
         }
@@ -2038,13 +2074,15 @@ const enSidebar = {
           items: [
             {
               text: '19.1 Agentic RL Foundations',
-              link: '/en/chapter22_agentic/intro'
+              link: '/en/chapter22_agentic/overview'
             },
             {
-              text: '19.2 Multi-Turn Reinforcement Learning'
+              text: '19.2 Multi-Turn Reinforcement Learning',
+              link: '/en/chapter22_agentic/formulation'
             },
             {
-              text: '19.3 Trajectory Credit Assignment'
+              text: '19.3 Trajectory Credit Assignment',
+              link: '/en/chapter22_agentic/credit-assignment'
             },
             {
               text: '19.4 Tool Use and Trajectory Generation',
@@ -2059,7 +2097,8 @@ const enSidebar = {
               link: '/en/chapter22_agentic/industrial-practice'
             },
             {
-              text: '19.7 Multi-Agent Collaboration'
+              text: '19.7 Multi-Agent Collaboration',
+              link: '/en/chapter22_agentic/multi-agent-swarm'
             },
             {
               text: '19.8 Hands-on: Training a DeepCoder Agent with rLLM',
@@ -2080,13 +2119,16 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '20.1 SWE-RL Basics'
+              text: '20.1 SWE-RL Basics',
+              link: '/en/chapter23_rl_based_swe/swe-bench-and-rlvr'
             },
             {
-              text: '20.2 Code World Model and DeepSWE'
+              text: '20.2 Code World Model and DeepSWE',
+              link: '/en/chapter23_rl_based_swe/world-model-and-deep-swe'
             },
             {
-              text: '20.3 Self-Play SWE-RL'
+              text: '20.3 Self-Play SWE-RL',
+              link: '/en/chapter23_rl_based_swe/self-play-ssr-and-summary'
             }
           ]
         },
@@ -2095,10 +2137,12 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '21.1 Browser RL Harness'
+              text: '21.1 Browser RL Harness',
+              link: '/en/chapter24_deep_research/browser-rl-harness'
             },
             {
-              text: '21.2 Evaluation Benchmarks and Open-Source Projects'
+              text: '21.2 Evaluation Benchmarks and Open-Source Projects',
+              link: '/en/chapter24_deep_research/deep-research-eval'
             }
           ]
         },
@@ -2107,10 +2151,12 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '22.1 GUI Agent Training'
+              text: '22.1 GUI Agent Training',
+              link: '/en/chapter25_computer_use/training'
             },
             {
-              text: '22.2 Prompt Injection and Instruction Hierarchy'
+              text: '22.2 Prompt Injection and Instruction Hierarchy',
+              link: '/en/chapter25_computer_use/safety-swarm'
             }
           ]
         }
@@ -2129,7 +2175,8 @@ const enSidebar = {
               link: '/en/chapter26_vlm/vlm-challenges'
             },
             {
-              text: '23.2 Visual Reflection RL'
+              text: '23.2 Visual Reflection RL',
+              link: '/en/chapter26_vlm/qwen3-vl-reflection'
             },
             {
               text: '23.3 Hands-on: Multimodal GRPO',
@@ -2146,19 +2193,24 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '24.1 Audio Reward Design'
+              text: '24.1 Audio Reward Design',
+              link: '/en/chapter27_audio_rl/reward-design'
             },
             {
-              text: '24.2 Multimodal Audio Agents'
+              text: '24.2 Multimodal Audio Agents',
+              link: '/en/chapter27_audio_rl/future'
             },
             {
-              text: '24.3 VLA Models'
+              text: '24.3 VLA Models',
+              link: '/en/chapter28_vla/embodied-intelligence/'
             },
             {
-              text: '24.4 Visual Generation and DanceGRPO'
+              text: '24.4 Visual Generation and DanceGRPO',
+              link: '/en/chapter29_visual_generation/intro'
             },
             {
-              text: '24.5 Video RLHF and Physics-Aware Generation'
+              text: '24.5 Video RLHF and Physics-Aware Generation',
+              link: '/en/chapter29_visual_generation/video-generation-modern'
             }
           ]
         }
@@ -2173,19 +2225,24 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: '25.1 Classical Alignment Failure Modes'
+              text: '25.1 Classical Alignment Failure Modes',
+              link: '/en/chapter30_alignment_failures/classical-failures'
             },
             {
-              text: '25.2 RLVR False Gains'
+              text: '25.2 RLVR False Gains',
+              link: '/en/chapter30_alignment_failures/modern-incidents'
             },
             {
-              text: '25.3 Sleeper Agents and Alignment Faking'
+              text: '25.3 Sleeper Agents and Alignment Faking',
+              link: '/en/chapter30_alignment_failures/sleeper-and-faking'
             },
             {
-              text: '25.4 Defense Mechanisms'
+              text: '25.4 Defense Mechanisms',
+              link: '/en/chapter30_alignment_failures/scaling-and-defenses'
             },
             {
-              text: '25.5 RL Evaluation and Harnesses'
+              text: '25.5 RL Evaluation and Harnesses',
+              link: '/en/chapter30_alignment_failures/rl-evaluation'
             }
           ]
         },
@@ -2206,7 +2263,8 @@ const enSidebar = {
               link: '/en/chapter32_selfplay/llm-multi-agent-rl/'
             },
             {
-              text: '26.4 Evolutionary Search and Scientific Discovery'
+              text: '26.4 Evolutionary Search and Scientific Discovery',
+              link: '/en/chapter32_selfplay/alphaevolve/'
             }
           ]
         }
@@ -2222,7 +2280,7 @@ const enSidebar = {
           items: [
             {
               text: 'A.1 Training Debugging Guide',
-              link: '/en/appendix_industrial_training/intro'
+              link: '/en/appendix_industrial_training/training-debugging'
             },
             {
               text: 'A.2 Training Infrastructure',
@@ -2281,11 +2339,12 @@ const enSidebar = {
           collapsed: false,
           items: [
             {
-              text: 'C.1 Learning Resources and Project Roadmap',
-              link: '/en/appendix_game_projects/intro'
+              text: 'C.1 Paper Reading Guide',
+              link: '/en/appendix_paper_reading/intro'
             },
             {
-              text: 'C.2 GPU Hours Estimation Table'
+              text: 'C.2 GPU Hours Estimation Table',
+              link: '/en/appendix_gpu_hours/intro'
             },
             {
               text: 'C.3 Metrics Glossary',

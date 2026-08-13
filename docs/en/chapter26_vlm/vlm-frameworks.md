@@ -236,7 +236,7 @@ VLM RL produces "models that can understand images." But in real scenarios, user
 
 ### Special Challenges in Multimodal Agent RL
 
-Combining this chapter's VLM RL with [Chapter 19's](../chapter22_agentic/intro) Agent RL introduces three additional challenges:
+Combining this chapter's VLM RL with [Chapter 19's](../chapter22_agentic/overview) Agent RL introduces three additional challenges:
 
 **1. Error misattribution.** When a multimodal Agent produces wrong results, the error may come from visual understanding ("misread" a value in the chart) or tool calling ("made a mistake" passing wrong parameters). These two types of errors require completely different fixes — the former needs more VLM RL training (this chapter's methods), the latter needs more [Agent RL training](../chapter22_agentic/tool-use-and-trajectory). In practice, **staged verification** is needed: first check if visual understanding is correct, then check if tool calls are reasonable.
 
@@ -257,7 +257,7 @@ def multimodal_agent_reward(trajectory, task):
 
 **GUI Agents.** Training models through RL to understand UI elements (buttons, input fields) in screenshots and perform clicks, typing, scrolling, and other operations. Representative work includes CRAFT-GUI (desktop GUI operations) and MobileRL (mobile touch-screen operations). GUI Agents have a natural RLVR advantage — whether an operation succeeded is objectively verifiable.
 
-**Multimodal Deep Research.** [Tongyi DeepResearch](../chapter22_agentic/deep-research-agent) already supports multimodal input, analyzing charts and images in search results and extracting chart data from PDF papers. This is a frontier direction integrating VLM RL and Agent RL.
+**Multimodal Deep Research.** [Deep Research agents](../chapter24_deep_research/browser-rl-harness) can analyze charts and images in search results and extract data from PDF papers. This is a frontier direction integrating VLM RL and Agent RL.
 
 **Creative Agents.** Receive user requirements and reference images, then call image generation/editing tools to create. The challenge lies in the subjectivity of reward — "how good is a style transfer" has no objective standard and requires LLM-as-Judge evaluation.
 

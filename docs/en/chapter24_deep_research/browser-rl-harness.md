@@ -1,8 +1,8 @@
 ---
-title: 'Supplement: Deep Research Agent'
+title: '21.1 Browser RL Harness'
 ---
 
-# Supplement: Deep Research Agent
+# 21.1 Browser RL Harness
 
 Previous sections discussed multi-turn RL credit assignment, trajectory synthesis, and tool-use training for Web Agents and Code Agents. Now we look at an application that integrates all of these: the **Deep Research Agent**. Its goal is to make AI behave like a human researcher — autonomously conducting long-horizon, multi-step information search, analysis, and synthesis, ultimately outputting a trustworthy research report.
 
@@ -263,7 +263,7 @@ The two models work collaboratively through self-play — the searcher locates i
 
 ## Evaluation: What Counts as "Good" Deep Research?
 
-> This section focuses on evaluation dimensions specific to the Deep Research scenario. The broader Agentic evaluation system (including tool use, end-to-end tasks, comprehensive capability benchmark panoramas, and evaluation system construction) is in [the supplemental page on industrial practice, evaluation, and bad cases](./industrial-evaluation).
+> This section focuses on evaluation dimensions specific to the Deep Research scenario. The broader Agentic evaluation system (including tool use, end-to-end tasks, comprehensive capability benchmark panoramas, and evaluation system construction) is in [the supplemental page on industrial practice, evaluation, and bad cases](../chapter22_agentic/industrial-evaluation).
 
 A Deep Research Agent's "goodness" goes far beyond final answer correctness. An excellent Deep Research result must simultaneously satisfy four levels:
 
@@ -428,7 +428,7 @@ def report_reward(report, task, verified_facts=None):
     )
 ```
 
-During training, it is recommended to use **short-to-long curriculum learning** — first train on 500-word short reports, then gradually increase to 5,000-word complete reports. This is consistent with [Section 19.4](./tool-use-and-trajectory), where HardGen's[^hardgen] difficulty-adaptive approach.
+During training, it is recommended to use **short-to-long curriculum learning** — first train on 500-word short reports, then gradually increase to 5,000-word complete reports. This is consistent with the difficulty-adaptive approach discussed in [Section 19.4](../chapter22_agentic/tool-use-and-trajectory).
 
 ### Two-Stage RL for Deep Research
 
@@ -747,7 +747,7 @@ flowchart TD
 
 Search-returned tokens (the `<information>` part) are **masked out** when computing RL loss — only model-generated tokens participate in gradient updates. The reason is intuitive: search result quality is not controlled by the model, so the model should not be penalized for low-quality search engine results.
 
-This is consistent with the Agent Loop design principles discussed in [Section 19.1](./intro): **environment feedback doesn't change policy; only the policy's own decisions change policy.**
+This is consistent with the Agent Loop design principles discussed in [Section 19.1](../chapter22_agentic/overview): **environment feedback doesn't change policy; only the policy's own decisions change policy.**
 
 #### Reward Function
 
@@ -882,7 +882,7 @@ def rollout(model, question, retriever, max_turns=10):
 # - Tokens between <answer>...</answer> -> mask=1 (model output)
 ```
 
-This is consistent with the Agent Loop discussed in [Section 19.1](./intro): environment-returned observations should not affect policy gradients.
+This is consistent with the Agent Loop discussed in [Section 19.1](../chapter22_agentic/overview): environment-returned observations should not affect policy gradients.
 
 ### Reproduction Results Report Template
 
@@ -934,11 +934,222 @@ Search-R1 is the concrete implementation of all RL knowledge from previous chapt
 
 - **RLVR (Chapter 15)**: Search-R1's reward is purely "is the answer correct," requiring no Reward Model — this is exactly RLVR's core idea.
 - **GRPO (Chapter 15)**: Search-R1 defaults to GRPO, with group sampling + relative comparison replacing PPO's Critic network.
-- **Agent Loop ([chapter overview](./intro))**: Search-R1's Rollout is the concrete implementation of the Agent Loop — the model alternates between reasoning and tool calls.
-- **ORM vs PRM ([Section 19.3](./multi-turn-rl))**: Search-R1 only uses ORM (terminal reward). Atom-Searcher[^atom_searcher] and Web-Shepherd[^web_shepherd] add PRM (process rewards) on top.
+- **Agent Loop ([chapter overview](../chapter22_agentic/overview))**: Search-R1's Rollout is the concrete implementation of the Agent Loop — the model alternates between reasoning and tool calls.
+- **ORM vs PRM ([Section 19.3](../chapter22_agentic/credit-assignment))**: Search-R1 only uses ORM (terminal reward). Atom-Searcher[^atom_searcher] and Web-Shepherd[^web_shepherd] add PRM (process rewards) on top.
 - **Retrieved Token Masking**: Consistent with the idea of masking prompt tokens in PPO — only do gradient updates on policy-controllable parts.
 
 </details>
+
+The discussion so far has described the task, training signals, and representative systems. We now turn the browser itself into an RL environment. Two engineering choices determine whether the system is trainable: which browser operations become actions, and how the harness executes, records, and scores those actions.
+
+## The Browser as an RL Environment
+
+For a deep-research agent, the environment is a browser or a search API. From an RL perspective, it is a partially observable, long-horizon problem with sparse rewards:
+
+$$
+\mathcal{M}_{\text{browser}}=(\mathcal{S},\mathcal{A},P,R,\gamma,T).
+$$
+
+- $\mathcal{S}$ includes the current URL, visible text, DOM tree, scroll position, cookies, and session state.
+- $\mathcal{A}$ is the browser action space defined below.
+- $P$ is determined by the browser and the websites; the agent does not know it in advance.
+- $R$ is usually sparse: $r_T=\mathbb{1}[\text{answer is correct}]$ and $r_{t<T}=0$.
+- $\gamma$ is often set to $1$ for tasks that last 20–100 steps.
+- $T$ is the interaction budget, commonly 30–50 steps.
+
+Compared with the GUI MDP in [Chapter 22](../chapter25_computer_use/training), deep research usually exposes more abstract actions and shorter trajectories:
+
+| Dimension                 | Deep research                            | Computer use                           |
+| ------------------------- | ---------------------------------------- | -------------------------------------- |
+| Observation               | DOM text, extracted text, or screenshots | Primarily screenshots                  |
+| Action granularity        | Search, visit, click link, extract       | Pixel click, key press, scroll         |
+| Transition predictability | Relatively high                          | Lower because of animation and pop-ups |
+| Reward                    | Usually only at the final step           | Usually only at the final step         |
+| Typical horizon           | 20–50 steps                              | 50–500 steps                           |
+
+## Three Designs for the Action Space
+
+### Search API Abstraction
+
+The smallest design hides the real browser and gives the agent three operations:
+
+```python
+ACTIONS = {
+    "search": {"query": str},
+    "visit": {"url": str},
+    "answer": {"text": str},
+}
+```
+
+Search-R1 and R1-Searcher use this style. The action space is easy to learn, every observation can be clean Markdown, and the environment is inexpensive to run. It cannot reliably handle pages that require JavaScript, scrolling, forms, or pagination. It is therefore best suited to text-centered tasks such as open-domain question answering and paper retrieval.
+
+### A Real Browser with Playwright
+
+Playwright or Puppeteer can expose a more complete browser interface:
+
+```python
+ACTIONS = {
+    "goto": {"url": str},
+    "click": {"selector": str},
+    "fill": {"selector": str, "value": str},
+    "scroll": {"dx": int, "dy": int},
+    "back": {},
+    "extract_text": {"selector": str},
+    "screenshot": {},
+    "answer": {"text": str},
+}
+```
+
+This design can load dynamic pages, preserve sessions, and return screenshots to a vision-language agent. It also creates a larger action space, adds one to several seconds of latency per step, and depends on selectors that may break when a page changes. It is useful for product comparison, financial research, and other tasks that require interactive pages.
+
+### Set-of-Mark
+
+Set-of-Mark (SoM) labels every interactive element on the current page. The agent selects a label instead of constructing a CSS selector:
+
+```text
+Observation:
+  [1] search field
+  [2] next-page button
+  [3] first result
+  [4] second result
+
+Action: click(3)
+```
+
+The resulting action is compact and works with both screenshots and DOM-derived element lists. The harness must still detect, label, and track the elements correctly. A labeling error can send the agent to the wrong page even when the policy selected the intended object.
+
+## Five Modules in a Browser RL Harness
+
+The action representation can vary, but a training harness needs the same five modules.
+
+### 1. Environment Wrapper
+
+```python
+class BrowserEnv:
+    def __init__(self, mode="api"):
+        self.mode = mode
+        self.browser = None
+        self.history = []
+
+    def reset(self, query):
+        self.history = [{"role": "user", "content": query}]
+        return self._get_observation()
+
+    def step(self, action):
+        """Return next_observation, reward, done, and diagnostic info."""
+        # Parse and execute the action.
+        # Capture the next observation.
+        # Stop after an answer or when the step budget is exhausted.
+        # Compute a reward only when the trajectory ends.
+        ...
+```
+
+The wrapper must impose timeouts, convert browser failures into observations the model can react to, and preserve cookies and session state across steps. Without these controls, a hanging page or a failed selector can block an entire rollout batch.
+
+### 2. Action Parser and Validator
+
+The model emits tokens, whereas the browser expects a structured command. The parser forms the boundary between them:
+
+```python
+def parse_action(output, mode):
+    try:
+        if mode == "api":
+            return ApiAction.from_xml(output)
+        if mode == "playwright":
+            return PlaywrightAction.from_code(output)
+        if mode == "som":
+            return SomAction.from_text(output)
+    except ParseError as error:
+        return ErrorAction(f"Parse failed: {error}")
+```
+
+The parser should tolerate minor formatting variation and return an error observation that lets the agent retry. It also enforces an allowlist: commands outside the browser task must never reach a shell or operating system.
+
+### 3. Reward Verifier
+
+The verifier depends on the task type:
+
+```python
+class RewardVerifier:
+    def __call__(self, query, answer, task_type):
+        if task_type == "qa":
+            return self.qa_score(query, answer)
+        if task_type == "citation":
+            return self.citation_score(query, answer)
+        if task_type == "multi_doc":
+            return self.multi_document_score(query, answer)
+        if task_type == "browse_comp":
+            return self.exact_match_score(query, answer)
+        raise ValueError(f"Unknown task type: {task_type}")
+```
+
+Exact match works for short-answer benchmarks; citation and multi-document tasks need richer checks. When an LLM judges the answer, the evaluation should be calibrated against preferences for length and writing style. The verifier should also detect shortcuts such as copying a search snippet without checking its source.
+
+### 4. Progress Tracker
+
+A 30-step trajectory is difficult to debug from a final reward alone. A compact event log exposes the state transition at every step:
+
+```text
+[10:23:15] Step 1: search("2024 US GDP")
+[10:23:18] -> 10 results; first source: bea.gov
+[10:23:22] Step 2: visit("https://bea.gov/...")
+[10:23:25] -> page loaded; 15 KB text
+[10:23:29] Step 3: extract("main table")
+[10:23:32] -> 4 rows x 3 columns
+[10:23:36] Step 4: answer("...")
+[10:23:38] -> reward: 1.0
+```
+
+The log identifies where a failed trajectory diverged. Successful trajectories can also be filtered and reused as supervised training data.
+
+### 5. Parallel Rollout Engine
+
+A single browser trajectory may require 60–150 seconds. Rollouts must therefore execute concurrently:
+
+```python
+async def parallel_rollout(agent, prompts, num_parallel=256):
+    semaphore = asyncio.Semaphore(num_parallel)
+
+    async def rollout_one(prompt):
+        async with semaphore:
+            env = BrowserEnv(mode="playwright")
+            observation = await env.reset(prompt)
+            trajectory = []
+            for _ in range(MAX_STEPS):
+                action = await agent.act(observation)
+                next_observation, reward, done, info = await env.step(action)
+                trajectory.append((observation, action, reward))
+                if done:
+                    break
+                observation = next_observation
+            return trajectory
+
+    return await asyncio.gather(*(rollout_one(p) for p in prompts))
+```
+
+A production implementation reuses browser instances, isolates failures to one trajectory, and applies concurrency limits to the browser, network, and inference service independently.
+
+## Complete Training Loop
+
+The five modules fit into the usual GRPO pipeline:
+
+```text
+prompt groups
+    -> parallel browser rollouts
+       -> environment wrapper
+       -> action parser
+       -> progress tracker
+       -> reward verifier
+    -> trajectory buffer
+    -> group-relative advantages
+    -> clipped policy update
+```
+
+The policy update is the same group-normalized, clipped update introduced in [Chapter 15](../chapter18_grpo/grpo-practice-and-mechanism). What changes is the environment and the verifier. A financial tool-use experiment can therefore become a deep-research experiment by replacing those two modules while retaining the rollout buffer and optimizer.
+
+## Summary
+
+A browser RL harness has five essential parts: an environment wrapper, an action parser, a reward verifier, a progress tracker, and a parallel rollout engine. The wrapper determines whether interactions remain reproducible, and the verifier determines whether reward corresponds to genuine research progress. [Section 21.2](./deep-research-eval) turns to evaluation benchmarks for the resulting agents.
 
 ## Recommended Practical Tutorials
 
